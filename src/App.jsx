@@ -253,10 +253,32 @@ export default function App() {
     setScreen('battle-results')
   }
 
-  const handleDemoScan = useCallback(() => {
-    const demoImage = 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&h=600&fit=crop'
-    setUploadedImage(demoImage)
-    analyzeOutfit(demoImage)
+  const handleDemoScan = useCallback(async () => {
+    setScreen('analyzing')
+    setError(null)
+
+    try {
+      // Fetch demo image and convert to base64
+      const demoImageUrl = 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&h=600&fit=crop'
+      const response = await fetch(demoImageUrl)
+      const blob = await response.blob()
+
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64data = reader.result
+        setUploadedImage(base64data)
+        analyzeOutfit(base64data)
+      }
+      reader.onerror = () => {
+        setError('Failed to load demo image')
+        setScreen('error')
+      }
+      reader.readAsDataURL(blob)
+    } catch (err) {
+      console.error('Demo scan error:', err)
+      setError('Failed to load demo image. Please try uploading your own.')
+      setScreen('error')
+    }
   }, [analyzeOutfit])
 
   const resetApp = useCallback(() => {
