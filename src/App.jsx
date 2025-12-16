@@ -23,14 +23,10 @@ export default function App() {
   const [scores, setScores] = useState(null)
   const [roastMode, setRoastMode] = useState(false)
   const [error, setError] = useState(null)
-
-  // Countdown timer state
+  const [revealStage, setRevealStage] = useState(0) // For sequential reveal
   const [timeUntilReset, setTimeUntilReset] = useState('')
-
-  // Pro status
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
 
-  // Check scans remaining
   const [scansRemaining, setScansRemaining] = useState(() => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -42,9 +38,8 @@ export default function App() {
   })
 
   const fileInputRef = useRef(null)
-  const canvasRef = useRef(null)
 
-  // Check for Stripe payment success
+  // Stripe payment success
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('success') === 'true') {
@@ -74,6 +69,26 @@ export default function App() {
     }
   }, [scansRemaining, isPro])
 
+  // Sequential reveal animation
+  useEffect(() => {
+    if (screen === 'results' && scores) {
+      setRevealStage(0)
+      const timers = [
+        setTimeout(() => setRevealStage(1), 200),  // Verdict
+        setTimeout(() => setRevealStage(2), 600),  // Score
+        setTimeout(() => setRevealStage(3), 1000), // Aesthetic/Celeb
+        setTimeout(() => setRevealStage(4), 1300), // Tip
+        setTimeout(() => setRevealStage(5), 1600), // Breakdown
+        setTimeout(() => setRevealStage(6), 2000), // Share button
+      ]
+      // Vibrate on reveal if available
+      if (navigator.vibrate) {
+        setTimeout(() => navigator.vibrate(50), 600)
+      }
+      return () => timers.forEach(t => clearTimeout(t))
+    }
+  }, [screen, scores])
+
   // Mock scores for free users
   const generateMockScores = useCallback(() => {
     const roastVerdicts = [
@@ -84,31 +99,44 @@ export default function App() {
       "The dryer ate better fits than this",
       "Pinterest fail but make it fashion",
       "The fit that texts back 'k'",
-      "This outfit has a 2.3 GPA",
+      "This outfit has a 2.3 GPA 📉",
       "Sir this is a Wendy's 💀",
       "Main NPC energy tbh",
-      "Giving clearance rack energy",
-      "The algorithm buried this one"
+      "Giving clearance rack at 9pm",
+      "The algorithm buried this one",
+      "This fit ghosted the vibe check",
+      "Colors are screaming for help"
     ]
 
     const niceVerdicts = [
       "Main character energy ✨",
-      "Clean minimalist vibes fr",
-      "Understated fire 🔥",
-      "The fit is fitting",
-      "Effortlessly hard",
-      "Quiet confidence activated",
-      "Lowkey dripping",
-      "This hits different",
-      "Certified fresh fit",
+      "Clean minimalist ate that 🔥",
+      "Understated fire detected",
+      "The fit is fitting fr fr",
+      "Effortlessly hard 💅",
+      "Quiet confidence unlocked",
+      "Lowkey dripping rn",
+      "This hits different ✨",
+      "Certified fresh fit 🏆",
       "Immaculate vibes only",
-      "Serving looks fr fr",
-      "Chef's kiss coordination 👨‍🍳"
+      "Serving looks no crumbs",
+      "Chef's kiss coordination 👨‍🍳",
+      "The drip is dripping 💧",
+      "Outfit understood the assignment"
+    ]
+
+    const shareTips = [
+      "Challenge your bestie to beat this score 👀",
+      "Screenshot & post to your story 📸",
+      "Tag someone who needs a rating 💀",
+      "Drop this in the group chat rn",
+      "Your followers need to see this",
+      "This score goes crazy, share it!"
     ]
 
     const tips = roastMode
-      ? ["Start over. Please.", "Have you considered... not this?", "Less is more. Way less.", "Google 'how to dress'"]
-      : ["Cuff the jeans for a cleaner silhouette", "A chunky watch would elevate this", "Try layering with a light jacket", "White sneakers would make this pop"]
+      ? ["Start over. Please.", "Have you considered... literally anything else?", "Less is more. Way less.", "Google 'how to dress' and return"]
+      : ["Cuff the jeans for cleaner lines", "A chunky watch would elevate", "Try layering with a light jacket", "White sneakers would slap here"]
 
     const baseScore = roastMode ? Math.floor(Math.random() * 30) + 45 : Math.floor(Math.random() * 20) + 75
 
@@ -121,13 +149,13 @@ export default function App() {
         ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
         : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
       tip: tips[Math.floor(Math.random() * tips.length)],
+      shareTip: shareTips[Math.floor(Math.random() * shareTips.length)],
       aesthetic: AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)],
       celebMatch: CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)],
       roastMode
     }
   }, [roastMode])
 
-  // Increment scan count
   const incrementScanCount = () => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -140,12 +168,10 @@ export default function App() {
     setScansRemaining(Math.max(0, 1 - count))
   }
 
-  // Analyze outfit
   const analyzeOutfit = useCallback(async (imageData) => {
     setScreen('analyzing')
     setError(null)
 
-    // Free users get mock scores (no API cost)
     if (!isPro) {
       await new Promise(resolve => setTimeout(resolve, 2500 + Math.random() * 1500))
       const mockScores = generateMockScores()
@@ -155,7 +181,6 @@ export default function App() {
       return
     }
 
-    // Pro users get real AI
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -172,17 +197,16 @@ export default function App() {
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
-      setError('AI is getting dressed... try again!')
+      setError("AI's getting dressed... try again!")
       setScreen('error')
     }
   }, [roastMode, isPro, generateMockScores])
 
-  // Handle file upload
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        setError('Image too large. Please use an image under 10MB.')
+        setError('Image too large. Please use under 10MB.')
         setScreen('error')
         return
       }
@@ -202,81 +226,102 @@ export default function App() {
     canvas.width = 1080
     canvas.height = 1920
 
-    // Background gradient
+    // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
     gradient.addColorStop(0, '#0a0a0f')
-    gradient.addColorStop(0.5, '#1a1a2e')
+    gradient.addColorStop(0.4, '#1a1a2e')
     gradient.addColorStop(1, '#0a0a0f')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, 1080, 1920)
 
-    // Load and draw user image
+    // Glow effect behind card
+    const glowColor = scores.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'
+    ctx.shadowColor = glowColor
+    ctx.shadowBlur = 100
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'
+    ctx.beginPath()
+    ctx.roundRect(90, 200, 900, 1400, 40)
+    ctx.fill()
+    ctx.shadowBlur = 0
+
+    // Glassmorphism card
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'
+    ctx.beginPath()
+    ctx.roundRect(90, 200, 900, 1400, 40)
+    ctx.fill()
+
+    // Border glow
+    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'
+    ctx.lineWidth = 3
+    ctx.stroke()
+
+    // Load user image
     const img = new Image()
     img.crossOrigin = 'anonymous'
-
     await new Promise((resolve) => {
       img.onload = resolve
       img.src = uploadedImage
     })
 
-    // Draw image in center (cropped to fit)
-    const imgSize = 600
+    // Draw photo with rounded corners
+    const imgSize = 500
     const imgX = (1080 - imgSize) / 2
-    const imgY = 300
+    const imgY = 280
 
-    // Rounded rectangle clip for image
     ctx.save()
     ctx.beginPath()
-    ctx.roundRect(imgX, imgY, imgSize, imgSize, 30)
+    ctx.roundRect(imgX, imgY, imgSize, imgSize * 1.3, 24)
     ctx.clip()
 
-    // Calculate crop to maintain aspect ratio
-    const scale = Math.max(imgSize / img.width, imgSize / img.height)
+    const scale = Math.max(imgSize / img.width, (imgSize * 1.3) / img.height)
     const scaledW = img.width * scale
     const scaledH = img.height * scale
     const offsetX = imgX + (imgSize - scaledW) / 2
-    const offsetY = imgY + (imgSize - scaledH) / 2
+    const offsetY = imgY + (imgSize * 1.3 - scaledH) / 2
     ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH)
     ctx.restore()
 
-    // Score circle
+    // Score circle with glow
     const scoreColor = scores.overall >= 80 ? '#00ff88' : scores.overall >= 60 ? '#00d4ff' : '#ff4444'
+    ctx.shadowColor = scoreColor
+    ctx.shadowBlur = 30
     ctx.beginPath()
-    ctx.arc(540, 1050, 100, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.5)'
+    ctx.arc(540, 1050, 90, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0,0,0,0.7)'
     ctx.fill()
     ctx.strokeStyle = scoreColor
-    ctx.lineWidth = 8
+    ctx.lineWidth = 6
     ctx.stroke()
+    ctx.shadowBlur = 0
 
-    // Score text
+    // Score number
     ctx.fillStyle = scoreColor
-    ctx.font = 'bold 72px SF Pro Display, -apple-system, sans-serif'
+    ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText(scores.overall, 540, 1070)
 
     // Verdict
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 48px SF Pro Display, -apple-system, sans-serif'
-    ctx.fillText(scores.verdict, 540, 1220)
+    ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(scores.verdict, 540, 1200)
 
-    // Aesthetic + Celeb
+    // Aesthetic + Celeb tags
     ctx.fillStyle = 'rgba(255,255,255,0.7)'
-    ctx.font = '32px SF Pro Display, -apple-system, sans-serif'
-    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1300)
+    ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1270)
 
     // Hashtag
-    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateGlowUp'
+    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateSlay'
     ctx.fillStyle = scores.roastMode ? '#ff4444' : '#00d4ff'
-    ctx.font = 'bold 36px SF Pro Display, -apple-system, sans-serif'
-    ctx.fillText(hashtag, 540, 1450)
+    ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(hashtag, 540, 1420)
 
     // Branding
     ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.font = '28px SF Pro Display, -apple-system, sans-serif'
-    ctx.fillText('Rated by FitRate AI • fitrate.app', 540, 1800)
+    ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText('Rated by FitRate AI • fitrate.app', 540, 1520)
 
-    // Convert to blob and share
+    // Convert and share
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
 
@@ -288,172 +333,215 @@ export default function App() {
             text: `${scores.verdict} ${hashtag}`
           })
         } catch (err) {
-          // Fallback: download
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = 'fitrate-score.png'
-          a.click()
+          downloadImage(blob)
         }
       } else {
-        // Fallback: download
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'fitrate-score.png'
-        a.click()
+        downloadImage(blob)
       }
     }, 'image/png')
   }, [uploadedImage, scores])
 
-  // Reset app
+  const downloadImage = (blob) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'fitrate-score.png'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const resetApp = useCallback(() => {
     setScreen('home')
     setUploadedImage(null)
     setScores(null)
     setError(null)
+    setRevealStage(0)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [])
 
-  // Score color helper
   const getScoreColor = (score) => {
     if (score >= 80) return '#00ff88'
     if (score >= 60) return '#00d4ff'
     return '#ff4444'
   }
 
-  // ============================================
-  // SCREENS
-  // ============================================
+  // Accent colors based on mode
+  const accent = roastMode ? '#ff4444' : '#00d4ff'
+  const accentGlow = roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
 
-  // HOME SCREEN - Ultra Simple
+  // ============================================
+  // HOME SCREEN
+  // ============================================
   if (screen === 'home') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 40%, #1a1a2e 60%, #0a0a0f 100%)',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
+        {/* Animated background orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute w-96 h-96 rounded-full opacity-30" style={{
+            background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
+            top: '10%', left: '-20%',
+            animation: 'float 8s ease-in-out infinite'
+          }} />
+          <div className="absolute w-80 h-80 rounded-full opacity-20" style={{
+            background: 'radial-gradient(circle, rgba(255,0,128,0.3) 0%, transparent 70%)',
+            bottom: '20%', right: '-15%',
+            animation: 'float 10s ease-in-out infinite reverse'
+          }} />
+        </div>
+
         {/* Hidden file input */}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          className="hidden"
-        />
+        <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
         {/* Pro Badge */}
         {isPro && (
-          <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full" style={{
-            background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,255,136,0.2))',
-            border: '1px solid rgba(0,255,136,0.4)'
+          <div className="absolute top-6 right-6 px-4 py-2 rounded-full" style={{
+            background: 'rgba(0,255,136,0.1)',
+            border: '1px solid rgba(0,255,136,0.3)',
+            backdropFilter: 'blur(10px)'
           }}>
-            <span className="text-xs font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
+            <span className="text-sm font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
           </div>
         )}
 
         {/* Logo */}
-        <h1 className="text-5xl font-extrabold mb-16" style={{
-          letterSpacing: '-2px',
-          background: roastMode
-            ? 'linear-gradient(135deg, #fff 0%, #ff4444 100%)'
-            : 'linear-gradient(135deg, #fff 0%, #00d4ff 100%)',
+        <h1 className="text-6xl font-black mb-4 tracking-tight" style={{
+          background: `linear-gradient(135deg, #fff 0%, ${accent} 100%)`,
           WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          WebkitTextFillColor: 'transparent',
+          textShadow: `0 0 80px ${accentGlow}`
         }}>FITRATE</h1>
 
-        {/* Main Button */}
+        <p className="text-sm mb-16 tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          AI OUTFIT RATING
+        </p>
+
+        {/* Main Button - Glassmorphism */}
         <button
           onClick={() => scansRemaining > 0 || isPro ? fileInputRef.current?.click() : null}
           disabled={scansRemaining === 0 && !isPro}
-          className="w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="relative w-56 h-56 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed group"
           style={{
-            background: roastMode
-              ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)'
-              : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
-            boxShadow: roastMode
-              ? '0 0 80px rgba(255,68,68,0.5)'
-              : '0 0 80px rgba(0,212,255,0.5)'
+            background: `linear-gradient(135deg, ${roastMode ? '#ff4444' : '#00d4ff'}33 0%, ${roastMode ? '#cc0000' : '#0099cc'}33 100%)`,
+            border: `2px solid ${roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'}`,
+            backdropFilter: 'blur(20px)',
+            boxShadow: `0 0 60px ${accentGlow}, inset 0 0 60px rgba(255,255,255,0.05)`
           }}
         >
-          <span className="text-6xl mb-3">{roastMode ? '💀' : '📸'}</span>
-          <span className="text-white text-xl font-bold tracking-wide">
+          {/* Inner glow ring */}
+          <div className="absolute inset-3 rounded-full transition-all duration-300 group-hover:scale-105" style={{
+            background: `linear-gradient(135deg, ${accent} 0%, ${roastMode ? '#ff0080' : '#00ff88'} 100%)`,
+            boxShadow: `0 0 40px ${accentGlow}`
+          }} />
+
+          {/* Icon */}
+          <span className="relative text-6xl mb-2 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+            {roastMode ? '💀' : '📸'}
+          </span>
+          <span className="relative text-white text-lg font-bold tracking-wider">
             {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
           </span>
         </button>
 
-        {/* Mode Toggle */}
+        {/* Mode Toggle - Glassmorphism pill */}
         <button
           onClick={() => setRoastMode(!roastMode)}
-          className="mt-8 px-6 py-3 rounded-full transition-all duration-300"
+          className="mt-10 px-8 py-4 rounded-full transition-all duration-500"
           style={{
-            background: roastMode ? 'rgba(255,68,68,0.2)' : 'rgba(255,255,255,0.05)',
-            border: roastMode ? '1px solid rgba(255,68,68,0.4)' : '1px solid rgba(255,255,255,0.1)'
+            background: roastMode ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.1)'}`,
+            backdropFilter: 'blur(10px)'
           }}
         >
-          <span className="text-sm font-semibold" style={{ color: roastMode ? '#ff4444' : 'rgba(255,255,255,0.6)' }}>
-            {roastMode ? '🔥 Roast Mode' : '😊 Nice Mode'}
+          <span className="text-base font-semibold" style={{ color: roastMode ? '#ff4444' : 'rgba(255,255,255,0.6)' }}>
+            {roastMode ? '🔥 Roast Mode' : '✨ Nice Mode'}
           </span>
         </button>
 
         {/* Scan Status */}
-        <div className="absolute bottom-8 text-center">
+        <div className="absolute bottom-10 text-center">
           {scansRemaining > 0 || isPro ? (
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {isPro ? '⚡ Unlimited AI scans' : '1 free rate per day • Unlimited with FitPass'}
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              {isPro ? '⚡ Unlimited AI ratings' : '1 free rate per day • Unlimited with FitPass'}
             </p>
           ) : (
-            <div>
-              <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                Next free rate in {timeUntilReset}
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                Next free rate in <span style={{ color: accent }}>{timeUntilReset}</span>
               </p>
               <a
                 href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-                className="text-xs font-bold"
-                style={{ color: '#00d4ff' }}
+                className="text-sm font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
+                style={{
+                  color: '#00d4ff',
+                  background: 'rgba(0,212,255,0.1)',
+                  border: '1px solid rgba(0,212,255,0.3)'
+                }}
               >
                 Get unlimited →
               </a>
             </div>
           )}
         </div>
+
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+          }
+        `}</style>
       </div>
     )
   }
 
+  // ============================================
   // ANALYZING SCREEN
+  // ============================================
   if (screen === 'analyzing') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        <div className="w-48 h-64 rounded-2xl overflow-hidden mb-8 relative" style={{
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-        }}>
-          <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{
-            background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 50%)'
-          }} />
-          {/* Scan line animation */}
-          <div className="absolute left-0 right-0 h-1" style={{
-            background: roastMode
-              ? 'linear-gradient(90deg, transparent, #ff4444, transparent)'
-              : 'linear-gradient(90deg, transparent, #00d4ff, transparent)',
-            boxShadow: roastMode ? '0 0 20px #ff4444' : '0 0 20px #00d4ff',
+        {/* Photo with scanning effect */}
+        <div className="relative mb-10">
+          <div className="w-52 h-72 rounded-3xl overflow-hidden" style={{
+            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 40px ${accentGlow}`,
+            border: `2px solid ${accent}33`
+          }}>
+            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+          </div>
+
+          {/* Scan line */}
+          <div className="absolute left-0 right-0 h-1 rounded-full" style={{
+            background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+            boxShadow: `0 0 20px ${accent}`,
             animation: 'scanLine 1.5s ease-in-out infinite'
           }} />
+
+          {/* Corner accents */}
+          <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 rounded-tl-lg" style={{ borderColor: accent }} />
+          <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 rounded-tr-lg" style={{ borderColor: accent }} />
+          <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 rounded-bl-lg" style={{ borderColor: accent }} />
+          <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 rounded-br-lg" style={{ borderColor: accent }} />
         </div>
 
-        <p className="text-white text-lg font-semibold mb-4">
+        {/* Loading text */}
+        <p className="text-xl font-semibold text-white mb-4" style={{
+          textShadow: `0 0 20px ${accentGlow}`,
+          animation: 'pulse 2s ease-in-out infinite'
+        }}>
           {roastMode ? 'Finding the violations...' : 'AI judging your drip...'}
         </p>
 
-        <div className="flex gap-2">
+        {/* Dots */}
+        <div className="flex gap-3">
           {[0, 1, 2].map((i) => (
             <div key={i} className="w-3 h-3 rounded-full" style={{
-              background: roastMode ? '#ff4444' : '#00d4ff',
+              background: accent,
+              boxShadow: `0 0 10px ${accent}`,
               animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s`
             }} />
           ))}
@@ -462,147 +550,201 @@ export default function App() {
         <style>{`
           @keyframes scanLine { 0% { top: 0; } 50% { top: calc(100% - 4px); } 100% { top: 0; } }
           @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         `}</style>
       </div>
     )
   }
 
-  // RESULTS SCREEN - Viral Share Focus
+  // ============================================
+  // RESULTS SCREEN - Sequential Reveal
+  // ============================================
   if (screen === 'results' && scores) {
     const scoreColor = getScoreColor(scores.overall)
+    const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
 
     return (
-      <div className="min-h-screen flex flex-col items-center p-6 pt-12 pb-24" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+      <div className="min-h-screen flex flex-col items-center p-6 pt-10 pb-24 overflow-hidden" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 30%, #1a1a2e 60%, #0a0a0f 100%)',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        {/* Verdict - Big & Bold */}
-        <p className="text-2xl font-bold text-white text-center mb-6 px-4" style={{
-          textShadow: '0 2px 20px rgba(0,0,0,0.5)'
-        }}>
-          {scores.verdict}
-        </p>
+        {/* Verdict - Huge & Bold */}
+        <div className={`transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <p className="text-2xl md:text-3xl font-black text-white text-center mb-6 px-4" style={{
+            textShadow: `0 0 30px ${modeAccent}66`
+          }}>
+            {scores.verdict}
+          </p>
+        </div>
 
         {/* Photo + Score */}
-        <div className="relative mb-6">
-          <div className="w-56 h-72 rounded-2xl overflow-hidden" style={{
+        <div className={`relative mb-4 transition-all duration-700 delay-200 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          {/* Glassmorphism card */}
+          <div className="p-3 rounded-3xl" style={{
+            background: 'rgba(255,255,255,0.05)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
             boxShadow: `0 20px 60px ${scoreColor}33`
           }}>
-            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+            <div className="w-52 h-68 rounded-2xl overflow-hidden">
+              <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" style={{ height: '260px' }} />
+            </div>
           </div>
 
           {/* Score Badge */}
-          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full flex items-center justify-center" style={{
-            background: '#0a0a0f',
-            border: `4px solid ${scoreColor}`,
-            boxShadow: `0 0 30px ${scoreColor}66`
-          }}>
-            <span className="text-2xl font-extrabold" style={{ color: scoreColor }}>
-              {scores.overall}
-            </span>
+          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+            <div className="relative w-24 h-24 rounded-full flex items-center justify-center" style={{
+              background: 'rgba(10,10,15,0.9)',
+              border: `4px solid ${scoreColor}`,
+              boxShadow: `0 0 40px ${scoreColor}66, inset 0 0 20px ${scoreColor}22`
+            }}>
+              {/* Animated ring */}
+              <svg className="absolute inset-0 w-full h-full -rotate-90">
+                <circle
+                  cx="48" cy="48" r="44"
+                  fill="none"
+                  stroke={scoreColor}
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray={`${scores.overall * 2.76} 276`}
+                  style={{
+                    transition: 'stroke-dasharray 1s ease-out',
+                    filter: `drop-shadow(0 0 10px ${scoreColor})`
+                  }}
+                />
+              </svg>
+              <span className="text-3xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
+            </div>
           </div>
         </div>
 
         {/* Aesthetic + Celeb */}
-        <p className="text-sm mt-4 mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          {scores.aesthetic} • {scores.celebMatch}
-        </p>
-
-        {/* Tip */}
-        <div className="w-full max-w-sm p-4 rounded-xl mb-6" style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <p className="text-xs font-bold mb-1" style={{ color: roastMode ? '#ff4444' : '#00d4ff' }}>
-            {roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
-          </p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{scores.tip}</p>
+        <div className={`mt-10 mb-4 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="flex items-center gap-2 px-6 py-3 rounded-full" style={{
+            background: 'rgba(255,255,255,0.05)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}>
+            <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              {scores.aesthetic} • {scores.celebMatch}
+            </span>
+          </div>
         </div>
 
-        {/* Score Breakdown - Compact */}
-        <div className="w-full max-w-sm flex gap-2 mb-8">
+        {/* Tip */}
+        <div className={`w-full max-w-sm transition-all duration-700 delay-400 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="p-4 rounded-2xl" style={{
+            background: 'rgba(255,255,255,0.03)',
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${modeAccent}33`
+          }}>
+            <p className="text-xs font-bold mb-1" style={{ color: modeAccent }}>
+              {scores.roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
+            </p>
+            <p className="text-sm text-white/80">{scores.tip}</p>
+            {scores.shareTip && (
+              <p className="text-xs mt-2 italic" style={{ color: 'rgba(255,255,255,0.4)' }}>{scores.shareTip}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Score Breakdown */}
+        <div className={`w-full max-w-sm flex gap-2 mt-4 mb-6 transition-all duration-700 delay-500 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {[
             { label: 'Color', score: scores.color },
             { label: 'Fit', score: scores.fit },
             { label: 'Style', score: scores.style }
           ].map((item) => (
             <div key={item.label} className="flex-1 p-3 rounded-xl text-center" style={{
-              background: 'rgba(255,255,255,0.03)'
+              background: 'rgba(255,255,255,0.03)',
+              backdropFilter: 'blur(10px)'
             }}>
               <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
-              <p className="text-lg font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
+              <p className="text-xl font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
             </div>
           ))}
         </div>
 
-        {/* SHARE BUTTON - Primary CTA */}
-        <button
-          onClick={generateShareCard}
-          className="w-full max-w-sm py-4 rounded-2xl text-white text-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: roastMode
-              ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)'
-              : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
-            boxShadow: roastMode
-              ? '0 4px 30px rgba(255,68,68,0.4)'
-              : '0 4px 30px rgba(0,212,255,0.4)'
-          }}
-        >
-          📤 Share Your Rate
-        </button>
+        {/* SHARE BUTTON - Pulsing glow */}
+        <div className={`w-full max-w-sm transition-all duration-700 delay-600 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          <button
+            onClick={generateShareCard}
+            className="w-full py-5 rounded-2xl text-white text-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: `linear-gradient(135deg, ${modeAccent} 0%, ${scores.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
+              boxShadow: `0 4px 30px ${modeAccent}66`,
+              animation: 'pulseGlow 2s ease-in-out infinite'
+            }}
+          >
+            📤 Share Your Rate
+          </button>
+        </div>
 
         {/* Rate Again */}
         <button
           onClick={resetApp}
-          className="mt-4 text-sm font-semibold"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
+          className="mt-4 text-sm font-medium transition-all hover:opacity-80"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
         >
           ← Rate Another Fit
         </button>
 
-        {/* Confetti for high scores */}
+        {/* Confetti for 90+ */}
         {scores.overall >= 90 && (
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
-            {[...Array(30)].map((_, i) => (
+            {[...Array(40)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-3 h-3"
+                className="absolute"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: '-20px',
-                  background: ['#ff4444', '#00d4ff', '#00ff88', '#ffd000'][Math.floor(Math.random() * 4)],
-                  borderRadius: Math.random() > 0.5 ? '50%' : '0',
-                  animation: `confetti ${2 + Math.random() * 2}s linear forwards`,
-                  animationDelay: `${Math.random() * 0.5}s`
+                  width: `${8 + Math.random() * 8}px`,
+                  height: `${8 + Math.random() * 8}px`,
+                  background: ['#ff4444', '#00d4ff', '#00ff88', '#ffd000', '#ff0080'][Math.floor(Math.random() * 5)],
+                  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+                  animation: `confetti ${2.5 + Math.random() * 2}s linear forwards`,
+                  animationDelay: `${Math.random() * 0.8}s`
                 }}
               />
             ))}
-            <style>{`
-              @keyframes confetti {
-                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-              }
-            `}</style>
           </div>
         )}
+
+        <style>{`
+          @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 30px ${modeAccent}66; }
+            50% { box-shadow: 0 4px 50px ${modeAccent}99; }
+          }
+          @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+        `}</style>
       </div>
     )
   }
 
+  // ============================================
   // ERROR SCREEN
+  // ============================================
   if (screen === 'error') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        <span className="text-6xl mb-6">👗</span>
-        <p className="text-white text-lg font-semibold mb-2">{error || "Something went wrong"}</p>
+        <span className="text-7xl mb-6">👗</span>
+        <p className="text-xl font-semibold text-white mb-2">{error || "Something went wrong"}</p>
         <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Give it another shot</p>
         <button
           onClick={resetApp}
-          className="px-8 py-3 rounded-xl text-white font-semibold"
-          style={{ background: 'rgba(255,255,255,0.1)' }}
+          className="px-8 py-4 rounded-2xl text-white font-semibold transition-all hover:scale-105"
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}
         >
           Try Again
         </button>
@@ -610,36 +752,39 @@ export default function App() {
     )
   }
 
+  // ============================================
   // PRO WELCOME SCREEN
+  // ============================================
   if (screen === 'pro-welcome') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        <div className="text-6xl mb-6">🎉</div>
-        <h2 className="text-3xl font-bold text-white mb-2">Welcome to FitPass!</h2>
+        <div className="text-7xl mb-6">🎉</div>
+        <h2 className="text-4xl font-black text-white mb-3">Welcome to FitPass!</h2>
         <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
           Unlimited AI outfit ratings unlocked
         </p>
 
-        <div className="p-4 rounded-xl mb-8 text-center" style={{
+        <div className="p-6 rounded-2xl mb-8 text-center" style={{
           background: 'rgba(0,255,136,0.1)',
-          border: '1px solid rgba(0,255,136,0.3)'
+          border: '1px solid rgba(0,255,136,0.3)',
+          backdropFilter: 'blur(10px)'
         }}>
-          <p className="text-sm" style={{ color: '#00ff88' }}>
+          <p className="text-base" style={{ color: '#00ff88' }}>
             ✨ Unlimited scans<br />
             🤖 Real GPT-4 Vision AI<br />
-            🔥 No daily limits
+            🔥 No daily limits ever
           </p>
         </div>
 
         <button
           onClick={() => setScreen('home')}
-          className="px-8 py-4 rounded-xl text-white font-bold text-lg"
+          className="px-10 py-5 rounded-2xl text-white font-bold text-xl transition-all hover:scale-105"
           style={{
-            background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
-            boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+            boxShadow: '0 4px 30px rgba(0,212,255,0.4)'
           }}
         >
           Start Rating 🚀
@@ -648,6 +793,5 @@ export default function App() {
     )
   }
 
-  // Fallback
   return null
 }
