@@ -252,40 +252,58 @@ export default function App() {
     }
   }, [analyzeOutfit])
 
-  // Generate share card
+  // Generate viral share card
   const generateShareCard = useCallback(async () => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     canvas.width = 1080
     canvas.height = 1920
 
+    // Determine viral caption based on score and mode
+    const getViralCaption = () => {
+      if (scores.roastMode) {
+        if (scores.overall < 60) return "AI just humbled me 💀 Your turn?"
+        if (scores.overall < 75) return "AI roasted my outfit 🔥 Dare you to try"
+        return "Even in Roast Mode I'm serving 😏"
+      } else {
+        if (scores.overall >= 90) return `${scores.overall}/100 - Try to beat this 🏆`
+        if (scores.overall >= 80) return "AI says I ate ✨ What's your score?"
+        if (scores.overall >= 70) return "Not bad... Can you do better? 👀"
+        return "We all start somewhere 😅 Your turn!"
+      }
+    }
+
+    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateSlay'
+    const challengeHashtag = scores.overall >= 80 ? ' #FitRateChallenge' : ''
+    const viralCaption = getViralCaption()
+
     // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
     gradient.addColorStop(0, '#0a0a0f')
-    gradient.addColorStop(0.4, '#1a1a2e')
+    gradient.addColorStop(0.4, scores.roastMode ? '#2a1a1a' : '#1a1a2e')
     gradient.addColorStop(1, '#0a0a0f')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, 1080, 1920)
 
     // Glow effect behind card
-    const glowColor = scores.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'
+    const glowColor = scores.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
     ctx.shadowColor = glowColor
-    ctx.shadowBlur = 100
-    ctx.fillStyle = 'rgba(255,255,255,0.05)'
+    ctx.shadowBlur = 120
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'
     ctx.beginPath()
-    ctx.roundRect(90, 200, 900, 1400, 40)
+    ctx.roundRect(60, 120, 960, 1520, 48)
     ctx.fill()
     ctx.shadowBlur = 0
 
     // Glassmorphism card
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'
+    ctx.fillStyle = 'rgba(255,255,255,0.06)'
     ctx.beginPath()
-    ctx.roundRect(90, 200, 900, 1400, 40)
+    ctx.roundRect(60, 120, 960, 1520, 48)
     ctx.fill()
 
     // Border glow
-    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'
-    ctx.lineWidth = 3
+    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)'
+    ctx.lineWidth = 4
     ctx.stroke()
 
     // Load user image
@@ -293,94 +311,164 @@ export default function App() {
     img.crossOrigin = 'anonymous'
     await new Promise((resolve) => {
       img.onload = resolve
+      img.onerror = resolve
       img.src = uploadedImage
     })
 
     // Draw photo with rounded corners
-    const imgSize = 500
-    const imgX = (1080 - imgSize) / 2
-    const imgY = 280
+    const imgWidth = 580
+    const imgHeight = 720
+    const imgX = (1080 - imgWidth) / 2
+    const imgY = 180
 
     ctx.save()
     ctx.beginPath()
-    ctx.roundRect(imgX, imgY, imgSize, imgSize * 1.3, 24)
+    ctx.roundRect(imgX, imgY, imgWidth, imgHeight, 28)
     ctx.clip()
 
-    const scale = Math.max(imgSize / img.width, (imgSize * 1.3) / img.height)
+    const scale = Math.max(imgWidth / img.width, imgHeight / img.height)
     const scaledW = img.width * scale
     const scaledH = img.height * scale
-    const offsetX = imgX + (imgSize - scaledW) / 2
-    const offsetY = imgY + (imgSize * 1.3 - scaledH) / 2
+    const offsetX = imgX + (imgWidth - scaledW) / 2
+    const offsetY = imgY + (imgHeight - scaledH) / 2
     ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH)
     ctx.restore()
 
     // Score circle with glow
     const scoreColor = scores.overall >= 80 ? '#00ff88' : scores.overall >= 60 ? '#00d4ff' : '#ff4444'
     ctx.shadowColor = scoreColor
-    ctx.shadowBlur = 30
+    ctx.shadowBlur = 40
     ctx.beginPath()
-    ctx.arc(540, 1050, 90, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.7)'
+    ctx.arc(540, 980, 100, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0,0,0,0.8)'
     ctx.fill()
     ctx.strokeStyle = scoreColor
-    ctx.lineWidth = 6
+    ctx.lineWidth = 8
     ctx.stroke()
     ctx.shadowBlur = 0
 
-    // Score number
+    // Score number - BIG
     ctx.fillStyle = scoreColor
-    ctx.font = 'bold 64px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.font = 'bold 72px -apple-system, BlinkMacSystemFont, sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText(scores.overall, 540, 1070)
+    ctx.fillText(scores.overall, 540, 1000)
 
-    // Verdict
-    ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 44px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(scores.verdict, 540, 1200)
-
-    // Aesthetic + Celeb tags
-    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+    // "/100" below score
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
     ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1270)
+    ctx.fillText('/100', 540, 1040)
 
-    // Hashtag
-    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateSlay'
-    ctx.fillStyle = scores.roastMode ? '#ff4444' : '#00d4ff'
-    ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(hashtag, 540, 1420)
+    // Verdict - HUGE and punchy
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, sans-serif'
+    // Word wrap for long verdicts
+    const maxWidth = 900
+    const verdictLines = wrapText(ctx, scores.verdict, maxWidth)
+    verdictLines.forEach((line, i) => {
+      ctx.fillText(line, 540, 1140 + (i * 52))
+    })
 
-    // Branding
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('Rated by FitRate AI • fitrate.app', 540, 1520)
+    // Aesthetic + Celeb in pill style
+    ctx.fillStyle = 'rgba(255,255,255,0.1)'
+    ctx.beginPath()
+    ctx.roundRect(140, 1220, 800, 50, 25)
+    ctx.fill()
+    ctx.fillStyle = 'rgba(255,255,255,0.8)'
+    ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1255)
+
+    // Challenge text - THE VIRAL HOOK
+    ctx.fillStyle = scores.roastMode ? '#ff6666' : '#00d4ff'
+    ctx.font = 'bold 38px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(viralCaption, 540, 1350)
+
+    // Hashtags
+    ctx.fillStyle = scores.roastMode ? '#ff4444' : '#00ff88'
+    ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText(`${hashtag}${challengeHashtag}`, 540, 1420)
+
+    // Call to action box
+    ctx.fillStyle = scores.roastMode ? 'rgba(255,68,68,0.2)' : 'rgba(0,212,255,0.2)'
+    ctx.beginPath()
+    ctx.roundRect(180, 1480, 720, 100, 20)
+    ctx.fill()
+    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // CTA text
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText('Rate YOUR fit → fitrate.app', 540, 1545)
+
+    // Branding footer
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'
+    ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.fillText('AI-Powered by FitRate', 540, 1620)
+
+    // Generate share text based on context
+    const getShareText = () => {
+      if (scores.roastMode) {
+        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? fitrate.app ${hashtag}`
+        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: fitrate.app ${hashtag}`
+      } else {
+        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: fitrate.app ${hashtag} #FitRateChallenge`
+        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? fitrate.app ${hashtag}`
+        return `Just got rated by FitRate AI! Your turn 👀 fitrate.app ${hashtag}`
+      }
+    }
 
     // Convert and share
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
+      const shareText = getShareText()
 
       if (navigator.share && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({
             files: [file],
-            title: `I scored ${scores.overall}/100 on FitRate!`,
-            text: `${scores.verdict} ${hashtag}`
+            title: `FitRate: ${scores.overall}/100`,
+            text: shareText
           })
         } catch (err) {
-          downloadImage(blob)
+          downloadImage(blob, shareText)
         }
       } else {
-        downloadImage(blob)
+        downloadImage(blob, shareText)
       }
     }, 'image/png')
   }, [uploadedImage, scores])
 
-  const downloadImage = (blob) => {
+  // Helper: wrap text
+  const wrapText = (ctx, text, maxWidth) => {
+    const words = text.split(' ')
+    const lines = []
+    let currentLine = ''
+
+    words.forEach(word => {
+      const testLine = currentLine + (currentLine ? ' ' : '') + word
+      if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+        lines.push(currentLine)
+        currentLine = word
+      } else {
+        currentLine = testLine
+      }
+    })
+    if (currentLine) lines.push(currentLine)
+    return lines
+  }
+
+  const downloadImage = (blob, shareText) => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = 'fitrate-score.png'
     a.click()
     URL.revokeObjectURL(url)
+    // Copy caption to clipboard for desktop users
+    if (shareText && navigator.clipboard) {
+      navigator.clipboard.writeText(shareText)
+    }
   }
 
   const resetApp = useCallback(() => {
@@ -711,6 +799,13 @@ export default function App() {
           >
             📤 Share Your Rate
           </button>
+
+          {/* FOMO Nudge */}
+          <p className="text-center text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {scores.overall >= 80
+              ? "🔥 Challenge someone to beat your score!"
+              : "📸 Most users share their results"}
+          </p>
         </div>
 
         {/* Rate Again */}
