@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-api.up.railway.app/api/analyze'
+const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
 
 // Feature flags and modes
 const OCCASIONS = [
