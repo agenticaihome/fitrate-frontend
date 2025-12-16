@@ -497,7 +497,8 @@ export default function App() {
     ctx.fill()
     ctx.fillStyle = 'rgba(255,255,255,0.8)'
     ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1255)
+    const celebText = isPro ? scores.celebMatch : 'Celeb Match: [LOCKED] 🔒'
+    ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, 1255)
 
     // Challenge text - THE VIRAL HOOK
     ctx.fillStyle = scores.roastMode ? '#ff6666' : '#00d4ff'
@@ -869,9 +870,12 @@ export default function App() {
             border: '1px solid rgba(255,255,255,0.1)'
           }}>
             <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              {scores.aesthetic} • {scores.celebMatch}
+              {scores.aesthetic} • {isPro ? scores.celebMatch : <span style={{ color: '#ff4444' }}>Celeb Match Exec (Locked) 🔒</span>}
             </span>
           </div>
+          {!isPro && (
+            <p className="text-[10px] text-center mt-2 opacity-60">Unlock celebrity matches with Pro</p>
+          )}
         </div>
 
         {/* Tip */}
