@@ -265,41 +265,41 @@ export default function App() {
 
     const niceVerdicts = [
       "Main character energy ✨",
-      "Clean minimalist ate that 🔥",
+      "Clean and confident 🔥",
       "Understated fire detected",
-      "The fit is fitting fr fr",
-      "Effortlessly hard 💅",
+      "This fit just works",
+      "Effortless style 💅",
       "Quiet confidence unlocked",
-      "Lowkey dripping rn",
+      "Actually dripping",
       "This hits different ✨",
       "Certified fresh fit 🏆",
       "Immaculate vibes only",
-      "Serving looks no crumbs",
-      "Chef's kiss coordination 👨‍🍳",
-      "The drip is dripping 💧",
+      "Serving looks",
+      "The coordination is *chefs kiss*",
+      "The drip is real 💧",
       "Outfit understood the assignment",
-      "You woke up and chose fashion",
-      "The fit ate and left no crumbs",
-      "Giving 'that' friend energy",
-      "Effortless but make it serve",
-      "Pinterest board come to life",
-      "This is someone's mood board",
-      "The silhouette? *Chef's kiss*",
-      "Casual but make it couture",
-      "Absolutely nailed the vibe 🎯",
-      "This fit has main character rights"
+      "You chose fashion today",
+      "The fit ate",
+      "That friend everyone screenshots",
+      "Effortless but intentional",
+      "Pinterest would be proud",
+      "Straight off a mood board",
+      "The silhouette is perfect",
+      "Casual done right",
+      "Nailed it 🎯",
+      "Main character rights earned"
     ]
 
     const shareTips = [
-      "Challenge your bestie to beat this 👀",
-      "Screenshot & post to your story 📸",
-      "Tag someone who needs a rating 💀",
-      "Drop this in the group chat rn",
+      "Challenge a friend to beat this 👀",
+      "Post to your story 📸",
+      "Tag someone who needs a rating",
+      "Drop this in the group chat",
       "Your followers need to see this",
-      "This score goes crazy, share it!",
+      "This score goes crazy",
       "Bet you can't get higher 🔥",
-      "Send to someone with worse fits",
-      "Post before you chicken out 😏",
+      "Send to someone who thinks they dress better",
+      "Post it 😏",
       "Your friends need to try this"
     ]
 
@@ -540,18 +540,18 @@ export default function App() {
     // Determine viral caption based on score and mode
     const getViralCaption = () => {
       if (scores.roastMode) {
-        if (scores.overall < 60) return "AI just humbled me 💀 Your turn?"
-        if (scores.overall < 75) return "AI roasted my outfit 🔥 Dare you to try"
-        return "Even in Roast Mode I'm serving 😏"
+        if (scores.overall < 60) return "AI humbled me 💀 Your turn?"
+        if (scores.overall < 75) return "AI roasted my fit 🔥 Try it"
+        return "Survived Roast Mode 😏"
       } else {
-        if (scores.overall >= 90) return `${scores.overall}/100 - Try to beat this 🏆`
-        if (scores.overall >= 80) return "AI says I ate ✨ What's your score?"
-        if (scores.overall >= 70) return "Not bad... Can you do better? 👀"
-        return "We all start somewhere 😅 Your turn!"
+        if (scores.overall >= 90) return `${scores.overall}/100 — beat that 🏆`
+        if (scores.overall >= 80) return "AI approved ✨ What's yours?"
+        if (scores.overall >= 70) return "Not bad... can you do better? 👀"
+        return "Your turn 👀"
       }
     }
 
-    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateSlay'
+    const hashtag = '#RateMyFit'
     const challengeHashtag = scores.overall >= 80 ? ' #FitRateChallenge' : ''
     const viralCaption = getViralCaption()
 
@@ -689,12 +689,12 @@ export default function App() {
     const getShareText = () => {
       const baseUrl = 'https://fitrate.app'
       if (scores.roastMode) {
-        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? ${baseUrl}?ref=${userId} ${hashtag}`
-        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: ${baseUrl}?ref=${userId} ${hashtag}`
+        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? ${baseUrl}?ref=${userId} #RateMyFit`
+        return `Got roasted and still scored ${scores.overall} 🔥 ${baseUrl}?ref=${userId} #RateMyFit`
       } else {
-        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: ${baseUrl}?ref=${userId} ${hashtag} #FitRateChallenge`
-        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? ${baseUrl}?ref=${userId} ${hashtag}`
-        return `Just got rated by FitRate AI! Your turn 👀 ${baseUrl}?ref=${userId} ${hashtag}`
+        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: ${baseUrl}?ref=${userId} #RateMyFit #FitRateChallenge`
+        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? ${baseUrl}?ref=${userId} #RateMyFit`
+        return `Just got rated by FitRate AI. Your turn 👀 ${baseUrl}?ref=${userId} #RateMyFit`
       }
     }
 
