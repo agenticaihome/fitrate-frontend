@@ -1,18 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 
-// Build: 2025-12-16T05:04:00Z - API URL fixed
+// API endpoint
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
 
-// Feature flags and modes
-const OCCASIONS = [
-  { id: 'casual', emoji: '😎', label: 'Casual' },
-  { id: 'date', emoji: '💕', label: 'Date Night' },
-  { id: 'work', emoji: '💼', label: 'Work/Interview' },
-  { id: 'party', emoji: '🎉', label: 'Party/Club' },
-  { id: 'streetwear', emoji: '🔥', label: 'Streetwear' },
-  { id: 'formal', emoji: '🎩', label: 'Formal Event' },
-]
-
+// Aesthetics for mock scores
 const AESTHETICS = [
   'Clean Girl', 'Dark Academia', 'Quiet Luxury', 'Streetwear', 'Y2K',
   'Cottagecore', 'Minimalist', 'Coastal Grandmother', 'Grunge', 'Preppy',
@@ -23,33 +14,23 @@ const CELEBRITIES = [
   'Timothée Chalamet at the airport', 'Zendaya on press tour', 'Bad Bunny off-duty',
   'Hailey Bieber coffee run', 'A$AP Rocky front row', 'Bella Hadid street style',
   'Harry Styles on tour', 'Kendall Jenner model off-duty', 'Tyler the Creator at Coachella',
-  'Dua Lipa going to dinner', 'Jacob Elordi casual', 'Sydney Sweeney brunch',
-  'Pete Davidson SNL afterparty', 'Rihanna anywhere tbh', 'Frank Ocean sighting'
+  'Dua Lipa going to dinner', 'Jacob Elordi casual', 'Sydney Sweeney brunch'
 ]
 
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [uploadedImage, setUploadedImage] = useState(null)
   const [scores, setScores] = useState(null)
+  const [roastMode, setRoastMode] = useState(false)
   const [error, setError] = useState(null)
 
-  // New feature states
-  const [roastMode, setRoastMode] = useState(false)
-  const [selectedOccasion, setSelectedOccasion] = useState(null)
-  const [showOccasionPicker, setShowOccasionPicker] = useState(false)
-  const [streak, setStreak] = useState(() => {
-    const stored = localStorage.getItem('fitrate_streak')
-    if (stored) {
-      const { count, lastDate } = JSON.parse(stored)
-      const today = new Date().toDateString()
-      const yesterday = new Date(Date.now() - 86400000).toDateString()
-      if (lastDate === today) return count
-      if (lastDate === yesterday) return count
-      return 0
-    }
-    return 0
-  })
+  // Countdown timer state
+  const [timeUntilReset, setTimeUntilReset] = useState('')
 
+  // Pro status
+  const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
+
+  // Check scans remaining
   const [scansRemaining, setScansRemaining] = useState(() => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -60,30 +41,93 @@ export default function App() {
     return 1
   })
 
-  // Battle mode states
-  const [battleMode, setBattleMode] = useState(false)
-  const [battleOutfits, setBattleOutfits] = useState([null, null])
-  const [battleResults, setBattleResults] = useState(null)
-
   const fileInputRef = useRef(null)
-  const battleInputRef = useRef(null)
+  const canvasRef = useRef(null)
 
-  const updateStreak = () => {
-    const today = new Date().toDateString()
-    const stored = localStorage.getItem('fitrate_streak')
-    let newStreak = 1
-
-    if (stored) {
-      const { count, lastDate } = JSON.parse(stored)
-      const yesterday = new Date(Date.now() - 86400000).toDateString()
-      if (lastDate === yesterday) newStreak = count + 1
-      else if (lastDate === today) newStreak = count
+  // Check for Stripe payment success
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('success') === 'true') {
+      localStorage.setItem('fitrate_pro', 'true')
+      setIsPro(true)
+      setScreen('pro-welcome')
+      window.history.replaceState({}, '', window.location.pathname)
     }
+  }, [])
 
-    localStorage.setItem('fitrate_streak', JSON.stringify({ count: newStreak, lastDate: today }))
-    setStreak(newStreak)
-  }
+  // Countdown timer
+  useEffect(() => {
+    if (scansRemaining === 0 && !isPro) {
+      const updateTimer = () => {
+        const now = new Date()
+        const tomorrow = new Date(now)
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        tomorrow.setHours(0, 0, 0, 0)
+        const diff = tomorrow - now
+        const hours = Math.floor(diff / (1000 * 60 * 60))
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        setTimeUntilReset(`${hours}h ${mins}m`)
+      }
+      updateTimer()
+      const interval = setInterval(updateTimer, 60000)
+      return () => clearInterval(interval)
+    }
+  }, [scansRemaining, isPro])
 
+  // Mock scores for free users
+  const generateMockScores = useCallback(() => {
+    const roastVerdicts = [
+      "Bro really said 'I'll figure it out later' 💀",
+      "The colors are in a toxic relationship",
+      "This fit is giving... participation trophy",
+      "Outfit said 'I have food at home'",
+      "The dryer ate better fits than this",
+      "Pinterest fail but make it fashion",
+      "The fit that texts back 'k'",
+      "This outfit has a 2.3 GPA",
+      "Sir this is a Wendy's 💀",
+      "Main NPC energy tbh",
+      "Giving clearance rack energy",
+      "The algorithm buried this one"
+    ]
+
+    const niceVerdicts = [
+      "Main character energy ✨",
+      "Clean minimalist vibes fr",
+      "Understated fire 🔥",
+      "The fit is fitting",
+      "Effortlessly hard",
+      "Quiet confidence activated",
+      "Lowkey dripping",
+      "This hits different",
+      "Certified fresh fit",
+      "Immaculate vibes only",
+      "Serving looks fr fr",
+      "Chef's kiss coordination 👨‍🍳"
+    ]
+
+    const tips = roastMode
+      ? ["Start over. Please.", "Have you considered... not this?", "Less is more. Way less.", "Google 'how to dress'"]
+      : ["Cuff the jeans for a cleaner silhouette", "A chunky watch would elevate this", "Try layering with a light jacket", "White sneakers would make this pop"]
+
+    const baseScore = roastMode ? Math.floor(Math.random() * 30) + 45 : Math.floor(Math.random() * 20) + 75
+
+    return {
+      overall: baseScore,
+      color: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
+      fit: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
+      style: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
+      verdict: roastMode
+        ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
+        : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
+      tip: tips[Math.floor(Math.random() * tips.length)],
+      aesthetic: AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)],
+      celebMatch: CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)],
+      roastMode
+    }
+  }, [roastMode])
+
+  // Increment scan count
   const incrementScanCount = () => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -94,119 +138,46 @@ export default function App() {
     }
     localStorage.setItem('fitrate_scans', JSON.stringify({ date: today, count }))
     setScansRemaining(Math.max(0, 1 - count))
-    updateStreak()
   }
 
-  const generateMockScores = () => {
-    const roastVerdicts = [
-      "Bro really said 'I'll figure it out later' 💀",
-      "The colors are in a toxic relationship",
-      "This fit is giving... participation trophy",
-      "Outfit said 'I have food at home'",
-      "The dryer ate better fits than this",
-      "This screams 'my mom still picks my clothes'",
-      "Pinterest fail but make it fashion",
-      "The fit that texts back 'k'",
-      "Giving 'I woke up 5 mins before leaving'",
-      "This outfit has a 2.3 GPA"
-    ]
-
-    const niceVerdicts = [
-      "Clean minimalist energy ✨", "Main character vibes fr", "Understated fire 🔥",
-      "The fit is fitting", "Effortlessly hard", "Quiet confidence activated",
-      "Lowkey dripping", "This hits different", "Certified fresh fit",
-      "Immaculate vibes only", "The algorithm would push this"
-    ]
-
-    const roastTips = [
-      "Start over. Please.",
-      "Have you considered... not this?",
-      "Google 'how to dress' and take notes",
-      "Call a friend. Any friend. Get help.",
-      "The outfit is outfit-ing but not in a good way"
-    ]
-
-    const niceTips = [
-      "Cuff the jeans for a cleaner silhouette",
-      "A chunky watch would elevate this hard",
-      "Swap the sneakers for loafers to level up",
-      "This would hit different with silver accessories",
-      "Try tucking the front of the shirt",
-      "A leather belt would complete the look",
-      "White sneakers would make this pop"
-    ]
-
-    const baseScore = roastMode ? Math.floor(Math.random() * 30) + 45 : Math.floor(Math.random() * 20) + 75
-    const aesthetic = AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)]
-    const celeb = CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)]
-
-    return {
-      overall: baseScore,
-      color: baseScore + Math.floor(Math.random() * 10) - 5,
-      fit: baseScore + Math.floor(Math.random() * 10) - 5,
-      style: baseScore + Math.floor(Math.random() * 10) - 5,
-      occasion: baseScore + Math.floor(Math.random() * 10) - 5,
-      verdict: roastMode
-        ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
-        : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
-      tip: roastMode
-        ? roastTips[Math.floor(Math.random() * roastTips.length)]
-        : niceTips[Math.floor(Math.random() * niceTips.length)],
-      aesthetic: aesthetic,
-      celebMatch: celeb,
-      trendScore: Math.floor(Math.random() * 30) + 60,
-      occasionMatch: selectedOccasion ? Math.floor(Math.random() * 25) + 70 : null,
-      roastMode: roastMode
-    }
-  }
-
+  // Analyze outfit
   const analyzeOutfit = useCallback(async (imageData) => {
     setScreen('analyzing')
     setError(null)
 
+    // Free users get mock scores (no API cost)
+    if (!isPro) {
+      await new Promise(resolve => setTimeout(resolve, 2500 + Math.random() * 1500))
+      const mockScores = generateMockScores()
+      setScores(mockScores)
+      incrementScanCount()
+      setScreen('results')
+      return
+    }
+
+    // Pro users get real AI
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: imageData,
-          roastMode,
-          occasion: selectedOccasion
-        })
+        body: JSON.stringify({ image: imageData, roastMode })
       })
-
       const data = await response.json()
 
-      if (!response.ok) {
-        // Handle rate limit
-        if (response.status === 429 || data.limitReached) {
-          setError(data.error || 'Daily limit reached')
-          setScansRemaining(0)
-          setScreen('limit-reached')
-          return
-        }
+      if (!response.ok || !data.success) {
         throw new Error(data.error || 'Analysis failed')
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Could not analyze outfit')
-      }
-
-      // Update scan count from server response
-      if (data.scanInfo) {
-        setScansRemaining(data.scanInfo.scansRemaining)
-      }
-
       setScores({ ...data.scores, roastMode })
-      updateStreak()
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
-      setError(err.message || 'Something went wrong. Please try again.')
+      setError('AI is getting dressed... try again!')
       setScreen('error')
     }
-  }, [roastMode, selectedOccasion])
+  }, [roastMode, isPro, generateMockScores])
 
+  // Handle file upload
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -217,417 +188,235 @@ export default function App() {
       }
       const reader = new FileReader()
       reader.onload = (e) => {
-        if (battleMode) {
-          const idx = battleOutfits[0] === null ? 0 : 1
-          const newOutfits = [...battleOutfits]
-          newOutfits[idx] = e.target?.result
-          setBattleOutfits(newOutfits)
-          if (idx === 1) {
-            // Both outfits uploaded, analyze battle
-            analyzeBattle(newOutfits)
-          }
-        } else {
-          setUploadedImage(e.target?.result)
-          analyzeOutfit(e.target?.result)
-        }
+        setUploadedImage(e.target?.result)
+        analyzeOutfit(e.target?.result)
       }
       reader.readAsDataURL(file)
     }
-  }, [analyzeOutfit, battleMode, battleOutfits])
-
-  const analyzeBattle = async (outfits) => {
-    setScreen('analyzing')
-    await new Promise(resolve => setTimeout(resolve, 3000))
-
-    const score1 = Math.floor(Math.random() * 25) + 70
-    const score2 = Math.floor(Math.random() * 25) + 70
-
-    setBattleResults({
-      outfit1: { score: score1, verdict: score1 > score2 ? "WINNER 👑" : "Close but no" },
-      outfit2: { score: score2, verdict: score2 > score1 ? "WINNER 👑" : "Close but no" },
-      winner: score1 > score2 ? 1 : score1 < score2 ? 2 : 0,
-      commentary: score1 === score2
-        ? "It's a tie! Both fits are equally fire 🔥"
-        : `Outfit ${score1 > score2 ? '1' : '2'} takes the crown by ${Math.abs(score1 - score2)} points!`
-    })
-    setScreen('battle-results')
-  }
-
-  const handleDemoScan = useCallback(async () => {
-    setScreen('analyzing')
-    setError(null)
-
-    try {
-      // Fetch demo image and convert to base64
-      const demoImageUrl = 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&h=600&fit=crop'
-      const response = await fetch(demoImageUrl)
-      const blob = await response.blob()
-
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64data = reader.result
-        setUploadedImage(base64data)
-        analyzeOutfit(base64data)
-      }
-      reader.onerror = () => {
-        setError('Failed to load demo image')
-        setScreen('error')
-      }
-      reader.readAsDataURL(blob)
-    } catch (err) {
-      console.error('Demo scan error:', err)
-      setError('Failed to load demo image. Please try uploading your own.')
-      setScreen('error')
-    }
   }, [analyzeOutfit])
 
+  // Generate share card
+  const generateShareCard = useCallback(async () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    canvas.width = 1080
+    canvas.height = 1920
+
+    // Background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
+    gradient.addColorStop(0, '#0a0a0f')
+    gradient.addColorStop(0.5, '#1a1a2e')
+    gradient.addColorStop(1, '#0a0a0f')
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, 1080, 1920)
+
+    // Load and draw user image
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+
+    await new Promise((resolve) => {
+      img.onload = resolve
+      img.src = uploadedImage
+    })
+
+    // Draw image in center (cropped to fit)
+    const imgSize = 600
+    const imgX = (1080 - imgSize) / 2
+    const imgY = 300
+
+    // Rounded rectangle clip for image
+    ctx.save()
+    ctx.beginPath()
+    ctx.roundRect(imgX, imgY, imgSize, imgSize, 30)
+    ctx.clip()
+
+    // Calculate crop to maintain aspect ratio
+    const scale = Math.max(imgSize / img.width, imgSize / img.height)
+    const scaledW = img.width * scale
+    const scaledH = img.height * scale
+    const offsetX = imgX + (imgSize - scaledW) / 2
+    const offsetY = imgY + (imgSize - scaledH) / 2
+    ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH)
+    ctx.restore()
+
+    // Score circle
+    const scoreColor = scores.overall >= 80 ? '#00ff88' : scores.overall >= 60 ? '#00d4ff' : '#ff4444'
+    ctx.beginPath()
+    ctx.arc(540, 1050, 100, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'
+    ctx.fill()
+    ctx.strokeStyle = scoreColor
+    ctx.lineWidth = 8
+    ctx.stroke()
+
+    // Score text
+    ctx.fillStyle = scoreColor
+    ctx.font = 'bold 72px SF Pro Display, -apple-system, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(scores.overall, 540, 1070)
+
+    // Verdict
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 48px SF Pro Display, -apple-system, sans-serif'
+    ctx.fillText(scores.verdict, 540, 1220)
+
+    // Aesthetic + Celeb
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+    ctx.font = '32px SF Pro Display, -apple-system, sans-serif'
+    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, 1300)
+
+    // Hashtag
+    const hashtag = scores.roastMode ? '#FitRateRoast' : '#FitRateGlowUp'
+    ctx.fillStyle = scores.roastMode ? '#ff4444' : '#00d4ff'
+    ctx.font = 'bold 36px SF Pro Display, -apple-system, sans-serif'
+    ctx.fillText(hashtag, 540, 1450)
+
+    // Branding
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.font = '28px SF Pro Display, -apple-system, sans-serif'
+    ctx.fillText('Rated by FitRate AI • fitrate.app', 540, 1800)
+
+    // Convert to blob and share
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `I scored ${scores.overall}/100 on FitRate!`,
+            text: `${scores.verdict} ${hashtag}`
+          })
+        } catch (err) {
+          // Fallback: download
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'fitrate-score.png'
+          a.click()
+        }
+      } else {
+        // Fallback: download
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'fitrate-score.png'
+        a.click()
+      }
+    }, 'image/png')
+  }, [uploadedImage, scores])
+
+  // Reset app
   const resetApp = useCallback(() => {
     setScreen('home')
     setUploadedImage(null)
     setScores(null)
     setError(null)
-    setSelectedOccasion(null)
-    setShowOccasionPicker(false)
-    setBattleMode(false)
-    setBattleOutfits([null, null])
-    setBattleResults(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [])
 
-  const handleShare = useCallback(async () => {
-    const scoreEmoji = scores?.overall >= 85 ? '🔥' : scores?.overall >= 70 ? '✨' : '💪'
-    const modeText = scores?.roastMode ? '💀 ROAST MODE 💀\n' : ''
-    const shareText = `${modeText}${scoreEmoji} I got ${scores?.overall}/100 on FitRate!\n\n"${scores?.verdict}"\n\nCan you beat my score? 👀\n\n#FitRate #OOTD #FashionAI`
-    const shareUrl = 'https://fitrate.app'
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `I scored ${scores?.overall}/100 on FitRate!`,
-          text: shareText,
-          url: shareUrl
-        })
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          copyToClipboard(shareText + '\n\n' + shareUrl)
-        }
-      }
-    } else {
-      copyToClipboard(shareText + '\n\n' + shareUrl)
-    }
-  }, [scores])
-
-  const handleChallengeFriend = useCallback(async () => {
-    const challengeText = `Think your fit is better than mine? 👀\n\nI just scored ${scores?.overall}/100 on FitRate.\n\nBeat my score if you can! 🔥\n\n#FitRateChallenge`
-    const shareUrl = 'https://fitrate.app'
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'FitRate Challenge!',
-          text: challengeText,
-          url: shareUrl
-        })
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          copyToClipboard(challengeText + '\n\n' + shareUrl)
-        }
-      }
-    } else {
-      copyToClipboard(challengeText + '\n\n' + shareUrl)
-    }
-  }, [scores])
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard?.writeText(text)
-    // Show a toast notification
-    const toast = document.createElement('div')
-    toast.textContent = '✓ Copied to clipboard!'
-    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#00ff88;color:#000;padding:12px 24px;border-radius:50px;font-weight:600;font-size:14px;z-index:9999;animation:fadeInOut 2s forwards;'
-    document.body.appendChild(toast)
-    setTimeout(() => toast.remove(), 2000)
-  }
-
+  // Score color helper
   const getScoreColor = (score) => {
-    if (score >= 85) return '#00ff88'
-    if (score >= 70) return '#00d4ff'
-    if (score >= 55) return '#ffd000'
+    if (score >= 80) return '#00ff88'
+    if (score >= 60) return '#00d4ff'
     return '#ff4444'
   }
 
-  const getScoreLabel = (score) => {
-    if (score >= 90) return 'IMMACULATE'
-    if (score >= 80) return 'CLEAN'
-    if (score >= 70) return 'SOLID'
-    if (score >= 60) return 'MID'
-    if (score >= 50) return 'STRUGGLING'
-    return 'VIOLATION'
-  }
+  // ============================================
+  // SCREENS
+  // ============================================
 
-  // HOME SCREEN
+  // HOME SCREEN - Ultra Simple
   if (screen === 'home') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5 relative overflow-hidden" style={{
-        background: roastMode
-          ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
-          : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
-        transition: 'background 0.5s ease'
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
-        {/* Ambient glows */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none" style={{
-          background: roastMode
-            ? 'radial-gradient(circle, rgba(255,68,68,0.15) 0%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%)',
-          filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite'
-        }} />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full pointer-events-none" style={{
-          background: 'radial-gradient(circle, rgba(255,0,128,0.12) 0%, transparent 70%)',
-          filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite 2s'
-        }} />
+        {/* Hidden file input */}
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          className="hidden"
+        />
 
-        {/* Streak Counter */}
-        {streak > 0 && (
-          <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
-            background: 'rgba(255,136,0,0.2)',
-            border: '1px solid rgba(255,136,0,0.3)'
+        {/* Pro Badge */}
+        {isPro && (
+          <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full" style={{
+            background: 'linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,255,136,0.2))',
+            border: '1px solid rgba(0,255,136,0.4)'
           }}>
-            <span className="text-lg">🔥</span>
-            <span className="text-sm font-bold" style={{ color: '#ff8800' }}>{streak} day streak</span>
+            <span className="text-xs font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
           </div>
         )}
-
-        {/* Roast Mode Toggle */}
-        <button
-          onClick={() => setRoastMode(!roastMode)}
-          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
-          style={{
-            background: roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(255,255,255,0.05)',
-            border: roastMode ? '1px solid rgba(255,68,68,0.5)' : '1px solid rgba(255,255,255,0.1)'
-          }}
-        >
-          <span className="text-lg">{roastMode ? '🔥' : '😊'}</span>
-          <span className="text-xs font-bold" style={{ color: roastMode ? '#ff4444' : 'rgba(255,255,255,0.5)' }}>
-            {roastMode ? 'ROAST MODE' : 'Nice Mode'}
-          </span>
-        </button>
 
         {/* Logo */}
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-2" style={{
+        <h1 className="text-5xl font-extrabold mb-16" style={{
           letterSpacing: '-2px',
           background: roastMode
-            ? 'linear-gradient(135deg, #fff 0%, #ff4444 50%, #ff8800 100%)'
-            : 'linear-gradient(135deg, #fff 0%, #00d4ff 50%, #ff0080 100%)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+            ? 'linear-gradient(135deg, #fff 0%, #ff4444 100%)'
+            : 'linear-gradient(135deg, #fff 0%, #00d4ff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
-          {roastMode ? '🔥 No Mercy Mode 🔥' : 'AI Outfit Rating'}
-        </p>
-
-        {/* Occasion Picker */}
-        {showOccasionPicker && (
-          <div className="mb-8 p-4 rounded-2xl w-full max-w-sm" style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>Rating for:</p>
-            <div className="grid grid-cols-3 gap-2">
-              {OCCASIONS.map((occ) => (
-                <button
-                  key={occ.id}
-                  onClick={() => setSelectedOccasion(selectedOccasion === occ.id ? null : occ.id)}
-                  className="flex flex-col items-center p-3 rounded-xl transition-all"
-                  style={{
-                    background: selectedOccasion === occ.id ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.05)',
-                    border: selectedOccasion === occ.id ? '1px solid rgba(0,212,255,0.5)' : '1px solid transparent'
-                  }}
-                >
-                  <span className="text-xl mb-1">{occ.emoji}</span>
-                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{occ.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Hidden file input */}
-        <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-
-        {/* Main scan button */}
+        {/* Main Button */}
         <button
-          onClick={() => scansRemaining > 0 && fileInputRef.current?.click()}
-          disabled={scansRemaining === 0}
-          className="w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 relative disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => scansRemaining > 0 || isPro ? fileInputRef.current?.click() : null}
+          disabled={scansRemaining === 0 && !isPro}
+          className="w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
             background: roastMode
               ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)'
               : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
             boxShadow: roastMode
-              ? '0 0 60px rgba(255,68,68,0.4), inset 0 2px 20px rgba(255,255,255,0.2)'
-              : '0 0 60px rgba(0,212,255,0.4), inset 0 2px 20px rgba(255,255,255,0.2)'
+              ? '0 0 80px rgba(255,68,68,0.5)'
+              : '0 0 80px rgba(0,212,255,0.5)'
           }}
         >
-          <div className="absolute inset-1 rounded-full pointer-events-none" style={{ border: '2px solid rgba(255,255,255,0.3)' }} />
-          <span className="text-5xl mb-2">{roastMode ? '💀' : '📸'}</span>
-          <span className="text-white text-lg font-bold" style={{ letterSpacing: '1px' }}>
-            {roastMode ? 'ROAST ME' : 'CHECK FIT'}
+          <span className="text-6xl mb-3">{roastMode ? '💀' : '📸'}</span>
+          <span className="text-white text-xl font-bold tracking-wide">
+            {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
           </span>
         </button>
 
-        <p className="text-sm mt-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {roastMode ? 'Prepare to be humbled' : 'Tap to scan your outfit'}
-        </p>
+        {/* Mode Toggle */}
+        <button
+          onClick={() => setRoastMode(!roastMode)}
+          className="mt-8 px-6 py-3 rounded-full transition-all duration-300"
+          style={{
+            background: roastMode ? 'rgba(255,68,68,0.2)' : 'rgba(255,255,255,0.05)',
+            border: roastMode ? '1px solid rgba(255,68,68,0.4)' : '1px solid rgba(255,255,255,0.1)'
+          }}
+        >
+          <span className="text-sm font-semibold" style={{ color: roastMode ? '#ff4444' : 'rgba(255,255,255,0.6)' }}>
+            {roastMode ? '🔥 Roast Mode' : '😊 Nice Mode'}
+          </span>
+        </button>
 
-        {/* Feature buttons */}
-        <div className="flex gap-3 mt-8">
-          <button
-            onClick={() => setShowOccasionPicker(!showOccasionPicker)}
-            className="px-4 py-2 rounded-full text-xs transition-all"
-            style={{
-              background: showOccasionPicker ? 'rgba(0,212,255,0.2)' : 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.6)'
-            }}
-          >
-            🎯 Occasion
-          </button>
-          <button
-            onClick={() => { setBattleMode(true); setScreen('battle') }}
-            className="px-4 py-2 rounded-full text-xs transition-all"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.6)'
-            }}
-          >
-            ⚔️ Fit Battle
-          </button>
-          <button
-            onClick={handleDemoScan}
-            className="px-4 py-2 rounded-full text-xs transition-all"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.6)'
-            }}
-          >
-            🎬 Demo
-          </button>
-        </div>
-
-        {/* Scan counter */}
-        <div className="absolute bottom-8 flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          <span className="w-2 h-2 rounded-full" style={{
-            background: scansRemaining > 0 ? '#00ff88' : '#ff4444',
-            boxShadow: scansRemaining > 0 ? '0 0 10px #00ff88' : '0 0 10px #ff4444'
-          }} />
-          {scansRemaining > 0 ? (
-            `${scansRemaining} free scan remaining today`
+        {/* Scan Status */}
+        <div className="absolute bottom-8 text-center">
+          {scansRemaining > 0 || isPro ? (
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {isPro ? '⚡ Unlimited AI scans' : '1 free rate per day • Unlimited with FitPass'}
+            </p>
           ) : (
-            <span>
-              No scans remaining — {' '}
+            <div>
+              <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Next free rate in {timeUntilReset}
+              </p>
               <a
                 href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold hover:underline"
-                style={{ color: '#ff0080' }}
+                className="text-xs font-bold"
+                style={{ color: '#00d4ff' }}
               >
-                Go Pro
+                Get unlimited →
               </a>
-            </span>
+            </div>
           )}
-        </div>
-
-        <style>{`@keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }`}</style>
-      </div>
-    )
-  }
-
-  // BATTLE MODE SCREEN
-  if (screen === 'battle') {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
-      }}>
-        <button onClick={resetApp} className="absolute top-6 left-6 text-white/50 text-sm">← Back</button>
-
-        <h2 className="text-2xl font-bold text-white mb-2">⚔️ FIT BATTLE ⚔️</h2>
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Upload 2 outfits. AI picks the winner.</p>
-
-        <div className="flex gap-4 mb-8">
-          {[0, 1].map((idx) => (
-            <div
-              key={idx}
-              onClick={() => !battleOutfits[idx] && fileInputRef.current?.click()}
-              className="w-36 h-48 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105"
-              style={{
-                background: battleOutfits[idx] ? 'transparent' : 'rgba(255,255,255,0.05)',
-                border: '2px dashed rgba(255,255,255,0.2)',
-                overflow: 'hidden'
-              }}
-            >
-              {battleOutfits[idx] ? (
-                <img src={battleOutfits[idx]} alt={`Outfit ${idx + 1}`} className="w-full h-full object-cover" />
-              ) : (
-                <>
-                  <span className="text-3xl mb-2">👕</span>
-                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Outfit {idx + 1}</span>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {!battleOutfits[0] ? 'Upload first outfit' : !battleOutfits[1] ? 'Now upload second outfit' : 'Analyzing...'}
-        </p>
-
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-      </div>
-    )
-  }
-
-  // BATTLE RESULTS
-  if (screen === 'battle-results' && battleResults) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
-      }}>
-        <h2 className="text-2xl font-bold text-white mb-6">⚔️ BATTLE RESULTS ⚔️</h2>
-
-        <div className="flex gap-4 mb-6">
-          {[0, 1].map((idx) => (
-            <div key={idx} className="flex flex-col items-center">
-              <div className="w-32 h-44 rounded-xl overflow-hidden mb-3 relative" style={{
-                border: battleResults.winner === idx + 1 ? '3px solid #00ff88' : '1px solid rgba(255,255,255,0.1)',
-                boxShadow: battleResults.winner === idx + 1 ? '0 0 30px rgba(0,255,136,0.3)' : 'none'
-              }}>
-                <img src={battleOutfits[idx]} alt={`Outfit ${idx + 1}`} className="w-full h-full object-cover" />
-                {battleResults.winner === idx + 1 && (
-                  <div className="absolute top-2 right-2 text-2xl">👑</div>
-                )}
-              </div>
-              <div className="text-3xl font-bold" style={{ color: getScoreColor(idx === 0 ? battleResults.outfit1.score : battleResults.outfit2.score) }}>
-                {idx === 0 ? battleResults.outfit1.score : battleResults.outfit2.score}
-              </div>
-              <div className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {idx === 0 ? battleResults.outfit1.verdict : battleResults.outfit2.verdict}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-center text-white font-semibold mb-8">{battleResults.commentary}</p>
-
-        <div className="flex gap-3">
-          <button onClick={resetApp} className="px-6 py-3 rounded-xl text-white font-semibold"
-            style={{ background: 'rgba(255,255,255,0.1)' }}>New Battle</button>
-          <button className="px-6 py-3 rounded-xl text-white font-semibold"
-            style={{ background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)' }}>Share Results</button>
         </div>
       </div>
     )
@@ -636,14 +425,18 @@ export default function App() {
   // ANALYZING SCREEN
   if (screen === 'analyzing') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: roastMode
-          ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
-          : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
-        <div className="w-44 h-60 rounded-2xl overflow-hidden mb-10 relative" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
-          <img src={uploadedImage || battleOutfits[0]} alt="Your outfit" className="w-full h-full object-cover" />
+        <div className="w-48 h-64 rounded-2xl overflow-hidden mb-8 relative" style={{
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+        }}>
+          <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 50%)'
+          }} />
+          {/* Scan line animation */}
           <div className="absolute left-0 right-0 h-1" style={{
             background: roastMode
               ? 'linear-gradient(90deg, transparent, #ff4444, transparent)'
@@ -652,22 +445,20 @@ export default function App() {
             animation: 'scanLine 1.5s ease-in-out infinite'
           }} />
         </div>
-        <h2 className="text-white text-xl font-semibold mb-3">
-          {roastMode ? 'Finding the violations...' : 'Analyzing your fit...'}
-        </h2>
+
+        <p className="text-white text-lg font-semibold mb-4">
+          {roastMode ? 'Finding the violations...' : 'AI judging your drip...'}
+        </p>
+
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
+            <div key={i} className="w-3 h-3 rounded-full" style={{
               background: roastMode ? '#ff4444' : '#00d4ff',
               animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s`
             }} />
           ))}
         </div>
-        {selectedOccasion && (
-          <p className="text-sm mt-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Rating for: {OCCASIONS.find(o => o.id === selectedOccasion)?.label}
-          </p>
-        )}
+
         <style>{`
           @keyframes scanLine { 0% { top: 0; } 50% { top: calc(100% - 4px); } 100% { top: 0; } }
           @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
@@ -676,164 +467,124 @@ export default function App() {
     )
   }
 
-  // RESULTS SCREEN
+  // RESULTS SCREEN - Viral Share Focus
   if (screen === 'results' && scores) {
+    const scoreColor = getScoreColor(scores.overall)
+
     return (
-      <div className="min-h-screen flex flex-col items-center p-5 pt-8 pb-20 overflow-y-auto" style={{
-        background: scores.roastMode
-          ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
-          : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center p-6 pt-12 pb-24" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
-        {/* Roast Mode Badge */}
-        {scores.roastMode && (
-          <div className="mb-4 px-4 py-1 rounded-full" style={{ background: 'rgba(255,68,68,0.3)', border: '1px solid rgba(255,68,68,0.5)' }}>
-            <span className="text-xs font-bold" style={{ color: '#ff4444' }}>🔥 ROAST MODE 🔥</span>
-          </div>
-        )}
-
-        {/* Result Card */}
-        <div className="w-full max-w-sm rounded-3xl p-6 relative overflow-hidden" style={{
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)'
+        {/* Verdict - Big & Bold */}
+        <p className="text-2xl font-bold text-white text-center mb-6 px-4" style={{
+          textShadow: '0 2px 20px rgba(0,0,0,0.5)'
         }}>
-          <div className="absolute top-4 right-4 text-xs font-bold" style={{ letterSpacing: '1px', color: 'rgba(255,255,255,0.2)' }}>FITRATE</div>
+          {scores.verdict}
+        </p>
 
-          {/* Photo with score */}
-          <div className="w-full h-64 rounded-2xl overflow-hidden relative mb-4">
-            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-            <div className="absolute bottom-0 left-0 right-0 p-4 pt-8 flex flex-col items-center" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.9))' }}>
-              <div className="text-5xl font-extrabold leading-none" style={{ color: getScoreColor(scores.overall), textShadow: `0 0 40px ${getScoreColor(scores.overall)}` }}>
-                {scores.overall}
-              </div>
-              <div className="text-xs font-bold mt-1" style={{ letterSpacing: '2px', color: getScoreColor(scores.overall) }}>{getScoreLabel(scores.overall)}</div>
-            </div>
-          </div>
-
-          {/* Verdict */}
-          <div className="text-center mb-4">
-            <p className="text-lg font-semibold text-white">{scores.verdict}</p>
-          </div>
-
-          {/* NEW: Aesthetic & Celeb Match */}
-          <div className="flex gap-2 mb-4">
-            <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Aesthetic</p>
-              <p className="text-sm font-semibold text-white">{scores.aesthetic}</p>
-            </div>
-            <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Celeb Match</p>
-              <p className="text-xs font-semibold text-white leading-tight">{scores.celebMatch}</p>
-            </div>
-          </div>
-
-          {/* Category Breakdown */}
-          <div className="flex flex-col gap-2.5">
-            {[
-              { label: 'Color', emoji: '🎨', score: scores.color },
-              { label: 'Fit', emoji: '👔', score: scores.fit },
-              { label: 'Style', emoji: '✨', score: scores.style },
-              { label: 'Trend', emoji: '📈', score: scores.trendScore },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3">
-                <span className="text-sm w-5">{item.emoji}</span>
-                <span className="text-xs w-12" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.label}</span>
-                <div className="flex-1 h-1.5 rounded overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <div className="h-full rounded" style={{
-                    width: `${Math.min(100, item.score)}%`,
-                    background: `linear-gradient(90deg, ${getScoreColor(item.score)}, ${getScoreColor(item.score)}88)`
-                  }} />
-                </div>
-                <span className="text-xs font-bold w-7 text-right" style={{ color: getScoreColor(item.score) }}>{item.score}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Pro Tip */}
-          <div className="mt-4 p-3 rounded-xl" style={{
-            background: scores.roastMode ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,255,0.1)',
-            border: scores.roastMode ? '1px solid rgba(255,68,68,0.2)' : '1px solid rgba(0,212,255,0.2)'
+        {/* Photo + Score */}
+        <div className="relative mb-6">
+          <div className="w-56 h-72 rounded-2xl overflow-hidden" style={{
+            boxShadow: `0 20px 60px ${scoreColor}33`
           }}>
-            <div className="text-xs font-bold mb-1" style={{ color: scores.roastMode ? '#ff4444' : '#00d4ff' }}>
-              {scores.roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
-            </div>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{scores.tip}</p>
+            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+          </div>
+
+          {/* Score Badge */}
+          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-20 h-20 rounded-full flex items-center justify-center" style={{
+            background: '#0a0a0f',
+            border: `4px solid ${scoreColor}`,
+            boxShadow: `0 0 30px ${scoreColor}66`
+          }}>
+            <span className="text-2xl font-extrabold" style={{ color: scoreColor }}>
+              {scores.overall}
+            </span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-3 mt-5 w-full max-w-sm">
-          <button onClick={resetApp} className="flex-1 py-3.5 rounded-xl text-white text-sm font-semibold"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>Scan Again</button>
-          <button onClick={handleShare} className="flex-1 py-3.5 rounded-xl text-white text-sm font-semibold"
-            style={{ background: scores.roastMode ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)' : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)' }}>
-            📤 Share {scores.roastMode ? 'Roast' : 'Result'}
-          </button>
-        </div>
+        {/* Aesthetic + Celeb */}
+        <p className="text-sm mt-4 mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          {scores.aesthetic} • {scores.celebMatch}
+        </p>
 
-        {/* Challenge Friend - Viral CTA */}
-        <button
-          onClick={handleChallengeFriend}
-          className="mt-3 w-full max-w-sm py-3.5 rounded-xl text-white text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: 'linear-gradient(135deg, #ff0080 0%, #7928ca 100%)',
-            boxShadow: '0 4px 20px rgba(255,0,128,0.3)'
-          }}
-        >
-          ⚔️ Challenge a Friend
-        </button>
-
-        {/* Pro CTA */}
-        <div className="mt-5 p-4 rounded-xl text-center w-full max-w-sm" style={{
-          background: 'linear-gradient(135deg, rgba(255,0,128,0.1) 0%, rgba(0,212,255,0.1) 100%)',
+        {/* Tip */}
+        <div className="w-full max-w-sm p-4 rounded-xl mb-6" style={{
+          background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
-          <p className="text-sm text-white font-semibold mb-1">Go Pro — 25 scans/day</p>
-          <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>Outfit history • Detailed tips • Priority scanning</p>
-          <a
-            href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-6 py-2 rounded-full text-white text-sm font-bold transition-all hover:scale-105 active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #ff0080 0%, #ff4d4d 100%)' }}
-          >
-            $3.99/mo
-          </a>
+          <p className="text-xs font-bold mb-1" style={{ color: roastMode ? '#ff4444' : '#00d4ff' }}>
+            {roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
+          </p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{scores.tip}</p>
         </div>
-      </div>
-    )
-  }
 
-  // LIMIT REACHED SCREEN
-  if (screen === 'limit-reached') {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
-        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
-      }}>
-        <div className="text-6xl mb-6">🔥</div>
-        <h2 className="text-white text-2xl font-bold mb-2">You're On Fire!</h2>
-        <p className="text-center mb-6 max-w-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          You've used your free scan for today. Upgrade to Pro for 25 scans/day!
-        </p>
+        {/* Score Breakdown - Compact */}
+        <div className="w-full max-w-sm flex gap-2 mb-8">
+          {[
+            { label: 'Color', score: scores.color },
+            { label: 'Fit', score: scores.fit },
+            { label: 'Style', score: scores.style }
+          ].map((item) => (
+            <div key={item.label} className="flex-1 p-3 rounded-xl text-center" style={{
+              background: 'rgba(255,255,255,0.03)'
+            }}>
+              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
+              <p className="text-lg font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
+            </div>
+          ))}
+        </div>
 
-        <a
-          href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-8 py-4 rounded-xl text-white font-bold text-lg transition-all hover:scale-105 active:scale-95 mb-4"
-          style={{ background: 'linear-gradient(135deg, #ff0080 0%, #ff4d4d 100%)' }}
+        {/* SHARE BUTTON - Primary CTA */}
+        <button
+          onClick={generateShareCard}
+          className="w-full max-w-sm py-4 rounded-2xl text-white text-lg font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: roastMode
+              ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)'
+              : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
+            boxShadow: roastMode
+              ? '0 4px 30px rgba(255,68,68,0.4)'
+              : '0 4px 30px rgba(0,212,255,0.4)'
+          }}
         >
-          Go Pro — $3.99/mo
-        </a>
-
-        <button onClick={resetApp} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          ← Back to Home
+          📤 Share Your Rate
         </button>
 
-        <p className="absolute bottom-8 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          Your free scan resets at midnight ✨
-        </p>
+        {/* Rate Again */}
+        <button
+          onClick={resetApp}
+          className="mt-4 text-sm font-semibold"
+          style={{ color: 'rgba(255,255,255,0.5)' }}
+        >
+          ← Rate Another Fit
+        </button>
+
+        {/* Confetti for high scores */}
+        {scores.overall >= 90 && (
+          <div className="fixed inset-0 pointer-events-none overflow-hidden">
+            {[...Array(30)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-3 h-3"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: '-20px',
+                  background: ['#ff4444', '#00d4ff', '#00ff88', '#ffd000'][Math.floor(Math.random() * 4)],
+                  borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                  animation: `confetti ${2 + Math.random() * 2}s linear forwards`,
+                  animationDelay: `${Math.random() * 0.5}s`
+                }}
+              />
+            ))}
+            <style>{`
+              @keyframes confetti {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+              }
+            `}</style>
+          </div>
+        )}
       </div>
     )
   }
@@ -841,18 +592,62 @@ export default function App() {
   // ERROR SCREEN
   if (screen === 'error') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
-        <div className="text-6xl mb-6">😅</div>
-        <h2 className="text-white text-xl font-semibold mb-3">Oops!</h2>
-        <p className="text-center mb-8 max-w-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{error}</p>
-        <button onClick={resetApp} className="px-8 py-4 rounded-xl text-white font-semibold"
-          style={{ background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)' }}>Try Again</button>
+        <span className="text-6xl mb-6">👗</span>
+        <p className="text-white text-lg font-semibold mb-2">{error || "Something went wrong"}</p>
+        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Give it another shot</p>
+        <button
+          onClick={resetApp}
+          className="px-8 py-3 rounded-xl text-white font-semibold"
+          style={{ background: 'rgba(255,255,255,0.1)' }}
+        >
+          Try Again
+        </button>
       </div>
     )
   }
 
+  // PRO WELCOME SCREEN
+  if (screen === 'pro-welcome') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+      }}>
+        <div className="text-6xl mb-6">🎉</div>
+        <h2 className="text-3xl font-bold text-white mb-2">Welcome to FitPass!</h2>
+        <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Unlimited AI outfit ratings unlocked
+        </p>
+
+        <div className="p-4 rounded-xl mb-8 text-center" style={{
+          background: 'rgba(0,255,136,0.1)',
+          border: '1px solid rgba(0,255,136,0.3)'
+        }}>
+          <p className="text-sm" style={{ color: '#00ff88' }}>
+            ✨ Unlimited scans<br />
+            🤖 Real GPT-4 Vision AI<br />
+            🔥 No daily limits
+          </p>
+        </div>
+
+        <button
+          onClick={() => setScreen('home')}
+          className="px-8 py-4 rounded-xl text-white font-bold text-lg"
+          style={{
+            background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
+            boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+          }}
+        >
+          Start Rating 🚀
+        </button>
+      </div>
+    )
+  }
+
+  // Fallback
   return null
 }
