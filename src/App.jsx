@@ -497,7 +497,7 @@ export default function App() {
         <div className="absolute bottom-10 text-center">
           {scansRemaining > 0 || isPro ? (
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              {isPro ? '⚡ Unlimited AI ratings' : '1 free rate per day • Unlimited with FitPass'}
+              {isPro ? '⚡ 25 AI ratings per day' : '1 free rate per day • 25/day with FitPass'}
             </p>
           ) : (
             <div className="flex flex-col items-center gap-2">
@@ -797,7 +797,7 @@ export default function App() {
         <div className="text-7xl mb-6">🎉</div>
         <h2 className="text-4xl font-black text-white mb-3">Welcome to FitPass!</h2>
         <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          Unlimited AI outfit ratings unlocked
+          25 AI outfit ratings per day unlocked
         </p>
 
         <div className="p-6 rounded-2xl mb-8 text-center" style={{
@@ -806,9 +806,9 @@ export default function App() {
           backdropFilter: 'blur(10px)'
         }}>
           <p className="text-base" style={{ color: '#00ff88' }}>
-            ✨ Unlimited scans<br />
+            ✨ 25 scans per day<br />
             🤖 Real GPT-4 Vision AI<br />
-            🔥 No daily limits ever
+            🔥 vs 1 free scan for non-Pro
           </p>
         </div>
 
@@ -860,7 +860,7 @@ export default function App() {
             boxShadow: '0 4px 30px rgba(0,212,255,0.4)'
           }}
         >
-          Get Unlimited Rates ⚡
+          Get 25 Rates/Day ⚡
         </a>
 
         <button
