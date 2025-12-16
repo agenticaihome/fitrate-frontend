@@ -375,6 +375,12 @@ export default function App() {
     setScreen('analyzing')
     setError(null)
 
+    // Optimistic check
+    if (!isPro && scansRemaining <= 0) {
+      setScreen('limit-reached')
+      return
+    }
+
     // Free users: call backend to track scan by IP, then show mock scores
     if (!isPro) {
       try {
@@ -399,6 +405,9 @@ export default function App() {
         if (data.scanInfo) {
           const bonus = data.scanInfo.bonusRemaining || 0
           setScansRemaining(data.scanInfo.scansRemaining + bonus)
+          // Persist usage to prevent refresh bypass
+          const used = data.scanInfo.scansUsed || 1
+          localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
         }
 
         // Update Streak
@@ -643,7 +652,7 @@ export default function App() {
     ctx.fill()
     ctx.fillStyle = 'rgba(255,255,255,0.8)'
     ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
-    const celebText = isPro ? scores.celebMatch : 'Celeb Match: [LOCKED] 🔒'
+    const celebText = scores.celebMatch
     ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, 1255)
 
     // Challenge text - THE VIRAL HOOK
@@ -1041,12 +1050,9 @@ export default function App() {
             border: '1px solid rgba(255,255,255,0.1)'
           }}>
             <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              {scores.aesthetic} • {isPro ? scores.celebMatch : <span style={{ color: '#ff4444' }}>Celeb Match Exec (Locked) 🔒</span>}
+              {scores.aesthetic} • {scores.celebMatch}
             </span>
           </div>
-          {!isPro && (
-            <p className="text-[10px] text-center mt-2 opacity-60">Unlock celebrity matches with Pro</p>
-          )}
         </div>
 
         {/* Tip */}
