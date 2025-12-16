@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 
-// API endpoint
+// API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
+const API_BASE = API_URL.replace('/api/analyze', '/api')
 
 // Aesthetics for mock scores
 const AESTHETICS = [
@@ -23,9 +24,12 @@ export default function App() {
   const [scores, setScores] = useState(null)
   const [roastMode, setRoastMode] = useState(false)
   const [error, setError] = useState(null)
-  const [revealStage, setRevealStage] = useState(0) // For sequential reveal
+  const [revealStage, setRevealStage] = useState(0)
   const [timeUntilReset, setTimeUntilReset] = useState('')
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
+  const [proEmail, setProEmail] = useState(() => localStorage.getItem('fitrate_email') || '')
+  const [emailInput, setEmailInput] = useState('')
+  const [emailChecking, setEmailChecking] = useState(false)
 
   const [scansRemaining, setScansRemaining] = useState(() => {
     const today = new Date().toDateString()
@@ -39,16 +43,68 @@ export default function App() {
 
   const fileInputRef = useRef(null)
 
-  // Stripe payment success
+  // Check Pro status via email on load
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('fitrate_email')
+    if (savedEmail && !isPro) {
+      checkProStatus(savedEmail)
+    }
+  }, [])
+
+  // Stripe payment success - show email prompt
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('success') === 'true') {
-      localStorage.setItem('fitrate_pro', 'true')
-      setIsPro(true)
-      setScreen('pro-welcome')
+      setScreen('pro-email-prompt')
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
+
+  // Check if email is Pro
+  const checkProStatus = async (email) => {
+    try {
+      setEmailChecking(true)
+      const response = await fetch(`${API_BASE}/pro/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      const data = await response.json()
+
+      if (data.isPro) {
+        localStorage.setItem('fitrate_pro', 'true')
+        localStorage.setItem('fitrate_email', email.toLowerCase().trim())
+        setIsPro(true)
+        setProEmail(email.toLowerCase().trim())
+        return true
+      }
+      return false
+    } catch (err) {
+      console.error('Pro check error:', err)
+      return false
+    } finally {
+      setEmailChecking(false)
+    }
+  }
+
+  // Handle email submit after payment
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault()
+    if (!emailInput.trim()) return
+
+    const isNowPro = await checkProStatus(emailInput.trim())
+    if (isNowPro) {
+      setScreen('pro-welcome')
+    } else {
+      // Email not found yet - might take a moment for webhook
+      // Save email anyway and mark as Pro (trust the redirect)
+      localStorage.setItem('fitrate_pro', 'true')
+      localStorage.setItem('fitrate_email', emailInput.toLowerCase().trim())
+      setIsPro(true)
+      setProEmail(emailInput.toLowerCase().trim())
+      setScreen('pro-welcome')
+    }
+  }
 
   // Countdown timer
   useEffect(() => {
@@ -876,6 +932,55 @@ export default function App() {
         >
           Try Again
         </button>
+      </div>
+    )
+  }
+
+  // ============================================
+  // PRO EMAIL PROMPT SCREEN
+  // ============================================
+  if (screen === 'pro-email-prompt') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+      }}>
+        <div className="text-6xl mb-6">✅</div>
+        <h2 className="text-3xl font-bold text-white mb-2">Payment Successful!</h2>
+        <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Enter the email you used to pay<br />to activate your Pro access
+        </p>
+
+        <form onSubmit={handleEmailSubmit} className="w-full max-w-sm">
+          <input
+            type="email"
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
+            placeholder="your@email.com"
+            className="w-full px-5 py-4 rounded-xl text-white text-lg mb-4"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              outline: 'none'
+            }}
+            required
+          />
+          <button
+            type="submit"
+            disabled={emailChecking || !emailInput.trim()}
+            className="w-full py-4 rounded-xl text-white font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50"
+            style={{
+              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+              boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+            }}
+          >
+            {emailChecking ? 'Checking...' : 'Activate Pro ⚡'}
+          </button>
+        </form>
+
+        <p className="text-xs mt-6 text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          Your Pro access will work across all devices
+        </p>
       </div>
     )
   }
