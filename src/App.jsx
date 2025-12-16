@@ -164,16 +164,45 @@ export default function App() {
     setError(null)
 
     try {
-      // For demo/fallback, use mock scores
-      await new Promise(resolve => setTimeout(resolve, 2500))
-      setScores(generateMockScores())
-      incrementScanCount()
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: imageData,
+          roastMode,
+          occasion: selectedOccasion
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        // Handle rate limit
+        if (response.status === 429 || data.limitReached) {
+          setError(data.error || 'Daily limit reached')
+          setScansRemaining(0)
+          setScreen('limit-reached')
+          return
+        }
+        throw new Error(data.error || 'Analysis failed')
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Could not analyze outfit')
+      }
+
+      // Update scan count from server response
+      if (data.scanInfo) {
+        setScansRemaining(data.scanInfo.scansRemaining)
+      }
+
+      setScores({ ...data.scores, roastMode })
+      updateStreak()
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
-      setScores(generateMockScores())
-      incrementScanCount()
-      setScreen('results')
+      setError(err.message || 'Something went wrong. Please try again.')
+      setScreen('error')
     }
   }, [roastMode, selectedOccasion])
 
@@ -243,24 +272,58 @@ export default function App() {
   }, [])
 
   const handleShare = useCallback(async () => {
-    const modeText = scores?.roastMode ? '🔥 ROAST MODE 🔥\n' : ''
-    const shareText = `${modeText}I got ${scores?.overall}/100 on FitCheck!\n${scores?.verdict}\n\nAesthetic: ${scores?.aesthetic}\nCeleb Match: ${scores?.celebMatch}`
-    const shareUrl = window.location.href
+    const scoreEmoji = scores?.overall >= 85 ? '🔥' : scores?.overall >= 70 ? '✨' : '💪'
+    const modeText = scores?.roastMode ? '💀 ROAST MODE 💀\n' : ''
+    const shareText = `${modeText}${scoreEmoji} I got ${scores?.overall}/100 on FitRate!\n\n"${scores?.verdict}"\n\nCan you beat my score? 👀\n\n#FitRate #OOTD #FashionAI`
+    const shareUrl = 'https://fitrate.app'
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: `FitCheck: ${scores?.overall}/100`, text: shareText, url: shareUrl })
+        await navigator.share({
+          title: `I scored ${scores?.overall}/100 on FitRate!`,
+          text: shareText,
+          url: shareUrl
+        })
       } catch (err) {
         if (err.name !== 'AbortError') {
-          navigator.clipboard?.writeText(shareText + '\n\nRate your fit: ' + shareUrl)
-          alert('Copied to clipboard!')
+          copyToClipboard(shareText + '\n\n' + shareUrl)
         }
       }
     } else {
-      navigator.clipboard?.writeText(shareText + '\n\nRate your fit: ' + shareUrl)
-      alert('Copied to clipboard!')
+      copyToClipboard(shareText + '\n\n' + shareUrl)
     }
   }, [scores])
+
+  const handleChallengeFriend = useCallback(async () => {
+    const challengeText = `Think your fit is better than mine? 👀\n\nI just scored ${scores?.overall}/100 on FitRate.\n\nBeat my score if you can! 🔥\n\n#FitRateChallenge`
+    const shareUrl = 'https://fitrate.app'
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'FitRate Challenge!',
+          text: challengeText,
+          url: shareUrl
+        })
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(challengeText + '\n\n' + shareUrl)
+        }
+      }
+    } else {
+      copyToClipboard(challengeText + '\n\n' + shareUrl)
+    }
+  }, [scores])
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard?.writeText(text)
+    // Show a toast notification
+    const toast = document.createElement('div')
+    toast.textContent = '✓ Copied to clipboard!'
+    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#00ff88;color:#000;padding:12px 24px;border-radius:50px;font-weight:600;font-size:14px;z-index:9999;animation:fadeInOut 2s forwards;'
+    document.body.appendChild(toast)
+    setTimeout(() => toast.remove(), 2000)
+  }
 
   const getScoreColor = (score) => {
     if (score >= 85) return '#00ff88'
@@ -681,17 +744,29 @@ export default function App() {
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>Scan Again</button>
           <button onClick={handleShare} className="flex-1 py-3.5 rounded-xl text-white text-sm font-semibold"
             style={{ background: scores.roastMode ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)' : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)' }}>
-            Share {scores.roastMode ? 'Roast' : 'Result'}
+            📤 Share {scores.roastMode ? 'Roast' : 'Result'}
           </button>
         </div>
+
+        {/* Challenge Friend - Viral CTA */}
+        <button
+          onClick={handleChallengeFriend}
+          className="mt-3 w-full max-w-sm py-3.5 rounded-xl text-white text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: 'linear-gradient(135deg, #ff0080 0%, #7928ca 100%)',
+            boxShadow: '0 4px 20px rgba(255,0,128,0.3)'
+          }}
+        >
+          ⚔️ Challenge a Friend
+        </button>
 
         {/* Pro CTA */}
         <div className="mt-5 p-4 rounded-xl text-center w-full max-w-sm" style={{
           background: 'linear-gradient(135deg, rgba(255,0,128,0.1) 0%, rgba(0,212,255,0.1) 100%)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
-          <p className="text-sm text-white font-semibold mb-1">Go Pro for Unlimited</p>
-          <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>+ Outfit history, detailed tips, no watermark</p>
+          <p className="text-sm text-white font-semibold mb-1">Go Pro — 25 scans/day</p>
+          <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>Outfit history • Detailed tips • Priority scanning</p>
           <a
             href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
             target="_blank"
@@ -702,6 +777,40 @@ export default function App() {
             $3.99/mo
           </a>
         </div>
+      </div>
+    )
+  }
+
+  // LIMIT REACHED SCREEN
+  if (screen === 'limit-reached') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
+        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+      }}>
+        <div className="text-6xl mb-6">🔥</div>
+        <h2 className="text-white text-2xl font-bold mb-2">You're On Fire!</h2>
+        <p className="text-center mb-6 max-w-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          You've used your free scan for today. Upgrade to Pro for 25 scans/day!
+        </p>
+
+        <a
+          href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-8 py-4 rounded-xl text-white font-bold text-lg transition-all hover:scale-105 active:scale-95 mb-4"
+          style={{ background: 'linear-gradient(135deg, #ff0080 0%, #ff4d4d 100%)' }}
+        >
+          Go Pro — $3.99/mo
+        </a>
+
+        <button onClick={resetApp} className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          ← Back to Home
+        </button>
+
+        <p className="absolute bottom-8 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          Your free scan resets at midnight ✨
+        </p>
       </div>
     )
   }

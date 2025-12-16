@@ -1,27 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0f" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="FitCheck" />
-    
-    <title>FitCheck - AI Outfit Rating</title>
-    <meta name="description" content="Get instant AI ratings on your outfits. The Umax for fashion." />
-    
-    <!-- Open Graph / Social -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="FitCheck - AI Outfit Rating" />
-    <meta property="og:description" content="Get instant AI ratings on your outfits" />
-    <meta property="og:image" content="/og-image.png" />
-    
-    <link rel="icon" type="image/png" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FitRate" />
+
+  <title>FitRate - AI Outfit Rating | Rate Your Fit</title>
+  <meta name="description"
+    content="Get instant AI ratings on your outfits. GPT-4 powered fashion analysis. The Umax for fashion. Rate your fit now!" />
+  <meta name="keywords"
+    content="outfit rating, AI fashion, fit check, fashion AI, outfit analyzer, style rating, OOTD" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://fitrate.app/" />
+  <meta property="og:title" content="FitRate - AI Outfit Rating" />
+  <meta property="og:description" content="Get instant AI ratings on your outfits. Can you score 90+? 🔥" />
+  <meta property="og:image" content="https://fitrate.app/og-image.png" />
+  <meta property="og:site_name" content="FitRate" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://fitrate.app/" />
+  <meta name="twitter:title" content="FitRate - AI Outfit Rating" />
+  <meta name="twitter:description" content="Get instant AI ratings on your outfits. Can you score 90+? 🔥" />
+  <meta name="twitter:image" content="https://fitrate.app/og-image.png" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
+  <link rel="apple-touch-icon" href="/icon-192.svg" />
+
+  <!-- Preconnect to API -->
+  <link rel="preconnect" href="https://fitrate-api.up.railway.app" />
+
+  <style>
+    /* Critical above-the-fold CSS */
+    body {
+      margin: 0;
+      background: #0a0a0f;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      20% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      80% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
