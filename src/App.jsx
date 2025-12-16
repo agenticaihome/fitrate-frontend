@@ -13,7 +13,7 @@ const OCCASIONS = [
 ]
 
 const AESTHETICS = [
-  'Clean Girl', 'Dark Academia', 'Quiet Luxury', 'Streetwear', 'Y2K', 
+  'Clean Girl', 'Dark Academia', 'Quiet Luxury', 'Streetwear', 'Y2K',
   'Cottagecore', 'Minimalist', 'Coastal Grandmother', 'Grunge', 'Preppy',
   'Gorpcore', 'Balletcore', 'Old Money', 'Skater', 'Bohemian'
 ]
@@ -31,7 +31,7 @@ export default function App() {
   const [uploadedImage, setUploadedImage] = useState(null)
   const [scores, setScores] = useState(null)
   const [error, setError] = useState(null)
-  
+
   // New feature states
   const [roastMode, setRoastMode] = useState(false)
   const [selectedOccasion, setSelectedOccasion] = useState(null)
@@ -48,7 +48,7 @@ export default function App() {
     }
     return 0
   })
-  
+
   const [scansRemaining, setScansRemaining] = useState(() => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -58,12 +58,12 @@ export default function App() {
     }
     return 1
   })
-  
+
   // Battle mode states
   const [battleMode, setBattleMode] = useState(false)
   const [battleOutfits, setBattleOutfits] = useState([null, null])
   const [battleResults, setBattleResults] = useState(null)
-  
+
   const fileInputRef = useRef(null)
   const battleInputRef = useRef(null)
 
@@ -71,14 +71,14 @@ export default function App() {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_streak')
     let newStreak = 1
-    
+
     if (stored) {
       const { count, lastDate } = JSON.parse(stored)
       const yesterday = new Date(Date.now() - 86400000).toDateString()
       if (lastDate === yesterday) newStreak = count + 1
       else if (lastDate === today) newStreak = count
     }
-    
+
     localStorage.setItem('fitrate_streak', JSON.stringify({ count: newStreak, lastDate: today }))
     setStreak(newStreak)
   }
@@ -109,14 +109,14 @@ export default function App() {
       "Giving 'I woke up 5 mins before leaving'",
       "This outfit has a 2.3 GPA"
     ]
-    
+
     const niceVerdicts = [
       "Clean minimalist energy ✨", "Main character vibes fr", "Understated fire 🔥",
       "The fit is fitting", "Effortlessly hard", "Quiet confidence activated",
       "Lowkey dripping", "This hits different", "Certified fresh fit",
       "Immaculate vibes only", "The algorithm would push this"
     ]
-    
+
     const roastTips = [
       "Start over. Please.",
       "Have you considered... not this?",
@@ -124,7 +124,7 @@ export default function App() {
       "Call a friend. Any friend. Get help.",
       "The outfit is outfit-ing but not in a good way"
     ]
-    
+
     const niceTips = [
       "Cuff the jeans for a cleaner silhouette",
       "A chunky watch would elevate this hard",
@@ -134,18 +134,18 @@ export default function App() {
       "A leather belt would complete the look",
       "White sneakers would make this pop"
     ]
-    
+
     const baseScore = roastMode ? Math.floor(Math.random() * 30) + 45 : Math.floor(Math.random() * 20) + 75
     const aesthetic = AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)]
     const celeb = CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)]
-    
+
     return {
       overall: baseScore,
       color: baseScore + Math.floor(Math.random() * 10) - 5,
       fit: baseScore + Math.floor(Math.random() * 10) - 5,
       style: baseScore + Math.floor(Math.random() * 10) - 5,
       occasion: baseScore + Math.floor(Math.random() * 10) - 5,
-      verdict: roastMode 
+      verdict: roastMode
         ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
         : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
       tip: roastMode
@@ -162,7 +162,7 @@ export default function App() {
   const analyzeOutfit = useCallback(async (imageData) => {
     setScreen('analyzing')
     setError(null)
-    
+
     try {
       // For demo/fallback, use mock scores
       await new Promise(resolve => setTimeout(resolve, 2500))
@@ -208,15 +208,15 @@ export default function App() {
   const analyzeBattle = async (outfits) => {
     setScreen('analyzing')
     await new Promise(resolve => setTimeout(resolve, 3000))
-    
+
     const score1 = Math.floor(Math.random() * 25) + 70
     const score2 = Math.floor(Math.random() * 25) + 70
-    
+
     setBattleResults({
       outfit1: { score: score1, verdict: score1 > score2 ? "WINNER 👑" : "Close but no" },
       outfit2: { score: score2, verdict: score2 > score1 ? "WINNER 👑" : "Close but no" },
       winner: score1 > score2 ? 1 : score1 < score2 ? 2 : 0,
-      commentary: score1 === score2 
+      commentary: score1 === score2
         ? "It's a tie! Both fits are equally fire 🔥"
         : `Outfit ${score1 > score2 ? '1' : '2'} takes the crown by ${Math.abs(score1 - score2)} points!`
     })
@@ -246,7 +246,7 @@ export default function App() {
     const modeText = scores?.roastMode ? '🔥 ROAST MODE 🔥\n' : ''
     const shareText = `${modeText}I got ${scores?.overall}/100 on FitCheck!\n${scores?.verdict}\n\nAesthetic: ${scores?.aesthetic}\nCeleb Match: ${scores?.celebMatch}`
     const shareUrl = window.location.href
-    
+
     if (navigator.share) {
       try {
         await navigator.share({ title: `FitCheck: ${scores?.overall}/100`, text: shareText, url: shareUrl })
@@ -282,7 +282,7 @@ export default function App() {
   if (screen === 'home') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-5 relative overflow-hidden" style={{
-        background: roastMode 
+        background: roastMode
           ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
           : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
@@ -290,7 +290,7 @@ export default function App() {
       }}>
         {/* Ambient glows */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none" style={{
-          background: roastMode 
+          background: roastMode
             ? 'radial-gradient(circle, rgba(255,68,68,0.15) 0%, transparent 70%)'
             : 'radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%)',
           filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite'
@@ -299,7 +299,7 @@ export default function App() {
           background: 'radial-gradient(circle, rgba(255,0,128,0.12) 0%, transparent 70%)',
           filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite 2s'
         }} />
-        
+
         {/* Streak Counter */}
         {streak > 0 && (
           <div className="absolute top-6 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
@@ -310,7 +310,7 @@ export default function App() {
             <span className="text-sm font-bold" style={{ color: '#ff8800' }}>{streak} day streak</span>
           </div>
         )}
-        
+
         {/* Roast Mode Toggle */}
         <button
           onClick={() => setRoastMode(!roastMode)}
@@ -325,20 +325,20 @@ export default function App() {
             {roastMode ? 'ROAST MODE' : 'Nice Mode'}
           </span>
         </button>
-        
+
         {/* Logo */}
         <h1 className="text-5xl md:text-6xl font-extrabold mb-2" style={{
           letterSpacing: '-2px',
-          background: roastMode 
+          background: roastMode
             ? 'linear-gradient(135deg, #fff 0%, #ff4444 50%, #ff8800 100%)'
             : 'linear-gradient(135deg, #fff 0%, #00d4ff 50%, #ff0080 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
-        
+
         <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>
           {roastMode ? '🔥 No Mercy Mode 🔥' : 'AI Outfit Rating'}
         </p>
-        
+
         {/* Occasion Picker */}
         {showOccasionPicker && (
           <div className="mb-8 p-4 rounded-2xl w-full max-w-sm" style={{
@@ -364,17 +364,17 @@ export default function App() {
             </div>
           </div>
         )}
-        
+
         {/* Hidden file input */}
         <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-        
+
         {/* Main scan button */}
         <button
           onClick={() => scansRemaining > 0 && fileInputRef.current?.click()}
           disabled={scansRemaining === 0}
           className="w-48 h-48 rounded-full flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 relative disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: roastMode 
+            background: roastMode
               ? 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)'
               : 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
             boxShadow: roastMode
@@ -388,11 +388,11 @@ export default function App() {
             {roastMode ? 'ROAST ME' : 'CHECK FIT'}
           </span>
         </button>
-        
+
         <p className="text-sm mt-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
           {roastMode ? 'Prepare to be humbled' : 'Tap to scan your outfit'}
         </p>
-        
+
         {/* Feature buttons */}
         <div className="flex gap-3 mt-8">
           <button
@@ -429,14 +429,29 @@ export default function App() {
             🎬 Demo
           </button>
         </div>
-        
+
         {/* Scan counter */}
         <div className="absolute bottom-8 flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          <span className="w-2 h-2 rounded-full" style={{ 
+          <span className="w-2 h-2 rounded-full" style={{
             background: scansRemaining > 0 ? '#00ff88' : '#ff4444',
             boxShadow: scansRemaining > 0 ? '0 0 10px #00ff88' : '0 0 10px #ff4444'
           }} />
-          {scansRemaining > 0 ? `${scansRemaining} free scan remaining today` : 'No scans remaining — Go Pro'}
+          {scansRemaining > 0 ? (
+            `${scansRemaining} free scan remaining today`
+          ) : (
+            <span>
+              No scans remaining — {' '}
+              <a
+                href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold hover:underline"
+                style={{ color: '#ff0080' }}
+              >
+                Go Pro
+              </a>
+            </span>
+          )}
         </div>
 
         <style>{`@keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }`}</style>
@@ -452,10 +467,10 @@ export default function App() {
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
         <button onClick={resetApp} className="absolute top-6 left-6 text-white/50 text-sm">← Back</button>
-        
+
         <h2 className="text-2xl font-bold text-white mb-2">⚔️ FIT BATTLE ⚔️</h2>
         <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Upload 2 outfits. AI picks the winner.</p>
-        
+
         <div className="flex gap-4 mb-8">
           {[0, 1].map((idx) => (
             <div
@@ -479,11 +494,11 @@ export default function App() {
             </div>
           ))}
         </div>
-        
+
         <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
           {!battleOutfits[0] ? 'Upload first outfit' : !battleOutfits[1] ? 'Now upload second outfit' : 'Analyzing...'}
         </p>
-        
+
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
       </div>
     )
@@ -497,7 +512,7 @@ export default function App() {
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
       }}>
         <h2 className="text-2xl font-bold text-white mb-6">⚔️ BATTLE RESULTS ⚔️</h2>
-        
+
         <div className="flex gap-4 mb-6">
           {[0, 1].map((idx) => (
             <div key={idx} className="flex flex-col items-center">
@@ -519,9 +534,9 @@ export default function App() {
             </div>
           ))}
         </div>
-        
+
         <p className="text-center text-white font-semibold mb-8">{battleResults.commentary}</p>
-        
+
         <div className="flex gap-3">
           <button onClick={resetApp} className="px-6 py-3 rounded-xl text-white font-semibold"
             style={{ background: 'rgba(255,255,255,0.1)' }}>New Battle</button>
@@ -536,7 +551,7 @@ export default function App() {
   if (screen === 'analyzing') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-5" style={{
-        background: roastMode 
+        background: roastMode
           ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
           : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
@@ -544,7 +559,7 @@ export default function App() {
         <div className="w-44 h-60 rounded-2xl overflow-hidden mb-10 relative" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
           <img src={uploadedImage || battleOutfits[0]} alt="Your outfit" className="w-full h-full object-cover" />
           <div className="absolute left-0 right-0 h-1" style={{
-            background: roastMode 
+            background: roastMode
               ? 'linear-gradient(90deg, transparent, #ff4444, transparent)'
               : 'linear-gradient(90deg, transparent, #00d4ff, transparent)',
             boxShadow: roastMode ? '0 0 20px #ff4444' : '0 0 20px #00d4ff',
@@ -556,9 +571,9 @@ export default function App() {
         </h2>
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ 
-              background: roastMode ? '#ff4444' : '#00d4ff', 
-              animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s` 
+            <div key={i} className="w-2.5 h-2.5 rounded-full" style={{
+              background: roastMode ? '#ff4444' : '#00d4ff',
+              animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s`
             }} />
           ))}
         </div>
@@ -579,7 +594,7 @@ export default function App() {
   if (screen === 'results' && scores) {
     return (
       <div className="min-h-screen flex flex-col items-center p-5 pt-8 pb-20 overflow-y-auto" style={{
-        background: scores.roastMode 
+        background: scores.roastMode
           ? 'linear-gradient(135deg, #1a0a0a 0%, #2e1a1a 50%, #1a0a0a 100%)'
           : 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
         fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
@@ -590,14 +605,14 @@ export default function App() {
             <span className="text-xs font-bold" style={{ color: '#ff4444' }}>🔥 ROAST MODE 🔥</span>
           </div>
         )}
-        
+
         {/* Result Card */}
         <div className="w-full max-w-sm rounded-3xl p-6 relative overflow-hidden" style={{
           background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)'
         }}>
           <div className="absolute top-4 right-4 text-xs font-bold" style={{ letterSpacing: '1px', color: 'rgba(255,255,255,0.2)' }}>FITRATE</div>
-          
+
           {/* Photo with score */}
           <div className="w-full h-64 rounded-2xl overflow-hidden relative mb-4">
             <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
@@ -608,12 +623,12 @@ export default function App() {
               <div className="text-xs font-bold mt-1" style={{ letterSpacing: '2px', color: getScoreColor(scores.overall) }}>{getScoreLabel(scores.overall)}</div>
             </div>
           </div>
-          
+
           {/* Verdict */}
           <div className="text-center mb-4">
             <p className="text-lg font-semibold text-white">{scores.verdict}</p>
           </div>
-          
+
           {/* NEW: Aesthetic & Celeb Match */}
           <div className="flex gap-2 mb-4">
             <div className="flex-1 p-3 rounded-xl text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -625,7 +640,7 @@ export default function App() {
               <p className="text-xs font-semibold text-white leading-tight">{scores.celebMatch}</p>
             </div>
           </div>
-          
+
           {/* Category Breakdown */}
           <div className="flex flex-col gap-2.5">
             {[
@@ -647,11 +662,11 @@ export default function App() {
               </div>
             ))}
           </div>
-          
+
           {/* Pro Tip */}
-          <div className="mt-4 p-3 rounded-xl" style={{ 
-            background: scores.roastMode ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,255,0.1)', 
-            border: scores.roastMode ? '1px solid rgba(255,68,68,0.2)' : '1px solid rgba(0,212,255,0.2)' 
+          <div className="mt-4 p-3 rounded-xl" style={{
+            background: scores.roastMode ? 'rgba(255,68,68,0.1)' : 'rgba(0,212,255,0.1)',
+            border: scores.roastMode ? '1px solid rgba(255,68,68,0.2)' : '1px solid rgba(0,212,255,0.2)'
           }}>
             <div className="text-xs font-bold mb-1" style={{ color: scores.roastMode ? '#ff4444' : '#00d4ff' }}>
               {scores.roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
@@ -659,7 +674,7 @@ export default function App() {
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{scores.tip}</p>
           </div>
         </div>
-        
+
         {/* Action Buttons */}
         <div className="flex gap-3 mt-5 w-full max-w-sm">
           <button onClick={resetApp} className="flex-1 py-3.5 rounded-xl text-white text-sm font-semibold"
@@ -669,7 +684,7 @@ export default function App() {
             Share {scores.roastMode ? 'Roast' : 'Result'}
           </button>
         </div>
-        
+
         {/* Pro CTA */}
         <div className="mt-5 p-4 rounded-xl text-center w-full max-w-sm" style={{
           background: 'linear-gradient(135deg, rgba(255,0,128,0.1) 0%, rgba(0,212,255,0.1) 100%)',
@@ -677,8 +692,15 @@ export default function App() {
         }}>
           <p className="text-sm text-white font-semibold mb-1">Go Pro for Unlimited</p>
           <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>+ Outfit history, detailed tips, no watermark</p>
-          <button className="px-6 py-2 rounded-full text-white text-sm font-bold"
-            style={{ background: 'linear-gradient(135deg, #ff0080 0%, #ff4d4d 100%)' }}>$3.99/mo</button>
+          <a
+            href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-6 py-2 rounded-full text-white text-sm font-bold transition-all hover:scale-105 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #ff0080 0%, #ff4d4d 100%)' }}
+          >
+            $3.99/mo
+          </a>
         </div>
       </div>
     )
