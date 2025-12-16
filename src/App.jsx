@@ -882,27 +882,36 @@ export default function App() {
           </span>
         </button>
 
-        {/* Scan Status */}
-        <div className="absolute bottom-10 text-center">
+        {/* Scan Status / Limit Reached Footer */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-center" style={{
+          background: 'linear-gradient(to top, #0a0a0f 20%, transparent 100%)',
+          paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
+        }}>
           {scansRemaining > 0 || isPro ? (
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              {isPro ? '⚡ 25 AI ratings per day' : '1 free rate per day • 25/day with FitPass'}
+            <p className="text-xs font-medium tracking-wide opacity-50">
+              {isPro ? '⚡ 25 daily ratings active' : '1 free rating resets daily'}
             </p>
           ) : (
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                Next free rate in <span style={{ color: accent }}>{timeUntilReset}</span>
-              </p>
+            <div className="w-full max-w-sm rounded-2xl p-4 flex items-center justify-between gap-4" style={{
+              background: 'rgba(20,20,30,0.8)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+            }}>
+              <div className="flex flex-col">
+                <span className="text-xs text-white/50 font-bold tracking-wider mb-0.5">NEXT FREE RATE</span>
+                <span className="text-lg font-mono font-bold text-white tabular-nums">{timeUntilReset}</span>
+              </div>
+
               <a
                 href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-                className="text-sm font-bold px-4 py-2 rounded-full transition-all hover:scale-105"
+                className="px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center gap-2 transition-transform active:scale-95"
                 style={{
-                  color: '#00d4ff',
-                  background: 'rgba(0,212,255,0.1)',
-                  border: '1px solid rgba(0,212,255,0.3)'
+                  background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                  boxShadow: '0 4px 15px rgba(0,212,255,0.3)'
                 }}
               >
-                Get 25/day →
+                Unlock ⚡
               </a>
             </div>
           )}
@@ -986,9 +995,10 @@ export default function App() {
     const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
 
     return (
-      <div className="min-h-screen flex flex-col items-center p-6 pt-10 pb-24 overflow-hidden" style={{
+      <div className="min-h-screen flex flex-col items-center p-6 pt-10 overflow-hidden" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 30%, #1a1a2e 60%, #0a0a0f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingBottom: 'max(6rem, env(safe-area-inset-bottom, 6rem))'
       }}>
         {/* Verdict - Huge & Bold */}
         <div className={`transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
