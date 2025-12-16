@@ -1324,18 +1324,39 @@ export default function App() {
   // ============================================
   if (screen === 'share-preview' && shareData) {
     const handleSystemShare = async () => {
-      if (navigator.share && navigator.canShare({ files: [shareData.file] })) {
+      // Try to share with URL param for better compatibility
+      if (navigator.share) {
         try {
-          await navigator.share({
-            files: [shareData.file],
+          // Construct data object dynamically
+          const data = {
             title: 'My FitRate Score',
-            text: shareData.text
-          })
+            text: shareData.text + "\n\n" + shareData.url, // Ensure URL is in text for apps that ignore 'url'
+          }
+
+          // Only add files if supported (some apps fail if files mixed with url)
+          if (navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
+            data.files = [shareData.file]
+          } else {
+            data.url = shareData.url // Fallback to just URL if files not supported
+          }
+
+          // Prioritize URL if we want clickable links? 
+          // Actually, let's try sending EVERYTHING.
+          // Note: Android often drops the URL if files are present.
+          // Putting URL in 'text' is the safest bet for visibility.
+
+          await navigator.share(data)
         } catch (err) {
-          console.error(err)
+          console.error("Share failed:", err)
+          // Fallback: Copy link if share fails
+          if (err.name !== 'AbortError') {
+            navigator.clipboard.writeText(shareData.url)
+            alert("Could not share directly. Link copied instead! 📋")
+          }
         }
       } else {
-        alert("System sharing not available on this device")
+        navigator.clipboard.writeText(shareData.url)
+        alert("System sharing not available. Link copied! 📋")
       }
     }
 
