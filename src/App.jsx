@@ -172,15 +172,48 @@ export default function App() {
     setScreen('analyzing')
     setError(null)
 
+    // Free users: call backend to track scan by IP, then show mock scores
     if (!isPro) {
-      await new Promise(resolve => setTimeout(resolve, 2500 + Math.random() * 1500))
-      const mockScores = generateMockScores()
-      setScores(mockScores)
-      incrementScanCount()
-      setScreen('results')
-      return
+      try {
+        // Register scan on server (tracks by IP - prevents localStorage bypass)
+        const consumeUrl = API_URL.replace('/analyze', '/analyze/consume')
+        const response = await fetch(consumeUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        })
+
+        const data = await response.json()
+
+        // Check if rate limited
+        if (response.status === 429 || !data.success) {
+          setScansRemaining(0)
+          setScreen('limit-reached')
+          return
+        }
+
+        // Update scans remaining from server
+        if (data.scanInfo) {
+          setScansRemaining(data.scanInfo.scansRemaining)
+        }
+
+        // Simulate AI thinking time for realism
+        await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1500))
+
+        // Generate mock scores (no OpenAI cost)
+        const mockScores = generateMockScores()
+        setScores(mockScores)
+        setScreen('results')
+        return
+      } catch (err) {
+        console.error('Consume error:', err)
+        setError("Connection issue... try again!")
+        setScreen('error')
+        return
+      }
     }
 
+    // Pro users: call real AI
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -788,6 +821,54 @@ export default function App() {
           }}
         >
           Start Rating 🚀
+        </button>
+      </div>
+    )
+  }
+
+  // ============================================
+  // LIMIT REACHED SCREEN
+  // ============================================
+  if (screen === 'limit-reached') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+      }}>
+        <span className="text-7xl mb-6">⏰</span>
+        <h2 className="text-2xl font-bold text-white mb-2">Daily Limit Reached</h2>
+        <p className="text-center mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          Your free rate resets at midnight
+        </p>
+
+        {timeUntilReset && (
+          <div className="px-6 py-3 rounded-full mb-8" style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}>
+            <span className="text-lg font-semibold" style={{ color: '#00d4ff' }}>
+              Next free rate in {timeUntilReset}
+            </span>
+          </div>
+        )}
+
+        <a
+          href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+          className="px-8 py-4 rounded-2xl text-white font-bold text-lg transition-all hover:scale-105 mb-4"
+          style={{
+            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+            boxShadow: '0 4px 30px rgba(0,212,255,0.4)'
+          }}
+        >
+          Get Unlimited Rates ⚡
+        </a>
+
+        <button
+          onClick={resetApp}
+          className="text-sm font-medium"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
+        >
+          ← Back to Home
         </button>
       </div>
     )
