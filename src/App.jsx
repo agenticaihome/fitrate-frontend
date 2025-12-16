@@ -31,6 +31,34 @@ export default function App() {
   const [emailInput, setEmailInput] = useState('')
   const [emailChecking, setEmailChecking] = useState(false)
 
+  // Daily Streak Logic
+  const [dailyStreak, setDailyStreak] = useState(() => {
+    try {
+      const stored = localStorage.getItem('fitrate_streak')
+      if (stored) {
+        const { date, count } = JSON.parse(stored)
+        const lastDate = new Date(date)
+        const today = new Date()
+
+        // Check if yesterday (allow 48h window to be safe)
+        const diffTime = Math.abs(today - lastDate)
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+        if (diffDays <= 2) return count // Keep streak
+        return 0 // Streak broken
+      }
+    } catch (e) { return 0 }
+    return 0
+  })
+
+  // Daily Theme Rotation
+  const DAILY_THEMES = [
+    "Y2K Revival", "Airport Looks", "Gym Baddie", "Date Night", "Coffee Run",
+    "Office Siren", "Cozy Sunday", "Festival Fit", "Street Style", "Old Money",
+    "Baggy Jeans", "Clean Girl", "Mob Wife", "Eclectic Grandpa"
+  ]
+  const todayTheme = DAILY_THEMES[Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % DAILY_THEMES.length]
+
   const [scansRemaining, setScansRemaining] = useState(() => {
     const today = new Date().toDateString()
     const stored = localStorage.getItem('fitrate_scans')
@@ -319,6 +347,18 @@ export default function App() {
           setScansRemaining(data.scanInfo.scansRemaining)
         }
 
+        // Update Streak
+        const storedStreak = localStorage.getItem('fitrate_streak')
+        let newStreak = 1
+        const today = new Date().toDateString()
+        if (storedStreak) {
+          const { date, count } = JSON.parse(storedStreak)
+          if (date !== today) newStreak = count + 1
+          else newStreak = count
+        }
+        localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
+        setDailyStreak(newStreak)
+
         // Simulate AI thinking time for realism
         await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1500))
 
@@ -347,6 +387,18 @@ export default function App() {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Analysis failed')
       }
+
+      // Update Streak
+      const storedStreak = localStorage.getItem('fitrate_streak')
+      let newStreak = 1
+      const today = new Date().toDateString()
+      if (storedStreak) {
+        const { date, count } = JSON.parse(storedStreak)
+        if (date !== today) newStreak = count + 1
+        else newStreak = count
+      }
+      localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
+      setDailyStreak(newStreak)
 
       setScores({ ...data.scores, roastMode })
       setScreen('results')
@@ -639,6 +691,16 @@ export default function App() {
         {/* Hidden file input */}
         <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
+        {/* Streak Counter */}
+        <div className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-full" style={{
+          background: 'rgba(255,153,0,0.1)',
+          border: '1px solid rgba(255,153,0,0.3)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <span className="text-xl">🔥</span>
+          <span className="text-lg font-bold" style={{ color: '#ffecb3' }}>{dailyStreak}</span>
+        </div>
+
         {/* Pro Badge */}
         {isPro && (
           <div className="absolute top-6 right-6 px-4 py-2 rounded-full" style={{
@@ -688,6 +750,15 @@ export default function App() {
             {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
           </span>
         </button>
+
+        {/* Daily Theme */}
+        <div className="mt-8 px-5 py-2 rounded-full flex items-center gap-2" style={{
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <span className="text-xs font-semibold tracking-wider text-white/60">TODAY'S VIBE:</span>
+          <span className="text-sm font-bold text-white shadow-sm" style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{todayTheme}</span>
+        </div>
 
         {/* Mode Toggle - Glassmorphism pill */}
         <button
