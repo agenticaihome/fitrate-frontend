@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 
+// Build: 2025-12-16T05:04:00Z - API URL fixed
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
 
 // Feature flags and modes
