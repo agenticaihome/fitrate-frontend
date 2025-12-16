@@ -23,6 +23,7 @@ export default function App() {
   const [screen, setScreen] = useState('home')
   const [uploadedImage, setUploadedImage] = useState(null)
   const [scores, setScores] = useState(null)
+  const [shareData, setShareData] = useState(null)
   const [roastMode, setRoastMode] = useState(false)
   const [error, setError] = useState(null)
   const [revealStage, setRevealStage] = useState(0)
@@ -686,36 +687,33 @@ export default function App() {
 
     // Generate share text based on context
     const getShareText = () => {
+      const baseUrl = 'https://fitrate.app'
       if (scores.roastMode) {
-        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? fitrate.app?ref=${userId} ${hashtag}`
-        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: fitrate.app?ref=${userId} ${hashtag}`
+        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? ${baseUrl}?ref=${userId} ${hashtag}`
+        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: ${baseUrl}?ref=${userId} ${hashtag}`
       } else {
-        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: fitrate.app?ref=${userId} ${hashtag} #FitRateChallenge`
-        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? fitrate.app?ref=${userId} ${hashtag}`
-        return `Just got rated by FitRate AI! Your turn 👀 fitrate.app?ref=${userId} ${hashtag}`
+        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: ${baseUrl}?ref=${userId} ${hashtag} #FitRateChallenge`
+        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? ${baseUrl}?ref=${userId} ${hashtag}`
+        return `Just got rated by FitRate AI! Your turn 👀 ${baseUrl}?ref=${userId} ${hashtag}`
       }
     }
 
     // Convert and share
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
-      const shareText = getShareText()
+      const text = getShareText()
+      const url = `https://fitrate.app?ref=${userId}`
 
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: `FitRate: ${scores.overall}/100`,
-            text: shareText
-          })
-        } catch (err) {
-          downloadImage(blob, shareText)
-        }
-      } else {
-        downloadImage(blob, shareText)
-      }
+      setShareData({
+        file,
+        text,
+        url,
+        imageBlob: blob // Keep blob for downloading
+      })
+      setScreen('share-preview')
+
     }, 'image/png')
-  }, [uploadedImage, scores])
+  }, [uploadedImage, scores, userId])
 
   // Helper: wrap text
   const wrapText = (ctx, text, maxWidth) => {
@@ -1317,6 +1315,129 @@ export default function App() {
         >
           ← Back to Home
         </button>
+      </div>
+    )
+  }
+
+  // ============================================
+  // SHARE PREVIEW SCREEN
+  // ============================================
+  if (screen === 'share-preview' && shareData) {
+    const handleSystemShare = async () => {
+      if (navigator.share && navigator.canShare({ files: [shareData.file] })) {
+        try {
+          await navigator.share({
+            files: [shareData.file],
+            title: 'My FitRate Score',
+            text: shareData.text
+          })
+        } catch (err) {
+          console.error(err)
+        }
+      } else {
+        alert("System sharing not available on this device")
+      }
+    }
+
+    const handleTwitterShare = () => {
+      const text = encodeURIComponent(shareData.text)
+      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank')
+    }
+
+    const handleWhatsAppShare = () => {
+      const text = encodeURIComponent(shareData.text)
+      window.open(`https://wa.me/?text=${text}`, '_blank')
+    }
+
+    const handleCopyLink = () => {
+      navigator.clipboard.writeText(shareData.url).then(() => {
+        alert("Link copied! 📋")
+      })
+    }
+
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center bg-[#0a0a0f] text-white font-sans overflow-y-auto"
+        style={{
+          height: '100dvh',
+          paddingBottom: 'env(safe-area-inset-bottom, 24px)'
+        }}>
+
+        <div className="w-full max-w-md flex flex-col items-center p-6 min-h-full">
+          <h2 className="text-3xl font-black mb-8 mt-4 text-center tracking-tight">Ready to Flex? 💪</h2>
+
+          {/* Image Preview - Responsive Size */}
+          <div className="relative w-[65%] max-w-[240px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl mb-8 transform transition-transform duration-500 hover:scale-[1.02]" style={{
+            border: '2px solid rgba(255,255,255,0.1)',
+            boxShadow: `0 20px 60px ${scores.roastMode ? '#ff4444' : '#00d4ff'}44`
+          }}>
+            <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
+          </div>
+
+          <div className="w-full flex flex-col gap-4 mt-auto">
+            {/* Main System Share - Scale effect on press */}
+            <button
+              onClick={handleSystemShare}
+              className="w-full py-4 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 transition-transform active:scale-95 touch-manipulation"
+              style={{
+                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                boxShadow: '0 8px 30px -4px rgba(0,212,255,0.4)',
+                minHeight: '60px'
+              }}
+            >
+              <span className="text-2xl">📤</span> Share Sheet
+            </button>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={handleTwitterShare}
+                className="py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95 touch-manipulation"
+                style={{
+                  background: '#000000',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  minHeight: '60px'
+                }}
+              >
+                🐦 Post
+              </button>
+              <button
+                onClick={handleWhatsAppShare}
+                className="py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95 touch-manipulation"
+                style={{
+                  background: '#25D366',
+                  minHeight: '60px'
+                }}
+              >
+                💬 Chat
+              </button>
+            </div>
+
+            <button
+              onClick={handleCopyLink}
+              className="w-full py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2 transition-colors active:bg-white/10 touch-manipulation"
+              style={{
+                color: 'rgba(255,255,255,0.9)',
+                background: 'rgba(255,255,255,0.05)',
+                minHeight: '56px'
+              }}
+            >
+              🔗 Copy Link
+            </button>
+
+            <button
+              onClick={() => downloadImage(shareData.imageBlob, shareData.text)}
+              className="w-full py-4 text-sm font-medium text-white/50 active:text-white transition-colors touch-manipulation"
+            >
+              ⬇️ Download Image
+            </button>
+          </div>
+
+          <button
+            onClick={() => setScreen('results')}
+            className="mt-4 py-2 px-6 text-sm font-medium rounded-full transition-colors active:bg-white/5 text-white/40 hover:text-white/60"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     )
   }
