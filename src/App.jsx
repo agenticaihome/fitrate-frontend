@@ -145,8 +145,15 @@ export default function App() {
     }
   }, [screen, scores])
 
-  // Mock scores for free users
+  // Mock scores for free users - Maximum variety!
   const generateMockScores = useCallback(() => {
+    // Use timestamp + random for better uniqueness
+    const seed = Date.now() + Math.random() * 1000000
+    const seededRandom = () => {
+      const x = Math.sin(seed + Math.random() * 10000) * 10000
+      return x - Math.floor(x)
+    }
+
     const roastVerdicts = [
       "Bro really said 'I'll figure it out later' 💀",
       "The colors are in a toxic relationship",
@@ -161,7 +168,17 @@ export default function App() {
       "Giving clearance rack at 9pm",
       "The algorithm buried this one",
       "This fit ghosted the vibe check",
-      "Colors are screaming for help"
+      "Colors are screaming for help",
+      "You wore this on purpose? 💀",
+      "Fabric said 'I give up'",
+      "The fit forgot the assignment",
+      "This is a cry for help",
+      "Outfit buffering... forever",
+      "Did the lighting dirty you or... 😬",
+      "Proportions left the chat",
+      "This fit has a villain origin story",
+      "Styled by throwing darts at the closet",
+      "The vibes are confused and scared"
     ]
 
     const niceVerdicts = [
@@ -178,37 +195,86 @@ export default function App() {
       "Serving looks no crumbs",
       "Chef's kiss coordination 👨‍🍳",
       "The drip is dripping 💧",
-      "Outfit understood the assignment"
+      "Outfit understood the assignment",
+      "You woke up and chose fashion",
+      "The fit ate and left no crumbs",
+      "Giving 'that' friend energy",
+      "Effortless but make it serve",
+      "Pinterest board come to life",
+      "This is someone's mood board",
+      "The silhouette? *Chef's kiss*",
+      "Casual but make it couture",
+      "Absolutely nailed the vibe 🎯",
+      "This fit has main character rights"
     ]
 
     const shareTips = [
-      "Challenge your bestie to beat this score 👀",
+      "Challenge your bestie to beat this 👀",
       "Screenshot & post to your story 📸",
       "Tag someone who needs a rating 💀",
       "Drop this in the group chat rn",
       "Your followers need to see this",
-      "This score goes crazy, share it!"
+      "This score goes crazy, share it!",
+      "Bet you can't get higher 🔥",
+      "Send to someone with worse fits",
+      "Post before you chicken out 😏",
+      "Your friends need to try this"
     ]
 
-    const tips = roastMode
-      ? ["Start over. Please.", "Have you considered... literally anything else?", "Less is more. Way less.", "Google 'how to dress' and return"]
-      : ["Cuff the jeans for cleaner lines", "A chunky watch would elevate", "Try layering with a light jacket", "White sneakers would slap here"]
+    const roastTips = [
+      "Start over. Please.",
+      "Have you considered... literally anything else?",
+      "Less is more. Way less.",
+      "Google 'how to dress' and return",
+      "Maybe try the other shirt next time",
+      "The fit clinic is now open 💀",
+      "Iron exists for a reason bestie",
+      "Delete this and try again",
+      "Stick to monochrome for a bit",
+      "Accessories can't save this"
+    ]
 
-    const baseScore = roastMode ? Math.floor(Math.random() * 30) + 45 : Math.floor(Math.random() * 20) + 75
+    const niceTips = [
+      "Cuff the jeans for cleaner lines",
+      "A chunky watch would elevate",
+      "Try layering with a light jacket",
+      "White sneakers would slap here",
+      "Add a simple chain necklace",
+      "Roll those sleeves up 🔥",
+      "This with sunglasses = 💯",
+      "The right bag would complete this",
+      "Try French tucking the shirt",
+      "Add a belt to define the waist"
+    ]
+
+    // Wider score range for variety
+    const baseScore = roastMode
+      ? Math.floor(Math.random() * 35) + 40  // 40-74 for roast
+      : Math.floor(Math.random() * 25) + 72   // 72-96 for nice
+
+    // Add some variance to make siblings different
+    const colorVariance = Math.floor(Math.random() * 20) - 10
+    const fitVariance = Math.floor(Math.random() * 20) - 10
+    const styleVariance = Math.floor(Math.random() * 20) - 10
 
     return {
       overall: baseScore,
-      color: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
-      fit: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
-      style: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
+      color: Math.min(100, Math.max(0, baseScore + colorVariance)),
+      fit: Math.min(100, Math.max(0, baseScore + fitVariance)),
+      style: Math.min(100, Math.max(0, baseScore + styleVariance)),
+      occasion: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
+      trend: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
       verdict: roastMode
         ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
         : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
-      tip: tips[Math.floor(Math.random() * tips.length)],
+      tip: roastMode
+        ? roastTips[Math.floor(Math.random() * roastTips.length)]
+        : niceTips[Math.floor(Math.random() * niceTips.length)],
       shareTip: shareTips[Math.floor(Math.random() * shareTips.length)],
       aesthetic: AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)],
       celebMatch: CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)],
-      roastMode
+      roastMode,
+      timestamp: Date.now() // Unique identifier
     }
   }, [roastMode])
 
