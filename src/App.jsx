@@ -601,7 +601,7 @@ export default function App() {
                   border: '1px solid rgba(0,212,255,0.3)'
                 }}
               >
-                Get unlimited →
+                Get 25/day →
               </a>
             </div>
           )}
