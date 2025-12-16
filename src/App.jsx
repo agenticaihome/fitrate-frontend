@@ -71,6 +71,16 @@ export default function App() {
 
   const fileInputRef = useRef(null)
 
+  // User ID for referrals
+  const [userId] = useState(() => {
+    let id = localStorage.getItem('fitrate_user_id')
+    if (!id) {
+      id = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10)
+      localStorage.setItem('fitrate_user_id', id)
+    }
+    return id
+  })
+
   // Check Pro status via email on load
   useEffect(() => {
     const savedEmail = localStorage.getItem('fitrate_email')
@@ -79,14 +89,56 @@ export default function App() {
     }
   }, [])
 
-  // Stripe payment success - show email prompt
+  // Handle Referrals & Payment Success
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
+
+    // Payment Success
     if (urlParams.get('success') === 'true') {
       setScreen('pro-email-prompt')
       window.history.replaceState({}, '', window.location.pathname)
     }
-  }, [])
+
+    // Referral Claim
+    const referrerId = urlParams.get('ref')
+    if (referrerId && referrerId !== userId) {
+      // Claim referral
+      fetch(`${API_BASE}/referral/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ referrerId })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.newReferral) {
+            // Give bonus to current user too (Referee Bonus)
+            const stored = localStorage.getItem('fitrate_scans')
+            if (stored) {
+              // If already used scan, reset to allow 1 more
+              // Simplest way: just clear the scan record so they get a fresh free scan
+              localStorage.removeItem('fitrate_scans')
+              setScansRemaining(1)
+              alert("🎉 You got a bonus scan for using an invite link!")
+            }
+          }
+        })
+        .catch(console.error)
+    }
+  }, [userId])
+
+  // Check bonuses on load
+  useEffect(() => {
+    if (userId) {
+      fetch(`${API_BASE}/referral/stats?userId=${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.bonusScans > 0) {
+            setScansRemaining(prev => prev + data.bonusScans)
+          }
+        })
+        .catch(console.error)
+    }
+  }, [userId])
 
   // Check if email is Pro
   const checkProStatus = async (email) => {
@@ -330,7 +382,7 @@ export default function App() {
         const response = await fetch(consumeUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
+          body: JSON.stringify({ userId })
         })
 
         const data = await response.json()
@@ -344,7 +396,8 @@ export default function App() {
 
         // Update scans remaining from server
         if (data.scanInfo) {
-          setScansRemaining(data.scanInfo.scansRemaining)
+          const bonus = data.scanInfo.bonusRemaining || 0
+          setScansRemaining(data.scanInfo.scansRemaining + bonus)
         }
 
         // Update Streak
@@ -584,12 +637,12 @@ export default function App() {
     // Generate share text based on context
     const getShareText = () => {
       if (scores.roastMode) {
-        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? fitrate.app ${hashtag}`
-        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: fitrate.app ${hashtag}`
+        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? fitrate.app?ref=${userId} ${hashtag}`
+        return `Got roasted by AI and still scored ${scores.overall} 🔥 Try it: fitrate.app?ref=${userId} ${hashtag}`
       } else {
-        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: fitrate.app ${hashtag} #FitRateChallenge`
-        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? fitrate.app ${hashtag}`
-        return `Just got rated by FitRate AI! Your turn 👀 fitrate.app ${hashtag}`
+        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: fitrate.app?ref=${userId} ${hashtag} #FitRateChallenge`
+        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? fitrate.app?ref=${userId} ${hashtag}`
+        return `Just got rated by FitRate AI! Your turn 👀 fitrate.app?ref=${userId} ${hashtag}`
       }
     }
 
@@ -747,7 +800,7 @@ export default function App() {
             {roastMode ? '💀' : '📸'}
           </span>
           <span className="relative text-white text-lg font-bold tracking-wider">
-            {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
+            {scansRemaining === 0 && !isPro ? 'LOCKED' : `RATE MY FIT${scansRemaining > 1 ? ` (${scansRemaining})` : ''}`}
           </span>
         </button>
 
