@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { playSound, vibrate } from './utils/soundEffects'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -472,12 +473,52 @@ export default function App() {
       }
       const reader = new FileReader()
       reader.onload = (e) => {
+        playSound('shutter')
+        vibrate(50)
         setUploadedImage(e.target?.result)
         analyzeOutfit(e.target?.result)
       }
       reader.readAsDataURL(file)
     }
   }, [analyzeOutfit])
+
+  // Reveal Sequence & Sounds
+  useEffect(() => {
+    if (screen === 'results' && scores) {
+      setRevealStage(0)
+
+      // Stage 1: Verdict (Instant)
+      const sound = scores.roastMode ? 'roast' : 'success'
+      setTimeout(() => {
+        playSound(sound)
+        vibrate(scores.roastMode ? [50, 50, 200] : [50, 50, 50])
+        setRevealStage(1)
+      }, 100)
+
+      // Stage 2: Photo
+      setTimeout(() => {
+        playSound('pop')
+        vibrate(10)
+        setRevealStage(2)
+      }, 600)
+
+      // Stage 3: Details
+      setTimeout(() => {
+        playSound('pop')
+        setRevealStage(3)
+      }, 1000)
+
+      // Stage 4: Tip
+      setTimeout(() => {
+        setRevealStage(4)
+      }, 1400)
+
+      // Stage 5: Breakdown
+      setTimeout(() => {
+        setRevealStage(5)
+      }, 1800)
+    }
+  }, [screen, scores])
 
   // Generate viral share card
   const generateShareCard = useCallback(async () => {
@@ -777,9 +818,12 @@ export default function App() {
           AI OUTFIT RATING
         </p>
 
-        {/* Main Button - Glassmorphism */}
         <button
-          onClick={() => scansRemaining > 0 || isPro ? fileInputRef.current?.click() : null}
+          onClick={() => {
+            playSound('click')
+            vibrate(20)
+            if (scansRemaining > 0 || isPro) fileInputRef.current?.click()
+          }}
           disabled={scansRemaining === 0 && !isPro}
           className="relative w-56 h-56 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed group"
           style={{
@@ -815,7 +859,10 @@ export default function App() {
 
         {/* Mode Toggle - Glassmorphism pill */}
         <button
-          onClick={() => setRoastMode(!roastMode)}
+          onClick={() => {
+            playSound('click')
+            setRoastMode(!roastMode)
+          }}
           className="mt-10 px-8 py-4 rounded-full transition-all duration-500"
           style={{
             background: roastMode ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.05)',
