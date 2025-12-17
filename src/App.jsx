@@ -962,7 +962,7 @@ export default function App() {
         }}>FITRATE</h1>
 
         <p className="text-xs mb-8 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          AI rates your fit in seconds
+          Post it... or let us roast it first 😈
         </p>
 
         {/* Challenge Banner - when friend shared a challenge link */}
@@ -1208,8 +1208,13 @@ export default function App() {
           </p>
         </div>
 
-        {/* Percentile social proof */}
+        {/* Viral hook + Percentile social proof */}
         <div className={`mb-3 transition-all duration-500 delay-200 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+          <p className="text-sm font-bold mb-1" style={{
+            color: scores.overall >= 80 ? '#00ff88' : (scores.overall >= 60 ? '#00d4ff' : '#ff6b6b')
+          }}>
+            {scores.overall >= 85 ? '🔥 This would go VIRAL' : (scores.overall >= 70 ? '👀 TikTok-worthy' : '😬 Room for improvement')}
+          </p>
           <p className="text-xs font-medium" style={{
             color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.5)',
             textShadow: scores.isLegendary ? '0 0 10px #ffd700' : 'none'
