@@ -615,14 +615,14 @@ export default function App() {
       localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
       setDailyStreak(newStreak)
 
-      setScores({ ...data.scores, roastMode })
+      setScores({ ...data.scores, mode, roastMode: mode === 'roast' })
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
       setError("AI's getting dressed... try again!")
       setScreen('error')
     }
-  }, [roastMode, isPro, generateMockScores])
+  }, [mode, isPro, generateMockScores])
 
   const handleFileUpload = useCallback((e) => {
     const file = e.target.files?.[0]
@@ -1213,7 +1213,7 @@ export default function App() {
 
         {/* Subtle reassurance */}
         <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {roastMode ? 'Brutally honest AI incoming...' : 'AI analyzing your style...'}
+          {mode === 'roast' ? 'Brutally honest AI incoming...' : mode === 'honest' ? 'Analyzing objectively...' : 'AI analyzing your style...'}
         </p>
 
         <style>{`
@@ -1625,9 +1625,9 @@ export default function App() {
 
           {/* Emotional headline */}
           <div className="text-center mb-6 mt-4">
-            <span className="text-4xl mb-3 block">{roastMode ? '🔥' : '✨'}</span>
+            <span className="text-4xl mb-3 block">{mode === 'roast' ? '🔥' : '✨'}</span>
             <h2 className="text-2xl font-black text-white mb-2">
-              {roastMode ? 'Want the brutal truth?' : 'Ready for more?'}
+              {mode === 'roast' ? 'Want the brutal truth?' : 'Ready for more?'}
             </h2>
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {timeUntilReset
@@ -1819,8 +1819,8 @@ export default function App() {
         <button
           onClick={() => {
             // If they used Nice mode, suggest Roast. Otherwise, rate another.
-            if (!roastMode) {
-              setRoastMode(true)
+            if (mode !== 'roast') {
+              setMode('roast')
               setScreen('home')
             } else {
               resetApp()
@@ -1828,15 +1828,15 @@ export default function App() {
           }}
           className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
           style={{
-            background: roastMode
+            background: mode === 'roast'
               ? 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)'
               : 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-            boxShadow: roastMode
+            boxShadow: mode === 'roast'
               ? '0 8px 30px rgba(0,212,255,0.3)'
               : '0 8px 30px rgba(255,68,68,0.3)'
           }}
         >
-          {roastMode ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
+          {mode === 'roast' ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
         </button>
 
         {/* Back to home */}
