@@ -53,7 +53,7 @@ export default function App() {
   const [uploadedImage, setUploadedImage] = useState(null)
   const [scores, setScores] = useState(null)
   const [shareData, setShareData] = useState(null)
-  const [roastMode, setRoastMode] = useState(false)
+  const [mode, setMode] = useState('nice') // 'nice', 'honest', or 'roast'
   const [error, setError] = useState(null)
   const [revealStage, setRevealStage] = useState(0)
   const [timeUntilReset, setTimeUntilReset] = useState('')
@@ -379,10 +379,38 @@ export default function App() {
       "Add a belt to define the waist"
     ]
 
-    // Wider score range for variety
-    const baseScore = roastMode
+    const honestVerdicts = [
+      "Solid, but room to improve",
+      "Almost there, just needs polish",
+      "Good bones, execution varies",
+      "The vision is there 📊",
+      "Practical but not memorable",
+      "Safe choice, nothing wrong",
+      "Shows effort, needs refinement",
+      "Close but missing something",
+      "Functional, not exceptional",
+      "Average execution of good idea"
+    ]
+
+    const honestTips = [
+      "The proportions need work",
+      "Consider a different wash",
+      "Colors are fighting a bit",
+      "Fit could be more intentional",
+      "Accessories would help here",
+      "Try a different silhouette",
+      "The layers need balance",
+      "Consider tailoring this piece",
+      "Material upgrade would help",
+      "Simpler might be better here"
+    ]
+
+    // Wider score range for variety - honest mode uses full natural range
+    const baseScore = mode === 'roast'
       ? Math.floor(Math.random() * 35) + 40  // 40-74 for roast
-      : Math.floor(Math.random() * 25) + 72   // 72-96 for nice
+      : mode === 'honest'
+        ? Math.floor(Math.random() * 45) + 45 // 45-89 for honest (natural distribution)
+        : Math.floor(Math.random() * 25) + 72   // 72-96 for nice
 
     // Add some variance to make siblings different
     const colorVariance = Math.floor(Math.random() * 20) - 10
@@ -438,6 +466,18 @@ export default function App() {
 
     const finalScore = isLegendary ? Math.floor(Math.random() * 5) + 96 : baseScore // 96-100 for legendary
 
+    // Pick verdicts/tips based on mode
+    const getVerdictPool = () => {
+      if (mode === 'roast') return roastVerdicts
+      if (mode === 'honest') return honestVerdicts
+      return niceVerdicts
+    }
+    const getTipPool = () => {
+      if (mode === 'roast') return roastTips
+      if (mode === 'honest') return honestTips
+      return niceTips
+    }
+
     return {
       overall: finalScore,
       color: Math.min(100, Math.max(0, finalScore + colorVariance)),
@@ -447,17 +487,18 @@ export default function App() {
       trend: Math.min(100, Math.max(0, finalScore + Math.floor(Math.random() * 16) - 8)),
       verdict: isLegendary
         ? legendaryVerdicts[Math.floor(Math.random() * legendaryVerdicts.length)]
-        : pickUnique(roastMode ? roastVerdicts : niceVerdicts, roastMode ? 'roast_verdict' : 'nice_verdict'),
-      tip: pickUnique(roastMode ? roastTips : niceTips, roastMode ? 'roast_tip' : 'nice_tip'),
+        : pickUnique(getVerdictPool(), `${mode}_verdict`),
+      tip: pickUnique(getTipPool(), `${mode}_tip`),
       shareTip: pickUnique(shareTips, 'share_tip'),
       aesthetic: pickUnique(AESTHETICS, 'aesthetic'),
       celebMatch: pickUnique(CELEBRITIES, 'celeb'),
       percentile: getPercentile(finalScore),
       isLegendary,
-      roastMode,
+      mode,
+      roastMode: mode === 'roast', // backwards compatibility
       timestamp: Date.now()
     }
-  }, [roastMode])
+  }, [mode])
 
   const incrementScanCount = () => {
     const today = new Date().toDateString()
@@ -490,7 +531,7 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             image: imageData,
-            roastMode,
+            mode,
             userId
           })
         })
@@ -554,7 +595,7 @@ export default function App() {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData, roastMode })
+        body: JSON.stringify({ image: imageData, mode })
       })
       const data = await response.json()
 
@@ -878,13 +919,25 @@ export default function App() {
   }
 
   // Accent colors based on mode
-  const accent = roastMode ? '#ff4444' : '#00d4ff'
-  const accentGlow = roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
+  const getModeColor = () => {
+    if (mode === 'roast') return '#ff4444'
+    if (mode === 'honest') return '#4A90D9'
+    return '#00d4ff'
+  }
+  const getModeGlow = () => {
+    if (mode === 'roast') return 'rgba(255,68,68,0.4)'
+    if (mode === 'honest') return 'rgba(74,144,217,0.4)'
+    return 'rgba(0,212,255,0.4)'
+  }
+  const accent = getModeColor()
+  const accentGlow = getModeGlow()
 
   // Analysis messages for analyzing screen
-  const analysisMessages = roastMode
+  const analysisMessages = mode === 'roast'
     ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
-    : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
+    : mode === 'honest'
+      ? ['Assessing objectively...', 'Checking proportions...', 'Analyzing honestly...', 'Computing real score...', 'Preparing honest feedback...']
+      : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
 
   // Progress and text animation effect for analyzing screen
   // IMPORTANT: This must be BEFORE any early returns to avoid hooks order issues
@@ -991,50 +1044,65 @@ export default function App() {
           disabled={scansRemaining === 0 && !isPro}
           className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-40 group"
           style={{
-            background: `radial-gradient(circle, ${roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'} 0%, transparent 70%)`,
-            border: `3px solid ${roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)'}`,
+            background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
+            border: `3px solid ${accent}99`,
             boxShadow: `0 0 80px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
           }}
         >
           {/* Pulsing inner glow */}
           <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-            background: `linear-gradient(135deg, ${accent} 0%, ${roastMode ? '#ff0080' : '#00ff88'} 100%)`,
+            background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
             boxShadow: `0 0 60px ${accentGlow}`,
             animation: 'pulse 2s ease-in-out infinite'
           }} />
 
           {/* Icon */}
           <span className="relative text-7xl mb-3 drop-shadow-lg">
-            {roastMode ? '🔥' : '📸'}
+            {mode === 'roast' ? '🔥' : mode === 'honest' ? '📊' : '📸'}
           </span>
           <span className="relative text-white text-xl font-black tracking-wider">
-            {roastMode ? 'ROAST MY FIT' : 'RATE MY FIT'}
+            {mode === 'roast' ? 'ROAST MY FIT' : mode === 'honest' ? 'REAL TALK' : 'RATE MY FIT'}
           </span>
         </button>
 
-        {/* Mode Toggle - Minimal pill */}
-        <button
-          onClick={() => {
-            playSound('click')
-            vibrate(15)
-            setRoastMode(!roastMode)
-          }}
-          className="mt-12 flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-300"
-          style={{
-            background: roastMode ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.05)',
-            border: `1px solid ${roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.15)'}`
-          }}
-        >
-          <span className={`text-lg transition-opacity ${!roastMode ? 'opacity-100' : 'opacity-40'}`}>😇</span>
-          <div className="relative w-12 h-6 rounded-full" style={{
-            background: roastMode ? '#ff4444' : 'rgba(255,255,255,0.2)'
-          }}>
-            <div className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-lg transition-all duration-300" style={{
-              left: roastMode ? '28px' : '4px'
-            }} />
-          </div>
-          <span className={`text-lg transition-opacity ${roastMode ? 'opacity-100' : 'opacity-40'}`}>😈</span>
-        </button>
+        {/* Three-Mode Selector Pills */}
+        <div className="mt-10 flex items-center gap-2 p-1 rounded-full" style={{
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          {[
+            { key: 'nice', emoji: '😇', label: 'Nice' },
+            { key: 'honest', emoji: '📊', label: 'Honest' },
+            { key: 'roast', emoji: '😈', label: 'Roast' }
+          ].map((m) => (
+            <button
+              key={m.key}
+              onClick={() => {
+                playSound('click')
+                vibrate(15)
+                setMode(m.key)
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
+              style={{
+                background: mode === m.key
+                  ? m.key === 'roast' ? 'rgba(255,68,68,0.3)'
+                    : m.key === 'honest' ? 'rgba(74,144,217,0.3)'
+                      : 'rgba(0,212,255,0.3)'
+                  : 'transparent',
+                border: mode === m.key
+                  ? `1px solid ${m.key === 'roast' ? '#ff4444' : m.key === 'honest' ? '#4A90D9' : '#00d4ff'}`
+                  : '1px solid transparent'
+              }}
+            >
+              <span className={`text-lg transition-opacity ${mode === m.key ? 'opacity-100' : 'opacity-50'}`}>
+                {m.emoji}
+              </span>
+              <span className={`text-sm font-medium transition-opacity ${mode === m.key ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>
+                {m.label}
+              </span>
+            </button>
+          ))}
+        </div>
 
         {/* Scan Status - Tiny, non-intrusive */}
         <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center" style={{
