@@ -165,7 +165,7 @@ export default function App() {
               // Simplest way: just clear the scan record so they get a fresh free scan
               localStorage.removeItem('fitrate_scans')
               setScansRemaining(1)
-              alert("🎉 You got a bonus scan for using an invite link!")
+              displayToast("🎉 Bonus scan unlocked!")
             }
           }
         })
@@ -912,6 +912,15 @@ export default function App() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [])
 
+  // Global toast notification (replaces browser alerts)
+  const displayToast = useCallback((message, duration = 2500) => {
+    setToastMessage(message)
+    setShowToast(true)
+    playSound('pop')
+    vibrate(20)
+    setTimeout(() => setShowToast(false), duration)
+  }, [])
+
   const getScoreColor = (score) => {
     if (score >= 80) return '#00ff88'
     if (score >= 60) return '#00d4ff'
@@ -995,6 +1004,16 @@ export default function App() {
             animation: 'pulse 4s ease-in-out infinite'
           }} />
         </div>
+
+        {/* Toast Notification */}
+        {showToast && (
+          <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60 animate-bounce" style={{
+            background: 'rgba(0,255,136,0.9)',
+            boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
+          }}>
+            <span className="text-black font-bold text-sm">{toastMessage}</span>
+          </div>
+        )}
 
         {/* Hidden file input */}
         <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
@@ -1104,9 +1123,14 @@ export default function App() {
           ))}
         </div>
 
+        {/* Trust Message */}
+        <p className="mt-6 text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <span>🔒</span> Photos analyzed instantly, never stored
+        </p>
+
         {/* Scan Status - Tiny, non-intrusive */}
         <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center" style={{
-          paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
+          paddingBottom: 'max(4rem, env(safe-area-inset-bottom, 4rem))'
         }}>
           {scansRemaining > 0 || isPro ? (
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -1126,6 +1150,15 @@ export default function App() {
               </span>
             </button>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-4" style={{
+          paddingBottom: 'env(safe-area-inset-bottom, 0.5rem)'
+        }}>
+          <a href="/privacy" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy</a>
+          <a href="/terms" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms</a>
+          <a href="/about" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>About</a>
         </div>
 
         <style>{`
@@ -1439,7 +1472,7 @@ export default function App() {
                   a.click()
                   URL.revokeObjectURL(url)
                   navigator.clipboard.writeText(`${challengeText}\n${challengeUrl}`)
-                  alert('Challenge image downloaded & link copied! 📤')
+                  displayToast('Challenge saved & copied! 📤')
                 }
               } else {
                 // No share card yet, generate it first then share
@@ -1690,7 +1723,7 @@ export default function App() {
 
           {/* Trust microcopy */}
           <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Cancel anytime. No weird caps.
+            Cancel anytime. No commitment.
           </p>
 
           {/* Back button */}
