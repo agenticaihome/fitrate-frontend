@@ -32,6 +32,7 @@ export default function App() {
   const [proEmail, setProEmail] = useState(() => localStorage.getItem('fitrate_email') || '')
   const [emailInput, setEmailInput] = useState('')
   const [emailChecking, setEmailChecking] = useState(false)
+  const [referralCount, setReferralCount] = useState(0)
 
   // Daily Streak Logic
   const [dailyStreak, setDailyStreak] = useState(() => {
@@ -134,8 +135,13 @@ export default function App() {
       fetch(`${API_BASE}/referral/stats?userId=${userId}`)
         .then(res => res.json())
         .then(data => {
-          if (data.success && data.bonusScans > 0) {
-            setScansRemaining(prev => prev + data.bonusScans)
+          if (data.success) {
+            if (data.bonusScans > 0) {
+              setScansRemaining(prev => prev + data.bonusScans)
+            }
+            if (data.referralCount) {
+              setReferralCount(data.referralCount)
+            }
           }
         })
         .catch(console.error)
@@ -339,24 +345,73 @@ export default function App() {
     const fitVariance = Math.floor(Math.random() * 20) - 10
     const styleVariance = Math.floor(Math.random() * 20) - 10
 
+    // Smart picker: avoid repeats for last 10 uses
+    const pickUnique = (array, historyKey) => {
+      const historyLimit = 10
+      let history = []
+      try {
+        const stored = localStorage.getItem(`fitrate_history_${historyKey}`)
+        if (stored) history = JSON.parse(stored)
+      } catch (e) { history = [] }
+
+      // Filter out recently used items
+      const available = array.filter(item => !history.includes(item))
+
+      // If all options exhausted, reset history and pick from full array
+      const pool = available.length > 0 ? available : array
+      const picked = pool[Math.floor(Math.random() * pool.length)]
+
+      // Update history (keep last N items)
+      history.push(picked)
+      if (history.length > historyLimit) history = history.slice(-historyLimit)
+      localStorage.setItem(`fitrate_history_${historyKey}`, JSON.stringify(history))
+
+      return picked
+    }
+
+    // Rare legendary easter eggs (1% chance)
+    const isLegendary = Math.random() < 0.01
+    const legendaryVerdicts = [
+      "⭐ LEGENDARY FIT ⭐",
+      "🔥 ABSOLUTE DRIP LORD 🔥",
+      "👑 FASHION ROYALTY 👑",
+      "💎 CERTIFIED ICONIC 💎",
+      "🌟 MAIN CHARACTER OF THE YEAR 🌟"
+    ]
+
+    // Social proof percentile (fake but believable)
+    const getPercentile = (score) => {
+      if (score >= 95) return 99
+      if (score >= 90) return 96
+      if (score >= 85) return 91
+      if (score >= 80) return 84
+      if (score >= 75) return 73
+      if (score >= 70) return 61
+      if (score >= 65) return 48
+      if (score >= 60) return 35
+      return Math.floor(score * 0.4)
+    }
+
+    const finalScore = isLegendary ? Math.floor(Math.random() * 5) + 96 : baseScore // 96-100 for legendary
+
     return {
-      overall: baseScore,
-      color: Math.min(100, Math.max(0, baseScore + colorVariance)),
-      fit: Math.min(100, Math.max(0, baseScore + fitVariance)),
-      style: Math.min(100, Math.max(0, baseScore + styleVariance)),
-      occasion: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
-      trend: Math.min(100, Math.max(0, baseScore + Math.floor(Math.random() * 16) - 8)),
-      verdict: roastMode
-        ? roastVerdicts[Math.floor(Math.random() * roastVerdicts.length)]
-        : niceVerdicts[Math.floor(Math.random() * niceVerdicts.length)],
-      tip: roastMode
-        ? roastTips[Math.floor(Math.random() * roastTips.length)]
-        : niceTips[Math.floor(Math.random() * niceTips.length)],
-      shareTip: shareTips[Math.floor(Math.random() * shareTips.length)],
-      aesthetic: AESTHETICS[Math.floor(Math.random() * AESTHETICS.length)],
-      celebMatch: CELEBRITIES[Math.floor(Math.random() * CELEBRITIES.length)],
+      overall: finalScore,
+      color: Math.min(100, Math.max(0, finalScore + colorVariance)),
+      fit: Math.min(100, Math.max(0, finalScore + fitVariance)),
+      style: Math.min(100, Math.max(0, finalScore + styleVariance)),
+      occasion: Math.min(100, Math.max(0, finalScore + Math.floor(Math.random() * 16) - 8)),
+      trend: Math.min(100, Math.max(0, finalScore + Math.floor(Math.random() * 16) - 8)),
+      verdict: isLegendary
+        ? legendaryVerdicts[Math.floor(Math.random() * legendaryVerdicts.length)]
+        : pickUnique(roastMode ? roastVerdicts : niceVerdicts, roastMode ? 'roast_verdict' : 'nice_verdict'),
+      tip: pickUnique(roastMode ? roastTips : niceTips, roastMode ? 'roast_tip' : 'nice_tip'),
+      shareTip: pickUnique(shareTips, 'share_tip'),
+      aesthetic: pickUnique(AESTHETICS, 'aesthetic'),
+      celebMatch: pickUnique(CELEBRITIES, 'celeb'),
+      percentile: getPercentile(finalScore),
+      isLegendary,
       roastMode,
-      timestamp: Date.now() // Unique identifier
+      timestamp: Date.now()
     }
   }, [roastMode])
 
@@ -498,10 +553,10 @@ export default function App() {
       setRevealStage(0)
 
       // Stage 1: Verdict (Instant)
-      const sound = scores.roastMode ? 'roast' : 'success'
+      const sound = scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
       setTimeout(() => {
         playSound(sound)
-        vibrate(scores.roastMode ? [50, 50, 200] : [50, 50, 50])
+        vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
         setRevealStage(1)
       }, 100)
 
@@ -532,6 +587,10 @@ export default function App() {
 
   // Generate viral share card
   const generateShareCard = useCallback(async () => {
+    // Satisfying feedback when generating
+    playSound('share')
+    vibrate(30)
+
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     canvas.width = 1080
@@ -802,6 +861,18 @@ export default function App() {
           <span className="text-lg font-bold" style={{ color: '#ffecb3' }}>{dailyStreak}</span>
         </div>
 
+        {/* Referral Counter - show if they've invited anyone */}
+        {referralCount > 0 && (
+          <div className="absolute top-20 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
+            background: 'rgba(255,0,200,0.1)',
+            border: '1px solid rgba(255,0,200,0.3)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <span className="text-sm">👥</span>
+            <span className="text-sm font-bold" style={{ color: '#ffb3ec' }}>{referralCount} invited</span>
+          </div>
+        )}
+
         {/* Pro Badge */}
         {isPro && (
           <div className="absolute top-6 right-6 px-4 py-2 rounded-full" style={{
@@ -1061,6 +1132,18 @@ export default function App() {
               {scores.aesthetic} • {scores.celebMatch}
             </span>
           </div>
+        </div>
+
+        {/* Percentile - Social Proof */}
+        <div className={`mb-2 transition-all duration-700 delay-350 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-sm font-medium" style={{
+            color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.6)',
+            textShadow: scores.isLegendary ? '0 0 10px #ffd700' : 'none'
+          }}>
+            {scores.isLegendary
+              ? "🌟 TOP 1% OF ALL TIME 🌟"
+              : `Better than ${scores.percentile}% of fits today`}
+          </p>
         </div>
 
         {/* Tip */}

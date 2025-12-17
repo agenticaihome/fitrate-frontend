@@ -94,6 +94,34 @@ export const playSound = (type) => {
                     o.stop(now + 0.4);
                 });
                 break;
+
+            case 'share':
+                // Satisfying whoosh/swoosh for share card
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.25);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+                break;
+
+            case 'legendary':
+                // Epic fanfare for rare easter eggs
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, now + i * 0.12);
+                    g.gain.setValueAtTime(0.3, now + i * 0.12);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.12 + 0.4);
+                    o.start(now + i * 0.12);
+                    o.stop(now + i * 0.12 + 0.4);
+                });
+                break;
         }
     } catch (e) {
         // Audio probably not allowed yet
