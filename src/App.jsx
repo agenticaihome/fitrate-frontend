@@ -777,26 +777,27 @@ export default function App() {
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // CTA text
+    // CTA text - Made to screenshot positioning
     ctx.fillStyle = '#ffffff'
     ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('Rate YOUR fit → fitrate.app', 540, 1545)
+    ctx.fillText('Your turn → fitrate.app', 540, 1545)
 
     // Branding footer
     ctx.fillStyle = 'rgba(255,255,255,0.35)'
     ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('AI-Powered by FitRate', 540, 1620)
+    ctx.fillText('Rate your fit in seconds', 540, 1620)
 
-    // Generate share text based on context
+    // Generate share text - punchy, viral, screenshot-worthy
     const getShareText = () => {
       const baseUrl = 'https://fitrate.app'
       if (scores.roastMode) {
-        if (scores.overall < 60) return `AI destroyed my outfit 💀 What's your score? ${baseUrl}?ref=${userId} #RateMyFit`
-        return `Got roasted and still scored ${scores.overall} 🔥 ${baseUrl}?ref=${userId} #RateMyFit`
+        if (scores.overall < 60) return `AI humbled me 💀 ${scores.overall}/100. Your turn? ${baseUrl}?ref=${userId}`
+        if (scores.overall < 75) return `Survived Roast Mode with ${scores.overall} 🔥 Beat that: ${baseUrl}?ref=${userId}`
+        return `AI couldn't roast me 😏 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
       } else {
-        if (scores.overall >= 90) return `${scores.overall}/100 on FitRate 🏆 Beat my score: ${baseUrl}?ref=${userId} #RateMyFit #FitRateChallenge`
-        if (scores.overall >= 80) return `AI rated my fit ${scores.overall}/100 ✨ What's yours? ${baseUrl}?ref=${userId} #RateMyFit`
-        return `Just got rated by FitRate AI. Your turn 👀 ${baseUrl}?ref=${userId} #RateMyFit`
+        if (scores.overall >= 90) return `${scores.overall}/100 — AI approved 🏆 Beat my score: ${baseUrl}?ref=${userId}`
+        if (scores.overall >= 80) return `${scores.overall}/100 ✨ What's YOUR score? ${baseUrl}?ref=${userId}`
+        return `Just got my fit rated. Your turn 👀 ${baseUrl}?ref=${userId}`
       }
     }
 
@@ -928,15 +929,21 @@ export default function App() {
         )}
 
         {/* Logo */}
-        <h1 className="text-6xl font-black mb-4 tracking-tight" style={{
+        <h1 className="text-6xl font-black mb-2 tracking-tight" style={{
           background: `linear-gradient(135deg, #fff 0%, ${accent} 100%)`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           textShadow: `0 0 80px ${accentGlow}`
         }}>FITRATE</h1>
 
-        <p className="text-sm mb-16 tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          AI OUTFIT RATING
+        {/* Positioning Subtitle */}
+        <p className="text-base font-medium mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          Rate your fit in seconds
+        </p>
+
+        {/* Trust Line */}
+        <p className="text-xs mb-12 tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          No sign-up. No fluff. Just honest feedback.
         </p>
 
         <button
@@ -965,7 +972,7 @@ export default function App() {
             {roastMode ? '💀' : '📸'}
           </span>
           <span className="relative text-white text-lg font-bold tracking-wider">
-            {scansRemaining === 0 && !isPro ? 'LOCKED' : `RATE MY FIT${scansRemaining > 1 ? ` (${scansRemaining})` : ''}`}
+            {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
           </span>
         </button>
 
