@@ -466,23 +466,32 @@ export default function App() {
       return
     }
 
-    // Free users: call backend to track scan by userId, then show mock scores
+    // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
       try {
-        // Register scan on server (tracks by userId - prevents bypass)
-        const consumeUrl = API_URL.replace('/analyze', '/analyze/consume')
-        const response = await fetch(consumeUrl, {
+        // Call real AI endpoint (backend routes free users to Gemini)
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId })
+          body: JSON.stringify({
+            image: imageData,
+            roastMode,
+            userId
+          })
         })
 
         const data = await response.json()
 
         // Check if rate limited
-        if (response.status === 429 || !data.success) {
+        if (response.status === 429 || data.limitReached) {
           setScansRemaining(0)
           setScreen('limit-reached')
+          return
+        }
+
+        if (!data.success) {
+          setError(data.error || 'Analysis failed')
+          setScreen('error')
           return
         }
 
@@ -506,16 +515,19 @@ export default function App() {
         localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
         setDailyStreak(newStreak)
 
-        // Simulate AI thinking time for realism
-        await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000))
+        // Add virality features to real scores
+        const scores = {
+          ...data.scores,
+          percentile: getPercentile(data.scores.overall),
+          isLegendary: data.scores.overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
+          shareTip: getRandomShareTip()
+        }
 
-        // Generate mock scores (works instantly, no API needed)
-        const mockScores = generateMockScores()
-        setScores(mockScores)
+        setScores(scores)
         setScreen('results')
         return
       } catch (err) {
-        console.error('Consume error:', err)
+        console.error('Analysis error:', err)
         setError("Connection issue... try again!")
         setScreen('error')
         return
