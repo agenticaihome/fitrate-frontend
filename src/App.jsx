@@ -870,221 +870,132 @@ export default function App() {
   const accentGlow = roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
 
   // ============================================
-  // HOME SCREEN
+  // HOME SCREEN - Camera First, Zero Friction
   // ============================================
   if (screen === 'home') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 40%, #1a1a2e 60%, #0a0a0f 100%)',
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        {/* Animated background orbs */}
+        {/* Subtle animated background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute w-96 h-96 rounded-full opacity-30" style={{
+          <div className="absolute w-[500px] h-[500px] rounded-full opacity-20" style={{
             background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
-            top: '10%', left: '-20%',
-            animation: 'float 8s ease-in-out infinite'
-          }} />
-          <div className="absolute w-80 h-80 rounded-full opacity-20" style={{
-            background: 'radial-gradient(circle, rgba(255,0,128,0.3) 0%, transparent 70%)',
-            bottom: '20%', right: '-15%',
-            animation: 'float 10s ease-in-out infinite reverse'
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            animation: 'pulse 4s ease-in-out infinite'
           }} />
         </div>
 
         {/* Hidden file input */}
         <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
-        {/* Streak Counter */}
-        <div className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-full" style={{
-          background: 'rgba(255,153,0,0.1)',
-          border: '1px solid rgba(255,153,0,0.3)',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <span className="text-xl">🔥</span>
-          <span className="text-lg font-bold" style={{ color: '#ffecb3' }}>{dailyStreak}</span>
-        </div>
-
-        {/* Referral Counter - show if they've invited anyone */}
-        {referralCount > 0 && (
-          <div className="absolute top-20 left-6 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
-            background: 'rgba(255,0,200,0.1)',
-            border: '1px solid rgba(255,0,200,0.3)',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <span className="text-sm">👥</span>
-            <span className="text-sm font-bold" style={{ color: '#ffb3ec' }}>{referralCount} invited</span>
-          </div>
-        )}
-
-        {/* Pro Badge */}
+        {/* Pro Badge - Only indicator kept */}
         {isPro && (
-          <div className="absolute top-6 right-6 px-4 py-2 rounded-full" style={{
-            background: 'rgba(0,255,136,0.1)',
-            border: '1px solid rgba(0,255,136,0.3)',
-            backdropFilter: 'blur(10px)'
+          <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full" style={{
+            background: 'rgba(0,255,136,0.15)',
+            border: '1px solid rgba(0,255,136,0.3)'
           }}>
-            <span className="text-sm font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
+            <span className="text-xs font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
           </div>
         )}
 
-        {/* Logo */}
-        <h1 className="text-6xl font-black mb-2 tracking-tight" style={{
+        {/* Logo - Small and subtle */}
+        <h1 className="text-3xl font-black mb-1 tracking-tight" style={{
           background: `linear-gradient(135deg, #fff 0%, ${accent} 100%)`,
           WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          textShadow: `0 0 80px ${accentGlow}`
+          WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        {/* Positioning Subtitle */}
-        <p className="text-base font-medium mb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          Rate your fit in seconds
+        <p className="text-xs mb-16 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          AI rates your fit in seconds
         </p>
 
-        {/* Trust Line */}
-        <p className="text-xs mb-12 tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
-          No sign-up. No fluff. Just honest feedback.
-        </p>
-
+        {/* HERO CTA - HUGE "Rate My Fit" button */}
         <button
           onClick={() => {
             playSound('click')
             vibrate(20)
             if (scansRemaining > 0 || isPro) fileInputRef.current?.click()
+            else setScreen('paywall')
           }}
           disabled={scansRemaining === 0 && !isPro}
-          className="relative w-56 h-56 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed group"
+          className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-40 group"
           style={{
-            background: `linear-gradient(135deg, ${roastMode ? '#ff4444' : '#00d4ff'}33 0%, ${roastMode ? '#cc0000' : '#0099cc'}33 100%)`,
-            border: `2px solid ${roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'}`,
-            backdropFilter: 'blur(20px)',
-            boxShadow: `0 0 60px ${accentGlow}, inset 0 0 60px rgba(255,255,255,0.05)`
+            background: `radial-gradient(circle, ${roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'} 0%, transparent 70%)`,
+            border: `3px solid ${roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)'}`,
+            boxShadow: `0 0 80px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
           }}
         >
-          {/* Inner glow ring */}
-          <div className="absolute inset-3 rounded-full transition-all duration-300 group-hover:scale-105" style={{
+          {/* Pulsing inner glow */}
+          <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
             background: `linear-gradient(135deg, ${accent} 0%, ${roastMode ? '#ff0080' : '#00ff88'} 100%)`,
-            boxShadow: `0 0 40px ${accentGlow}`
+            boxShadow: `0 0 60px ${accentGlow}`,
+            animation: 'pulse 2s ease-in-out infinite'
           }} />
 
           {/* Icon */}
-          <span className="relative text-6xl mb-2 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-            {roastMode ? '💀' : '📸'}
+          <span className="relative text-7xl mb-3 drop-shadow-lg">
+            {roastMode ? '🔥' : '📸'}
           </span>
-          <span className="relative text-white text-lg font-bold tracking-wider">
-            {scansRemaining === 0 && !isPro ? 'LOCKED' : 'RATE MY FIT'}
+          <span className="relative text-white text-xl font-black tracking-wider">
+            {roastMode ? 'ROAST MY FIT' : 'RATE MY FIT'}
           </span>
         </button>
 
-        {/* Daily Theme */}
-        <div className="mt-8 px-5 py-2 rounded-full flex items-center gap-2" style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <span className="text-xs font-semibold tracking-wider text-white/60">TODAY'S VIBE:</span>
-          <span className="text-sm font-bold text-white shadow-sm" style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{todayTheme}</span>
-        </div>
-
-        {/* Mode Toggle - Glassmorphism pill */}
+        {/* Mode Toggle - Minimal pill */}
         <button
           onClick={() => {
             playSound('click')
+            vibrate(15)
             setRoastMode(!roastMode)
           }}
-          className="mt-10 px-8 py-4 rounded-full transition-all duration-500"
+          className="mt-12 flex items-center gap-3 px-6 py-3 rounded-full transition-all duration-300"
           style={{
             background: roastMode ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.05)',
-            border: `1px solid ${roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.1)'}`,
-            backdropFilter: 'blur(10px)'
+            border: `1px solid ${roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.15)'}`
           }}
         >
-          <span className="text-base font-semibold" style={{ color: roastMode ? '#ff4444' : 'rgba(255,255,255,0.6)' }}>
-            {roastMode ? '🔥 Roast Mode' : '✨ Nice Mode'}
-          </span>
+          <span className={`text-lg transition-opacity ${!roastMode ? 'opacity-100' : 'opacity-40'}`}>😇</span>
+          <div className="relative w-12 h-6 rounded-full" style={{
+            background: roastMode ? '#ff4444' : 'rgba(255,255,255,0.2)'
+          }}>
+            <div className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-lg transition-all duration-300" style={{
+              left: roastMode ? '28px' : '4px'
+            }} />
+          </div>
+          <span className={`text-lg transition-opacity ${roastMode ? 'opacity-100' : 'opacity-40'}`}>😈</span>
         </button>
 
-        {/* Scan Status / Limit Reached Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center gap-3" style={{
-          background: 'linear-gradient(to top, #0a0a0f 20%, transparent 100%)',
+        {/* Scan Status - Tiny, non-intrusive */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center" style={{
           paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
         }}>
           {scansRemaining > 0 || isPro ? (
-            <>
-              {/* Visible scan counter */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
-                background: 'rgba(0,212,255,0.1)',
-                border: '1px solid rgba(0,212,255,0.2)'
-              }}>
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                  {isPro ? `⚡ Pro: ${25 - (scansRemaining || 0)} / 25 today` : `${scansRemaining} / 2 free today`}
-                </span>
-              </div>
-
-              {/* Pro Roasts indicator */}
-              {proRoasts > 0 && (
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
-                  background: 'rgba(255,68,68,0.1)',
-                  border: '1px solid rgba(255,68,68,0.3)'
-                }}>
-                  <span className="text-xs font-bold" style={{ color: '#ff6b6b' }}>
-                    🔥 {proRoasts} Pro Roast{proRoasts > 1 ? 's' : ''} ready
-                  </span>
-                </div>
-              )}
-
-              <p className="text-xs font-medium tracking-wide opacity-40">
-                Pro goes harder 😈
-              </p>
-            </>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              {isPro ? '⚡ Unlimited scans' : `${scansRemaining} free fit${scansRemaining !== 1 ? 's' : ''} today`}
+            </p>
           ) : (
-            <div className="w-full max-w-sm rounded-2xl p-5 flex flex-col gap-4" style={{
-              background: 'rgba(20,20,30,0.9)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-            }}>
-              {/* Emotional copy - not "limit reached" */}
-              <div className="text-center">
-                <span className="text-lg font-bold text-white">You used today's free fits 👀</span>
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  Resets in {timeUntilReset}
-                </p>
-              </div>
-
-              {/* Two purchase options */}
-              <div className="flex gap-3">
-                {/* $0.99 one-time Pro Roast */}
-                <a
-                  href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
-                  className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
-                  style={{
-                    background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-                    boxShadow: '0 4px 15px rgba(255,68,68,0.3)'
-                  }}
-                >
-                  $0.99 Pro Roast 🔥
-                </a>
-
-                {/* Pro subscription */}
-                <a
-                  href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
-                  className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                    boxShadow: '0 4px 15px rgba(0,212,255,0.3)'
-                  }}
-                >
-                  $2.99/wk Pro ⚡
-                </a>
-              </div>
-            </div>
+            <button
+              onClick={() => setScreen('paywall')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-95"
+              style={{
+                background: 'rgba(255,68,68,0.1)',
+                border: '1px solid rgba(255,68,68,0.3)'
+              }}
+            >
+              <span className="text-xs font-medium" style={{ color: '#ff6b6b' }}>
+                Free fits reset in {timeUntilReset} · Get Pro
+              </span>
+            </button>
           )}
         </div>
 
         <style>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.1); }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
           }
         `}</style>
       </div>
@@ -1092,234 +1003,286 @@ export default function App() {
   }
 
   // ============================================
-  // ANALYZING SCREEN
+  // ANALYZING SCREEN - Dopamine Loader
   // ============================================
   if (screen === 'analyzing') {
+    // Rotating analysis messages
+    const [analysisText, setAnalysisText] = useState(0)
+    const [progress, setProgress] = useState(0)
+    const analysisMessages = roastMode
+      ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
+      : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
+
+    // Progress and text animation
+    useEffect(() => {
+      // Progress animation (0-100 over ~2s)
+      const progressInterval = setInterval(() => {
+        setProgress(p => {
+          if (p >= 100) return 100
+          const next = p + Math.random() * 8 + 2 // Variable speed for realism
+          // Haptic tick at 80%
+          if (p < 80 && next >= 80) {
+            vibrate(30)
+            playSound('tick')
+          }
+          return Math.min(100, next)
+        })
+      }, 100)
+
+      // Rotating text
+      const textInterval = setInterval(() => {
+        setAnalysisText(t => (t + 1) % analysisMessages.length)
+      }, 600)
+
+      return () => {
+        clearInterval(progressInterval)
+        clearInterval(textInterval)
+      }
+    }, [])
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        {/* Photo with scanning effect */}
-        <div className="relative mb-10">
-          <div className="w-52 h-72 rounded-3xl overflow-hidden" style={{
-            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 40px ${accentGlow}`,
-            border: `2px solid ${accent}33`
+        {/* Photo with glow effect */}
+        <div className="relative mb-8">
+          <div className="w-44 h-60 rounded-2xl overflow-hidden" style={{
+            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 60px ${accentGlow}`,
+            border: `2px solid ${accent}44`
           }}>
             <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
           </div>
 
-          {/* Scan line */}
-          <div className="absolute left-0 right-0 h-1 rounded-full" style={{
-            background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-            boxShadow: `0 0 20px ${accent}`,
-            animation: 'scanLine 1.5s ease-in-out infinite'
-          }} />
+          {/* Scanning overlay effect */}
+          <div className="absolute inset-0 rounded-2xl overflow-hidden">
+            <div className="absolute left-0 right-0 h-1" style={{
+              background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+              boxShadow: `0 0 20px ${accent}`,
+              animation: 'scanLine 1.2s ease-in-out infinite'
+            }} />
+          </div>
 
-          {/* Corner accents */}
-          <div className="absolute -top-2 -left-2 w-6 h-6 border-l-2 border-t-2 rounded-tl-lg" style={{ borderColor: accent }} />
-          <div className="absolute -top-2 -right-2 w-6 h-6 border-r-2 border-t-2 rounded-tr-lg" style={{ borderColor: accent }} />
-          <div className="absolute -bottom-2 -left-2 w-6 h-6 border-l-2 border-b-2 rounded-bl-lg" style={{ borderColor: accent }} />
-          <div className="absolute -bottom-2 -right-2 w-6 h-6 border-r-2 border-b-2 rounded-br-lg" style={{ borderColor: accent }} />
+          {/* Corner brackets */}
+          <div className="absolute -top-2 -left-2 w-5 h-5 border-l-2 border-t-2 rounded-tl-lg" style={{ borderColor: accent }} />
+          <div className="absolute -top-2 -right-2 w-5 h-5 border-r-2 border-t-2 rounded-tr-lg" style={{ borderColor: accent }} />
+          <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 rounded-bl-lg" style={{ borderColor: accent }} />
+          <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 rounded-br-lg" style={{ borderColor: accent }} />
         </div>
 
-        {/* Loading text */}
-        <p className="text-xl font-semibold text-white mb-4" style={{
-          textShadow: `0 0 20px ${accentGlow}`,
-          animation: 'pulse 2s ease-in-out infinite'
+        {/* Progress Ring */}
+        <div className="relative w-24 h-24 mb-6">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+            {/* Background ring */}
+            <circle
+              cx="50" cy="50" r="45"
+              fill="none"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="8"
+            />
+            {/* Progress ring */}
+            <circle
+              cx="50" cy="50" r="45"
+              fill="none"
+              stroke={accent}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={`${progress * 2.83} 283`}
+              style={{
+                filter: `drop-shadow(0 0 10px ${accent})`,
+                transition: 'stroke-dasharray 0.1s ease-out'
+              }}
+            />
+          </svg>
+          {/* Percentage text */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-2xl font-black" style={{ color: accent }}>
+              {Math.round(progress)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Rotating analysis text */}
+        <p className="text-lg font-semibold text-white text-center h-7 transition-opacity duration-300" style={{
+          textShadow: `0 0 20px ${accentGlow}`
         }}>
-          {roastMode ? 'Finding the violations...' : 'AI judging your drip...'}
+          {analysisMessages[analysisText]}
         </p>
 
-        {/* Dots */}
-        <div className="flex gap-3">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="w-3 h-3 rounded-full" style={{
-              background: accent,
-              boxShadow: `0 0 10px ${accent}`,
-              animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s`
-            }} />
-          ))}
-        </div>
+        {/* Subtle reassurance */}
+        <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          {roastMode ? 'Brutally honest AI incoming...' : 'AI analyzing your style...'}
+        </p>
 
         <style>{`
-          @keyframes scanLine { 0% { top: 0; } 50% { top: calc(100% - 4px); } 100% { top: 0; } }
-          @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
-          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+          @keyframes scanLine { 
+            0% { top: 0; } 
+            50% { top: calc(100% - 4px); } 
+            100% { top: 0; } 
+          }
         `}</style>
       </div>
     )
   }
 
   // ============================================
-  // RESULTS SCREEN - Sequential Reveal
+  // RESULTS SCREEN - The Viral Engine
   // ============================================
   if (screen === 'results' && scores) {
     const scoreColor = getScoreColor(scores.overall)
     const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
 
     return (
-      <div className="min-h-screen flex flex-col items-center p-6 pt-10 overflow-hidden" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 30%, #1a1a2e 60%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center p-4 overflow-hidden" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingBottom: 'max(6rem, env(safe-area-inset-bottom, 6rem))'
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
+        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
       }}>
-        {/* Verdict - Huge & Bold */}
-        <div className={`transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-2xl md:text-3xl font-black text-white text-center mb-6 px-4" style={{
-            textShadow: `0 0 30px ${modeAccent}66`
+        {/* OVERALL SCORE - BIG at TOP */}
+        <div className={`relative mb-3 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+          <div className="relative w-32 h-32">
+            {/* Animated score ring */}
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+              <circle
+                cx="50" cy="50" r="45"
+                fill="none"
+                stroke={scoreColor}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${scores.overall * 2.83} 283`}
+                style={{
+                  transition: 'stroke-dasharray 1s ease-out',
+                  filter: `drop-shadow(0 0 15px ${scoreColor})`
+                }}
+              />
+            </svg>
+            {/* Score number */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-5xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>/100</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Verdict - Huge & Punchy */}
+        <div className={`transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-xl font-black text-white text-center mb-2 px-6" style={{
+            textShadow: `0 0 30px ${modeAccent}66`,
+            lineHeight: 1.3
           }}>
             {scores.verdict}
           </p>
         </div>
 
-        {/* Photo + Score */}
-        <div className={`relative mb-4 transition-all duration-700 delay-200 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-          {/* Glassmorphism card */}
-          <div className="p-3 rounded-3xl" style={{
-            background: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: `0 20px 60px ${scoreColor}33`
+        {/* Percentile social proof */}
+        <div className={`mb-3 transition-all duration-500 delay-200 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+          <p className="text-xs font-medium" style={{
+            color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.5)',
+            textShadow: scores.isLegendary ? '0 0 10px #ffd700' : 'none'
           }}>
-            <div className="w-52 h-68 rounded-2xl overflow-hidden">
-              <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" style={{ height: '260px' }} />
-            </div>
-          </div>
+            {scores.isLegendary ? "🌟 TOP 1% OF ALL TIME" : `Better than ${scores.percentile}% today`}
+          </p>
+        </div>
 
-          {/* Score Badge */}
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-            <div className="relative w-24 h-24 rounded-full flex items-center justify-center" style={{
-              background: 'rgba(10,10,15,0.9)',
-              border: `4px solid ${scoreColor}`,
-              boxShadow: `0 0 40px ${scoreColor}66, inset 0 0 20px ${scoreColor}22`
-            }}>
-              {/* Animated ring */}
-              <svg className="absolute inset-0 w-full h-full -rotate-90">
-                <circle
-                  cx="48" cy="48" r="44"
-                  fill="none"
-                  stroke={scoreColor}
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeDasharray={`${scores.overall * 2.76} 276`}
-                  style={{
-                    transition: 'stroke-dasharray 1s ease-out',
-                    filter: `drop-shadow(0 0 10px ${scoreColor})`
-                  }}
-                />
-              </svg>
-              <span className="text-3xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
-            </div>
+        {/* Photo - Smaller, clean */}
+        <div className={`relative mb-3 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          <div className="w-36 h-48 rounded-2xl overflow-hidden" style={{
+            boxShadow: `0 10px 40px ${scoreColor}33`,
+            border: `2px solid ${scoreColor}44`
+          }}>
+            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
           </div>
         </div>
 
-        {/* Aesthetic + Celeb */}
-        <div className={`mt-10 mb-4 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="flex items-center gap-2 px-6 py-3 rounded-full" style={{
+        {/* Aesthetic + Celeb Badge */}
+        <div className={`mb-3 transition-all duration-500 delay-400 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
             background: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255,255,255,0.1)'
           }}>
-            <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
               {scores.aesthetic} • {scores.celebMatch}
             </span>
           </div>
         </div>
 
-        {/* Percentile - Social Proof */}
-        <div className={`mb-2 transition-all duration-700 delay-350 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <p className="text-sm font-medium" style={{
-            color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.6)',
-            textShadow: scores.isLegendary ? '0 0 10px #ffd700' : 'none'
-          }}>
-            {scores.isLegendary
-              ? "🌟 TOP 1% OF ALL TIME 🌟"
-              : `Better than ${scores.percentile}% of fits today`}
-          </p>
-        </div>
-
-        {/* Tip */}
-        <div className={`w-full max-w-sm transition-all duration-700 delay-400 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="p-4 rounded-2xl" style={{
-            background: 'rgba(255,255,255,0.03)',
-            backdropFilter: 'blur(10px)',
-            border: `1px solid ${modeAccent}33`
-          }}>
-            <p className="text-xs font-bold mb-1" style={{ color: modeAccent }}>
-              {scores.roastMode ? '💀 THE TRUTH' : '💡 PRO TIP'}
-            </p>
-            <p className="text-sm text-white/80">{scores.tip}</p>
-            {scores.shareTip && (
-              <p className="text-xs mt-2 italic" style={{ color: 'rgba(255,255,255,0.4)' }}>{scores.shareTip}</p>
-            )}
+        {/* Sub-scores - Horizontal bars */}
+        <div className={`w-full max-w-xs mb-3 transition-all duration-500 delay-500 ${revealStage >= 4 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: 'Color', score: scores.color },
+              { label: 'Fit', score: scores.fit },
+              { label: 'Style', score: scores.style }
+            ].map((item) => (
+              <div key={item.label} className="text-center p-2 rounded-xl" style={{
+                background: 'rgba(255,255,255,0.03)'
+              }}>
+                <p className="text-[10px] mb-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
+                <p className="text-lg font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Score Breakdown */}
-        <div className={`w-full max-w-sm flex gap-2 mt-4 mb-6 transition-all duration-700 delay-500 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          {[
-            { label: 'Color', score: scores.color },
-            { label: 'Fit', score: scores.fit },
-            { label: 'Style', score: scores.style }
-          ].map((item) => (
-            <div key={item.label} className="flex-1 p-3 rounded-xl text-center" style={{
-              background: 'rgba(255,255,255,0.03)',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
-              <p className="text-xl font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
-            </div>
-          ))}
+        {/* ONE Tip - Short & Readable */}
+        <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-600 ${revealStage >= 4 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="px-4 py-2.5 rounded-xl text-center" style={{
+            background: `rgba(${scores.roastMode ? '255,68,68' : '0,212,255'},0.1)`,
+            border: `1px solid rgba(${scores.roastMode ? '255,68,68' : '0,212,255'},0.2)`
+          }}>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              {scores.roastMode ? '💀 ' : '💡 '}{scores.tip}
+            </p>
+          </div>
         </div>
 
-        {/* SHARE BUTTON - Pulsing glow */}
-        <div className={`w-full max-w-sm transition-all duration-700 delay-600 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+        {/* SHARE BUTTON - PRIMARY CTA, Above Fold */}
+        <div className={`w-full max-w-xs transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
             onClick={generateShareCard}
-            className="w-full py-5 rounded-2xl text-white text-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full py-4 rounded-2xl text-white text-lg font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
             style={{
               background: `linear-gradient(135deg, ${modeAccent} 0%, ${scores.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
-              boxShadow: `0 4px 30px ${modeAccent}66`,
+              boxShadow: `0 8px 30px ${modeAccent}44`,
               animation: 'pulseGlow 2s ease-in-out infinite'
             }}
           >
-            📤 Share Your Rate
+            <span className="text-xl">📤</span> Share Your Rate
           </button>
 
-          {/* FOMO Nudge */}
-          <p className="text-center text-xs mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            {scores.overall >= 80
-              ? "🔥 Challenge someone to beat your score!"
-              : "📸 Most users share their results"}
+          {/* Challenge nudge */}
+          <p className="text-center text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {scores.overall >= 80 ? "Challenge someone to beat this 🔥" : scores.shareTip || "Tag a friend to rate their fit"}
           </p>
         </div>
 
-        {/* Rate Again */}
+        {/* Rate Again - Subtle */}
         <button
           onClick={resetApp}
-          className="mt-4 text-sm font-medium transition-all hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
+          className="mt-3 text-xs font-medium transition-all active:opacity-60"
+          style={{ color: 'rgba(255,255,255,0.35)' }}
         >
-          ← Rate Another Fit
+          ← Rate Another
         </button>
 
         {/* Confetti for 90+ */}
         {scores.overall >= 90 && (
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
-            {[...Array(40)].map((_, i) => (
+            {[...Array(30)].map((_, i) => (
               <div
                 key={i}
                 className="absolute"
                 style={{
                   left: `${Math.random() * 100}%`,
-                  top: '-20px',
-                  width: `${8 + Math.random() * 8}px`,
-                  height: `${8 + Math.random() * 8}px`,
+                  top: '-10px',
+                  width: `${6 + Math.random() * 6}px`,
+                  height: `${6 + Math.random() * 6}px`,
                   background: ['#ff4444', '#00d4ff', '#00ff88', '#ffd000', '#ff0080'][Math.floor(Math.random() * 5)],
                   borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-                  animation: `confetti ${2.5 + Math.random() * 2}s linear forwards`,
-                  animationDelay: `${Math.random() * 0.8}s`
+                  animation: `confetti ${2 + Math.random() * 1.5}s linear forwards`,
+                  animationDelay: `${Math.random() * 0.5}s`
                 }}
               />
             ))}
@@ -1328,8 +1291,8 @@ export default function App() {
 
         <style>{`
           @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 4px 30px ${modeAccent}66; }
-            50% { box-shadow: 0 4px 50px ${modeAccent}99; }
+            0%, 100% { box-shadow: 0 8px 30px ${modeAccent}44; }
+            50% { box-shadow: 0 8px 50px ${modeAccent}77; }
           }
           @keyframes confetti {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
@@ -1458,193 +1421,221 @@ export default function App() {
   }
 
   // ============================================
-  // LIMIT REACHED SCREEN
+  // PAYWALL SCREEN - Mobile-Native Bottom Sheet
   // ============================================
-  if (screen === 'limit-reached') {
+  if (screen === 'paywall' || screen === 'limit-reached') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center justify-end p-0" style={{
+        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 100%)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        <span className="text-7xl mb-6">⏰</span>
-        <h2 className="text-2xl font-bold text-white mb-2">Daily Limit Reached</h2>
-        <p className="text-center mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          Your free rate resets at midnight
-        </p>
-
-        {timeUntilReset && (
-          <div className="px-6 py-3 rounded-full mb-8" style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <span className="text-lg font-semibold" style={{ color: '#00d4ff' }}>
-              Next free rate in {timeUntilReset}
-            </span>
+        {/* Backdrop with photo preview if available */}
+        {uploadedImage && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <img src={uploadedImage} alt="" className="w-64 h-80 object-cover rounded-2xl blur-sm" />
           </div>
         )}
 
-        <a
-          href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-          className="px-8 py-4 rounded-2xl text-white font-bold text-lg transition-all hover:scale-105 mb-4"
+        {/* Bottom Sheet */}
+        <div className="w-full max-w-md rounded-t-3xl p-6 pb-10 relative z-10" style={{
+          background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(15,15,25,0.99) 100%)',
+          backdropFilter: 'blur(20px)',
+          animation: 'slideUp 0.4s ease-out',
+          paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom, 2.5rem))'
+        }}>
+          {/* Handle bar */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-white/20" />
+
+          {/* Emotional headline */}
+          <div className="text-center mb-6 mt-4">
+            <span className="text-4xl mb-3 block">{roastMode ? '🔥' : '✨'}</span>
+            <h2 className="text-2xl font-black text-white mb-2">
+              {roastMode ? 'Want the brutal truth?' : 'Ready for more?'}
+            </h2>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {timeUntilReset
+                ? `Free fits reset in ${timeUntilReset}`
+                : 'Unlock unlimited outfit ratings'}
+            </p>
+          </div>
+
+          {/* Purchase Options */}
+          <div className="flex flex-col gap-3 mb-5">
+            {/* Primary: One-time Pro Roast */}
+            <a
+              href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
+              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
+                boxShadow: '0 8px 30px rgba(255,68,68,0.3)'
+              }}
+            >
+              🔥 Roast this one · $0.99
+            </a>
+
+            {/* Secondary: Pro subscription */}
+            <a
+              href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
+              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+              }}
+            >
+              ⚡ Pro AI · $2.99/week
+            </a>
+          </div>
+
+          {/* Trust microcopy */}
+          <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            Cancel anytime. No weird caps.
+          </p>
+
+          {/* Back button */}
+          <button
+            onClick={resetApp}
+            className="w-full py-3 text-sm font-medium transition-all active:opacity-60"
+            style={{ color: 'rgba(255,255,255,0.4)' }}
+          >
+            ← Maybe later
+          </button>
+        </div>
+
+        <style>{`
+          @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  // ============================================
+  // SHARE PREVIEW SCREEN - One Tap, Zero Friction
+  // ============================================
+  if (screen === 'share-preview' && shareData) {
+    const handleShare = async () => {
+      playSound('share')
+      vibrate(30)
+
+      if (navigator.share) {
+        try {
+          const data = {
+            title: 'My FitRate Score',
+            text: shareData.text,
+          }
+          if (navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
+            data.files = [shareData.file]
+          }
+          await navigator.share(data)
+          // After successful share, show follow-up
+          setScreen('share-success')
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            // Download as fallback
+            downloadImage(shareData.imageBlob, shareData.text)
+          }
+        }
+      } else {
+        // Desktop fallback
+        downloadImage(shareData.imageBlob, shareData.text)
+        navigator.clipboard.writeText(shareData.url)
+        setScreen('share-success')
+      }
+    }
+
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+      }}>
+        {/* Share Card Preview */}
+        <div className="relative w-[55%] max-w-[200px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-8" style={{
+          border: `2px solid ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`,
+          boxShadow: `0 20px 60px ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`
+        }}>
+          <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
+        </div>
+
+        {/* Primary Share CTA */}
+        <button
+          onClick={handleShare}
+          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 transition-all active:scale-95 mb-4"
           style={{
-            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-            boxShadow: '0 4px 30px rgba(0,212,255,0.4)'
+            background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
+            boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
           }}
         >
-          Get 25 Rates/Day ⚡
-        </a>
+          <span className="text-2xl">📤</span> Share to Story
+        </button>
 
+        {/* Download option */}
         <button
-          onClick={resetApp}
-          className="text-sm font-medium"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
+          onClick={() => downloadImage(shareData.imageBlob, shareData.text)}
+          className="text-sm font-medium mb-4 transition-all active:opacity-60"
+          style={{ color: 'rgba(255,255,255,0.5)' }}
         >
-          ← Back to Home
+          ⬇️ Save to Photos
+        </button>
+
+        {/* Cancel */}
+        <button
+          onClick={() => setScreen('results')}
+          className="text-xs transition-all active:opacity-60"
+          style={{ color: 'rgba(255,255,255,0.3)' }}
+        >
+          Cancel
         </button>
       </div>
     )
   }
 
   // ============================================
-  // SHARE PREVIEW SCREEN
+  // SHARE SUCCESS - One Follow-up Option
   // ============================================
-  if (screen === 'share-preview' && shareData) {
-    const handleSystemShare = async () => {
-      // Try to share with URL param for better compatibility
-      if (navigator.share) {
-        try {
-          // Construct data object dynamically
-          const data = {
-            title: 'My FitRate Score',
-            text: shareData.text, // Text already contains the URL
-          }
-
-          // Only add files if supported (some apps fail if files mixed with url)
-          if (navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
-            data.files = [shareData.file]
-          } else {
-            data.url = shareData.url // Fallback to just URL if files not supported
-          }
-
-          // Prioritize URL if we want clickable links? 
-          // Actually, let's try sending EVERYTHING.
-          // Note: Android often drops the URL if files are present.
-          // Putting URL in 'text' is the safest bet for visibility.
-
-          await navigator.share(data)
-        } catch (err) {
-          console.error("Share failed:", err)
-          // Fallback: Copy link if share fails
-          if (err.name !== 'AbortError') {
-            navigator.clipboard.writeText(shareData.url)
-            alert("Could not share directly. Link copied instead! 📋")
-          }
-        }
-      } else {
-        navigator.clipboard.writeText(shareData.url)
-        alert("System sharing not available. Link copied! 📋")
-      }
-    }
-
-    const handleTwitterShare = () => {
-      const text = encodeURIComponent(shareData.text)
-      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank')
-    }
-
-    const handleWhatsAppShare = () => {
-      const text = encodeURIComponent(shareData.text)
-      window.open(`https://wa.me/?text=${text}`, '_blank')
-    }
-
-    const handleCopyLink = () => {
-      navigator.clipboard.writeText(shareData.url).then(() => {
-        alert("Link copied! 📋")
-      })
-    }
-
+  if (screen === 'share-success') {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center bg-[#0a0a0f] text-white font-sans overflow-y-auto"
-        style={{
-          height: '100dvh',
-          paddingBottom: 'env(safe-area-inset-bottom, 24px)'
-        }}>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+      }}>
+        <span className="text-6xl mb-4">🎉</span>
+        <h2 className="text-2xl font-black mb-2">Shared!</h2>
+        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          Let's see if they can beat it
+        </p>
 
-        <div className="w-full max-w-md flex flex-col items-center p-6 min-h-full">
-          <h2 className="text-3xl font-black mb-8 mt-4 text-center tracking-tight">Ready to Flex? 💪</h2>
+        {/* ONE Follow-up Option */}
+        <button
+          onClick={() => {
+            // If they used Nice mode, suggest Roast. Otherwise, rate another.
+            if (!roastMode) {
+              setRoastMode(true)
+              setScreen('home')
+            } else {
+              resetApp()
+            }
+          }}
+          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
+          style={{
+            background: roastMode
+              ? 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)'
+              : 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
+            boxShadow: roastMode
+              ? '0 8px 30px rgba(0,212,255,0.3)'
+              : '0 8px 30px rgba(255,68,68,0.3)'
+          }}
+        >
+          {roastMode ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
+        </button>
 
-          {/* Image Preview - Responsive Size */}
-          <div className="relative w-[65%] max-w-[240px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl mb-8 transform transition-transform duration-500 hover:scale-[1.02]" style={{
-            border: '2px solid rgba(255,255,255,0.1)',
-            boxShadow: `0 20px 60px ${scores.roastMode ? '#ff4444' : '#00d4ff'}44`
-          }}>
-            <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
-          </div>
-
-          <div className="w-full flex flex-col gap-4 mt-auto">
-            {/* Main System Share - Scale effect on press */}
-            <button
-              onClick={handleSystemShare}
-              className="w-full py-4 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 transition-transform active:scale-95 touch-manipulation"
-              style={{
-                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                boxShadow: '0 8px 30px -4px rgba(0,212,255,0.4)',
-                minHeight: '60px'
-              }}
-            >
-              <span className="text-2xl">📤</span> Share Sheet
-            </button>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={handleTwitterShare}
-                className="py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95 touch-manipulation"
-                style={{
-                  background: '#000000',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  minHeight: '60px'
-                }}
-              >
-                🐦 Post
-              </button>
-              <button
-                onClick={handleWhatsAppShare}
-                className="py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95 touch-manipulation"
-                style={{
-                  background: '#25D366',
-                  minHeight: '60px'
-                }}
-              >
-                💬 Chat
-              </button>
-            </div>
-
-            <button
-              onClick={handleCopyLink}
-              className="w-full py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-2 transition-colors active:bg-white/10 touch-manipulation"
-              style={{
-                color: 'rgba(255,255,255,0.9)',
-                background: 'rgba(255,255,255,0.05)',
-                minHeight: '56px'
-              }}
-            >
-              🔗 Copy Link
-            </button>
-
-            <button
-              onClick={() => downloadImage(shareData.imageBlob, shareData.text)}
-              className="w-full py-4 text-sm font-medium text-white/50 active:text-white transition-colors touch-manipulation"
-            >
-              ⬇️ Download Image
-            </button>
-          </div>
-
-          <button
-            onClick={() => setScreen('results')}
-            className="mt-4 py-2 px-6 text-sm font-medium rounded-full transition-colors active:bg-white/5 text-white/40 hover:text-white/60"
-          >
-            Cancel
-          </button>
-        </div>
+        {/* Back to home */}
+        <button
+          onClick={resetApp}
+          className="text-sm font-medium transition-all active:opacity-60"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
+        >
+          ← Done
+        </button>
       </div>
     )
   }

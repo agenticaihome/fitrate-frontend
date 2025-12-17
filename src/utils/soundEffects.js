@@ -107,6 +107,16 @@ export const playSound = (type) => {
                 osc.stop(now + 0.25);
                 break;
 
+            case 'tick':
+                // Subtle tick for progress milestones
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, now);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+                osc.start(now);
+                osc.stop(now + 0.03);
+                break;
+
             case 'legendary':
                 // Epic fanfare for rare easter eggs
                 [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
