@@ -1265,6 +1265,53 @@ export default function App() {
           </div>
         </div>
 
+        {/* PRO EXCLUSIVE: Savage Level + Item Roasts */}
+        {scores.savageLevel && (
+          <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Pro Badge */}
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold" style={{
+                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                color: '#000'
+              }}>⚡ PRO ANALYSIS</span>
+            </div>
+
+            {/* Savage Level Meter */}
+            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)' }}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Savage Level</span>
+                <span className="text-lg font-black" style={{ color: '#ff4444' }}>{scores.savageLevel}/10 🔥</span>
+              </div>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                <div className="h-full rounded-full" style={{
+                  width: `${scores.savageLevel * 10}%`,
+                  background: 'linear-gradient(90deg, #ff4444 0%, #ff0080 100%)'
+                }} />
+              </div>
+            </div>
+
+            {/* Item-by-Item Roasts */}
+            {scores.itemRoasts && (
+              <div className="space-y-2 mb-3">
+                {Object.entries(scores.itemRoasts).filter(([_, roast]) => roast && roast !== 'N/A').map(([item, roast]) => (
+                  <div key={item} className="px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <span className="text-[10px] uppercase font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>{item}</span>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>{roast}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Worst Celeb Comparison */}
+            {scores.worstCelebComparison && (
+              <div className="px-3 py-2 rounded-lg text-center" style={{ background: 'rgba(255,68,68,0.05)', border: '1px dashed rgba(255,68,68,0.3)' }}>
+                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>NOT giving:</span>
+                <p className="text-xs font-medium" style={{ color: 'rgba(255,68,68,0.9)' }}>{scores.worstCelebComparison}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* SHARE BUTTON - PRIMARY CTA, Above Fold */}
         <div className={`w-full max-w-xs transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
