@@ -466,39 +466,30 @@ export default function App() {
       return
     }
 
-    // ALL users now call real AI (Gemini for free tier, GPT-4 for Pro)
-    // The backend handles this automatically
+    // Free users: call backend to track scan by userId, then show mock scores
     if (!isPro) {
       try {
-        // Call real AI endpoint (now uses Gemini - free tier)
-        const response = await fetch(API_URL, {
+        // Register scan on server (tracks by userId - prevents bypass)
+        const consumeUrl = API_URL.replace('/analyze', '/analyze/consume')
+        const response = await fetch(consumeUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: imageData,
-            roastMode,
-            userId
-          })
+          body: JSON.stringify({ userId })
         })
 
         const data = await response.json()
 
         // Check if rate limited
-        if (response.status === 429 || data.limitReached) {
+        if (response.status === 429 || !data.success) {
           setScansRemaining(0)
           setScreen('limit-reached')
           return
         }
 
-        if (!data.success) {
-          setError(data.error || 'Analysis failed')
-          setScreen('error')
-          return
-        }
-
         // Update scans remaining from server
         if (data.scanInfo) {
-          setScansRemaining(data.scanInfo.scansRemaining)
+          const bonus = data.scanInfo.bonusRemaining || 0
+          setScansRemaining(data.scanInfo.scansRemaining + bonus)
           const used = data.scanInfo.scansUsed || 1
           localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
         }
@@ -515,19 +506,16 @@ export default function App() {
         localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
         setDailyStreak(newStreak)
 
-        // Add virality features to scores
-        const scores = {
-          ...data.scores,
-          percentile: getPercentile(data.scores.overall),
-          isLegendary: Math.random() < 0.01, // 1% legendary chance
-          shareTip: getRandomShareTip()
-        }
+        // Simulate AI thinking time for realism
+        await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000))
 
-        setScores(scores)
+        // Generate mock scores (works instantly, no API needed)
+        const mockScores = generateMockScores()
+        setScores(mockScores)
         setScreen('results')
         return
       } catch (err) {
-        console.error('Analysis error:', err)
+        console.error('Consume error:', err)
         setError("Connection issue... try again!")
         setScreen('error')
         return
