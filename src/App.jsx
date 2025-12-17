@@ -873,6 +873,44 @@ export default function App() {
   const accent = roastMode ? '#ff4444' : '#00d4ff'
   const accentGlow = roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
 
+  // Analysis messages for analyzing screen
+  const analysisMessages = roastMode
+    ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
+    : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
+
+  // Progress and text animation effect for analyzing screen
+  // IMPORTANT: This must be BEFORE any early returns to avoid hooks order issues
+  useEffect(() => {
+    if (screen !== 'analyzing') return
+
+    // Reset progress when entering analyzing screen
+    setAnalysisProgress(0)
+    setAnalysisText(0)
+
+    // Progress animation (0-100 over ~2s)
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress(p => {
+        if (p >= 100) return 100
+        const next = p + Math.random() * 8 + 2
+        if (p < 80 && next >= 80) {
+          vibrate(30)
+          playSound('tick')
+        }
+        return Math.min(100, next)
+      })
+    }, 100)
+
+    // Rotating text
+    const textInterval = setInterval(() => {
+      setAnalysisText(t => (t + 1) % 5)
+    }, 600)
+
+    return () => {
+      clearInterval(progressInterval)
+      clearInterval(textInterval)
+    }
+  }, [screen])
+
   // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // ============================================
@@ -1009,44 +1047,6 @@ export default function App() {
   // ============================================
   // ANALYZING SCREEN - Dopamine Loader
   // ============================================
-  // Analysis messages defined outside conditional
-  const analysisMessages = roastMode
-    ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
-    : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
-
-  // Progress and text animation effect (runs when screen is 'analyzing')
-  useEffect(() => {
-    if (screen !== 'analyzing') return
-
-    // Reset progress when entering analyzing screen
-    setAnalysisProgress(0)
-    setAnalysisText(0)
-
-    // Progress animation (0-100 over ~2s)
-    const progressInterval = setInterval(() => {
-      setAnalysisProgress(p => {
-        if (p >= 100) return 100
-        const next = p + Math.random() * 8 + 2 // Variable speed for realism
-        // Haptic tick at 80%
-        if (p < 80 && next >= 80) {
-          vibrate(30)
-          playSound('tick')
-        }
-        return Math.min(100, next)
-      })
-    }, 100)
-
-    // Rotating text
-    const textInterval = setInterval(() => {
-      setAnalysisText(t => (t + 1) % 5)
-    }, 600)
-
-    return () => {
-      clearInterval(progressInterval)
-      clearInterval(textInterval)
-    }
-  }, [screen])
-
   if (screen === 'analyzing') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
