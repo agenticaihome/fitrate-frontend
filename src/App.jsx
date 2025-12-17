@@ -1408,17 +1408,42 @@ export default function App() {
 
           {/* Challenge a Friend Button */}
           <button
-            onClick={() => {
-              const challengeUrl = `${window.location.origin}?challenge=${scores.overall}`
-              if (navigator.share) {
-                navigator.share({
-                  title: `Can you beat ${scores.overall}?`,
-                  text: `I got ${scores.overall}/100 on FitRate! Think you can beat it? 👊`,
-                  url: challengeUrl
-                })
+            onClick={async () => {
+              playSound('click')
+              vibrate(20)
+
+              // Generate the share card first if we have shareData, otherwise use existing
+              if (shareData?.imageBlob) {
+                // We already have a share card image, share it with challenge text
+                const challengeUrl = `${window.location.origin}?challenge=${scores.overall}`
+                const challengeText = `I got ${scores.overall}/100 on FitRate! Think you can beat it? 👊`
+
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
+                  try {
+                    await navigator.share({
+                      title: `Can you beat ${scores.overall}?`,
+                      text: challengeText,
+                      url: challengeUrl,
+                      files: [shareData.file]
+                    })
+                  } catch (e) {
+                    // User cancelled or error
+                    console.log('Share cancelled or failed:', e)
+                  }
+                } else {
+                  // Fallback: download image + copy link
+                  const url = URL.createObjectURL(shareData.imageBlob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = 'fitrate-challenge.png'
+                  a.click()
+                  URL.revokeObjectURL(url)
+                  navigator.clipboard.writeText(`${challengeText}\n${challengeUrl}`)
+                  alert('Challenge image downloaded & link copied! 📤')
+                }
               } else {
-                navigator.clipboard.writeText(challengeUrl)
-                alert('Challenge link copied!')
+                // No share card yet, generate it first then share
+                generateShareCard()
               }
             }}
             className="w-full max-w-xs py-3 mt-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all active:scale-95"
@@ -1431,7 +1456,7 @@ export default function App() {
           </button>
 
           <p className="text-center text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Send a link for them to beat your score
+            Share your score card & challenge link
           </p>
         </div>
 
