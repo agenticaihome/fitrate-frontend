@@ -1257,7 +1257,7 @@ export default function App() {
               animation: 'pulseGlow 2s ease-in-out infinite'
             }}
           >
-            <span className="text-xl">📤</span> Share Your Rate
+            <span className="text-xl">📤</span> Share to Story
           </button>
 
           {/* Challenge nudge */}
