@@ -1711,7 +1711,7 @@ export default function App() {
         {/* Primary Share CTA - Native Share with Image */}
         <button
           onClick={handleShare}
-          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-3"
+          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-6"
           style={{
             background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
             boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
@@ -1720,71 +1720,11 @@ export default function App() {
           <span className="text-xl">📤</span> Share with Image
         </button>
 
-        {/* Secondary Actions Row */}
-        <div className="flex gap-3 mb-4 w-full max-w-xs">
-          {/* Copy Caption - Full width now */}
-          <button
-            onClick={copyCaption}
-            className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
-          >
-            📋 Copy Caption
-          </button>
-        </div>
-
-        {/* Platform Buttons */}
-        <div className="flex gap-3 mb-6">
-          {/* X/Twitter */}
-          <button
-            onClick={shareToTwitter}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
-          >
-            <span className="text-lg">𝕏</span>
-          </button>
-
-          {/* TikTok - just copy caption, they use share sheet for image */}
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(shareData.text)
-              showCopiedToast('Caption copied for TikTok ✅')
-            }}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
-          >
-            <span className="text-lg">🎵</span>
-          </button>
-
-          {/* Instagram - just copy caption */}
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(shareData.text)
-              showCopiedToast('Caption copied for IG ✅')
-            }}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
-            style={{
-              background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-              border: 'none'
-            }}
-          >
-            <span className="text-lg">📷</span>
-          </button>
-        </div>
-
-        {/* Cancel */}
+        {/* Back */}
         <button
           onClick={() => setScreen('results')}
-          className="text-xs transition-all active:opacity-60"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
+          className="text-sm transition-all active:opacity-60"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
         >
           ← Back to Results
         </button>
