@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title>About | FitRate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back:hover {
+            color: #00d4ff;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #00d4ff;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #fff;
+        }
+
+        .cta {
+            display: inline-block;
+            background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+            color: #000;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            margin: 2rem 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        a {
+            color: #00d4ff;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            margin: 0 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .made-with {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 500px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="back">← Back to FitRate</a>
+
+        <div class="logo">FITRATE</div>
+        <p class="tagline">The AI that rates your outfit before the internet does 😈</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📸</div>
+                <div class="feature-title">Instant Analysis</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Photos Never Stored</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔥</div>
+                <div class="feature-title">Roast Mode</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>What is FitRate?</h2>
+            <p>FitRate is an AI-powered outfit rating app. Upload a photo of your fit, and our AI gives you an honest
+                score with style tips, aesthetic matching, and celebrity comparisons.</p>
+            <p>Whether you want validation, honest feedback, or a brutal roast — we've got a mode for that.</p>
+        </div>
+
+        <div class="section">
+            <h2>Three Modes</h2>
+            <p><strong>😇 Nice Mode</strong> — Supportive feedback that hypes up your fit</p>
+            <p><strong>📊 Honest Mode</strong> — Real talk, no sugarcoating</p>
+            <p><strong>🔥 Roast Mode</strong> — Brutally honest (but funny) roasts</p>
+        </div>
+
+        <div class="section">
+            <h2>Privacy First</h2>
+            <p>Your photos are analyzed instantly and immediately deleted. We never store, save, or use your images for
+                anything else. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+        </div>
+
+        <a href="/" class="cta">Rate My Fit →</a>
+
+        <div class="footer">
+            <a href="/">Home</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/about">About</a>
+            <p class="made-with">Made with ❤️ · © 2025 FitRate</p>
+        </div>
+    </div>
+</body>
+
+</html>
