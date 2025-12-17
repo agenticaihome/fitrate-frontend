@@ -63,6 +63,12 @@ export default function App() {
   const [emailChecking, setEmailChecking] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
 
+  // Challenge a Friend (score from URL)
+  const [challengeScore, setChallengeScore] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return parseInt(params.get('challenge')) || null
+  })
+
   // Daily Streak Logic
   const [dailyStreak, setDailyStreak] = useState(() => {
     try {
@@ -950,9 +956,22 @@ export default function App() {
           WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        <p className="text-xs mb-16 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="text-xs mb-8 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
           AI rates your fit in seconds
         </p>
+
+        {/* Challenge Banner - when friend shared a challenge link */}
+        {challengeScore && (
+          <div className="mb-8 px-6 py-4 rounded-2xl text-center" style={{
+            background: 'linear-gradient(135deg, rgba(255,68,68,0.2) 0%, rgba(255,136,0,0.2) 100%)',
+            border: '1px solid rgba(255,136,0,0.4)'
+          }}>
+            <p className="text-2xl font-black text-white mb-1">👊 Beat {challengeScore}?</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Your friend scored {challengeScore}/100 — can you do better?
+            </p>
+          </div>
+        )}
 
         {/* HERO CTA - HUGE "Rate My Fit" button */}
         <button
@@ -1260,9 +1279,32 @@ export default function App() {
             <span className="text-xl">📤</span> Share to Story
           </button>
 
-          {/* Challenge nudge */}
-          <p className="text-center text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            {scores.overall >= 80 ? "Challenge someone to beat this 🔥" : scores.shareTip || "Tag a friend to rate their fit"}
+          {/* Challenge a Friend Button */}
+          <button
+            onClick={() => {
+              const challengeUrl = `${window.location.origin}?challenge=${scores.overall}`
+              if (navigator.share) {
+                navigator.share({
+                  title: `Can you beat ${scores.overall}?`,
+                  text: `I got ${scores.overall}/100 on FitRate! Think you can beat it? 👊`,
+                  url: challengeUrl
+                })
+              } else {
+                navigator.clipboard.writeText(challengeUrl)
+                alert('Challenge link copied!')
+              }
+            }}
+            className="w-full max-w-xs py-3 mt-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            <span>👊</span> Challenge a Friend
+          </button>
+
+          <p className="text-center text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Send a link for them to beat your score
           </p>
         </div>
 
