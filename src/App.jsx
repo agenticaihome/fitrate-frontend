@@ -96,10 +96,13 @@ export default function App() {
     const stored = localStorage.getItem('fitrate_scans')
     if (stored) {
       const { date, count } = JSON.parse(stored)
-      if (date === today) return Math.max(0, 1 - count)
+      if (date === today) return Math.max(0, 2 - count)  // Changed to 2 free/day
     }
-    return 1
+    return 2  // 2 free scans per day
   })
+
+  // Pro Roasts available (from referrals or $0.99 purchase)
+  const [proRoasts, setProRoasts] = useState(0)
 
   const fileInputRef = useRef(null)
 
@@ -453,7 +456,7 @@ export default function App() {
       if (date === today) count = storedCount + 1
     }
     localStorage.setItem('fitrate_scans', JSON.stringify({ date: today, count }))
-    setScansRemaining(Math.max(0, 1 - count))
+    setScansRemaining(Math.max(0, 2 - count))  // Changed to 2 free/day
   }
 
   const analyzeOutfit = useCallback(async (imageData) => {
@@ -994,36 +997,79 @@ export default function App() {
         </button>
 
         {/* Scan Status / Limit Reached Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-center" style={{
+        <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center gap-3" style={{
           background: 'linear-gradient(to top, #0a0a0f 20%, transparent 100%)',
           paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
         }}>
           {scansRemaining > 0 || isPro ? (
-            <p className="text-xs font-medium tracking-wide opacity-50">
-              {isPro ? '⚡ 25 daily ratings active' : '1 free rating resets daily'}
-            </p>
+            <>
+              {/* Visible scan counter */}
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
+                background: 'rgba(0,212,255,0.1)',
+                border: '1px solid rgba(0,212,255,0.2)'
+              }}>
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  {isPro ? `⚡ Pro: ${25 - (scansRemaining || 0)} / 25 today` : `${scansRemaining} / 2 free today`}
+                </span>
+              </div>
+
+              {/* Pro Roasts indicator */}
+              {proRoasts > 0 && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{
+                  background: 'rgba(255,68,68,0.1)',
+                  border: '1px solid rgba(255,68,68,0.3)'
+                }}>
+                  <span className="text-xs font-bold" style={{ color: '#ff6b6b' }}>
+                    🔥 {proRoasts} Pro Roast{proRoasts > 1 ? 's' : ''} ready
+                  </span>
+                </div>
+              )}
+
+              <p className="text-xs font-medium tracking-wide opacity-40">
+                Pro goes harder 😈
+              </p>
+            </>
           ) : (
-            <div className="w-full max-w-sm rounded-2xl p-4 flex items-center justify-between gap-4" style={{
-              background: 'rgba(20,20,30,0.8)',
+            <div className="w-full max-w-sm rounded-2xl p-5 flex flex-col gap-4" style={{
+              background: 'rgba(20,20,30,0.9)',
               backdropFilter: 'blur(16px)',
               border: '1px solid rgba(255,255,255,0.1)',
               boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
             }}>
-              <div className="flex flex-col">
-                <span className="text-xs text-white/50 font-bold tracking-wider mb-0.5">NEXT FREE RATE</span>
-                <span className="text-lg font-mono font-bold text-white tabular-nums">{timeUntilReset}</span>
+              {/* Emotional copy - not "limit reached" */}
+              <div className="text-center">
+                <span className="text-lg font-bold text-white">You used today's free fits 👀</span>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  Resets in {timeUntilReset}
+                </p>
               </div>
 
-              <a
-                href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
-                className="px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center gap-2 transition-transform active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                  boxShadow: '0 4px 15px rgba(0,212,255,0.3)'
-                }}
-              >
-                Unlock ⚡
-              </a>
+              {/* Two purchase options */}
+              <div className="flex gap-3">
+                {/* $0.99 one-time Pro Roast */}
+                <a
+                  href="https://buy.stripe.com/YOUR_099_LINK"
+                  className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
+                  style={{
+                    background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
+                    boxShadow: '0 4px 15px rgba(255,68,68,0.3)'
+                  }}
+                >
+                  $0.99 Pro Roast 🔥
+                </a>
+
+                {/* Pro subscription */}
+                <a
+                  href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+                  className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
+                  style={{
+                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                    boxShadow: '0 4px 15px rgba(0,212,255,0.3)'
+                  }}
+                >
+                  $2.99/wk Pro ⚡
+                </a>
+              </div>
             </div>
           )}
         </div>
