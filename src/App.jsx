@@ -1423,7 +1423,7 @@ export default function App() {
           // Construct data object dynamically
           const data = {
             title: 'My FitRate Score',
-            text: shareData.text + "\n\n" + shareData.url, // Ensure URL is in text for apps that ignore 'url'
+            text: shareData.text, // Text already contains the URL
           }
 
           // Only add files if supported (some apps fail if files mixed with url)
