@@ -1048,7 +1048,7 @@ export default function App() {
               <div className="flex gap-3">
                 {/* $0.99 one-time Pro Roast */}
                 <a
-                  href="https://buy.stripe.com/YOUR_099_LINK"
+                  href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
                   className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
                   style={{
                     background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
@@ -1060,7 +1060,7 @@ export default function App() {
 
                 {/* Pro subscription */}
                 <a
-                  href="https://buy.stripe.com/4gM00l2SI7wT7LpfztfYY00"
+                  href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
                   className="flex-1 py-3 rounded-xl text-center text-white text-sm font-bold transition-transform active:scale-95"
                   style={{
                     background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
