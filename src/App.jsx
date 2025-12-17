@@ -19,6 +19,35 @@ const CELEBRITIES = [
   'Dua Lipa going to dinner', 'Jacob Elordi casual', 'Sydney Sweeney brunch'
 ]
 
+// Helper: Social proof percentile based on score
+const getPercentile = (score) => {
+  if (score >= 95) return 99
+  if (score >= 90) return 96
+  if (score >= 85) return 91
+  if (score >= 80) return 84
+  if (score >= 75) return 73
+  if (score >= 70) return 61
+  if (score >= 65) return 48
+  if (score >= 60) return 35
+  return Math.floor(score * 0.4)
+}
+
+// Helper: Random share tips for virality
+const SHARE_TIPS = [
+  "Challenge a friend to beat this 👀",
+  "Post to your story 📸",
+  "Tag someone who needs a rating",
+  "Drop this in the group chat",
+  "Your followers need to see this",
+  "This score goes crazy",
+  "Bet you can't get higher 🔥",
+  "Send to someone who thinks they dress better",
+  "Post it 😏",
+  "Your friends need to try this"
+]
+
+const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
+
 export default function App() {
   const [screen, setScreen] = useState('home')
   const [uploadedImage, setUploadedImage] = useState(null)
@@ -437,31 +466,39 @@ export default function App() {
       return
     }
 
-    // Free users: call backend to track scan by IP, then show mock scores
+    // ALL users now call real AI (Gemini for free tier, GPT-4 for Pro)
+    // The backend handles this automatically
     if (!isPro) {
       try {
-        // Register scan on server (tracks by IP - prevents localStorage bypass)
-        const consumeUrl = API_URL.replace('/analyze', '/analyze/consume')
-        const response = await fetch(consumeUrl, {
+        // Call real AI endpoint (now uses Gemini - free tier)
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId })
+          body: JSON.stringify({
+            image: imageData,
+            roastMode,
+            userId
+          })
         })
 
         const data = await response.json()
 
         // Check if rate limited
-        if (response.status === 429 || !data.success) {
+        if (response.status === 429 || data.limitReached) {
           setScansRemaining(0)
           setScreen('limit-reached')
           return
         }
 
+        if (!data.success) {
+          setError(data.error || 'Analysis failed')
+          setScreen('error')
+          return
+        }
+
         // Update scans remaining from server
         if (data.scanInfo) {
-          const bonus = data.scanInfo.bonusRemaining || 0
-          setScansRemaining(data.scanInfo.scansRemaining + bonus)
-          // Persist usage to prevent refresh bypass
+          setScansRemaining(data.scanInfo.scansRemaining)
           const used = data.scanInfo.scansUsed || 1
           localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
         }
@@ -478,16 +515,19 @@ export default function App() {
         localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
         setDailyStreak(newStreak)
 
-        // Simulate AI thinking time for realism
-        await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1500))
+        // Add virality features to scores
+        const scores = {
+          ...data.scores,
+          percentile: getPercentile(data.scores.overall),
+          isLegendary: Math.random() < 0.01, // 1% legendary chance
+          shareTip: getRandomShareTip()
+        }
 
-        // Generate mock scores (no OpenAI cost)
-        const mockScores = generateMockScores()
-        setScores(mockScores)
+        setScores(scores)
         setScreen('results')
         return
       } catch (err) {
-        console.error('Consume error:', err)
+        console.error('Analysis error:', err)
         setError("Connection issue... try again!")
         setScreen('error')
         return
