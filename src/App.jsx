@@ -104,6 +104,10 @@ export default function App() {
   // Pro Roasts available (from referrals or $0.99 purchase)
   const [proRoasts, setProRoasts] = useState(0)
 
+  // Analyzing screen state (must be at component level for hooks rules)
+  const [analysisText, setAnalysisText] = useState(0)
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+
   const fileInputRef = useRef(null)
 
   // User ID for referrals
@@ -1005,41 +1009,45 @@ export default function App() {
   // ============================================
   // ANALYZING SCREEN - Dopamine Loader
   // ============================================
+  // Analysis messages defined outside conditional
+  const analysisMessages = roastMode
+    ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
+    : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
+
+  // Progress and text animation effect (runs when screen is 'analyzing')
+  useEffect(() => {
+    if (screen !== 'analyzing') return
+
+    // Reset progress when entering analyzing screen
+    setAnalysisProgress(0)
+    setAnalysisText(0)
+
+    // Progress animation (0-100 over ~2s)
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress(p => {
+        if (p >= 100) return 100
+        const next = p + Math.random() * 8 + 2 // Variable speed for realism
+        // Haptic tick at 80%
+        if (p < 80 && next >= 80) {
+          vibrate(30)
+          playSound('tick')
+        }
+        return Math.min(100, next)
+      })
+    }, 100)
+
+    // Rotating text
+    const textInterval = setInterval(() => {
+      setAnalysisText(t => (t + 1) % 5)
+    }, 600)
+
+    return () => {
+      clearInterval(progressInterval)
+      clearInterval(textInterval)
+    }
+  }, [screen])
+
   if (screen === 'analyzing') {
-    // Rotating analysis messages
-    const [analysisText, setAnalysisText] = useState(0)
-    const [progress, setProgress] = useState(0)
-    const analysisMessages = roastMode
-      ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
-      : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
-
-    // Progress and text animation
-    useEffect(() => {
-      // Progress animation (0-100 over ~2s)
-      const progressInterval = setInterval(() => {
-        setProgress(p => {
-          if (p >= 100) return 100
-          const next = p + Math.random() * 8 + 2 // Variable speed for realism
-          // Haptic tick at 80%
-          if (p < 80 && next >= 80) {
-            vibrate(30)
-            playSound('tick')
-          }
-          return Math.min(100, next)
-        })
-      }, 100)
-
-      // Rotating text
-      const textInterval = setInterval(() => {
-        setAnalysisText(t => (t + 1) % analysisMessages.length)
-      }, 600)
-
-      return () => {
-        clearInterval(progressInterval)
-        clearInterval(textInterval)
-      }
-    }, [])
-
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
@@ -1087,7 +1095,7 @@ export default function App() {
               stroke={accent}
               strokeWidth="8"
               strokeLinecap="round"
-              strokeDasharray={`${progress * 2.83} 283`}
+              strokeDasharray={`${analysisProgress * 2.83} 283`}
               style={{
                 filter: `drop-shadow(0 0 10px ${accent})`,
                 transition: 'stroke-dasharray 0.1s ease-out'
@@ -1097,7 +1105,7 @@ export default function App() {
           {/* Percentage text */}
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-2xl font-black" style={{ color: accent }}>
-              {Math.round(progress)}%
+              {Math.round(analysisProgress)}%
             </span>
           </div>
         </div>
