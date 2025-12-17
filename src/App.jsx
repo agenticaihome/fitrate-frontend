@@ -1722,7 +1722,7 @@ export default function App() {
 
         {/* Secondary Actions Row */}
         <div className="flex gap-3 mb-4 w-full max-w-xs">
-          {/* Copy Caption */}
+          {/* Copy Caption - Full width now */}
           <button
             onClick={copyCaption}
             className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
@@ -1732,21 +1732,6 @@ export default function App() {
             }}
           >
             📋 Copy Caption
-          </button>
-
-          {/* Save Image */}
-          <button
-            onClick={() => {
-              downloadImage(shareData.imageBlob, shareData.text)
-              showCopiedToast('Image saved ✅')
-            }}
-            className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
-          >
-            ⬇️ Save Image
           </button>
         </div>
 
@@ -1764,12 +1749,11 @@ export default function App() {
             <span className="text-lg">𝕏</span>
           </button>
 
-          {/* TikTok hint - downloads for manual upload */}
+          {/* TikTok - just copy caption, they use share sheet for image */}
           <button
             onClick={() => {
-              downloadImage(shareData.imageBlob, shareData.text)
-              showCopiedToast('Saved for TikTok! Caption copied ✅')
               navigator.clipboard.writeText(shareData.text)
+              showCopiedToast('Caption copied for TikTok ✅')
             }}
             className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
             style={{
@@ -1780,12 +1764,11 @@ export default function App() {
             <span className="text-lg">🎵</span>
           </button>
 
-          {/* Instagram hint */}
+          {/* Instagram - just copy caption */}
           <button
             onClick={() => {
-              downloadImage(shareData.imageBlob, shareData.text)
-              showCopiedToast('Saved for IG! Caption copied ✅')
               navigator.clipboard.writeText(shareData.text)
+              showCopiedToast('Caption copied for IG ✅')
             }}
             className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
             style={{
