@@ -893,23 +893,28 @@ export default function App() {
     setAnalysisProgress(0)
     setAnalysisText(0)
 
-    // Progress animation (0-100 over ~2s)
+    // Progress animation (0-90 over ~8-10s, caps at 90% until API responds)
     const progressInterval = setInterval(() => {
       setAnalysisProgress(p => {
-        if (p >= 100) return 100
-        const next = p + Math.random() * 8 + 2
+        if (p >= 90) return 90  // Cap at 90%, API response will complete it
+        // Slow ramp: 0.5-2% per tick for realistic ~10s duration
+        const increment = Math.random() * 1.5 + 0.5
+        const next = p + increment
+        if (p < 50 && next >= 50) {
+          vibrate(20)
+        }
         if (p < 80 && next >= 80) {
           vibrate(30)
           playSound('tick')
         }
-        return Math.min(100, next)
+        return Math.min(90, next)
       })
-    }, 100)
+    }, 200)  // Slower interval: 200ms instead of 100ms
 
-    // Rotating text
+    // Rotating text (slightly slower)
     const textInterval = setInterval(() => {
       setAnalysisText(t => (t + 1) % 5)
-    }, 600)
+    }, 1200)  // 1.2s instead of 0.6s for more readable messages
 
     return () => {
       clearInterval(progressInterval)
