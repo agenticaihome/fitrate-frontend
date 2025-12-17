@@ -62,6 +62,8 @@ export default function App() {
   const [emailInput, setEmailInput] = useState('')
   const [emailChecking, setEmailChecking] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
 
   // Challenge a Friend (score from URL)
   const [challengeScore, setChallengeScore] = useState(() => {
@@ -1619,71 +1621,181 @@ export default function App() {
   }
 
   // ============================================
-  // SHARE PREVIEW SCREEN - One Tap, Zero Friction
+  // SHARE PREVIEW SCREEN - Ultimate Share Experience
   // ============================================
   if (screen === 'share-preview' && shareData) {
+    const showCopiedToast = (message) => {
+      setToastMessage(message)
+      setShowToast(true)
+      playSound('pop')
+      vibrate(20)
+      setTimeout(() => setShowToast(false), 2000)
+    }
+
     const handleShare = async () => {
       playSound('share')
       vibrate(30)
 
       if (navigator.share) {
         try {
+          // Always try to share with image first
           const data = {
             title: 'My FitRate Score',
             text: shareData.text,
           }
+
+          // Check if we can share files (most mobile browsers)
           if (navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
             data.files = [shareData.file]
           }
+
           await navigator.share(data)
-          // After successful share, show follow-up
           setScreen('share-success')
         } catch (err) {
           if (err.name !== 'AbortError') {
-            // Download as fallback
+            // Fallback: download + copy
             downloadImage(shareData.imageBlob, shareData.text)
+            showCopiedToast('Image saved! Caption copied ✅')
           }
         }
       } else {
         // Desktop fallback
         downloadImage(shareData.imageBlob, shareData.text)
-        navigator.clipboard.writeText(shareData.url)
-        setScreen('share-success')
+        navigator.clipboard.writeText(shareData.text)
+        showCopiedToast('Image saved! Caption copied ✅')
+        setTimeout(() => setScreen('share-success'), 1500)
       }
+    }
+
+    const copyCaption = async () => {
+      try {
+        await navigator.clipboard.writeText(shareData.text)
+        showCopiedToast('Caption copied ✅')
+      } catch (err) {
+        showCopiedToast('Couldn\'t copy 😕')
+      }
+    }
+
+    const shareToTwitter = () => {
+      const tweetText = encodeURIComponent(shareData.text)
+      window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank')
     }
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
+        {/* Toast Notification */}
+        {showToast && (
+          <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60 animate-bounce" style={{
+            background: 'rgba(0,255,136,0.9)',
+            boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
+          }}>
+            <span className="text-black font-bold text-sm">{toastMessage}</span>
+          </div>
+        )}
+
         {/* Share Card Preview */}
-        <div className="relative w-[55%] max-w-[200px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-8" style={{
+        <div className="relative w-[50%] max-w-[180px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-6" style={{
           border: `2px solid ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`,
           boxShadow: `0 20px 60px ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`
         }}>
           <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
         </div>
 
-        {/* Primary Share CTA */}
+        {/* Caption Preview */}
+        <p className="text-xs text-center mb-4 px-4 max-w-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          "{shareData.text.slice(0, 60)}..."
+        </p>
+
+        {/* Primary Share CTA - Native Share with Image */}
         <button
           onClick={handleShare}
-          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 transition-all active:scale-95 mb-4"
+          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-3"
           style={{
             background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
             boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
           }}
         >
-          <span className="text-2xl">📤</span> Share to Story
+          <span className="text-xl">📤</span> Share with Image
         </button>
 
-        {/* Download option */}
-        <button
-          onClick={() => downloadImage(shareData.imageBlob, shareData.text)}
-          className="text-sm font-medium mb-4 transition-all active:opacity-60"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
-        >
-          ⬇️ Save to Photos
-        </button>
+        {/* Secondary Actions Row */}
+        <div className="flex gap-3 mb-4 w-full max-w-xs">
+          {/* Copy Caption */}
+          <button
+            onClick={copyCaption}
+            className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            📋 Copy Caption
+          </button>
+
+          {/* Save Image */}
+          <button
+            onClick={() => {
+              downloadImage(shareData.imageBlob, shareData.text)
+              showCopiedToast('Image saved ✅')
+            }}
+            className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            ⬇️ Save Image
+          </button>
+        </div>
+
+        {/* Platform Buttons */}
+        <div className="flex gap-3 mb-6">
+          {/* X/Twitter */}
+          <button
+            onClick={shareToTwitter}
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            <span className="text-lg">𝕏</span>
+          </button>
+
+          {/* TikTok hint - downloads for manual upload */}
+          <button
+            onClick={() => {
+              downloadImage(shareData.imageBlob, shareData.text)
+              showCopiedToast('Saved for TikTok! Caption copied ✅')
+              navigator.clipboard.writeText(shareData.text)
+            }}
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            <span className="text-lg">🎵</span>
+          </button>
+
+          {/* Instagram hint */}
+          <button
+            onClick={() => {
+              downloadImage(shareData.imageBlob, shareData.text)
+              showCopiedToast('Saved for IG! Caption copied ✅')
+              navigator.clipboard.writeText(shareData.text)
+            }}
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{
+              background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+              border: 'none'
+            }}
+          >
+            <span className="text-lg">📷</span>
+          </button>
+        </div>
 
         {/* Cancel */}
         <button
@@ -1691,11 +1803,12 @@ export default function App() {
           className="text-xs transition-all active:opacity-60"
           style={{ color: 'rgba(255,255,255,0.3)' }}
         >
-          Cancel
+          ← Back to Results
         </button>
       </div>
     )
   }
+
 
   // ============================================
   // SHARE SUCCESS - One Follow-up Option
