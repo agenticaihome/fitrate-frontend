@@ -1938,7 +1938,7 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Quick Buy: Pro Roast */}
+              {/* Quick Buy: SAVAGE Roast */}
               <button
                 onClick={() => startCheckout('proRoast')}
                 className="w-full py-2.5 rounded-lg text-sm font-bold transition-all active:scale-95 mb-2"
@@ -1948,7 +1948,7 @@ export default function App() {
                   boxShadow: '0 4px 20px rgba(255,68,68,0.3)'
                 }}
               >
-                🔥 Get Pro's Opinion - $0.99
+                💀 Get SAVAGE Roast - $0.99
               </button>
 
               {/* Full Unlock */}
@@ -2705,13 +2705,13 @@ export default function App() {
             </div>
           </div>
 
-          {/* Pro Roast option */}
+          {/* SAVAGE Roast option */}
           <button
             onClick={() => startCheckout('proRoast')}
             disabled={checkoutLoading}
-            className="w-full py-3 rounded-xl text-cyan-400 font-medium text-sm mb-4 transition-all border border-cyan-500/30 hover:bg-cyan-500/10"
+            className="w-full py-3 rounded-xl text-red-400 font-medium text-sm mb-4 transition-all border border-red-500/30 hover:bg-red-500/10"
           >
-            Or just get 1 Pro Roast for $0.99
+            💀 Or get 1 SAVAGE Roast for $0.99
           </button>
 
           {/* Invite 3 → Get 15 Free Scans */}
