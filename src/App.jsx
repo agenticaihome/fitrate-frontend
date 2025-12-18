@@ -1630,13 +1630,11 @@ export default function App() {
                 vibrate(15)
                 setMode(m.key)
               }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300"
+              className={`flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 active:scale-[0.97] ${mode === m.key ? 'opacity-100' : 'opacity-60'}`}
               style={{
                 background: mode === m.key
-                  ? m.key === 'roast' ? 'rgba(255,68,68,0.3)'
-                    : m.key === 'honest' ? 'rgba(74,144,217,0.3)'
-                      : 'rgba(0,212,255,0.3)'
-                  : 'transparent',
+                  ? m.key === 'roast' ? 'rgba(255,68,68,0.25)' : m.key === 'honest' ? 'rgba(74,144,217,0.25)' : 'rgba(0,212,255,0.25)'
+                  : 'rgba(255,255,255,0.05)',
                 border: mode === m.key
                   ? `1px solid ${m.key === 'roast' ? '#ff4444' : m.key === 'honest' ? '#4A90D9' : '#00d4ff'}`
                   : '1px solid transparent'
@@ -2755,7 +2753,7 @@ export default function App() {
           <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
             background: 'rgba(0,0,0,0.95)'
           }}>
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
               boxShadow: '0 0 60px rgba(255,215,0,0.2)'
             }}>
               <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
@@ -2769,7 +2767,7 @@ export default function App() {
 
               {/* Countdown Timer */}
               {declineCountdown && (
-                <p className="text-center mb-4 text-red-400 font-bold animate-pulse">
+                <p className="text-center mb-4 text-yellow-400/80 font-bold">
                   ⏳ Offer expires in {Math.floor(declineCountdown / 60)}:{String(declineCountdown % 60).padStart(2, '0')}
                 </p>
               )}
@@ -2777,21 +2775,30 @@ export default function App() {
               <button
                 onClick={() => startCheckout('proWeeklyDiscount')}
                 disabled={checkoutLoading}
-                className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all active:scale-95"
+                className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
                 style={{
                   background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
-                  boxShadow: '0 8px 30px rgba(255,215,0,0.3)'
+                  boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
                 }}
               >
-                {checkoutLoading ? '...' : '🔥 Claim This Deal'}
+                {checkoutLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+                    Loading...
+                  </span>
+                ) : '🔥 Claim This Deal'}
               </button>
+
+              <p className="text-center text-[10px] text-gray-500 mb-3">
+                🔐 Secure checkout · Cancel anytime
+              </p>
 
               <button
                 onClick={() => {
                   setShowDeclineOffer(false)
                   setShowPaywall(false)
                 }}
-                className="w-full py-2 text-sm text-gray-500 transition-all"
+                className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
               >
                 No thanks, I'll pay full price later
               </button>
@@ -2836,11 +2843,12 @@ export default function App() {
           </div>
 
           {/* Pricing with anchor */}
-          <div className="relative w-full mb-3">
+          <div className="relative w-full mb-4">
             {/* MOST POPULAR badge */}
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold z-10" style={{
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-black z-10" style={{
               background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-              color: '#000'
+              color: '#000',
+              boxShadow: '0 4px 15px rgba(255,215,0,0.3)'
             }}>
               ✨ MOST POPULAR
             </span>
@@ -2848,13 +2856,18 @@ export default function App() {
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="w-full py-4 rounded-2xl text-white font-bold text-lg transition-all active:scale-95"
+              className="w-full py-4 rounded-2xl text-white font-bold text-lg transition-all duration-100 active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
               style={{
                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+                boxShadow: '0 8px 30px rgba(0,212,255,0.35)'
               }}
             >
-              {checkoutLoading ? 'Loading...' : (
+              {checkoutLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Loading...
+                </span>
+              ) : (
                 <span>
                   <span className="line-through text-white/50 text-sm mr-2">$3.99</span>
                   $2.99/week
@@ -2863,7 +2876,7 @@ export default function App() {
             </button>
           </div>
 
-          {/* Scan Packs Section */}
+          {/* Scan Packs Section - Supercell Style Loot Cards */}
           <div className="w-full mb-4">
             <p className="text-center text-xs text-gray-500 mb-3">— or buy scans —</p>
             <div className="flex gap-2 justify-center">
@@ -2871,43 +2884,50 @@ export default function App() {
               <button
                 onClick={() => startCheckout('starterPack')}
                 disabled={checkoutLoading}
-                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95"
+                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)'
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)'
                 }}
               >
-                <span className="block text-lg font-bold text-white">5</span>
-                <span className="block text-xs text-gray-400">$1.99</span>
+                <span className="block text-2xl font-black text-white">5</span>
+                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
+                <span className="block text-sm font-bold text-white mt-1">$1.99</span>
               </button>
 
               {/* Popular Pack - BEST VALUE */}
               <button
                 onClick={() => startCheckout('popularPack')}
                 disabled={checkoutLoading}
-                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95 relative"
+                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] relative disabled:opacity-50"
                 style={{
-                  background: 'rgba(0,212,255,0.15)',
-                  border: '2px solid #00d4ff'
+                  background: 'rgba(0,212,255,0.12)',
+                  border: '2px solid #00d4ff',
+                  boxShadow: '0 0 20px rgba(0,212,255,0.15)'
                 }}
               >
-                <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold px-2 py-0.5 rounded-full bg-cyan-500 text-black">BEST</span>
-                <span className="block text-lg font-bold text-cyan-400">15</span>
-                <span className="block text-xs text-gray-400">$3.99</span>
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] font-black px-3 py-1 rounded-full" style={{
+                  background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                  color: '#000'
+                }}>BEST</span>
+                <span className="block text-2xl font-black text-cyan-400">15</span>
+                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
+                <span className="block text-sm font-bold text-white mt-1">$3.99</span>
               </button>
 
               {/* Power Pack */}
               <button
                 onClick={() => startCheckout('powerPack')}
                 disabled={checkoutLoading}
-                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95"
+                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)'
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)'
                 }}
               >
-                <span className="block text-lg font-bold text-white">50</span>
-                <span className="block text-xs text-gray-400">$9.99</span>
+                <span className="block text-2xl font-black text-white">50</span>
+                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
+                <span className="block text-sm font-bold text-white mt-1">$9.99</span>
               </button>
             </div>
           </div>
@@ -2916,14 +2936,18 @@ export default function App() {
           <button
             onClick={() => startCheckout('proRoast')}
             disabled={checkoutLoading}
-            className="w-full py-3 rounded-xl text-red-400 font-medium text-sm mb-4 transition-all border border-red-500/30 hover:bg-red-500/10"
+            className="w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
+            style={{
+              background: 'rgba(255,68,68,0.08)',
+              border: '1px solid rgba(255,68,68,0.25)'
+            }}
           >
             💀 Or get 1 SAVAGE Roast for $0.99
           </button>
 
           {/* Invite 3 → Get 15 Free Scans */}
-          <div className="w-full p-3 rounded-xl mb-4" style={{
-            background: 'rgba(0,255,136,0.05)',
+          <div className="w-full p-4 rounded-2xl mb-4" style={{
+            background: 'rgba(0,255,136,0.06)',
             border: '1px dashed rgba(0,255,136,0.3)'
           }}>
             <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE SCANS</p>
@@ -2954,7 +2978,7 @@ export default function App() {
                   displayToast('Link copied! 📋')
                 }
               }}
-              className="w-full py-2 rounded-lg text-xs font-bold transition-all active:scale-95"
+              className="w-full py-3 rounded-2xl text-sm font-bold transition-all duration-100 active:scale-[0.97]"
               style={{
                 background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
                 color: '#000'
@@ -2964,13 +2988,16 @@ export default function App() {
             </button>
           </div>
 
-          {/* Close */}
+          {/* Reassurance + Close */}
+          <p className="text-center text-[10px] text-gray-500 mb-3">
+            🔐 Secure checkout · Cancel anytime
+          </p>
           <button
             onClick={() => {
               playSound('click')
               setShowDeclineOffer(true)
             }}
-            className="w-full py-2 text-sm text-gray-500 transition-all"
+            className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
           >
             Not now
           </button>
