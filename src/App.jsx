@@ -55,6 +55,9 @@ export default function App() {
   const [shareData, setShareData] = useState(null)
   const [mode, setMode] = useState('nice') // 'nice', 'honest', or 'roast'
   const [error, setError] = useState(null)
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [showDeclineOffer, setShowDeclineOffer] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [revealStage, setRevealStage] = useState(0)
   const [timeUntilReset, setTimeUntilReset] = useState('')
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
@@ -247,6 +250,29 @@ export default function App() {
       setIsPro(true)
       setProEmail(emailInput.toLowerCase().trim())
       setScreen('pro-welcome')
+    }
+  }
+
+  // Start Stripe Checkout session
+  const startCheckout = async (product) => {
+    setCheckoutLoading(true)
+    try {
+      const res = await fetch(`${API_BASE}/checkout/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product, userId, email: proEmail })
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        displayToast('Failed to start checkout')
+        setCheckoutLoading(false)
+      }
+    } catch (err) {
+      console.error('Checkout error:', err)
+      displayToast('Checkout failed, try again')
+      setCheckoutLoading(false)
     }
   }
 
@@ -1357,7 +1383,7 @@ export default function App() {
                 startCamera()
               }
             } else {
-              setScreen('paywall')
+              setShowPaywall(true) // Show paywall modal with decline offer
             }
           }}
           disabled={scansRemaining === 0 && !isPro}
@@ -2240,6 +2266,130 @@ export default function App() {
         >
           ← Done
         </button>
+      </div>
+    )
+  }
+
+  // ============================================
+  // PAYWALL MODAL - Pro upgrade with decline offer
+  // ============================================
+  if (showPaywall) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+        background: 'rgba(0,0,0,0.9)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        {/* Decline Offer Popup */}
+        {showDeclineOffer && (
+          <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
+            background: 'rgba(0,0,0,0.95)'
+          }}>
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
+              boxShadow: '0 0 60px rgba(255,215,0,0.2)'
+            }}>
+              <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
+              <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
+
+              <p className="text-gray-400 mb-6">
+                Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
+                <br />
+                <span className="text-xs">(then $2.99/week, cancel anytime)</span>
+              </p>
+
+              <button
+                onClick={() => startCheckout('proWeeklyDiscount')}
+                disabled={checkoutLoading}
+                className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
+                  boxShadow: '0 8px 30px rgba(255,215,0,0.3)'
+                }}
+              >
+                {checkoutLoading ? '...' : '🔥 Claim This Deal'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowDeclineOffer(false)
+                  setShowPaywall(false)
+                }}
+                className="w-full py-2 text-sm text-gray-500 transition-all"
+              >
+                No thanks, I'll pay full price later
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Main Paywall */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20" style={{
+          boxShadow: '0 0 60px rgba(0,212,255,0.1)'
+        }}>
+          {/* Close X */}
+          <button
+            onClick={() => {
+              playSound('click')
+              setShowDeclineOffer(true) // Show decline offer instead of closing
+            }}
+            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
+          >
+            ×
+          </button>
+
+          <div className="text-center mb-6">
+            <span className="text-4xl mb-2 block">👑</span>
+            <h2 className="text-white text-2xl font-black">Go Pro</h2>
+            <p className="text-gray-400 text-sm mt-1">Unlock 25 scans per day</p>
+          </div>
+
+          {/* Benefits */}
+          <div className="space-y-3 mb-6">
+            {[
+              '25 outfit ratings per day',
+              'All modes: Nice, Honest, Roast',
+              'Celebrity style matches',
+              'Priority AI analysis'
+            ].map((benefit, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">{benefit}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Pricing */}
+          <button
+            onClick={() => startCheckout('proWeekly')}
+            disabled={checkoutLoading}
+            className="w-full py-4 rounded-2xl text-white font-bold text-lg mb-3 transition-all active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+              boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+            }}
+          >
+            {checkoutLoading ? 'Loading...' : '$2.99/week · Cancel anytime'}
+          </button>
+
+          {/* Pro Roast option */}
+          <button
+            onClick={() => startCheckout('proRoast')}
+            disabled={checkoutLoading}
+            className="w-full py-3 rounded-xl text-cyan-400 font-medium text-sm mb-4 transition-all border border-cyan-500/30 hover:bg-cyan-500/10"
+          >
+            Or just get 1 Pro Roast for $0.99
+          </button>
+
+          {/* Close */}
+          <button
+            onClick={() => {
+              playSound('click')
+              setShowDeclineOffer(true)
+            }}
+            className="w-full py-2 text-sm text-gray-500 transition-all"
+          >
+            Not now
+          </button>
+        </div>
       </div>
     )
   }
