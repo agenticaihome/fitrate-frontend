@@ -2101,7 +2101,7 @@ export default function App() {
         <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
             onClick={generateShareCard}
-            className="btn-physical w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
+            className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
             style={{
               background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
               boxShadow: '0 10px 40px rgba(0, 212, 255, 0.4), var(--shadow-physical)'
@@ -2721,7 +2721,7 @@ export default function App() {
         )}
 
         {/* Main Paywall */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20" style={{
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
           boxShadow: '0 0 60px rgba(0,212,255,0.1)'
         }}>
           {/* Close X */}
