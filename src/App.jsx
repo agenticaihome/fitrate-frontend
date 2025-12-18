@@ -209,6 +209,13 @@ export default function App() {
             if (data.purchasedScans > 0) {
               setPurchasedScans(data.purchasedScans)
             }
+            // Handle referral unlock (3+ referrals = unlimited)
+            if (data.unlockedViaReferrals) {
+              localStorage.setItem('fitrate_unlocked_referrals', 'true')
+            }
+            if (data.totalReferrals !== undefined) {
+              localStorage.setItem('fitrate_total_referrals', data.totalReferrals.toString())
+            }
           }
         })
         .catch(console.error)
@@ -1458,8 +1465,10 @@ export default function App() {
           onClick={() => {
             playSound('click')
             vibrate(20)
-            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans
-            if (scansRemaining > 0 || isPro || purchasedScans > 0) {
+            // Check if unlocked via referrals (3+ successful referrals)
+            const unlockedViaReferrals = localStorage.getItem('fitrate_unlocked_referrals') === 'true'
+            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans, OR unlocked via referrals
+            if (scansRemaining > 0 || isPro || purchasedScans > 0 || unlockedViaReferrals) {
               // Mobile: use native camera app (better experience)
               // Desktop: use getUserMedia live camera
               const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
@@ -2607,6 +2616,49 @@ export default function App() {
           >
             Or just get 1 Pro Roast for $0.99
           </button>
+
+          {/* Invite 3 → Unlock Free */}
+          <div className="w-full p-3 rounded-xl mb-4" style={{
+            background: 'rgba(0,255,136,0.05)',
+            border: '1px dashed rgba(0,255,136,0.3)'
+          }}>
+            <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR UNLOCK FREE</p>
+            <p className="text-center text-white text-sm font-bold mb-2">
+              Invite 3 friends → Unlimited scans forever
+            </p>
+            <div className="flex items-center justify-center gap-1 mb-3">
+              {[0, 1, 2].map(i => {
+                const totalReferrals = parseInt(localStorage.getItem('fitrate_total_referrals') || '0')
+                const filled = i < totalReferrals
+                return (
+                  <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{
+                    background: filled ? 'rgba(0,255,136,0.3)' : 'rgba(255,255,255,0.1)',
+                    border: filled ? '2px solid #00ff88' : '2px solid rgba(255,255,255,0.2)'
+                  }}>
+                    {filled ? '✓' : '?'}
+                  </div>
+                )
+              })}
+            </div>
+            <button
+              onClick={async () => {
+                const shareUrl = `https://fitrate.app?ref=${userId}`
+                if (navigator.share) {
+                  navigator.share({ title: 'Rate my fit!', url: shareUrl })
+                } else {
+                  await navigator.clipboard.writeText(shareUrl)
+                  displayToast('Link copied! 📋')
+                }
+              }}
+              className="w-full py-2 rounded-lg text-xs font-bold transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
+                color: '#000'
+              }}
+            >
+              Share & Invite Friends 🚀
+            </button>
+          </div>
 
           {/* Close */}
           <button
