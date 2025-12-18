@@ -713,20 +713,41 @@ export default function App() {
       }
     }
 
-    const hashtag = '#RateMyFit'
-    const challengeHashtag = scores.overall >= 80 ? ' #FitRateChallenge' : ''
+    // Smart hashtags based on mode and score
+    const getHashtags = () => {
+      const base = '#FitRate #RateMyFit'
+      if (scores.roastMode) {
+        if (scores.overall < 40) return `${base} #Destroyed #AIRoast`
+        return `${base} #RoastMode #AIRoast`
+      }
+      if (scores.mode === 'honest') {
+        return `${base} #HonestRating #RealTalk`
+      }
+      if (scores.overall >= 95) return `${base} #Perfect #FitCheck`
+      if (scores.overall >= 90) return `${base} #FitCheck #OOTD`
+      if (scores.overall >= 80) return `${base} #FitRateChallenge`
+      return `${base} #FitCheck`
+    }
+    const hashtags = getHashtags()
     const viralCaption = getViralCaption()
+    // Mode-specific colors
+    const getModeAccent = () => {
+      if (scores.roastMode) return { mid: '#2a1a1a', glow: 'rgba(255,68,68,0.4)', accent: '#ff4444', light: '#ff6666' }
+      if (scores.mode === 'honest') return { mid: '#1a1a2a', glow: 'rgba(74,144,217,0.4)', accent: '#4A90D9', light: '#6BA8E8' }
+      return { mid: '#1a1a2e', glow: 'rgba(0,212,255,0.4)', accent: '#00d4ff', light: '#00ff88' }
+    }
+    const modeColors = getModeAccent()
 
     // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
     gradient.addColorStop(0, '#0a0a0f')
-    gradient.addColorStop(0.4, scores.roastMode ? '#2a1a1a' : '#1a1a2e')
+    gradient.addColorStop(0.4, modeColors.mid)
     gradient.addColorStop(1, '#0a0a0f')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, 1080, 1920)
 
     // Glow effect behind card
-    const glowColor = scores.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
+    const glowColor = modeColors.glow
     ctx.shadowColor = glowColor
     ctx.shadowBlur = 120
     ctx.fillStyle = 'rgba(255,255,255,0.03)'
@@ -819,21 +840,21 @@ export default function App() {
     ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, 1255)
 
     // Challenge text - THE VIRAL HOOK
-    ctx.fillStyle = scores.roastMode ? '#ff6666' : '#00d4ff'
+    ctx.fillStyle = modeColors.light
     ctx.font = 'bold 38px -apple-system, BlinkMacSystemFont, sans-serif'
     ctx.fillText(viralCaption, 540, 1350)
 
     // Hashtags
-    ctx.fillStyle = scores.roastMode ? '#ff4444' : '#00ff88'
+    ctx.fillStyle = modeColors.accent
     ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(`${hashtag}${challengeHashtag}`, 540, 1420)
+    ctx.fillText(hashtags, 540, 1420)
 
     // Call to action box
-    ctx.fillStyle = scores.roastMode ? 'rgba(255,68,68,0.2)' : 'rgba(0,212,255,0.2)'
+    ctx.fillStyle = modeColors.glow.replace('0.4', '0.2')
     ctx.beginPath()
     ctx.roundRect(180, 1480, 720, 100, 20)
     ctx.fill()
-    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.5)' : 'rgba(0,212,255,0.5)'
+    ctx.strokeStyle = modeColors.glow.replace('0.4', '0.5')
     ctx.lineWidth = 2
     ctx.stroke()
 
