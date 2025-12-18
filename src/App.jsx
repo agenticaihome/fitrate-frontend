@@ -1288,7 +1288,10 @@ export default function App() {
           </div>
         )}
 
-        {/* Hidden fallback file input (used when camera not available) */}
+        {/* Mobile camera input (uses native camera app) */}
+        <input type="file" accept="image/*" capture="environment" id="mobileCameraInput" onChange={handleFileUpload} className="hidden" />
+
+        {/* Desktop/gallery file input */}
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
         {/* Hidden canvas for photo capture */}
@@ -1334,8 +1337,14 @@ export default function App() {
             playSound('click')
             vibrate(20)
             if (scansRemaining > 0 || isPro) {
-              // Start camera directly - falls back to file picker on error
-              startCamera()
+              // Mobile: use native camera app (better experience)
+              // Desktop: use getUserMedia live camera
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+              if (isMobile) {
+                document.getElementById('mobileCameraInput')?.click()
+              } else {
+                startCamera()
+              }
             } else {
               setScreen('paywall')
             }
