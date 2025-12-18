@@ -1797,7 +1797,7 @@ export default function App() {
               animation: 'pulseGlow 2s ease-in-out infinite'
             }}
           >
-            <span className="text-xl">📤</span> Share to Story
+            <span className="text-xl">📤</span> Share
           </button>
 
           {/* Challenge a Friend Button */}
