@@ -209,10 +209,7 @@ export default function App() {
             if (data.purchasedScans > 0) {
               setPurchasedScans(data.purchasedScans)
             }
-            // Handle referral unlock (3+ referrals = unlimited)
-            if (data.unlockedViaReferrals) {
-              localStorage.setItem('fitrate_unlocked_referrals', 'true')
-            }
+            // Track referral progress for UI display
             if (data.totalReferrals !== undefined) {
               localStorage.setItem('fitrate_total_referrals', data.totalReferrals.toString())
             }
@@ -1465,10 +1462,8 @@ export default function App() {
           onClick={() => {
             playSound('click')
             vibrate(20)
-            // Check if unlocked via referrals (3+ successful referrals)
-            const unlockedViaReferrals = localStorage.getItem('fitrate_unlocked_referrals') === 'true'
-            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans, OR unlocked via referrals
-            if (scansRemaining > 0 || isPro || purchasedScans > 0 || unlockedViaReferrals) {
+            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans
+            if (scansRemaining > 0 || isPro || purchasedScans > 0) {
               // Mobile: use native camera app (better experience)
               // Desktop: use getUserMedia live camera
               const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
@@ -2617,14 +2612,14 @@ export default function App() {
             Or just get 1 Pro Roast for $0.99
           </button>
 
-          {/* Invite 3 → Unlock Free */}
+          {/* Invite 3 → Get 15 Free Scans */}
           <div className="w-full p-3 rounded-xl mb-4" style={{
             background: 'rgba(0,255,136,0.05)',
             border: '1px dashed rgba(0,255,136,0.3)'
           }}>
-            <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR UNLOCK FREE</p>
+            <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE SCANS</p>
             <p className="text-center text-white text-sm font-bold mb-2">
-              Invite 3 friends → Unlimited scans forever
+              Invite 3 friends → Get 15 free scans
             </p>
             <div className="flex items-center justify-center gap-1 mb-3">
               {[0, 1, 2].map(i => {
