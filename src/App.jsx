@@ -1366,12 +1366,12 @@ export default function App() {
   const accent = getModeColor()
   const accentGlow = getModeGlow()
 
-  // Analysis messages for analyzing screen
+  // Analysis messages for analyzing screen - High-status dopamine feedback
   const analysisMessages = mode === 'roast'
-    ? ['Scanning for violations...', 'Checking color crimes...', 'Analyzing fit fails...', 'Computing roast level...', 'Preparing verdict...']
+    ? ['Synthesizing social suicide...', 'Detecting fabric failure...', 'Calculating ego damage...', 'Calibrating savagery...', 'Finalizing the damage...']
     : mode === 'honest'
-      ? ['Assessing objectively...', 'Checking proportions...', 'Analyzing honestly...', 'Computing real score...', 'Preparing honest feedback...']
-      : ['Checking color harmony...', 'Analyzing silhouette...', 'Reading the vibe...', 'Scanning for drip...', 'Computing fit score...']
+      ? ['Analyzing social positioning...', 'Calculating wardrobe ROI...', 'Synthesizing aesthetic metrics...', 'Detecting style efficiency...', 'Finalizing objective data...']
+      : ['Detecting main character signal...', 'Optimizing social ROI...', 'Synthesizing aesthetic value...', 'Calculating aura level...', 'Finalizing the flex...']
 
   // Progress and text animation effect for analyzing screen
   // IMPORTANT: This must be BEFORE any early returns to avoid hooks order issues
@@ -1598,48 +1598,64 @@ export default function App() {
           </div>
         )}
 
-        {/* HERO CTA - HUGE "Rate My Fit" button */}
-        <button
-          onClick={() => {
-            playSound('click')
-            vibrate(20)
-            if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-              if (isMobile) {
-                document.getElementById('mobileCameraInput')?.click()
+        {/* STREAK PILL - Soft Loop Retention */}
+        {dailyStreak > 0 && (
+          <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_20px_rgba(255,165,0,0.1)]">
+              <span className="text-sm">🔥</span>
+              <span className="text-xs font-black text-orange-400 uppercase tracking-widest">{dailyStreak} DAY STREAK</span>
+            </div>
+          </div>
+        )}
+
+        {/* HERO CTA - Central path of least resistance */}
+        <div className="flex-1 flex flex-col items-center justify-center -mt-20">
+          <button
+            onClick={() => {
+              playSound('click')
+              vibrate(20)
+              if (scansRemaining > 0 || isPro || purchasedScans > 0) {
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                if (isMobile) {
+                  document.getElementById('mobileCameraInput')?.click()
+                } else {
+                  startCamera()
+                }
               } else {
-                startCamera()
+                setShowPaywall(true)
               }
-            } else {
-              setShowPaywall(true)
-            }
-          }}
-          disabled={scansRemaining === 0 && !isPro && purchasedScans === 0}
-          className="btn-physical relative w-64 h-64 rounded-full flex flex-col items-center justify-center disabled:opacity-40 group"
-          style={{
-            background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
-            border: `3px solid ${accent}99`,
-            boxShadow: `var(--shadow-physical), 0 0 80px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
-          }}
-        >
-          {/* Pulsing inner glow */}
-          <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-            background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
-            boxShadow: `0 0 60px ${accentGlow}`,
-            animation: 'pulse 2s ease-in-out infinite'
-          }} />
+            }}
+            disabled={scansRemaining === 0 && !isPro && purchasedScans === 0}
+            className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center disabled:opacity-40 group"
+            style={{
+              background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
+              border: `3px solid ${accent}99`,
+              boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
+            }}
+          >
+            {/* Pulsing inner glow */}
+            <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
+              background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
+              boxShadow: `0 0 60px ${accentGlow}`,
+              animation: 'pulse 2s ease-in-out infinite'
+            }} />
 
-          {/* Icon */}
-          <span className="relative text-7xl mb-3 drop-shadow-lg">
-            {mode === 'roast' ? '🔥' : mode === 'honest' ? '📊' : '📸'}
-          </span>
-          <span className="relative text-white text-xl font-black tracking-wider">
-            {mode === 'roast' ? 'ROAST MY FIT' : mode === 'honest' ? 'REAL TALK' : 'RATE MY FIT'}
-          </span>
-        </button>
+            {/* Icon */}
+            <span className="relative text-8xl mb-4 drop-shadow-2xl">
+              {mode === 'roast' ? '🔥' : mode === 'honest' ? '📊' : '📸'}
+            </span>
+            <span className="relative text-white text-2xl font-black tracking-widest uppercase">
+              {mode === 'roast' ? 'ROAST ME' : mode === 'honest' ? 'ANALYZE' : 'RATE ME'}
+            </span>
 
-        {/* Three-Mode Selector Pills */}
-        <div className="mt-10 flex items-center gap-2 p-1 rounded-full" style={{
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] animate-pulse">Tap to Start</p>
+            </div>
+          </button>
+        </div>
+
+        {/* MODE SELECTOR - Refined, secondary pill */}
+        <div className="mb-10 flex items-center gap-2 p-1 rounded-full" style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
@@ -2081,12 +2097,15 @@ export default function App() {
           )}
         </div>
 
-        {/* PRIMARY CTA: SHARE */}
+        {/* PRIMARY CTA: SHARE BEFORE SELL */}
         <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
             onClick={generateShareCard}
-            className="btn-physical w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group"
-            style={{ background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)' }}
+            className="btn-physical w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
+            style={{
+              background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
+              boxShadow: '0 10px 40px rgba(0, 212, 255, 0.4), var(--shadow-physical)'
+            }}
           >
             <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <span className="text-2xl">📤</span> SHARE THIS FIT
@@ -2094,9 +2113,9 @@ export default function App() {
 
           <button
             onClick={resetApp}
-            className="w-full py-4 mt-3 text-white/30 text-xs font-black uppercase tracking-widest active:text-white/60 transition-colors"
+            className="btn-physical w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black uppercase tracking-widest active:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
-            ← Rate Another One
+            <span>🔄</span> Rate Another Fit
           </button>
         </div>
 

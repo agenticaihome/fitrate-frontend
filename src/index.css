@@ -7,7 +7,8 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  user-select: none; /* Prevent accidental text selection on mobile */
+  user-select: none;
+  /* Prevent accidental text selection on mobile */
 }
 
 :root {
@@ -18,7 +19,9 @@
   --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
@@ -49,20 +52,32 @@ body {
 
 /* Animations */
 @keyframes bounce {
-  0%, 80%, 100% { 
-    transform: scale(0.6); 
-    opacity: 0.5; 
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
   }
-  40% { 
-    transform: scale(1); 
-    opacity: 1; 
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
 @keyframes scanLine {
-  0% { top: 0; }
-  50% { top: calc(100% - 4px); }
-  100% { top: 0; }
+  0% {
+    top: 0;
+  }
+
+  50% {
+    top: calc(100% - 4px);
+  }
+
+  100% {
+    top: 0;
+  }
 }
 
 @keyframes fadeInUp {
@@ -70,6 +85,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -81,6 +97,7 @@ body {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -109,6 +126,13 @@ body {
   transition: var(--transition-fast);
   transform: translateY(0);
   box-shadow: var(--shadow-physical);
+  min-height: 48px;
+  /* Mobile safe tap target */
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
 }
 
 .btn-physical:active {
@@ -121,11 +145,22 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   transition: var(--transition-normal);
+  cursor: pointer;
+  min-height: 48px;
 }
 
 .card-physical:active {
   background: rgba(255, 255, 255, 0.05);
   transform: scale(0.99);
+}
+
+/* Ensure all buttons meet 48px touch requirement */
+button,
+[role="button"] {
+  min-height: 44px;
+  /* Slightly more flexible for inline but target 48px */
+  min-width: 44px;
+  touch-action: manipulation;
 }
 
 /* Gradient text utility */
