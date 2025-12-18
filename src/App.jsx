@@ -1537,6 +1537,28 @@ export default function App() {
               </span>
             </button>
           ))}
+
+          {/* Locked SAVAGE Mode - Pro Only */}
+          <button
+            onClick={() => {
+              playSound('click')
+              vibrate(15)
+              setShowPaywall(true)
+            }}
+            className="relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 opacity-60"
+            style={{
+              background: 'rgba(255,0,0,0.1)',
+              border: '1px dashed rgba(255,0,0,0.4)'
+            }}
+          >
+            <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-0.5 rounded-full font-bold" style={{
+              background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+              color: '#000'
+            }}>PRO</span>
+            <span className="text-lg">💀</span>
+            <span className="text-sm font-medium text-gray-400">Savage</span>
+            <span className="text-[10px]">🔒</span>
+          </button>
         </div>
 
         {/* Trust Message */}
@@ -1910,17 +1932,30 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Unlock Button */}
+              {/* Quick Buy: Pro Roast */}
               <button
-                onClick={() => setShowPaywall(true)}
-                className="w-full py-2.5 rounded-lg text-sm font-bold transition-all active:scale-95"
+                onClick={() => startCheckout('proRoast')}
+                className="w-full py-2.5 rounded-lg text-sm font-bold transition-all active:scale-95 mb-2"
                 style={{
-                  background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                  color: '#000',
-                  boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
+                  background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
+                  color: '#fff',
+                  boxShadow: '0 4px 20px rgba(255,68,68,0.3)'
                 }}
               >
-                Unlock Full Analysis 🔓
+                🔥 Get Pro's Opinion - $0.99
+              </button>
+
+              {/* Full Unlock */}
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="w-full py-2 rounded-lg text-xs font-medium transition-all active:scale-95"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'rgba(255,255,255,0.7)'
+                }}
+              >
+                Or go Pro for 25 scans/day →
               </button>
             </div>
           </div>
