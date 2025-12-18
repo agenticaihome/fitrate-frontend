@@ -2,6 +2,12 @@
 <html lang="en">
 
 <head>
+  <!-- Force HTTPS (required for camera access) -->
+  <script>
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+    }
+  </script>
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-M574TETDZQ"></script>
   <script>
