@@ -139,10 +139,21 @@ export default function App() {
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
   // User ID for referrals
+  // SECURITY: Use crypto.randomUUID for cryptographically secure IDs
   const [userId] = useState(() => {
     let id = localStorage.getItem('fitrate_user_id')
     if (!id) {
-      id = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10)
+      // Use crypto.randomUUID if available (modern browsers), fallback to crypto.getRandomValues
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        id = crypto.randomUUID()
+      } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        const arr = new Uint8Array(16)
+        crypto.getRandomValues(arr)
+        id = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('')
+      } else {
+        // Last resort fallback (should never happen in modern browsers)
+        id = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10)
+      }
       localStorage.setItem('fitrate_user_id', id)
     }
     return id
@@ -280,6 +291,7 @@ export default function App() {
   }
 
   // Handle email submit after payment
+  // SECURITY: Don't blindly trust redirect - verify with server first
   const handleEmailSubmit = async (e) => {
     e.preventDefault()
     if (!emailInput.trim()) return
@@ -288,13 +300,26 @@ export default function App() {
     if (isNowPro) {
       setScreen('pro-welcome')
     } else {
-      // Email not found yet - might take a moment for webhook
-      // Save email anyway and mark as Pro (trust the redirect)
-      localStorage.setItem('fitrate_pro', 'true')
+      // Email not found yet - webhook might take a moment to process
+      // Save email for future checks but DON'T grant Pro status yet
       localStorage.setItem('fitrate_email', emailInput.toLowerCase().trim())
-      setIsPro(true)
       setProEmail(emailInput.toLowerCase().trim())
-      setScreen('pro-welcome')
+
+      // Show a message and retry after a short delay
+      displayToast('⏳ Payment processing... checking again in a moment')
+
+      // Retry after 3 seconds (webhook usually processes quickly)
+      setTimeout(async () => {
+        const retryPro = await checkProStatus(emailInput.trim())
+        if (retryPro) {
+          setScreen('pro-welcome')
+        } else {
+          // Still not confirmed - show success anyway but don't set isPro locally
+          // The next API call will check server-side Pro status
+          displayToast('🎉 Welcome! Your Pro status will activate shortly.')
+          setScreen('home')
+        }
+      }, 3000)
     }
   }
 
