@@ -828,17 +828,45 @@ export default function App() {
       return { mid: '#1a1a2e', glow: 'rgba(0,212,255,0.4)', accent: '#00d4ff', light: '#00ff88' }
     }
     const modeColors = getModeAccent()
+    const isProCard = isPro || scores.savageLevel
 
-    // Gradient background
+    // Gradient background - Premium for Pro
     const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
-    gradient.addColorStop(0, '#0a0a0f')
-    gradient.addColorStop(0.4, modeColors.mid)
-    gradient.addColorStop(1, '#0a0a0f')
+    if (isProCard) {
+      gradient.addColorStop(0, '#0a0a12')
+      gradient.addColorStop(0.3, '#1a1a2e')
+      gradient.addColorStop(0.5, '#16213e')
+      gradient.addColorStop(0.7, '#1a1a2e')
+      gradient.addColorStop(1, '#0a0a12')
+    } else {
+      gradient.addColorStop(0, '#0a0a0f')
+      gradient.addColorStop(0.4, modeColors.mid)
+      gradient.addColorStop(1, '#0a0a0f')
+    }
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, 1080, 1920)
 
+    // PRO SPARKLE BORDER - Gold glow for Pro users
+    if (isProCard) {
+      ctx.shadowColor = '#ffd700'
+      ctx.shadowBlur = 40
+      ctx.strokeStyle = '#ffd700'
+      ctx.lineWidth = 6
+      ctx.beginPath()
+      ctx.roundRect(30, 30, 1020, 1860, 40)
+      ctx.stroke()
+      ctx.shadowBlur = 0
+
+      // Inner sparkle line
+      ctx.strokeStyle = 'rgba(255,215,0,0.3)'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.roundRect(40, 40, 1000, 1840, 36)
+      ctx.stroke()
+    }
+
     // Glow effect behind card
-    const glowColor = modeColors.glow
+    const glowColor = isProCard ? 'rgba(255,215,0,0.3)' : modeColors.glow
     ctx.shadowColor = glowColor
     ctx.shadowBlur = 120
     ctx.fillStyle = 'rgba(255,255,255,0.03)'
@@ -848,13 +876,13 @@ export default function App() {
     ctx.shadowBlur = 0
 
     // Glassmorphism card
-    ctx.fillStyle = 'rgba(255,255,255,0.06)'
+    ctx.fillStyle = isProCard ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.06)'
     ctx.beginPath()
     ctx.roundRect(60, 120, 960, 1520, 48)
     ctx.fill()
 
     // Border glow
-    ctx.strokeStyle = scores.roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)'
+    ctx.strokeStyle = isProCard ? 'rgba(255,215,0,0.5)' : (scores.roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)')
     ctx.lineWidth = 4
     ctx.stroke()
 
@@ -960,8 +988,59 @@ export default function App() {
       ctx.fillText(sub.score.toString(), x, subScoreY + 28)
     })
 
+    // PRO EXCLUSIVE: Savage Meter + Item Roast
+    let proContentY = subScoreY + 50
+    if (isProCard && scores.savageLevel) {
+      // Savage meter background
+      const meterX = 180
+      const meterWidth = 720
+      const meterHeight = 28
+      ctx.fillStyle = 'rgba(255,68,68,0.15)'
+      ctx.beginPath()
+      ctx.roundRect(meterX, proContentY, meterWidth, meterHeight, 14)
+      ctx.fill()
+
+      // Savage meter fill
+      const fillWidth = (scores.savageLevel / 10) * meterWidth
+      const savageGradient = ctx.createLinearGradient(meterX, 0, meterX + fillWidth, 0)
+      savageGradient.addColorStop(0, '#ff4444')
+      savageGradient.addColorStop(1, '#ff6b6b')
+      ctx.fillStyle = savageGradient
+      ctx.beginPath()
+      ctx.roundRect(meterX, proContentY, fillWidth, meterHeight, 14)
+      ctx.fill()
+
+      // Savage label
+      const fireEmoji = scores.savageLevel >= 9 ? '🔥🔥🔥' : scores.savageLevel >= 7 ? '🔥🔥' : '🔥'
+      ctx.fillStyle = '#ffffff'
+      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.textAlign = 'left'
+      ctx.fillText(`${fireEmoji} SAVAGE: ${scores.savageLevel}/10`, meterX + 20, proContentY - 8)
+      ctx.textAlign = 'center'
+
+      proContentY += 50
+    }
+
+    // PRO EXCLUSIVE: Best item roast quote
+    if (isProCard && scores.itemRoasts) {
+      const roasts = scores.itemRoasts
+      // Pick the best roast (shoes usually most visible)
+      const bestRoast = roasts.shoes || roasts.top || roasts.bottom
+      if (bestRoast && bestRoast !== 'N/A') {
+        const truncatedRoast = bestRoast.length > 45 ? bestRoast.slice(0, 42) + '...' : bestRoast
+        ctx.fillStyle = 'rgba(255,215,0,0.15)'
+        ctx.beginPath()
+        ctx.roundRect(140, proContentY, 800, 50, 25)
+        ctx.fill()
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
+        ctx.fillText(`💬 "${truncatedRoast}"`, 540, proContentY + 33)
+        proContentY += 60
+      }
+    }
+
     // Aesthetic + Celeb in pill style
-    const pillY = subScoreY + 60
+    const pillY = isProCard && scores.savageLevel ? proContentY : subScoreY + 60
     ctx.fillStyle = 'rgba(255,255,255,0.1)'
     ctx.beginPath()
     ctx.roundRect(140, pillY, 800, 50, 25)
@@ -972,14 +1051,15 @@ export default function App() {
     ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, pillY + 35)
 
     // Challenge text - THE VIRAL HOOK
-    ctx.fillStyle = modeColors.light
+    ctx.fillStyle = isProCard ? '#ffd700' : modeColors.light
     ctx.font = 'bold 38px -apple-system, BlinkMacSystemFont, sans-serif'
     ctx.fillText(viralCaption, 540, 1350)
 
-    // Hashtags
-    ctx.fillStyle = modeColors.accent
+    // Hashtags - Pro gets special hashtag
+    ctx.fillStyle = isProCard ? '#ffd700' : modeColors.accent
     ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(hashtags, 540, 1420)
+    const proHashtags = isProCard ? '✨ #FitRatePro #OutfitCheck ✨' : hashtags
+    ctx.fillText(proHashtags, 540, 1420)
 
     // Call to action box
     ctx.fillStyle = modeColors.glow.replace('0.4', '0.2')
@@ -1896,9 +1976,10 @@ export default function App() {
         {/* PRO PREVIEW - Blurred content to create desire */}
         {!isPro && !scores.savageLevel && (
           <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="p-4 rounded-xl relative overflow-hidden" style={{
-              background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.08) 100%)',
-              border: '1px solid rgba(255,215,0,0.3)'
+            <div className="p-4 rounded-xl relative overflow-hidden animate-pulse" style={{
+              background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.1) 100%)',
+              border: '2px solid rgba(255,215,0,0.4)',
+              boxShadow: '0 0 20px rgba(255,215,0,0.2), inset 0 0 30px rgba(255,215,0,0.05)'
             }}>
               {/* Pro Badge */}
               <div className="flex items-center justify-center gap-2 mb-3">
