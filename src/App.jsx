@@ -80,6 +80,9 @@ export default function App() {
     return parseInt(params.get('challenge')) || null
   })
 
+  // Purchased scans (from scan packs)
+  const [purchasedScans, setPurchasedScans] = useState(0)
+
   // Daily Streak Logic
   const [dailyStreak, setDailyStreak] = useState(() => {
     try {
@@ -201,6 +204,9 @@ export default function App() {
             }
             if (data.referralCount) {
               setReferralCount(data.referralCount)
+            }
+            if (data.purchasedScans > 0) {
+              setPurchasedScans(data.purchasedScans)
             }
           }
         })
@@ -1389,7 +1395,8 @@ export default function App() {
           onClick={() => {
             playSound('click')
             vibrate(20)
-            if (scansRemaining > 0 || isPro) {
+            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans
+            if (scansRemaining > 0 || isPro || purchasedScans > 0) {
               // Mobile: use native camera app (better experience)
               // Desktop: use getUserMedia live camera
               const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
@@ -1402,7 +1409,7 @@ export default function App() {
               setShowPaywall(true) // Show paywall modal with decline offer
             }
           }}
-          disabled={scansRemaining === 0 && !isPro}
+          disabled={scansRemaining === 0 && !isPro && purchasedScans === 0}
           className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-40 group"
           style={{
             background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
