@@ -973,13 +973,30 @@ export default function App() {
     }
   }, [])
 
+  const stopCamera = useCallback(() => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop())
+      setCameraStream(null)
+    }
+  }, [cameraStream])
+
   const capturePhoto = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current) return
+    if (!videoRef.current || !canvasRef.current) {
+      console.error('Video or canvas ref not available')
+      return
+    }
+
+    const video = videoRef.current
+
+    // Check if video is ready
+    if (video.readyState < 2) {
+      console.error('Video not ready yet')
+      return
+    }
 
     playSound('shutter')
     vibrate(50)
 
-    const video = videoRef.current
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
 
@@ -987,8 +1004,11 @@ export default function App() {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
 
-    // Draw video frame to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+    // Draw video frame to canvas (flip horizontally to unmirror)
+    ctx.save()
+    ctx.scale(-1, 1)
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height)
+    ctx.restore()
 
     // Get image data as base64
     const imageData = canvas.toDataURL('image/jpeg', 0.9)
@@ -997,14 +1017,7 @@ export default function App() {
     stopCamera()
     setUploadedImage(imageData)
     analyzeOutfit(imageData)
-  }, [analyzeOutfit])
-
-  const stopCamera = useCallback(() => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop())
-      setCameraStream(null)
-    }
-  }, [cameraStream])
+  }, [stopCamera, analyzeOutfit])
 
   const resetApp = useCallback(() => {
     stopCamera()
@@ -1156,6 +1169,9 @@ export default function App() {
             </span>
           </div>
         </div>
+
+        {/* Hidden canvas for photo capture */}
+        <canvas ref={canvasRef} className="hidden" />
       </div>
     )
   }
