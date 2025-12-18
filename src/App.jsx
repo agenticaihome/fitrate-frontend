@@ -257,7 +257,7 @@ export default function App() {
   const STRIPE_LINKS = {
     proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',        // $2.99/week
     proWeeklyDiscount: 'https://buy.stripe.com/8x214p2SI8AX8PtfztfYY03', // $1.99/week (decline offer)
-    proRoast: 'https://buy.stripe.com/placeholder' // TODO: Add Pro Roast link if needed
+    proRoast: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01' // $0.99 one-time
   }
 
   // Open Stripe checkout
