@@ -2198,7 +2198,7 @@ export default function App() {
               color: shareFormat === 'story' ? '#00d4ff' : 'rgba(255,255,255,0.5)'
             }}
           >
-            📱 Stories
+            9:16
           </button>
           <button
             onClick={() => {
@@ -2214,7 +2214,7 @@ export default function App() {
               color: shareFormat === 'feed' ? '#00d4ff' : 'rgba(255,255,255,0.5)'
             }}
           >
-            📐 Feed
+            1:1
           </button>
         </div>
 
