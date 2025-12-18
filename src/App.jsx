@@ -928,11 +928,12 @@ export default function App() {
       img.src = uploadedImage
     })
 
-    // Draw photo with rounded corners
-    const imgWidth = 580
-    const imgHeight = 720
+    // Draw photo with rounded corners - SCALE for format
+    const yScale = canvas.height / 1920 // Scale factor for 1:1 vs 9:16
+    const imgWidth = isSquare ? 500 : 580
+    const imgHeight = isSquare ? 500 : 720
     const imgX = (1080 - imgWidth) / 2
-    const imgY = 180
+    const imgY = isSquare ? 100 : 180
 
     ctx.save()
     ctx.beginPath()
@@ -947,12 +948,13 @@ export default function App() {
     ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH)
     ctx.restore()
 
-    // Score circle with glow
+    // Score circle with glow - POSITION SCALED
+    const scoreY = isSquare ? 660 : 980
     const scoreColor = scores.overall >= 80 ? '#00ff88' : scores.overall >= 60 ? '#00d4ff' : '#ff4444'
     ctx.shadowColor = scoreColor
     ctx.shadowBlur = 40
     ctx.beginPath()
-    ctx.arc(540, 980, 100, 0, Math.PI * 2)
+    ctx.arc(540, scoreY, isSquare ? 80 : 100, 0, Math.PI * 2)
     ctx.fillStyle = 'rgba(0,0,0,0.8)'
     ctx.fill()
     ctx.strokeStyle = scoreColor
@@ -966,7 +968,7 @@ export default function App() {
       const badgeWidth = 200
       const badgeHeight = 36
       const badgeX = (1080 - badgeWidth) / 2
-      const badgeY = 925
+      const badgeY = isSquare ? 610 : 925
 
       const goldGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY)
       goldGradient.addColorStop(0, '#ffd700')
@@ -981,45 +983,52 @@ export default function App() {
       ctx.fillStyle = '#000'
       ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText('⚡ PRO ANALYSIS', 540, 950)
+      ctx.fillText('⚡ PRO ANALYSIS', 540, isSquare ? 635 : 950)
     }
 
     // Score number - BIG
     ctx.fillStyle = scoreColor
-    ctx.font = 'bold 72px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.font = `bold ${isSquare ? 56 : 72}px -apple-system, BlinkMacSystemFont, sans-serif`
     ctx.textAlign = 'center'
-    ctx.fillText(scores.overall, 540, 1000)
+    ctx.fillText(scores.overall, 540, scoreY + (isSquare ? 18 : 20))
 
     // "/100" below score
     ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('/100', 540, 1040)
+    ctx.font = `${isSquare ? 22 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('/100', 540, scoreY + (isSquare ? 50 : 60))
 
-    // Verdict - HUGE and punchy
+    // Verdict - HUGE and punchy (positioned based on format)
+    const verdictY = isSquare ? 780 : 1140
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.font = `bold ${isSquare ? 36 : 46}px -apple-system, BlinkMacSystemFont, sans-serif`
     // Word wrap for long verdicts
-    const maxWidth = 900
+    const maxWidth = isSquare ? 800 : 900
     const verdictLines = wrapText(ctx, scores.verdict, maxWidth)
     verdictLines.forEach((line, i) => {
-      ctx.fillText(line, 540, 1140 + (i * 52))
+      ctx.fillText(line, 540, verdictY + (i * (isSquare ? 42 : 52)))
     })
 
-    // Sub-scores row (Color / Fit / Style)
-    const subScores = [
-      { label: 'Color', score: scores.color },
-      { label: 'Fit', score: scores.fit },
-      { label: 'Style', score: scores.style }
-    ]
-    const subScoreY = verdictLines.length > 1 ? 1210 : 1180
-    ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
-    subScores.forEach((sub, i) => {
-      const x = 300 + (i * 240)
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'
-      ctx.fillText(sub.label, x, subScoreY)
-      ctx.fillStyle = scoreColor
-      ctx.fillText(sub.score.toString(), x, subScoreY + 28)
-    })
+    // Sub-scores row (Color / Fit / Style) - only on story format (skip for square)
+    const subScoreY = isSquare
+      ? (verdictLines.length > 1 ? 870 : 850)
+      : (verdictLines.length > 1 ? 1210 : 1180)
+
+    if (!isSquare) {
+      // Full subscores for 9:16
+      const subScores = [
+        { label: 'Color', score: scores.color },
+        { label: 'Fit', score: scores.fit },
+        { label: 'Style', score: scores.style }
+      ]
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+      subScores.forEach((sub, i) => {
+        const x = 300 + (i * 240)
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'
+        ctx.fillText(sub.label, x, subScoreY)
+        ctx.fillStyle = scoreColor
+        ctx.fillText(sub.score.toString(), x, subScoreY + 28)
+      })
+    }
 
     // PRO EXCLUSIVE: Savage Meter + Item Roast
     let proContentY = subScoreY + 50
@@ -1072,32 +1081,49 @@ export default function App() {
       }
     }
 
-    // Aesthetic + Celeb in pill style
-    const pillY = isProCard && scores.savageLevel ? proContentY : subScoreY + 60
-    ctx.fillStyle = 'rgba(255,255,255,0.1)'
-    ctx.beginPath()
-    ctx.roundRect(140, pillY, 800, 50, 25)
-    ctx.fill()
-    ctx.fillStyle = 'rgba(255,255,255,0.8)'
-    ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
-    const celebText = scores.celebMatch
-    ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, pillY + 35)
+    // Aesthetic + Celeb in pill style (skip for square to save space, or position lower)
+    const pillY = isSquare
+      ? subScoreY + 20
+      : (isProCard && scores.savageLevel ? proContentY : subScoreY + 60)
 
-    // Challenge text - THE VIRAL HOOK
+    if (!isSquare) {
+      ctx.fillStyle = 'rgba(255,255,255,0.1)'
+      ctx.beginPath()
+      ctx.roundRect(140, pillY, 800, 50, 25)
+      ctx.fill()
+      ctx.fillStyle = 'rgba(255,255,255,0.8)'
+      ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
+      const celebText = scores.celebMatch
+      ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, pillY + 35)
+    }
+
+    // For square: show condensed aesthetic tag
+    if (isSquare) {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'
+      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText(`${scores.aesthetic}`, 540, 900)
+    }
+
+    // Challenge text - THE VIRAL HOOK (dynamic Y)
+    const captionY = isSquare ? 950 : 1350
     ctx.fillStyle = isProCard ? '#ffd700' : modeColors.light
-    ctx.font = 'bold 38px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText(viralCaption, 540, 1350)
+    ctx.font = `bold ${isSquare ? 28 : 38}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText(viralCaption, 540, captionY)
 
-    // Hashtags - Pro gets special hashtag
-    ctx.fillStyle = isProCard ? '#ffd700' : modeColors.accent
-    ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
-    const proHashtags = isProCard ? '✨ #FitRatePro #OutfitCheck ✨' : hashtags
-    ctx.fillText(proHashtags, 540, 1420)
+    // Hashtags - Pro gets special hashtag (skip for square to save space)
+    if (!isSquare) {
+      ctx.fillStyle = isProCard ? '#ffd700' : modeColors.accent
+      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+      const proHashtags = isProCard ? '✨ #FitRatePro #OutfitCheck ✨' : hashtags
+      ctx.fillText(proHashtags, 540, 1420)
+    }
 
-    // Call to action box
+    // Call to action box - dynamic for format
+    const ctaY = isSquare ? 990 : 1480
+    const ctaHeight = isSquare ? 70 : 100
     ctx.fillStyle = modeColors.glow.replace('0.4', '0.2')
     ctx.beginPath()
-    ctx.roundRect(180, 1480, 720, 100, 20)
+    ctx.roundRect(isSquare ? 140 : 180, ctaY, isSquare ? 800 : 720, ctaHeight, 20)
     ctx.fill()
     ctx.strokeStyle = modeColors.glow.replace('0.4', '0.5')
     ctx.lineWidth = 2
@@ -1105,13 +1131,15 @@ export default function App() {
 
     // CTA text - Made to screenshot positioning
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('Your turn → fitrate.app', 540, 1545)
+    ctx.font = `bold ${isSquare ? 26 : 34}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('Your turn → fitrate.app', 540, ctaY + (ctaHeight / 2) + 8)
 
-    // Branding footer
-    ctx.fillStyle = 'rgba(255,255,255,0.35)'
-    ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.fillText('Rate your fit in seconds', 540, 1620)
+    // Branding footer (skip for square)
+    if (!isSquare) {
+      ctx.fillStyle = 'rgba(255,255,255,0.35)'
+      ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('Rate your fit in seconds', 540, 1620)
+    }
 
     // Generate share text - punchy, viral, screenshot-worthy
     const getShareText = () => {
