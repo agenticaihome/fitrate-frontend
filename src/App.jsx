@@ -1734,6 +1734,11 @@ export default function App() {
               background: 'rgba(255,215,0,0.1)',
               border: '1px solid rgba(255,215,0,0.3)'
             }}
+          >
+            <span>⚡ Upgrade to Elite</span>
+          </button>
+        )}
+
         {/* BOTTOM SECTION - COORDINATED LAYOUT */}
         <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6" style={{
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
