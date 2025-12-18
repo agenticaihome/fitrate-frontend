@@ -136,6 +136,7 @@ export default function App() {
   const [countdown, setCountdown] = useState(null) // null = no timer, 3/2/1 = counting
   const [facingMode, setFacingMode] = useState('environment') // 'environment' = rear, 'user' = front
   const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
+  const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -225,6 +226,27 @@ export default function App() {
       window.removeEventListener('online', handleOnline)
     }
   }, [])
+
+  // Decline offer countdown timer (5 minutes = 300 seconds)
+  useEffect(() => {
+    if (showDeclineOffer) {
+      setDeclineCountdown(300) // Start at 5 minutes
+      const timer = setInterval(() => {
+        setDeclineCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            setShowDeclineOffer(false)
+            setShowPaywall(false)
+            return null
+          }
+          return prev - 1
+        })
+      }, 1000)
+      return () => clearInterval(timer)
+    } else {
+      setDeclineCountdown(null)
+    }
+  }, [showDeclineOffer])
 
   // Check if email is Pro
   const checkProStatus = async (email) => {
@@ -918,15 +940,32 @@ export default function App() {
       ctx.fillText(line, 540, 1140 + (i * 52))
     })
 
+    // Sub-scores row (Color / Fit / Style)
+    const subScores = [
+      { label: 'Color', score: scores.color },
+      { label: 'Fit', score: scores.fit },
+      { label: 'Style', score: scores.style }
+    ]
+    const subScoreY = verdictLines.length > 1 ? 1210 : 1180
+    ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+    subScores.forEach((sub, i) => {
+      const x = 300 + (i * 240)
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
+      ctx.fillText(sub.label, x, subScoreY)
+      ctx.fillStyle = scoreColor
+      ctx.fillText(sub.score.toString(), x, subScoreY + 28)
+    })
+
     // Aesthetic + Celeb in pill style
+    const pillY = subScoreY + 60
     ctx.fillStyle = 'rgba(255,255,255,0.1)'
     ctx.beginPath()
-    ctx.roundRect(140, 1220, 800, 50, 25)
+    ctx.roundRect(140, pillY, 800, 50, 25)
     ctx.fill()
     ctx.fillStyle = 'rgba(255,255,255,0.8)'
     ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
     const celebText = scores.celebMatch
-    ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, 1255)
+    ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, pillY + 35)
 
     // Challenge text - THE VIRAL HOOK
     ctx.fillStyle = modeColors.light
@@ -2409,11 +2448,18 @@ export default function App() {
               <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
               <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
 
-              <p className="text-gray-400 mb-6">
+              <p className="text-gray-400 mb-2">
                 Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
                 <br />
                 <span className="text-xs">(then $2.99/week, cancel anytime)</span>
               </p>
+
+              {/* Countdown Timer */}
+              {declineCountdown && (
+                <p className="text-center mb-4 text-red-400 font-bold animate-pulse">
+                  ⏳ Offer expires in {Math.floor(declineCountdown / 60)}:{String(declineCountdown % 60).padStart(2, '0')}
+                </p>
+              )}
 
               <button
                 onClick={() => startCheckout('proWeeklyDiscount')}
