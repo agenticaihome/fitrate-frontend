@@ -40,18 +40,20 @@ const getPercentile = (score) => {
   return Math.floor(score * 0.4)
 }
 
-// Helper: Random share tips for virality
+// Helper: Random share tips for virality (universal appeal)
 const SHARE_TIPS = [
   "Challenge a friend to beat this 👀",
-  "Post to your story 📸",
+  "Share with friends 📸",
   "Tag someone who needs a rating",
-  "Drop this in the group chat",
-  "Your followers need to see this",
-  "This score goes crazy",
-  "Bet you can't get higher 🔥",
-  "Send to someone who thinks they dress better",
-  "Post it 😏",
-  "Your friends need to try this"
+  "Send this to your group chat",
+  "Show your friends this score",
+  "Think you can do better? Try again!",
+  "Bet a friend can't beat this 🔥",
+  "Send to someone stylish",
+  "Share your results!",
+  "Get your friends to try it too",
+  "Compare scores with friends",
+  "Who has the best style? Find out!"
 ]
 
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
@@ -403,6 +405,7 @@ export default function App() {
     }
 
     const roastVerdicts = [
+      // Gen Z roasts
       "Bro really said 'I'll figure it out later' 💀",
       "The colors are in a toxic relationship",
       "This fit is giving... participation trophy",
@@ -412,24 +415,33 @@ export default function App() {
       "The fit that texts back 'k'",
       "This outfit has a 2.3 GPA 📉",
       "Sir this is a Wendy's 💀",
-      "Main NPC energy tbh",
-      "Giving clearance rack at 9pm",
       "The algorithm buried this one",
-      "This fit ghosted the vibe check",
       "Colors are screaming for help",
       "You wore this on purpose? 💀",
       "Fabric said 'I give up'",
-      "The fit forgot the assignment",
       "This is a cry for help",
       "Outfit buffering... forever",
       "Did the lighting dirty you or... 😬",
       "Proportions left the chat",
       "This fit has a villain origin story",
       "Styled by throwing darts at the closet",
-      "The vibes are confused and scared"
+      // Universal roasts (funny but accessible)
+      "Did your mirror break this morning? 😅",
+      "Bold choice. Very bold.",
+      "The outfit equivalent of a Monday",
+      "I've seen better... at the laundromat",
+      "Were you in a rush? Be honest.",
+      "This needs a do-over",
+      "Interesting... and not in a good way",
+      "Even the mannequin would say no",
+      "Your closet deserves an apology",
+      "Confidence is great, but so is a mirror",
+      "This is a fashion emergency 🚨",
+      "Let's pretend this didn't happen"
     ]
 
     const niceVerdicts = [
+      // Gen Z favorites
       "Main character energy ✨",
       "Clean and confident 🔥",
       "Understated fire detected",
@@ -442,60 +454,82 @@ export default function App() {
       "Immaculate vibes only",
       "Serving looks",
       "The coordination is *chefs kiss*",
-      "The drip is real 💧",
       "Outfit understood the assignment",
       "You chose fashion today",
-      "The fit ate",
-      "That friend everyone screenshots",
       "Effortless but intentional",
       "Pinterest would be proud",
       "Straight off a mood board",
-      "The silhouette is perfect",
       "Casual done right",
       "Nailed it 🎯",
-      "Main character rights earned"
+      // Universal appeal
+      "Looking sharp! Ready for anything",
+      "Great style choices here",
+      "Well put together 👏",
+      "This outfit works beautifully",
+      "Classic meets modern — love it",
+      "Confident and polished",
+      "You've got great taste",
+      "Style on point today",
+      "This look is a winner",
+      "Really well coordinated",
+      "A+ for effort and execution",
+      "Sharp and stylish"
     ]
 
     const shareTips = [
+      // Share prompts for all ages
       "Challenge a friend to beat this 👀",
-      "Post to your story 📸",
+      "Share with friends 📸",
       "Tag someone who needs a rating",
-      "Drop this in the group chat",
-      "Your followers need to see this",
-      "This score goes crazy",
-      "Bet you can't get higher 🔥",
-      "Send to someone who thinks they dress better",
-      "Post it 😏",
-      "Your friends need to try this"
+      "Send this to your group chat",
+      "Show your friends this score",
+      "Think you can do better? Try again!",
+      "Bet a friend can't beat this 🔥",
+      "Send to someone stylish",
+      "Share your results!",
+      "Get your friends to try it too",
+      "Compare scores with friends",
+      "Who has the best style? Find out!"
     ]
 
     const roastTips = [
+      // Funny but understandable for all ages
       "Start over. Please.",
       "Have you considered... literally anything else?",
       "Less is more. Way less.",
-      "Google 'how to dress' and return",
+      "A quick search for 'outfit ideas' might help",
       "Maybe try the other shirt next time",
-      "The fit clinic is now open 💀",
-      "Iron exists for a reason bestie",
-      "Delete this and try again",
-      "Stick to monochrome for a bit",
-      "Accessories can't save this"
+      "Time for a wardrobe intervention",
+      "An iron might be your new best friend",
+      "Try again tomorrow",
+      "Stick to simpler colors for now",
+      "Accessories won't save this one",
+      "Phone a stylish friend",
+      "When in doubt, go with basics",
+      "Perhaps consult a mirror first?",
+      "This is a learning opportunity"
     ]
 
     const niceTips = [
+      // Style tips that work for everyone
       "Cuff the jeans for cleaner lines",
-      "A chunky watch would elevate",
+      "A nice watch would elevate this",
       "Try layering with a light jacket",
-      "White sneakers would slap here",
-      "Add a simple chain necklace",
-      "Roll those sleeves up 🔥",
-      "This with sunglasses = 💯",
-      "The right bag would complete this",
-      "Try French tucking the shirt",
-      "Add a belt to define the waist"
+      "Clean white sneakers work great here",
+      "A simple accessory could add polish",
+      "Rolling the sleeves adds a relaxed vibe",
+      "Sunglasses would complete the look",
+      "The right bag would tie this together",
+      "Try tucking in the front of your shirt",
+      "A belt would add nice definition",
+      "Consider adding a pop of color",
+      "This would pair well with a blazer",
+      "Minimal jewelry keeps it elegant",
+      "Great canvas for accessories"
     ]
 
     const honestVerdicts = [
+      // Constructive feedback
       "Solid, but room to improve",
       "Almost there, just needs polish",
       "Good bones, execution varies",
@@ -505,20 +539,35 @@ export default function App() {
       "Shows effort, needs refinement",
       "Close but missing something",
       "Functional, not exceptional",
-      "Average execution of good idea"
+      "Average execution of good idea",
+      // Universal honest feedback
+      "Decent foundation to build on",
+      "Some nice elements, some misses",
+      "A few tweaks could elevate this",
+      "Good start, room to grow",
+      "Not bad, but could be better",
+      "Respectable effort overall",
+      "Works for the occasion",
+      "Middle of the road — safe bet",
+      "Has potential with adjustments"
     ]
 
     const honestTips = [
-      "The proportions need work",
-      "Consider a different wash",
-      "Colors are fighting a bit",
-      "Fit could be more intentional",
-      "Accessories would help here",
+      // Constructive suggestions for all ages
+      "The proportions could use adjustment",
+      "Consider a different color palette",
+      "These colors clash slightly",
+      "The fit could be more tailored",
+      "The right accessories would help",
       "Try a different silhouette",
-      "The layers need balance",
-      "Consider tailoring this piece",
-      "Material upgrade would help",
-      "Simpler might be better here"
+      "Balance the layers better",
+      "Tailoring would make a big difference",
+      "Higher quality fabric would elevate this",
+      "Simpler might work better here",
+      "Check the overall balance",
+      "Iron or steam for a polished look",
+      "Match your shoes to the outfit tone",
+      "Less is more in this case"
     ]
 
     // Wider score range for variety - honest mode uses full natural range
@@ -1581,8 +1630,11 @@ export default function App() {
           WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        <p className="text-xs mb-8 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          Rate your fit before you post 📸
+        <p className="text-xs mb-2 tracking-wide" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          Your AI style coach
+        </p>
+        <p className="text-[10px] mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          Snap a photo • Get instant feedback • Have fun
         </p>
 
         {/* Challenge Banner - when friend shared a challenge link */}
