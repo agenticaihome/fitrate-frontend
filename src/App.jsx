@@ -1630,10 +1630,10 @@ export default function App() {
           WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        <p className="text-xs mb-2 tracking-wide" style={{ color: 'rgba(255,255,255,0.5)' }}>
+        <p className="text-sm mb-2 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
           Your AI style coach
         </p>
-        <p className="text-[10px] mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="text-xs mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>
           Snap a photo • Get instant feedback • Have fun
         </p>
 
@@ -1661,7 +1661,7 @@ export default function App() {
         )}
 
         {/* HERO CTA - Central path of least resistance */}
-        <div className="flex-1 flex flex-col items-center justify-center -mt-20">
+        <div className="flex-1 flex flex-col items-center justify-center -mt-12 sm:-mt-20">
           <button
             onClick={() => {
               playSound('click')
@@ -1700,14 +1700,14 @@ export default function App() {
               {mode === 'roast' ? 'ROAST ME' : mode === 'honest' ? 'ANALYZE' : 'RATE ME'}
             </span>
 
-            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] animate-pulse">Tap to Start</p>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] animate-pulse">Tap to Start</p>
             </div>
           </button>
         </div>
 
         {/* MODE SELECTOR - Refined, secondary pill */}
-        <div className="mb-10 flex items-center gap-2 p-1 rounded-full" style={{
+        <div className="mt-6 mb-10 flex items-center gap-2 p-1 rounded-full" style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
@@ -1772,7 +1772,7 @@ export default function App() {
         </div>
 
         {/* Trust Message */}
-        <p className="mt-6 text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
           <span>🔒</span> Photos analyzed instantly, never stored
         </p>
 
