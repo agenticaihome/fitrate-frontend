@@ -2498,10 +2498,52 @@ export default function App() {
       }
     }
 
-    const shareToTwitter = () => {
-      const tweetText = encodeURIComponent(shareData.text)
-      window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank')
+    // Share helpers with UTM tracking
+    const getShareUrl = () => {
+      const baseUrl = `${window.location.origin}?challenge=${scores?.overall || 85}`
+      return `${baseUrl}&utm_source=share&utm_medium=social&utm_campaign=fitrate`
     }
+
+    const getShareText = () => {
+      return `I got ${scores?.overall || 85}/100 on FitRate! 🔥 Think you can beat it?`
+    }
+
+    const copyShareLink = async () => {
+      try {
+        await navigator.clipboard.writeText(getShareUrl())
+        playSound('click')
+        showCopiedToast('Link copied! 📋')
+      } catch (err) {
+        showCopiedToast("Couldn't copy 😕")
+      }
+    }
+
+    const shareToTwitter = () => {
+      const text = encodeURIComponent(getShareText())
+      const url = encodeURIComponent(getShareUrl())
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
+    }
+
+    const shareToFacebook = () => {
+      const url = encodeURIComponent(getShareUrl())
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
+    }
+
+    const shareToReddit = () => {
+      const title = encodeURIComponent(getShareText())
+      const url = encodeURIComponent(getShareUrl())
+      window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank')
+    }
+
+    const shareToSMS = () => {
+      const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
+      // Use different format for iOS vs Android
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+      window.location.href = isIOS ? `sms:&body=${text}` : `sms:?body=${text}`
+    }
+
+    // Check if native share is available
+    const hasNativeShare = typeof navigator.share === 'function'
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
@@ -2569,14 +2611,72 @@ export default function App() {
         {/* Primary Share CTA - Native Share with Image */}
         <button
           onClick={handleShare}
-          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-6"
+          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-4"
           style={{
             background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
             boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
           }}
         >
-          <span className="text-xl">📤</span> Share with Image
+          <span className="text-xl">📤</span> {hasNativeShare ? 'Share with Image' : 'Download & Share'}
         </button>
+
+        {/* Fallback Share Buttons - Always visible for more options */}
+        <div className="w-full max-w-xs mb-6">
+          <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Or share directly to:
+          </p>
+          <div className="grid grid-cols-5 gap-2">
+            {/* Copy Link */}
+            <button
+              onClick={copyShareLink}
+              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-xl mb-1">🔗</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Copy</span>
+            </button>
+
+            {/* SMS/Text */}
+            <button
+              onClick={shareToSMS}
+              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-xl mb-1">💬</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Text</span>
+            </button>
+
+            {/* X (Twitter) */}
+            <button
+              onClick={shareToTwitter}
+              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-xl mb-1">𝕏</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>X</span>
+            </button>
+
+            {/* Facebook */}
+            <button
+              onClick={shareToFacebook}
+              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-xl mb-1">📘</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>FB</span>
+            </button>
+
+            {/* Reddit */}
+            <button
+              onClick={shareToReddit}
+              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-xl mb-1">🤖</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Reddit</span>
+            </button>
+          </div>
+        </div>
 
         {/* Back */}
         <button
