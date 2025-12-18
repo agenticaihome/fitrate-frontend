@@ -5,6 +5,14 @@ import { playSound, vibrate } from './utils/soundEffects'
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
 const API_BASE = API_URL.replace('/api/analyze', '/api')
 
+// SECURITY: API key for authenticated requests (set in environment)
+const API_KEY = import.meta.env.VITE_API_KEY || ''
+
+// Helper to get headers for API requests
+const getApiHeaders = () => ({
+  'Content-Type': 'application/json',
+  ...(API_KEY && { 'X-API-Key': API_KEY })
+})
 // Aesthetics for mock scores
 const AESTHETICS = [
   'Clean Girl', 'Dark Academia', 'Quiet Luxury', 'Streetwear', 'Y2K',
@@ -183,7 +191,7 @@ export default function App() {
       // Claim referral
       fetch(`${API_BASE}/referral/claim`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiHeaders(),
         body: JSON.stringify({ referrerId })
       })
         .then(res => res.json())
@@ -269,7 +277,7 @@ export default function App() {
       setEmailChecking(true)
       const response = await fetch(`${API_BASE}/pro/check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiHeaders(),
         body: JSON.stringify({ email })
       })
       const data = await response.json()
@@ -636,7 +644,7 @@ export default function App() {
         // Call real AI endpoint (backend routes free users to Gemini)
         const response = await fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getApiHeaders(),
           body: JSON.stringify({
             image: imageData,
             mode,
@@ -707,7 +715,7 @@ export default function App() {
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getApiHeaders(),
         body: JSON.stringify({ image: imageData, mode })
       })
       const data = await response.json()
