@@ -122,6 +122,7 @@ export default function App() {
   const [cameraStream, setCameraStream] = useState(null)
   const [cameraError, setCameraError] = useState(null)
   const [countdown, setCountdown] = useState(null) // null = no timer, 3/2/1 = counting
+  const [facingMode, setFacingMode] = useState('environment') // 'environment' = rear, 'user' = front
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -944,19 +945,23 @@ export default function App() {
   }
 
   // Camera functions for live webcam capture
-  const startCamera = useCallback(async () => {
+  const startCamera = useCallback(async (facing = facingMode) => {
     setCameraError(null)
+    // Stop any existing stream first
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop())
+    }
     try {
-      // Request camera with preference for rear camera on mobile
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // Prefer rear camera
+          facingMode: facing,
           width: { ideal: 1280 },
           height: { ideal: 1920 }
         },
         audio: false
       })
       setCameraStream(stream)
+      setFacingMode(facing)
       setScreen('camera')
 
       // Connect stream to video element after screen renders
@@ -972,7 +977,12 @@ export default function App() {
       setCameraError(err.message)
       fileInputRef.current?.click()
     }
-  }, [])
+  }, [facingMode, cameraStream])
+
+  const flipCamera = useCallback(() => {
+    const newFacing = facingMode === 'environment' ? 'user' : 'environment'
+    startCamera(newFacing)
+  }, [facingMode, startCamera])
 
   const stopCamera = useCallback(() => {
     if (cameraStream) {
@@ -1005,11 +1015,15 @@ export default function App() {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
 
-    // Draw video frame to canvas (flip horizontally to unmirror)
-    ctx.save()
-    ctx.scale(-1, 1)
-    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height)
-    ctx.restore()
+    // Draw video frame to canvas (flip for front camera to match preview)
+    if (facingMode === 'user') {
+      ctx.save()
+      ctx.scale(-1, 1)
+      ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height)
+      ctx.restore()
+    } else {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+    }
 
     // Get image data as base64
     const imageData = canvas.toDataURL('image/jpeg', 0.9)
@@ -1019,7 +1033,7 @@ export default function App() {
     setCountdown(null)
     setUploadedImage(imageData)
     analyzeOutfit(imageData)
-  }, [stopCamera, analyzeOutfit])
+  }, [stopCamera, analyzeOutfit, facingMode])
 
   // Timer capture - 3 second countdown then capture
   const timerCapture = useCallback(() => {
@@ -1136,37 +1150,78 @@ export default function App() {
   // ============================================
   if (screen === 'camera') {
     return (
-      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+      <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
+      }}>
         {/* Live camera preview */}
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="flex-1 object-cover w-full"
-          style={{ transform: 'scaleX(-1)' }} // Mirror for selfie feel
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
         />
 
-        {/* Camera controls overlay */}
-        <div className="absolute bottom-0 left-0 right-0 pb-safe">
-          {/* Control bar */}
-          <div className="flex items-center justify-center gap-8 py-8 bg-gradient-to-t from-black/90 to-transparent">
-            {/* Cancel button */}
+        {/* Top bar - Mode indicator & buttons */}
+        <div className="relative z-10 flex items-center justify-between px-4 pt-4">
+          {/* Mode indicator */}
+          <div className="px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+            <span className="text-white text-sm font-medium">
+              {mode === 'roast' ? '🔥 Roast' : mode === 'honest' ? '📊 Honest' : '✨ Nice'}
+            </span>
+          </div>
+
+          {/* Top right buttons */}
+          <div className="flex items-center gap-2">
+            {/* Flip camera button */}
+            <button
+              onClick={flipCamera}
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm active:scale-95"
+            >
+              <span className="text-white text-lg">🔄</span>
+            </button>
+
+            {/* Gallery button */}
             <button
               onClick={() => {
                 stopCamera()
                 setScreen('home')
+                setTimeout(() => fileInputRef.current?.click(), 100)
               }}
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95"
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm active:scale-95"
             >
-              <span className="text-white text-2xl">✕</span>
+              <span className="text-white text-lg">🖼️</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Spacer to push controls to bottom */}
+        <div className="flex-1" />
+
+        {/* Bottom controls */}
+        <div className="relative z-10 pb-6">
+          <div className="flex items-center justify-center gap-6 py-4" style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)'
+          }}>
+            {/* Cancel button */}
+            <button
+              onClick={() => {
+                stopCamera()
+                setCountdown(null)
+                setScreen('home')
+              }}
+              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95"
+            >
+              <span className="text-white text-xl">✕</span>
             </button>
 
             {/* Capture button - BIG */}
             <button
               onClick={capturePhoto}
               disabled={countdown !== null}
-              className="w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
+              className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
               style={{
                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                 boxShadow: '0 0 30px rgba(0,212,255,0.5)',
@@ -1176,48 +1231,28 @@ export default function App() {
               <span className="text-3xl">📸</span>
             </button>
 
-            {/* Timer button (3s countdown) */}
+            {/* Timer button */}
             <button
               onClick={timerCapture}
               disabled={countdown !== null}
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95 disabled:opacity-50"
+              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
             >
-              <span className="text-white text-lg font-bold">3s</span>
+              <span className="text-white text-sm font-bold">3s</span>
             </button>
           </div>
         </div>
 
-        {/* Gallery button - top right corner */}
-        <button
-          onClick={() => {
-            stopCamera()
-            setScreen('home')
-            setTimeout(() => fileInputRef.current?.click(), 100)
-          }}
-          className="absolute top-safe right-4 mt-4 w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm"
-        >
-          <span className="text-white text-xl">🖼️</span>
-        </button>
-
         {/* Countdown overlay */}
         {countdown !== null && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-9xl font-black text-white animate-pulse" style={{
-              textShadow: '0 0 60px rgba(0,212,255,0.8), 0 0 120px rgba(0,212,255,0.5)'
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+            <div className="text-8xl font-black text-white" style={{
+              textShadow: '0 0 40px rgba(0,212,255,0.8), 0 0 80px rgba(0,212,255,0.5)',
+              animation: 'pulse 0.5s ease-in-out'
             }}>
               {countdown}
             </div>
           </div>
         )}
-
-        {/* Mode indicator */}
-        <div className="absolute top-safe left-0 right-0 flex justify-center pt-4">
-          <div className="px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
-            <span className="text-white text-sm font-medium">
-              {mode === 'roast' ? '🔥 Roast Mode' : mode === 'honest' ? '📊 Honest Mode' : '✨ Nice Mode'}
-            </span>
-          </div>
-        </div>
 
         {/* Hidden canvas for photo capture */}
         <canvas ref={canvasRef} className="hidden" />
