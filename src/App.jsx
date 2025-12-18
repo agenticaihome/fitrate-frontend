@@ -1603,10 +1603,7 @@ export default function App() {
           onClick={() => {
             playSound('click')
             vibrate(20)
-            // Allow scan if: daily scans remain, OR isPro, OR has purchased scans
             if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-              // Mobile: use native camera app (better experience)
-              // Desktop: use getUserMedia live camera
               const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
               if (isMobile) {
                 document.getElementById('mobileCameraInput')?.click()
@@ -1614,15 +1611,15 @@ export default function App() {
                 startCamera()
               }
             } else {
-              setShowPaywall(true) // Show paywall modal with decline offer
+              setShowPaywall(true)
             }
           }}
           disabled={scansRemaining === 0 && !isPro && purchasedScans === 0}
-          className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-40 group"
+          className="btn-physical relative w-64 h-64 rounded-full flex flex-col items-center justify-center disabled:opacity-40 group"
           style={{
             background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
             border: `3px solid ${accent}99`,
-            boxShadow: `0 0 80px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
+            boxShadow: `var(--shadow-physical), 0 0 80px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
           }}
         >
           {/* Pulsing inner glow */}
@@ -1900,7 +1897,7 @@ export default function App() {
     const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
 
     return (
-      <div className="min-h-screen flex flex-col items-center p-4 overflow-hidden" style={{
+      <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
         paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
@@ -1909,7 +1906,6 @@ export default function App() {
         {/* OVERALL SCORE - BIG at TOP */}
         <div className={`relative mb-3 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
           <div className="relative w-32 h-32">
-            {/* Animated score ring */}
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
               <circle
@@ -1925,7 +1921,6 @@ export default function App() {
                 }}
               />
             </svg>
-            {/* Score number */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-5xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>/100</span>
@@ -1933,7 +1928,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Verdict - Huge & Punchy */}
+        {/* Verdict - Large & Punchy */}
         <div className={`transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <p className="text-xl font-black text-white text-center mb-2 px-6" style={{
             textShadow: `0 0 30px ${modeAccent}66`,
@@ -1943,26 +1938,22 @@ export default function App() {
           </p>
         </div>
 
-        {/* Viral hook + Percentile social proof */}
-        <div className={`mb-3 transition-all duration-500 delay-200 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Social Proof */}
+        <div className={`mb-4 transition-all duration-500 delay-200 text-center ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
           <p className="text-sm font-bold mb-1" style={{
             color: scores.overall >= 80 ? '#00ff88' : (scores.overall >= 60 ? '#00d4ff' : '#ff6b6b')
           }}>
             {(() => {
-              // Mode-specific viral hooks - Nice mode is more supportive
               if (scores.roastMode) {
-                // Roast mode - brutal
                 if (scores.overall >= 60) return '😏 You survived'
                 if (scores.overall >= 45) return '💀 Rough day for your closet'
                 return '☠️ AI showed no mercy'
               } else if (scores.mode === 'honest') {
-                // Honest mode - balanced
                 if (scores.overall >= 85) return '🔥 Post this immediately'
                 if (scores.overall >= 70) return '👍 Solid fit, respectable'
                 if (scores.overall >= 55) return '📊 Average range'
                 return '📉 Needs work'
               } else {
-                // Nice mode - supportive (lower thresholds)
                 if (scores.overall >= 90) return '🔥 LEGENDARY — Post this NOW'
                 if (scores.overall >= 80) return '✨ Main character energy'
                 if (scores.overall >= 70) return '💅 Serve! TikTok would approve'
@@ -1971,302 +1962,165 @@ export default function App() {
               }
             })()}
           </p>
-          <p className="text-xs font-medium" style={{
-            color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.5)',
-            textShadow: scores.isLegendary ? '0 0 10px #ffd700' : 'none'
-          }}>
-            {scores.isLegendary ? "🌟 TOP 1% OF ALL TIME" : `Better than ${scores.percentile}% today`}
+          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Better than {scores.percentile}% of fits today
           </p>
+        </div>
 
-          {/* "You improved!" messaging */}
-          {scores.previousScore !== null && (
-            <p className="text-xs font-bold mt-1" style={{
-              color: scores.overall > scores.previousScore ? '#00ff88' :
-                scores.overall < scores.previousScore ? '#ff6b6b' : '#00d4ff'
-            }}>
-              {scores.overall > scores.previousScore
-                ? `📈 +${scores.overall - scores.previousScore} from last time!`
-                : scores.overall < scores.previousScore
-                  ? `📉 ${scores.previousScore - scores.overall} lower than before`
-                  : '➡️ Same as last time'}
-            </p>
+        {/* PHOTO & MAIN RESULT CARD */}
+        <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <button
+            onClick={generateShareCard}
+            className="card-physical w-full p-4 group relative overflow-hidden active:scale-[0.98] transition-all text-left"
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: `0 20px 50px rgba(0,0,0,0.3), inset 0 0 40px ${modeAccent}11`
+            }}
+          >
+            <div className="flex gap-4 items-center">
+              <div className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl flex-shrink-0" style={{ border: `1px solid ${scoreColor}44` }}>
+                <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-black tracking-widest text-white/30 uppercase mb-2">Style Analysis</p>
+                <p className="text-sm font-bold text-white mb-2 leading-tight">"{scores.tip}"</p>
+                <div className="flex flex-wrap gap-1">
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-bold uppercase">{scores.aesthetic}</span>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-bold uppercase">{scores.celebMatch}</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-[9px] font-black text-white/20 uppercase tracking-widest mt-4 group-active:text-white/40">Tap card to share</p>
+          </button>
+        </div>
+
+        {/* GOLDEN INSIGHT (PRO) OR TEASER (FREE) */}
+        <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-500 ${revealStage >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+          {isPro ? (
+            <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm">✨</span>
+                <span className="text-[10px] font-black tracking-widest text-cyan-400 uppercase">Golden Insight</span>
+              </div>
+              <div className="space-y-4 text-left">
+                {scores.identityReflection && (
+                  <div>
+                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Identity Reflection</span>
+                    <p className="text-sm text-white font-medium leading-relaxed">{scores.identityReflection}</p>
+                  </div>
+                )}
+                {scores.socialPerception && (
+                  <div>
+                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Social Perception</span>
+                    <p className="text-sm text-white font-medium leading-relaxed">{scores.socialPerception}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowPaywall(true)}
+              className="card-physical w-full p-5 border-dashed border-cyan-500/30 bg-cyan-500/5 active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🔒</span>
+                  <span className="text-[10px] font-black tracking-widest text-cyan-400 uppercase">Pro Benefits</span>
+                </div>
+                <span className="text-[10px] font-black text-cyan-400">UNLOCK</span>
+              </div>
+              <div className="space-y-4 mb-4 text-left">
+                <div>
+                  <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Identity Reflection</span>
+                  <div className="h-4 w-full bg-white/5 rounded blur-[4px]" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Social Perception</span>
+                  <div className="h-4 w-3/4 bg-white/5 rounded blur-[4px]" />
+                </div>
+              </div>
+              <div className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-black text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                Unlock Golden Insights 👑
+              </div>
+            </button>
           )}
         </div>
 
-        {/* Photo - Smaller, clean */}
-        <div className={`relative mb-3 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-          <div className="w-36 h-48 rounded-2xl overflow-hidden" style={{
-            boxShadow: `0 10px 40px ${scoreColor}33`,
-            border: `2px solid ${scoreColor}44`
-          }}>
-            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-          </div>
-        </div>
-
-        {/* Aesthetic + Celeb Badge */}
-        <div className={`mb-3 transition-all duration-500 delay-400 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              {scores.aesthetic} • {scores.celebMatch}
-            </span>
-          </div>
-        </div>
-
-        {/* Sub-scores - Horizontal bars */}
-        <div className={`w-full max-w-xs mb-3 transition-all duration-500 delay-500 ${revealStage >= 4 ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { label: 'Color', score: scores.color },
-              { label: 'Fit', score: scores.fit },
-              { label: 'Style', score: scores.style }
-            ].map((item) => (
-              <div key={item.label} className="text-center p-2 rounded-xl" style={{
-                background: 'rgba(255,255,255,0.03)'
-              }}>
-                <p className="text-[10px] mb-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{item.label}</p>
-                <p className="text-lg font-bold" style={{ color: getScoreColor(item.score) }}>{item.score}</p>
+        {/* SUB-RATINGS & ROASTS */}
+        <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {[{ l: 'Color', s: scores.color }, { l: 'Fit', s: scores.fit }, { l: 'Style', s: scores.style }].map(x => (
+              <div key={x.l} className="text-center p-2 rounded-xl bg-white/5">
+                <p className="text-[9px] text-white/30 uppercase font-black mb-1">{x.l}</p>
+                <p className="text-lg font-bold" style={{ color: getScoreColor(x.s) }}>{x.s}</p>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* ONE Tip - Short & Readable */}
-        <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-600 ${revealStage >= 4 ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="px-4 py-2.5 rounded-xl text-center" style={{
-            background: `rgba(${scores.roastMode ? '255,68,68' : '0,212,255'},0.1)`,
-            border: `1px solid rgba(${scores.roastMode ? '255,68,68' : '0,212,255'},0.2)`
-          }}>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              {scores.roastMode ? '💀 ' : '💡 '}{scores.tip}
-            </p>
-          </div>
-        </div>
-
-        {/* PRO PREVIEW - Blurred content to create desire */}
-        {!isPro && !scores.savageLevel && (
-          <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="p-4 rounded-xl relative overflow-hidden animate-pulse" style={{
-              background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.1) 100%)',
-              border: '2px solid rgba(255,215,0,0.4)',
-              boxShadow: '0 0 20px rgba(255,215,0,0.2), inset 0 0 30px rgba(255,215,0,0.05)'
-            }}>
-              {/* Pro Badge */}
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="px-3 py-1 rounded-full text-[10px] font-bold" style={{
-                  background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                  color: '#000'
-                }}>⚡ PRO ANALYSIS</span>
-              </div>
-
-              {/* Blurred Savage Level */}
-              <div className="mb-3 p-2 rounded-lg relative" style={{ background: 'rgba(255,68,68,0.1)' }}>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Savage Level</span>
-                  <span className="text-sm font-bold" style={{ color: '#ff4444', filter: 'blur(4px)' }}>7/10 🔥</span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <div className="h-full rounded-full" style={{
-                    width: '70%',
-                    background: 'linear-gradient(90deg, #ff4444, #ff6b6b)',
-                    filter: 'blur(3px)'
-                  }} />
-                </div>
-              </div>
-
-              {/* Blurred Item Roast Preview */}
-              <div className="p-2 rounded-lg mb-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <p className="text-[10px] mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Item Roast Preview:</p>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)', filter: 'blur(5px)' }}>
-                  "Those sneakers are fire but that chain looks like it came from..."
-                </p>
-              </div>
-
-              {/* Quick Buy: SAVAGE Roast */}
-              <button
-                onClick={() => startCheckout('proRoast')}
-                className="w-full py-2.5 rounded-lg text-sm font-bold transition-all active:scale-95 mb-2"
-                style={{
-                  background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-                  color: '#fff',
-                  boxShadow: '0 4px 20px rgba(255,68,68,0.3)'
-                }}
-              >
-                💀 Get SAVAGE Roast - $0.99
-              </button>
-
-              {/* Full Unlock */}
-              <button
-                onClick={() => setShowPaywall(true)}
-                className="w-full py-2 rounded-lg text-xs font-medium transition-all active:scale-95"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'rgba(255,255,255,0.7)'
-                }}
-              >
-                Or go Pro for 25 scans/day →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* PRO EXCLUSIVE: Savage Level + Item Roasts */}
-        {scores.savageLevel && (
-          <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-            {/* Pro Badge */}
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="px-2 py-1 rounded-full text-[10px] font-bold" style={{
-                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                color: '#000'
-              }}>⚡ PRO ANALYSIS</span>
-            </div>
-
-            {/* Savage Level Meter */}
-            <div className="mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)' }}>
+          {scores.savageLevel && (
+            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 mb-4 text-left">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Savage Level</span>
-                <span className="text-lg font-black" style={{ color: '#ff4444' }}>{scores.savageLevel}/10 🔥</span>
+                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Savage Level</span>
+                <span className="text-lg font-black text-red-500">{scores.savageLevel}/10 🔥</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                <div className="h-full rounded-full" style={{
-                  width: `${scores.savageLevel * 10}%`,
-                  background: 'linear-gradient(90deg, #ff4444 0%, #ff0080 100%)'
-                }} />
+              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-red-500" style={{ width: `${scores.savageLevel * 10}%` }} />
               </div>
+              {scores.itemRoasts && (
+                <div className="mt-4 space-y-2">
+                  {Object.entries(scores.itemRoasts).filter(([_, r]) => r && r !== 'N/A').map(([k, v]) => (
+                    <div key={k} className="text-xs text-white/80 leading-snug">
+                      <span className="font-black text-red-500/70 uppercase text-[9px] mr-2">{k}:</span>
+                      {v}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+          )}
+        </div>
 
-            {/* Item-by-Item Roasts */}
-            {scores.itemRoasts && (
-              <div className="space-y-2 mb-3">
-                {Object.entries(scores.itemRoasts).filter(([_, roast]) => roast && roast !== 'N/A').map(([item, roast]) => (
-                  <div key={item} className="px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                    <span className="text-[10px] uppercase font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>{item}</span>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>{roast}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Worst Celeb Comparison */}
-            {scores.worstCelebComparison && (
-              <div className="px-3 py-2 rounded-lg text-center" style={{ background: 'rgba(255,68,68,0.05)', border: '1px dashed rgba(255,68,68,0.3)' }}>
-                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>NOT giving:</span>
-                <p className="text-xs font-medium" style={{ color: 'rgba(255,68,68,0.9)' }}>{scores.worstCelebComparison}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* SHARE BUTTON - PRIMARY CTA, Above Fold */}
-        <div className={`w-full max-w-xs transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+        {/* PRIMARY CTA: SHARE */}
+        <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
             onClick={generateShareCard}
-            className="w-full py-4 rounded-2xl text-white text-lg font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
-            style={{
-              background: `linear-gradient(135deg, ${modeAccent} 0%, ${scores.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
-              boxShadow: `0 8px 30px ${modeAccent}44`,
-              animation: 'pulseGlow 2s ease-in-out infinite'
-            }}
+            className="btn-physical w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group"
+            style={{ background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)' }}
           >
-            <span className="text-xl">📤</span> Share
+            <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            <span className="text-2xl">📤</span> SHARE THIS FIT
           </button>
 
-          {/* Challenge a Friend Button */}
           <button
-            onClick={async () => {
-              playSound('click')
-              vibrate(20)
-
-              // Generate the share card first if we have shareData, otherwise use existing
-              if (shareData?.imageBlob) {
-                // We already have a share card image, share it with challenge text
-                const challengeUrl = `${window.location.origin}?challenge=${scores.overall}`
-                const challengeText = `I got ${scores.overall}/100 on FitRate! Think you can beat it? 👊`
-
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
-                  try {
-                    await navigator.share({
-                      title: `Can you beat ${scores.overall}?`,
-                      text: challengeText,
-                      url: challengeUrl,
-                      files: [shareData.file]
-                    })
-                  } catch (e) {
-                    // User cancelled or error
-                    console.log('Share cancelled or failed:', e)
-                  }
-                } else {
-                  // Fallback: download image + copy link
-                  const url = URL.createObjectURL(shareData.imageBlob)
-                  const a = document.createElement('a')
-                  a.href = url
-                  a.download = 'fitrate-challenge.png'
-                  a.click()
-                  URL.revokeObjectURL(url)
-                  navigator.clipboard.writeText(`${challengeText}\n${challengeUrl}`)
-                  displayToast('Challenge saved & copied! 📤')
-                }
-              } else {
-                // No share card yet, generate it first then share
-                generateShareCard()
-              }
-            }}
-            className="w-full max-w-xs py-3 mt-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all active:scale-95"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)'
-            }}
+            onClick={resetApp}
+            className="w-full py-4 mt-3 text-white/30 text-xs font-black uppercase tracking-widest active:text-white/60 transition-colors"
           >
-            <span>👊</span> Challenge a Friend
+            ← Rate Another One
           </button>
-
-          <p className="text-center text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Share your score card & challenge link
-          </p>
         </div>
-
-        {/* Rate Again - Subtle */}
-        <button
-          onClick={resetApp}
-          className="mt-3 text-xs font-medium transition-all active:opacity-60"
-          style={{ color: 'rgba(255,255,255,0.35)' }}
-        >
-          ← Rate Another
-        </button>
 
         {/* Confetti for 90+ */}
         {scores.overall >= 90 && (
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
-            {[...Array(30)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: '-10px',
-                  width: `${6 + Math.random() * 6}px`,
-                  height: `${6 + Math.random() * 6}px`,
-                  background: ['#ff4444', '#00d4ff', '#00ff88', '#ffd000', '#ff0080'][Math.floor(Math.random() * 5)],
-                  borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-                  animation: `confetti ${2 + Math.random() * 1.5}s linear forwards`,
-                  animationDelay: `${Math.random() * 0.5}s`
-                }}
-              />
+            {[...Array(20)].map((_, i) => (
+              <div key={i} className="absolute animate-bounce" style={{
+                left: `${Math.random() * 100}%`,
+                top: `${-20 - Math.random() * 50}px`,
+                width: '8px',
+                height: '8px',
+                background: ['#ffd700', '#00ff88', '#00d4ff'][i % 3],
+                borderRadius: '50%',
+                animation: `fall ${2 + Math.random() * 3}s linear infinite`,
+                animationDelay: `${Math.random() * 3}s`
+              }} />
             ))}
           </div>
         )}
 
         <style>{`
-          @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 8px 30px ${modeAccent}44; }
-            50% { box-shadow: 0 8px 50px ${modeAccent}77; }
-          }
-          @keyframes confetti {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          @keyframes fall {
+            to { transform: translateY(100vh) rotate(360deg); }
           }
         `}</style>
       </div>
@@ -2868,109 +2722,104 @@ export default function App() {
             <p className="text-gray-400 text-sm mt-1">Unlock 25 scans per day</p>
           </div>
 
-          {/* Benefits */}
-          <div className="space-y-3 mb-6">
-            {[
-              '25 outfit ratings per day',
-              'All modes: Nice, Honest, Roast',
-              'Celebrity style matches',
-              'Priority AI analysis'
-            ].map((benefit, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm">
-                <span className="text-green-400">✓</span>
-                <span className="text-gray-300">{benefit}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Pricing with anchor */}
-          <div className="relative w-full mb-4">
-            {/* MOST POPULAR badge */}
-            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[10px] font-black z-10" style={{
-              background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-              color: '#000',
-              boxShadow: '0 4px 15px rgba(255,215,0,0.3)'
-            }}>
-              ✨ MOST POPULAR
-            </span>
-
+          {/* Pro Subscription Hero Card */}
+          <div className="relative w-full mb-6">
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="w-full py-4 rounded-2xl text-white font-bold text-lg transition-all duration-100 active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-hidden"
               style={{
-                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                boxShadow: '0 8px 30px rgba(0,212,255,0.35)'
+                background: 'linear-gradient(135deg, #00d4ff 0%, #0077ff 100%)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                boxShadow: 'var(--shadow-physical), 0 0 40px rgba(0,212,255,0.2)'
               }}
             >
-              {checkoutLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  Loading...
+              {/* Shine effect */}
+              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
+
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-white text-2xl font-black leading-tight">Elite Pro</h3>
+                  <p className="text-white/70 text-sm">Full psycho-analysis access</p>
+                </div>
+                <span className="text-3xl">👑</span>
+              </div>
+
+              <div className="space-y-2 mb-6">
+                {[
+                  '25 outfit ratings/day',
+                  'Identity Reflection Insights',
+                  'Social Perception Analysis',
+                  'All Modes: Roast, Honest, Nice'
+                ].map((benefit, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs font-bold text-white/90">
+                    <span className="text-white">✓</span>
+                    <span>{benefit}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-white">$2.99</span>
+                <span className="text-white/60 text-sm mb-1 pb-1">/ week</span>
+                <span className="ml-auto text-[10px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
+                  Most Popular
                 </span>
-              ) : (
-                <span>
-                  <span className="line-through text-white/50 text-sm mr-2">$3.99</span>
-                  $2.99/week
-                </span>
-              )}
+              </div>
             </button>
           </div>
 
+          <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR GRAB A SCAN PACK —</p>
+
+
           {/* Scan Packs Section - Supercell Style Loot Cards */}
-          <div className="w-full mb-4">
-            <p className="text-center text-xs text-gray-500 mb-3">— or buy scans —</p>
-            <div className="flex gap-2 justify-center">
-              {/* Starter Pack */}
-              <button
-                onClick={() => startCheckout('starterPack')}
-                disabled={checkoutLoading}
-                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.12)'
-                }}
-              >
-                <span className="block text-2xl font-black text-white">5</span>
-                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
-                <span className="block text-sm font-bold text-white mt-1">$1.99</span>
-              </button>
+          <div className="grid grid-cols-3 gap-3">
+            {/* Starter Pack */}
+            <button
+              onClick={() => startCheckout('starterPack')}
+              disabled={checkoutLoading}
+              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}
+            >
+              <span className="block text-2xl font-black text-white">5</span>
+              <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
+              <span className="block text-sm font-bold text-white mt-1">$1.99</span>
+            </button>
 
-              {/* Popular Pack - BEST VALUE */}
-              <button
-                onClick={() => startCheckout('popularPack')}
-                disabled={checkoutLoading}
-                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] relative disabled:opacity-50"
-                style={{
-                  background: 'rgba(0,212,255,0.12)',
-                  border: '2px solid #00d4ff',
-                  boxShadow: '0 0 20px rgba(0,212,255,0.15)'
-                }}
-              >
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] font-black px-3 py-1 rounded-full" style={{
-                  background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                  color: '#000'
-                }}>BEST</span>
-                <span className="block text-2xl font-black text-cyan-400">15</span>
-                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
-                <span className="block text-sm font-bold text-white mt-1">$3.99</span>
-              </button>
+            {/* Popular Pack - Supercell Highlight */}
+            <button
+              onClick={() => startCheckout('popularPack')}
+              disabled={checkoutLoading}
+              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px] relative overflow-hidden"
+              style={{
+                background: 'rgba(0,212,255,0.1)',
+                border: '2px solid #00d4ff',
+                boxShadow: 'var(--shadow-physical), 0 0 20px rgba(0,212,255,0.2)'
+              }}
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400" />
+              <span className="block text-3xl font-black text-cyan-400">15</span>
+              <span className="block text-[9px] text-cyan-400/70 uppercase font-black">scans</span>
+              <span className="block text-sm font-bold text-white mt-1">$3.99</span>
+            </button>
 
-              {/* Power Pack */}
-              <button
-                onClick={() => startCheckout('powerPack')}
-                disabled={checkoutLoading}
-                className="flex-1 p-4 rounded-2xl text-center transition-all duration-100 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.12)'
-                }}
-              >
-                <span className="block text-2xl font-black text-white">50</span>
-                <span className="block text-[10px] text-gray-400 uppercase tracking-wide">scans</span>
-                <span className="block text-sm font-bold text-white mt-1">$9.99</span>
-              </button>
-            </div>
+            {/* Power Pack */}
+            <button
+              onClick={() => startCheckout('powerPack')}
+              disabled={checkoutLoading}
+              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}
+            >
+              <span className="block text-2xl font-black text-white">50</span>
+              <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
+              <span className="block text-sm font-bold text-white mt-1">$9.99</span>
+            </button>
           </div>
 
           {/* SAVAGE Roast option */}

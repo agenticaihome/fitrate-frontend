@@ -7,6 +7,15 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  user-select: none; /* Prevent accidental text selection on mobile */
+}
+
+:root {
+  --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-physical: 0 8px 0 rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.3);
+  --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
+  --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
 }
 
 html, body, #root {
@@ -94,9 +103,29 @@ body {
   animation: scaleIn 0.3s ease-out forwards;
 }
 
-/* Button press effect */
-button:active {
-  transform: scale(0.97);
+/* Physical UI Components */
+.btn-physical {
+  position: relative;
+  transition: var(--transition-fast);
+  transform: translateY(0);
+  box-shadow: var(--shadow-physical);
+}
+
+.btn-physical:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card-physical {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  transition: var(--transition-normal);
+}
+
+.card-physical:active {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.99);
 }
 
 /* Gradient text utility */
