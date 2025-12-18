@@ -1829,37 +1829,55 @@ export default function App() {
           </div>
         </div>
 
-        {/* LOCKED FEATURES PREVIEW - Show free users what Pro offers */}
+        {/* PRO PREVIEW - Blurred content to create desire */}
         {!isPro && !scores.savageLevel && (
           <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="p-3 rounded-xl" style={{
-              background: 'rgba(255,215,0,0.05)',
-              border: '1px dashed rgba(255,215,0,0.3)'
+            <div className="p-4 rounded-xl relative overflow-hidden" style={{
+              background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.08) 100%)',
+              border: '1px solid rgba(255,215,0,0.3)'
             }}>
-              <p className="text-center text-[10px] text-yellow-400/70 mb-2">🔒 UNLOCK WITH PRO</p>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  <span>🔒</span>
-                  <span>3 More Styling Tips</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  <span>🔒</span>
-                  <span>Color Palette Analysis</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                  <span>🔒</span>
-                  <span>Savage Roast Mode 🔥</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowPaywall(true)}
-                className="w-full mt-3 py-2 rounded-lg text-xs font-bold transition-all active:scale-95"
-                style={{
+              {/* Pro Badge */}
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold" style={{
                   background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
                   color: '#000'
+                }}>⚡ PRO ANALYSIS</span>
+              </div>
+
+              {/* Blurred Savage Level */}
+              <div className="mb-3 p-2 rounded-lg relative" style={{ background: 'rgba(255,68,68,0.1)' }}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>Savage Level</span>
+                  <span className="text-sm font-bold" style={{ color: '#ff4444', filter: 'blur(4px)' }}>7/10 🔥</span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                  <div className="h-full rounded-full" style={{
+                    width: '70%',
+                    background: 'linear-gradient(90deg, #ff4444, #ff6b6b)',
+                    filter: 'blur(3px)'
+                  }} />
+                </div>
+              </div>
+
+              {/* Blurred Item Roast Preview */}
+              <div className="p-2 rounded-lg mb-3" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <p className="text-[10px] mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Item Roast Preview:</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)', filter: 'blur(5px)' }}>
+                  "Those sneakers are fire but that chain looks like it came from..."
+                </p>
+              </div>
+
+              {/* Unlock Button */}
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="w-full py-2.5 rounded-lg text-sm font-bold transition-all active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                  color: '#000',
+                  boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
                 }}
               >
-                Unlock Pro Features ✨
+                Unlock Full Analysis 🔓
               </button>
             </div>
           </div>
