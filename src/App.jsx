@@ -121,6 +121,7 @@ export default function App() {
   const canvasRef = useRef(null)
   const [cameraStream, setCameraStream] = useState(null)
   const [cameraError, setCameraError] = useState(null)
+  const [countdown, setCountdown] = useState(null) // null = no timer, 3/2/1 = counting
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -1015,9 +1016,36 @@ export default function App() {
 
     // Stop camera and analyze
     stopCamera()
+    setCountdown(null)
     setUploadedImage(imageData)
     analyzeOutfit(imageData)
   }, [stopCamera, analyzeOutfit])
+
+  // Timer capture - 3 second countdown then capture
+  const timerCapture = useCallback(() => {
+    if (countdown !== null) return // Already counting
+
+    playSound('tick')
+    vibrate(20)
+    setCountdown(3)
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev === null) {
+          clearInterval(timer)
+          return null
+        }
+        if (prev <= 1) {
+          clearInterval(timer)
+          setTimeout(() => capturePhoto(), 100)
+          return null
+        }
+        playSound('tick')
+        vibrate(20)
+        return prev - 1
+      })
+    }, 1000)
+  }, [countdown, capturePhoto])
 
   const resetApp = useCallback(() => {
     stopCamera()
@@ -1137,7 +1165,8 @@ export default function App() {
             {/* Capture button - BIG */}
             <button
               onClick={capturePhoto}
-              className="w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95"
+              disabled={countdown !== null}
+              className="w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
               style={{
                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                 boxShadow: '0 0 30px rgba(0,212,255,0.5)',
@@ -1147,19 +1176,39 @@ export default function App() {
               <span className="text-3xl">📸</span>
             </button>
 
-            {/* Gallery button */}
+            {/* Timer button (3s countdown) */}
             <button
-              onClick={() => {
-                stopCamera()
-                setScreen('home')
-                setTimeout(() => fileInputRef.current?.click(), 100)
-              }}
-              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95"
+              onClick={timerCapture}
+              disabled={countdown !== null}
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95 disabled:opacity-50"
             >
-              <span className="text-white text-2xl">🖼️</span>
+              <span className="text-white text-lg font-bold">3s</span>
             </button>
           </div>
         </div>
+
+        {/* Gallery button - top right corner */}
+        <button
+          onClick={() => {
+            stopCamera()
+            setScreen('home')
+            setTimeout(() => fileInputRef.current?.click(), 100)
+          }}
+          className="absolute top-safe right-4 mt-4 w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm"
+        >
+          <span className="text-white text-xl">🖼️</span>
+        </button>
+
+        {/* Countdown overlay */}
+        {countdown !== null && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-9xl font-black text-white animate-pulse" style={{
+              textShadow: '0 0 60px rgba(0,212,255,0.8), 0 0 120px rgba(0,212,255,0.5)'
+            }}>
+              {countdown}
+            </div>
+          </div>
+        )}
 
         {/* Mode indicator */}
         <div className="absolute top-safe left-0 right-0 flex justify-center pt-4">
