@@ -65,6 +65,12 @@ export default function App() {
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
 
+  // Track last score for "you improved!" messaging
+  const [lastScore, setLastScore] = useState(() => {
+    const saved = localStorage.getItem('fitrate_last_score')
+    return saved ? parseInt(saved) : null
+  })
+
   // Challenge a Friend (score from URL)
   const [challengeScore, setChallengeScore] = useState(() => {
     const params = new URLSearchParams(window.location.search)
@@ -582,8 +588,13 @@ export default function App() {
           ...data.scores,
           percentile: getPercentile(data.scores.overall),
           isLegendary: data.scores.overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
-          shareTip: getRandomShareTip()
+          shareTip: getRandomShareTip(),
+          previousScore: lastScore // For "you improved!" messaging
         }
+
+        // Save this score as the new lastScore
+        localStorage.setItem('fitrate_last_score', data.scores.overall.toString())
+        setLastScore(data.scores.overall)
 
         setScores(scores)
         setScreen('results')
@@ -1605,7 +1616,28 @@ export default function App() {
           <p className="text-sm font-bold mb-1" style={{
             color: scores.overall >= 80 ? '#00ff88' : (scores.overall >= 60 ? '#00d4ff' : '#ff6b6b')
           }}>
-            {scores.overall >= 85 ? '🔥 This would go VIRAL' : (scores.overall >= 70 ? '👀 TikTok-worthy' : '😬 Room for improvement')}
+            {(() => {
+              // Mode-specific viral hooks - Nice mode is more supportive
+              if (scores.roastMode) {
+                // Roast mode - brutal
+                if (scores.overall >= 60) return '😏 You survived'
+                if (scores.overall >= 45) return '💀 Rough day for your closet'
+                return '☠️ AI showed no mercy'
+              } else if (scores.mode === 'honest') {
+                // Honest mode - balanced
+                if (scores.overall >= 85) return '🔥 Post this immediately'
+                if (scores.overall >= 70) return '👍 Solid fit, respectable'
+                if (scores.overall >= 55) return '📊 Average range'
+                return '📉 Needs work'
+              } else {
+                // Nice mode - supportive (lower thresholds)
+                if (scores.overall >= 90) return '🔥 LEGENDARY — Post this NOW'
+                if (scores.overall >= 80) return '✨ Main character energy'
+                if (scores.overall >= 70) return '💅 Serve! TikTok would approve'
+                if (scores.overall >= 60) return '👀 Cute! Minor tweaks = viral'
+                return '💪 Good foundation, keep styling!'
+              }
+            })()}
           </p>
           <p className="text-xs font-medium" style={{
             color: scores.isLegendary ? '#ffd700' : 'rgba(255,255,255,0.5)',
@@ -1613,6 +1645,20 @@ export default function App() {
           }}>
             {scores.isLegendary ? "🌟 TOP 1% OF ALL TIME" : `Better than ${scores.percentile}% today`}
           </p>
+
+          {/* "You improved!" messaging */}
+          {scores.previousScore !== null && (
+            <p className="text-xs font-bold mt-1" style={{
+              color: scores.overall > scores.previousScore ? '#00ff88' :
+                scores.overall < scores.previousScore ? '#ff6b6b' : '#00d4ff'
+            }}>
+              {scores.overall > scores.previousScore
+                ? `📈 +${scores.overall - scores.previousScore} from last time!`
+                : scores.overall < scores.previousScore
+                  ? `📉 ${scores.previousScore - scores.overall} lower than before`
+                  : '➡️ Same as last time'}
+            </p>
+          )}
         </div>
 
         {/* Photo - Smaller, clean */}
