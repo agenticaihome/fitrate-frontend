@@ -253,26 +253,22 @@ export default function App() {
     }
   }
 
-  // Start Stripe Checkout session
-  const startCheckout = async (product) => {
-    setCheckoutLoading(true)
-    try {
-      const res = await fetch(`${API_BASE}/checkout/create-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, userId, email: proEmail })
-      })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        displayToast('Failed to start checkout')
-        setCheckoutLoading(false)
-      }
-    } catch (err) {
-      console.error('Checkout error:', err)
-      displayToast('Checkout failed, try again')
-      setCheckoutLoading(false)
+  // Stripe Payment Links
+  const STRIPE_LINKS = {
+    proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',        // $2.99/week
+    proWeeklyDiscount: 'https://buy.stripe.com/8x214p2SI8AX8PtfztfYY03', // $1.99/week (decline offer)
+    proRoast: 'https://buy.stripe.com/placeholder' // TODO: Add Pro Roast link if needed
+  }
+
+  // Open Stripe checkout
+  const startCheckout = (product) => {
+    const url = STRIPE_LINKS[product]
+    if (url && !url.includes('placeholder')) {
+      // Add userId for webhook tracking
+      const checkoutUrl = `${url}?client_reference_id=${userId}`
+      window.location.href = checkoutUrl
+    } else {
+      displayToast('Checkout not available yet')
     }
   }
 
