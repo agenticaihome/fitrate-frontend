@@ -270,7 +270,11 @@ export default function App() {
   const STRIPE_LINKS = {
     proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',        // $2.99/week
     proWeeklyDiscount: 'https://buy.stripe.com/8x214p2SI8AX8PtfztfYY03', // $1.99/week (decline offer)
-    proRoast: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01' // $0.99 one-time
+    proRoast: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',         // $0.99 one-time
+    // Scan Packs (one-time)
+    starterPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04',      // 5 scans - $1.99
+    popularPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05',      // 15 scans - $3.99
+    powerPack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06'         // 50 scans - $9.99
   }
 
   // Open Stripe checkout
@@ -2417,6 +2421,55 @@ export default function App() {
           >
             {checkoutLoading ? 'Loading...' : '$2.99/week · Cancel anytime'}
           </button>
+
+          {/* Scan Packs Section */}
+          <div className="w-full mb-4">
+            <p className="text-center text-xs text-gray-500 mb-3">— or buy scans —</p>
+            <div className="flex gap-2 justify-center">
+              {/* Starter Pack */}
+              <button
+                onClick={() => startCheckout('starterPack')}
+                disabled={checkoutLoading}
+                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+              >
+                <span className="block text-lg font-bold text-white">5</span>
+                <span className="block text-xs text-gray-400">$1.99</span>
+              </button>
+
+              {/* Popular Pack - BEST VALUE */}
+              <button
+                onClick={() => startCheckout('popularPack')}
+                disabled={checkoutLoading}
+                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95 relative"
+                style={{
+                  background: 'rgba(0,212,255,0.15)',
+                  border: '2px solid #00d4ff'
+                }}
+              >
+                <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold px-2 py-0.5 rounded-full bg-cyan-500 text-black">BEST</span>
+                <span className="block text-lg font-bold text-cyan-400">15</span>
+                <span className="block text-xs text-gray-400">$3.99</span>
+              </button>
+
+              {/* Power Pack */}
+              <button
+                onClick={() => startCheckout('powerPack')}
+                disabled={checkoutLoading}
+                className="flex-1 py-3 px-2 rounded-xl text-center transition-all active:scale-95"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+              >
+                <span className="block text-lg font-bold text-white">50</span>
+                <span className="block text-xs text-gray-400">$9.99</span>
+              </button>
+            </div>
+          </div>
 
           {/* Pro Roast option */}
           <button
