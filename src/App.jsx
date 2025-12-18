@@ -1701,7 +1701,7 @@ export default function App() {
             </span>
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] animate-pulse">Tap to Start</p>
+              <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">Tap to Start</p>
             </div>
           </button>
         </div>
@@ -1753,21 +1753,22 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300 ${isPro ? '' : 'opacity-60'}`}
+            className={`relative flex items-center gap-1.5 px-3 py-2 rounded-2xl transition-all duration-300 ${isPro ? '' : 'opacity-70'}`}
             style={{
               background: mode === 'savage' && isPro ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.1)',
-              border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)'
+              border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)',
+              marginTop: !isPro ? '4px' : '0'
             }}
           >
             {!isPro && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap z-10" style={{
                 background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
                 color: '#000'
               }}>PRO</span>
             )}
-            <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
-            <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Savage</span>
-            {!isPro && <span className="text-[10px]">🔒</span>}
+            <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-60'}`}>💀</span>
+            <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-60 text-gray-400'}`}>Savage</span>
+            {!isPro && <span className="text-[10px] ml-0.5">🔒</span>}
           </button>
         </div>
 
@@ -1799,7 +1800,7 @@ export default function App() {
           <div className="flex flex-col items-center gap-3">
             {scansRemaining > 0 || isPro ? (
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {isPro ? '⚡ 25 Elite Scans per Day' : `${scansRemaining} free fit${scansRemaining !== 1 ? 's' : ''} left today`}
+                {isPro ? '⚡ 25 ratings per day' : `${scansRemaining} free rating${scansRemaining !== 1 ? 's' : ''} left today`}
               </p>
             ) : (
               <button
@@ -1812,7 +1813,7 @@ export default function App() {
                 }}
               >
                 <span className="text-xs font-black" style={{ color: '#ffd700' }}>
-                  REFILL SCANS · UNLOCK PRO 👑
+                  GET MORE RATINGS 👑
                 </span>
               </button>
             )}
@@ -1820,18 +1821,18 @@ export default function App() {
             {!isPro && scansRemaining > 0 && (
               <button
                 onClick={() => setShowPaywall(true)}
-                className="text-[10px] font-black tracking-[0.2em] text-orange-400 opacity-60 hover:opacity-100 transition-opacity uppercase"
+                className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase"
               >
-                Get 25 Scans per Day →
+                Go Unlimited →
               </button>
             )}
           </div>
 
           {/* Footer Links - Compact */}
           <div className="flex justify-center gap-6 pb-2">
-            <a href="/privacy" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Privacy</a>
-            <a href="/terms" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Terms</a>
-            <a href="/about" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>About</a>
+            <a href="/privacy" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy</a>
+            <a href="/terms" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Terms</a>
+            <a href="/about" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>About</a>
           </div>
         </div>
 
@@ -1849,21 +1850,14 @@ export default function App() {
                 <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
                   boxShadow: '0 0 60px rgba(255,215,0,0.2)'
                 }}>
-                  <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
-                  <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
+                  <p className="text-yellow-400 font-bold text-lg mb-2">✨ Special Offer</p>
+                  <h2 className="text-white text-2xl font-black mb-4">Try Pro for less</h2>
 
-                  <p className="text-gray-400 mb-2">
-                    Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
+                  <p className="text-gray-400 mb-4">
+                    Get Unlimited for just <span className="text-yellow-400 font-bold">$1.99/week</span>
                     <br />
-                    <span className="text-xs">(then $2.99/week, cancel anytime)</span>
+                    <span className="text-xs">(Regular price $2.99/week, cancel anytime)</span>
                   </p>
-
-                  {/* Countdown Timer */}
-                  {declineCountdown && (
-                    <p className="text-center mb-4 text-yellow-400/80 font-bold">
-                      ⏳ Offer expires in {Math.floor(declineCountdown / 60)}:{String(declineCountdown % 60).padStart(2, '0')}
-                    </p>
-                  )}
 
                   <button
                     onClick={() => startCheckout('proWeeklyDiscount')}
@@ -1879,7 +1873,7 @@ export default function App() {
                         <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
                         Loading...
                       </span>
-                    ) : '🔥 Claim This Deal'}
+                    ) : 'Get This Deal'}
                   </button>
 
                   <p className="text-center text-[10px] text-gray-500 mb-3">
@@ -1893,7 +1887,7 @@ export default function App() {
                     }}
                     className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
                   >
-                    No thanks, I'll pay full price later
+                    Maybe later
                   </button>
                 </div>
               </div>
@@ -1916,8 +1910,8 @@ export default function App() {
 
               <div className="text-center mb-6">
                 <span className="text-4xl mb-2 block">👑</span>
-                <h2 className="text-white text-2xl font-black">Go Pro</h2>
-                <p className="text-gray-400 text-sm mt-1">Unlock 25 scans per day</p>
+                <h2 className="text-white text-2xl font-black">Go Unlimited</h2>
+                <p className="text-gray-400 text-sm mt-1">Get 25 outfit ratings every day</p>
               </div>
 
               {/* Pro Subscription Hero Card */}
@@ -1937,18 +1931,18 @@ export default function App() {
 
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-white text-2xl font-black leading-tight">Elite Pro</h3>
-                      <p className="text-white/70 text-sm">Full psycho-analysis access</p>
+                      <h3 className="text-white text-2xl font-black leading-tight">Unlimited</h3>
+                      <p className="text-white/70 text-sm">All features included</p>
                     </div>
                     <span className="text-3xl">👑</span>
                   </div>
 
                   <div className="space-y-2 mb-6">
                     {[
-                      '25 outfit ratings/day',
-                      'Identity Reflection Insights',
-                      'Social Perception Analysis',
-                      'All Modes: Roast, Honest, Nice'
+                      '25 outfit ratings per day',
+                      'What your style says about you',
+                      'How others see your outfit',
+                      'All modes: Nice, Honest, Roast'
                     ].map((benefit, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs font-bold text-white/90">
                         <span className="text-white">✓</span>
@@ -1961,13 +1955,13 @@ export default function App() {
                     <span className="text-3xl font-black text-white">$2.99</span>
                     <span className="text-white/60 text-sm mb-1 pb-1">/ week</span>
                     <span className="ml-auto text-[10px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
-                      Most Popular
+                      Best Value
                     </span>
                   </div>
                 </button>
               </div>
 
-              <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR GRAB A SCAN PACK —</p>
+              <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR PAY PER RATING —</p>
 
               {/* Scan Packs Section - Supercell Style Loot Cards */}
               <div className="grid grid-cols-3 gap-3">
@@ -1982,7 +1976,7 @@ export default function App() {
                   }}
                 >
                   <span className="block text-2xl font-black text-white">5</span>
-                  <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
+                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
                   <span className="block text-sm font-bold text-white mt-1">$1.99</span>
                 </button>
 
@@ -1999,7 +1993,7 @@ export default function App() {
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400" />
                   <span className="block text-3xl font-black text-cyan-400">15</span>
-                  <span className="block text-[9px] text-cyan-400/70 uppercase font-black">scans</span>
+                  <span className="block text-[9px] text-cyan-400/70 uppercase font-black">ratings</span>
                   <span className="block text-sm font-bold text-white mt-1">$3.99</span>
                 </button>
 
@@ -2014,7 +2008,7 @@ export default function App() {
                   }}
                 >
                   <span className="block text-2xl font-black text-white">50</span>
-                  <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
+                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
                   <span className="block text-sm font-bold text-white mt-1">$9.99</span>
                 </button>
               </div>
@@ -2032,14 +2026,14 @@ export default function App() {
                 💀 Or get 1 SAVAGE Roast for $0.99
               </button>
 
-              {/* Invite 3 → Get 15 Free Scans */}
+              {/* Invite 3 → Get 15 Free Ratings */}
               <div className="w-full p-4 rounded-2xl mb-4" style={{
                 background: 'rgba(0,255,136,0.06)',
                 border: '1px dashed rgba(0,255,136,0.3)'
               }}>
-                <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE SCANS</p>
+                <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE RATINGS</p>
                 <p className="text-center text-white text-sm font-bold mb-2">
-                  Invite 3 friends → Get 15 free scans
+                  Invite 3 friends → Get 15 free ratings
                 </p>
                 <div className="flex items-center justify-center gap-1 mb-3">
                   {[0, 1, 2].map(i => {
@@ -2188,7 +2182,7 @@ export default function App() {
               <span>🔒</span><span>Item-by-item roasts (Pro)</span>
             </div>
             <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-              <span>🔒</span><span>GPT-4 Vision analysis (Pro)</span>
+              <span>🔒</span><span>Advanced AI analysis (Pro)</span>
             </div>
           </div>
         )}
@@ -2311,7 +2305,7 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <p className="text-center text-[9px] font-black text-white/20 uppercase tracking-widest mt-4 group-active:text-white/40">Tap card to share</p>
+            <p className="text-center text-[11px] font-black text-white/40 uppercase tracking-widest mt-4 group-active:text-white/60">Tap to share</p>
           </button>
         </div>
 
@@ -2460,15 +2454,14 @@ export default function App() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <span className="text-7xl mb-6">👗</span>
-        <p className="text-xl font-semibold text-white mb-2">{error || "Something went wrong"}</p>
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Give it another shot</p>
+        <p className="text-xl font-semibold text-white mb-2">{error || "Oops! We couldn't rate that one"}</p>
+        <p className="text-sm mb-8 text-center px-4" style={{ color: 'rgba(255,255,255,0.5)' }}>Try a clearer photo or check your connection</p>
         <button
           onClick={resetApp}
-          className="px-8 py-4 rounded-2xl text-white font-semibold transition-all hover:scale-105"
+          className="btn-physical px-8 py-4 rounded-2xl text-white font-semibold transition-all active:scale-[0.97]"
           style={{
-            background: 'rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+            boxShadow: 'var(--shadow-physical), 0 0 30px rgba(0,212,255,0.3)'
           }}
         >
           Try Again
@@ -2536,9 +2529,9 @@ export default function App() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <div className="text-7xl mb-6">🎉</div>
-        <h2 className="text-4xl font-black text-white mb-3">Welcome to FitPass!</h2>
+        <h2 className="text-4xl font-black text-white mb-3">Welcome to Pro!</h2>
         <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          25 AI outfit ratings per day unlocked
+          You're now unlimited
         </p>
 
         <div className="p-6 rounded-2xl mb-8 text-center" style={{
@@ -2547,9 +2540,9 @@ export default function App() {
           backdropFilter: 'blur(10px)'
         }}>
           <p className="text-base" style={{ color: '#00ff88' }}>
-            ✨ 25 scans per day<br />
-            🤖 Real GPT-4 Vision AI<br />
-            🔥 vs 1 free scan for non-Pro
+            ✨ 25 ratings per day<br />
+            🤖 Advanced AI analysis<br />
+            🔥 All modes unlocked
           </p>
         </div>
 
@@ -2758,6 +2751,11 @@ export default function App() {
       window.location.href = isIOS ? `sms:&body=${text}` : `sms:?body=${text}`
     }
 
+    const shareToWhatsApp = () => {
+      const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
+      window.open(`https://wa.me/?text=${text}`, '_blank')
+    }
+
     // Check if native share is available
     const hasNativeShare = typeof navigator.share === 'function'
 
@@ -2841,55 +2839,66 @@ export default function App() {
           <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
             Or share directly to:
           </p>
-          <div className="grid grid-cols-5 gap-2">
-            {/* Copy Link */}
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            {/* WhatsApp - Primary */}
             <button
-              onClick={copyShareLink}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              onClick={shareToWhatsApp}
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(37,211,102,0.15)', border: '1px solid rgba(37,211,102,0.3)' }}
             >
-              <span className="text-xl mb-1">🔗</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Copy</span>
+              <span className="text-2xl mb-1">💬</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>WhatsApp</span>
             </button>
 
             {/* SMS/Text */}
             <button
               onClick={shareToSMS}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
               style={{ background: 'rgba(255,255,255,0.1)' }}
             >
-              <span className="text-xl mb-1">💬</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Text</span>
+              <span className="text-2xl mb-1">📱</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Message</span>
             </button>
 
+            {/* Copy Link */}
+            <button
+              onClick={copyShareLink}
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-2xl mb-1">🔗</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Copy Link</span>
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
             {/* X (Twitter) */}
             <button
               onClick={shareToTwitter}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">𝕏</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>X</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>X</span>
             </button>
 
             {/* Facebook */}
             <button
               onClick={shareToFacebook}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">📘</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>FB</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Facebook</span>
             </button>
 
             {/* Reddit */}
             <button
               onClick={shareToReddit}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">🤖</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Reddit</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Reddit</span>
             </button>
           </div>
         </div>
