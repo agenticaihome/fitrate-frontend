@@ -954,9 +954,8 @@ export default function App() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: facing,
-          width: { ideal: 1280 },
-          height: { ideal: 1920 }
+          facingMode: facing
+          // Let browser choose best resolution - prevent zoom/crop issues
         },
         audio: false
       })
