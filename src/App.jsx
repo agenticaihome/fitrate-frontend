@@ -1715,10 +1715,14 @@ export default function App() {
         {!isPro && scansRemaining <= 1 && (
           <button
             onClick={() => setShowPaywall(true)}
-            className="text-[10px] mt-3 underline transition-all"
-            style={{ color: 'rgba(255,215,0,0.7)' }}
+            className="flex items-center gap-1 text-xs mt-3 px-3 py-1.5 rounded-full transition-all active:scale-95 hover:opacity-100"
+            style={{
+              color: '#ffd700',
+              background: 'rgba(255,215,0,0.1)',
+              border: '1px solid rgba(255,215,0,0.3)'
+            }}
           >
-            Pro gets 25 scans/day + SAVAGE mode →
+            ⚡ Pro gets 25 scans/day + SAVAGE mode →
           </button>
         )}
 
@@ -1753,6 +1757,15 @@ export default function App() {
           <a href="/privacy" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy</a>
           <a href="/terms" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms</a>
           <a href="/about" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>About</a>
+          {!isPro && (
+            <button
+              onClick={() => setShowPaywall(true)}
+              className="text-[10px] transition-opacity hover:opacity-100"
+              style={{ color: 'rgba(255,215,0,0.5)' }}
+            >
+              Go Pro ⚡
+            </button>
+          )}
         </div>
 
         <style>{`
