@@ -873,6 +873,30 @@ export default function App() {
     ctx.stroke()
     ctx.shadowBlur = 0
 
+    // PRO BADGE - Gold banner for Pro users or purchased scans
+    if (isPro || scores.savageLevel) {
+      // Gold gradient badge background
+      const badgeWidth = 200
+      const badgeHeight = 36
+      const badgeX = (1080 - badgeWidth) / 2
+      const badgeY = 925
+
+      const goldGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY)
+      goldGradient.addColorStop(0, '#ffd700')
+      goldGradient.addColorStop(1, '#ff8c00')
+
+      ctx.fillStyle = goldGradient
+      ctx.beginPath()
+      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18)
+      ctx.fill()
+
+      // Badge text
+      ctx.fillStyle = '#000'
+      ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('⚡ PRO ANALYSIS', 540, 950)
+    }
+
     // Score number - BIG
     ctx.fillStyle = scoreColor
     ctx.font = 'bold 72px -apple-system, BlinkMacSystemFont, sans-serif'
@@ -1761,6 +1785,42 @@ export default function App() {
             </p>
           </div>
         </div>
+
+        {/* LOCKED FEATURES PREVIEW - Show free users what Pro offers */}
+        {!isPro && !scores.savageLevel && (
+          <div className={`w-full max-w-xs mb-4 transition-all duration-500 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="p-3 rounded-xl" style={{
+              background: 'rgba(255,215,0,0.05)',
+              border: '1px dashed rgba(255,215,0,0.3)'
+            }}>
+              <p className="text-center text-[10px] text-yellow-400/70 mb-2">🔒 UNLOCK WITH PRO</p>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <span>🔒</span>
+                  <span>3 More Styling Tips</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <span>🔒</span>
+                  <span>Color Palette Analysis</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <span>🔒</span>
+                  <span>Savage Roast Mode 🔥</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="w-full mt-3 py-2 rounded-lg text-xs font-bold transition-all active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                  color: '#000'
+                }}
+              >
+                Unlock Pro Features ✨
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* PRO EXCLUSIVE: Savage Level + Item Roasts */}
         {scores.savageLevel && (
