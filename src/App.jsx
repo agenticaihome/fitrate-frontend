@@ -2476,18 +2476,33 @@ export default function App() {
             ))}
           </div>
 
-          {/* Pricing */}
-          <button
-            onClick={() => startCheckout('proWeekly')}
-            disabled={checkoutLoading}
-            className="w-full py-4 rounded-2xl text-white font-bold text-lg mb-3 transition-all active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-              boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
-            }}
-          >
-            {checkoutLoading ? 'Loading...' : '$2.99/week · Cancel anytime'}
-          </button>
+          {/* Pricing with anchor */}
+          <div className="relative w-full mb-3">
+            {/* MOST POPULAR badge */}
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold z-10" style={{
+              background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+              color: '#000'
+            }}>
+              ✨ MOST POPULAR
+            </span>
+
+            <button
+              onClick={() => startCheckout('proWeekly')}
+              disabled={checkoutLoading}
+              className="w-full py-4 rounded-2xl text-white font-bold text-lg transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+              }}
+            >
+              {checkoutLoading ? 'Loading...' : (
+                <span>
+                  <span className="line-through text-white/50 text-sm mr-2">$3.99</span>
+                  $2.99/week
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* Scan Packs Section */}
           <div className="w-full mb-4">
