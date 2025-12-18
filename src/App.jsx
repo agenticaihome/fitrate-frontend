@@ -208,6 +208,18 @@ export default function App() {
     }
   }, [userId])
 
+  // Offline/Online detection
+  useEffect(() => {
+    const handleOffline = () => displayToast('No internet connection 📵')
+    const handleOnline = () => displayToast('Back online ✅')
+    window.addEventListener('offline', handleOffline)
+    window.addEventListener('online', handleOnline)
+    return () => {
+      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener('online', handleOnline)
+    }
+  }, [])
+
   // Check if email is Pro
   const checkProStatus = async (email) => {
     try {
