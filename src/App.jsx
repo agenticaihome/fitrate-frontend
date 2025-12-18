@@ -117,8 +117,10 @@ export default function App() {
   const [analysisProgress, setAnalysisProgress] = useState(0)
 
   const fileInputRef = useRef(null)
-  const cameraInputRef = useRef(null)
-  const [showCameraChoice, setShowCameraChoice] = useState(false)
+  const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+  const [cameraStream, setCameraStream] = useState(null)
+  const [cameraError, setCameraError] = useState(null)
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -940,14 +942,79 @@ export default function App() {
     }
   }
 
+  // Camera functions for live webcam capture
+  const startCamera = useCallback(async () => {
+    setCameraError(null)
+    try {
+      // Request camera with preference for rear camera on mobile
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment', // Prefer rear camera
+          width: { ideal: 1280 },
+          height: { ideal: 1920 }
+        },
+        audio: false
+      })
+      setCameraStream(stream)
+      setScreen('camera')
+
+      // Connect stream to video element after screen renders
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          videoRef.current.play()
+        }
+      }, 100)
+    } catch (err) {
+      console.error('Camera error:', err)
+      // Camera not available - fall back to file picker
+      setCameraError(err.message)
+      fileInputRef.current?.click()
+    }
+  }, [])
+
+  const capturePhoto = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return
+
+    playSound('shutter')
+    vibrate(50)
+
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+
+    // Set canvas size to match video
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+
+    // Draw video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+    // Get image data as base64
+    const imageData = canvas.toDataURL('image/jpeg', 0.9)
+
+    // Stop camera and analyze
+    stopCamera()
+    setUploadedImage(imageData)
+    analyzeOutfit(imageData)
+  }, [analyzeOutfit])
+
+  const stopCamera = useCallback(() => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop())
+      setCameraStream(null)
+    }
+  }, [cameraStream])
+
   const resetApp = useCallback(() => {
+    stopCamera()
     setScreen('home')
     setUploadedImage(null)
     setScores(null)
     setError(null)
     setRevealStage(0)
     if (fileInputRef.current) fileInputRef.current.value = ''
-  }, [])
+  }, [stopCamera])
 
   // Global toast notification (replaces browser alerts)
   const displayToast = useCallback((message, duration = 2500) => {
@@ -1024,6 +1091,76 @@ export default function App() {
   }, [screen])
 
   // ============================================
+  // CAMERA SCREEN - Full screen live camera
+  // ============================================
+  if (screen === 'camera') {
+    return (
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        {/* Live camera preview */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="flex-1 object-cover w-full"
+          style={{ transform: 'scaleX(-1)' }} // Mirror for selfie feel
+        />
+
+        {/* Camera controls overlay */}
+        <div className="absolute bottom-0 left-0 right-0 pb-safe">
+          {/* Control bar */}
+          <div className="flex items-center justify-center gap-8 py-8 bg-gradient-to-t from-black/90 to-transparent">
+            {/* Cancel button */}
+            <button
+              onClick={() => {
+                stopCamera()
+                setScreen('home')
+              }}
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95"
+            >
+              <span className="text-white text-2xl">✕</span>
+            </button>
+
+            {/* Capture button - BIG */}
+            <button
+              onClick={capturePhoto}
+              className="w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                boxShadow: '0 0 30px rgba(0,212,255,0.5)',
+                border: '4px solid white'
+              }}
+            >
+              <span className="text-3xl">📸</span>
+            </button>
+
+            {/* Gallery button */}
+            <button
+              onClick={() => {
+                stopCamera()
+                setScreen('home')
+                setTimeout(() => fileInputRef.current?.click(), 100)
+              }}
+              className="w-14 h-14 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-sm transition-all active:scale-95"
+            >
+              <span className="text-white text-2xl">🖼️</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mode indicator */}
+        <div className="absolute top-safe left-0 right-0 flex justify-center pt-4">
+          <div className="px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+            <span className="text-white text-sm font-medium">
+              {mode === 'roast' ? '🔥 Roast Mode' : mode === 'honest' ? '📊 Honest Mode' : '✨ Nice Mode'}
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // ============================================
   if (screen === 'home') {
@@ -1052,56 +1189,11 @@ export default function App() {
           </div>
         )}
 
-        {/* Hidden inputs - one for camera, one for gallery */}
-        <input type="file" accept="image/*" capture="environment" ref={cameraInputRef} onChange={handleFileUpload} className="hidden" />
+        {/* Hidden fallback file input (used when camera not available) */}
         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
 
-        {/* Camera/Gallery Choice Modal (Desktop) */}
-        {showCameraChoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowCameraChoice(false)}>
-            <div className="bg-[#1a1a2e] rounded-3xl p-8 max-w-sm w-full mx-4 border border-white/10" onClick={e => e.stopPropagation()}>
-              <h3 className="text-xl font-bold text-white text-center mb-6">How do you want to upload?</h3>
-
-              <button
-                onClick={() => {
-                  setShowCameraChoice(false)
-                  cameraInputRef.current?.click()
-                }}
-                className="w-full py-4 mb-3 rounded-2xl text-white font-semibold flex items-center justify-center gap-3 transition-all active:scale-95"
-                style={{
-                  background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : '#00ff88'} 100%)`,
-                  boxShadow: `0 8px 30px ${accentGlow}`
-                }}
-              >
-                <span className="text-2xl">📸</span>
-                Take a Photo
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowCameraChoice(false)
-                  fileInputRef.current?.click()
-                }}
-                className="w-full py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-3 transition-all active:scale-95"
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.2)'
-                }}
-              >
-                <span className="text-2xl">🖼️</span>
-                Choose from Gallery
-              </button>
-
-              <button
-                onClick={() => setShowCameraChoice(false)}
-                className="w-full mt-4 py-2 text-sm transition-all"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Hidden canvas for photo capture */}
+        <canvas ref={canvasRef} className="hidden" />
 
         {/* Pro Badge - Only indicator kept */}
         {isPro && (
@@ -1143,14 +1235,8 @@ export default function App() {
             playSound('click')
             vibrate(20)
             if (scansRemaining > 0 || isPro) {
-              // Check if mobile (has touch + small screen = go straight to camera)
-              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
-              if (isMobile) {
-                cameraInputRef.current?.click()
-              } else {
-                // Desktop: show choice modal
-                setShowCameraChoice(true)
-              }
+              // Start camera directly - falls back to file picker on error
+              startCamera()
             } else {
               setScreen('paywall')
             }
