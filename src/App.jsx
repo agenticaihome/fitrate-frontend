@@ -1517,7 +1517,7 @@ export default function App() {
                 vibrate(15)
                 setMode(m.key)
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300"
               style={{
                 background: mode === m.key
                   ? m.key === 'roast' ? 'rgba(255,68,68,0.3)'
@@ -1529,10 +1529,10 @@ export default function App() {
                   : '1px solid transparent'
               }}
             >
-              <span className={`text-lg transition-opacity ${mode === m.key ? 'opacity-100' : 'opacity-50'}`}>
+              <span className={`text-sm transition-opacity ${mode === m.key ? 'opacity-100' : 'opacity-50'}`}>
                 {m.emoji}
               </span>
-              <span className={`text-sm font-medium transition-opacity ${mode === m.key ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>
+              <span className={`text-xs font-medium transition-opacity ${mode === m.key ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>
                 {m.label}
               </span>
             </button>
@@ -1549,20 +1549,20 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${isPro ? '' : 'opacity-60'}`}
+            className={`relative flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300 ${isPro ? '' : 'opacity-60'}`}
             style={{
               background: mode === 'savage' && isPro ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.1)',
               border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)'
             }}
           >
             {!isPro && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-0.5 rounded-full font-bold" style={{
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{
                 background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
                 color: '#000'
               }}>PRO</span>
             )}
-            <span className={`text-lg transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
-            <span className={`text-sm font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Savage</span>
+            <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
+            <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Savage</span>
             {!isPro && <span className="text-[10px]">🔒</span>}
           </button>
         </div>
@@ -1572,22 +1572,15 @@ export default function App() {
           <span>🔒</span> Photos analyzed instantly, never stored
         </p>
 
-        {/* Scan Counter with Pro Tease */}
-        {!isPro && (
-          <div className="mt-3 text-center">
-            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              ⚡ {scansRemaining} free {scansRemaining === 1 ? 'scan' : 'scans'} left today
-            </p>
-            {scansRemaining <= 1 && (
-              <button
-                onClick={() => setShowPaywall(true)}
-                className="text-[10px] mt-1 underline transition-all"
-                style={{ color: 'rgba(255,215,0,0.7)' }}
-              >
-                Pro gets 25 scans/day + savage roasts →
-              </button>
-            )}
-          </div>
+        {/* Pro Tease - shows when low on scans */}
+        {!isPro && scansRemaining <= 1 && (
+          <button
+            onClick={() => setShowPaywall(true)}
+            className="text-[10px] mt-3 underline transition-all"
+            style={{ color: 'rgba(255,215,0,0.7)' }}
+          >
+            Pro gets 25 scans/day + SAVAGE mode →
+          </button>
         )}
 
         {/* Scan Status - Tiny, non-intrusive */}
