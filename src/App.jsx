@@ -1734,59 +1734,49 @@ export default function App() {
               background: 'rgba(255,215,0,0.1)',
               border: '1px solid rgba(255,215,0,0.3)'
             }}
-          >
-            ⚡ Pro gets 25 scans/day + SAVAGE mode →
-          </button>
-        )}
-
-        {/* Scan Status - Tiny, non-intrusive */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center" style={{
-          paddingBottom: 'max(4rem, env(safe-area-inset-bottom, 4rem))'
+        {/* BOTTOM SECTION - COORDINATED LAYOUT */}
+        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6" style={{
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
         }}>
-          {scansRemaining > 0 || isPro ? (
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              {isPro ? '⚡ Unlimited scans' : `${scansRemaining} free fit${scansRemaining !== 1 ? 's' : ''} today`}
-            </p>
-          ) : (
-            <button
-              onClick={() => setScreen('paywall')}
-              className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-95"
-              style={{
-                background: 'rgba(255,68,68,0.1)',
-                border: '1px solid rgba(255,68,68,0.3)'
-              }}
-            >
-              <span className="text-xs font-medium" style={{ color: '#ff6b6b' }}>
-                Free fits reset in {timeUntilReset} · Get Pro
-              </span>
-            </button>
-          )}
-        </div>
+          {/* Scan Status & Pro Upgrade */}
+          <div className="flex flex-col items-center gap-3">
+            {scansRemaining > 0 || isPro ? (
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {isPro ? '⚡ Unlimited Elite Scans' : `${scansRemaining} free fit${scansRemaining !== 1 ? 's' : ''} left today`}
+              </p>
+            ) : (
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="btn-physical flex items-center gap-2 px-6 py-2.5 rounded-full animate-pulse-glow"
+                style={{
+                  background: 'rgba(255,215,0,0.1)',
+                  border: '1px solid rgba(255,215,0,0.4)',
+                  boxShadow: '0 0 30px rgba(255,215,0,0.1)'
+                }}
+              >
+                <span className="text-xs font-black" style={{ color: '#ffd700' }}>
+                  REFILL SCANS · UNLOCK PRO 👑
+                </span>
+              </button>
+            )}
 
-        {/* Footer */}
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-4" style={{
-          paddingBottom: 'env(safe-area-inset-bottom, 0.5rem)'
-        }}>
-          <a href="/privacy" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy</a>
-          <a href="/terms" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms</a>
-          <a href="/about" className="text-[10px] transition-opacity hover:opacity-70" style={{ color: 'rgba(255,255,255,0.3)' }}>About</a>
-          {!isPro && (
-            <button
-              onClick={() => setShowPaywall(true)}
-              className="text-[10px] transition-opacity hover:opacity-100"
-              style={{ color: 'rgba(255,215,0,0.5)' }}
-            >
-              Go Pro ⚡
-            </button>
-          )}
-        </div>
+            {!isPro && scansRemaining > 0 && (
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="text-[10px] font-black tracking-[0.2em] text-orange-400 opacity-60 hover:opacity-100 transition-opacity uppercase"
+              >
+                Get Unlimited Savage Scans →
+              </button>
+            )}
+          </div>
 
-        <style>{`
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
-          }
-        `}</style>
+          {/* Footer Links - Compact */}
+          <div className="flex justify-center gap-6 pb-2">
+            <a href="/privacy" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Privacy</a>
+            <a href="/terms" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Terms</a>
+            <a href="/about" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>About</a>
+          </div>
+        </div>
       </div>
     )
   }
