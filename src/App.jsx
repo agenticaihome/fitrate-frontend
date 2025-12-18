@@ -695,13 +695,20 @@ export default function App() {
     // Determine viral caption based on score and mode
     const getViralCaption = () => {
       if (scores.roastMode) {
+        if (scores.overall < 30) return "I got DESTROYED 💀💀💀"
+        if (scores.overall < 45) return "AI showed no mercy 💀"
         if (scores.overall < 60) return "AI humbled me 💀 Your turn?"
-        if (scores.overall < 75) return "AI roasted my fit 🔥 Try it"
         return "Survived Roast Mode 😏"
+      } else if (scores.mode === 'honest') {
+        if (scores.overall >= 90) return `${scores.overall}/100 — Honest mode approved 📊`
+        if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊`
+        if (scores.overall >= 60) return `Honest score: ${scores.overall} — thoughts? 📊`
+        return `Got my honest rating 📊 Your turn?`
       } else {
+        if (scores.overall >= 95) return `${scores.overall}/100 — I'm literally perfect 💅`
         if (scores.overall >= 90) return `${scores.overall}/100 — beat that 🏆`
         if (scores.overall >= 80) return "AI approved ✨ What's yours?"
-        if (scores.overall >= 70) return "Not bad... can you do better? 👀"
+        if (scores.overall >= 70) return "Pretty good 👀 Can you beat it?"
         return "Your turn 👀"
       }
     }
@@ -844,13 +851,20 @@ export default function App() {
     const getShareText = () => {
       const baseUrl = 'https://fitrate.app'
       if (scores.roastMode) {
+        if (scores.overall < 30) return `AI gave me a ${scores.overall} 💀💀💀 I'm devastated. Your turn? ${baseUrl}?ref=${userId}`
+        if (scores.overall < 45) return `${scores.overall}/100 — AI showed NO mercy 💀 ${baseUrl}?ref=${userId}`
         if (scores.overall < 60) return `AI humbled me 💀 ${scores.overall}/100. Your turn? ${baseUrl}?ref=${userId}`
-        if (scores.overall < 75) return `Survived Roast Mode with ${scores.overall} 🔥 Beat that: ${baseUrl}?ref=${userId}`
-        return `AI couldn't roast me 😏 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
+        return `Survived Roast Mode 😏 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
+      } else if (scores.mode === 'honest') {
+        if (scores.overall >= 90) return `Honest mode gave me ${scores.overall}/100 📊 No cap. ${baseUrl}?ref=${userId}`
+        if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊 What's YOUR honest score? ${baseUrl}?ref=${userId}`
+        return `Got my honest rating: ${scores.overall} 📊 ${baseUrl}?ref=${userId}`
       } else {
+        if (scores.overall >= 95) return `${scores.overall}/100 💅 I'm literally perfect. Beat that: ${baseUrl}?ref=${userId}`
         if (scores.overall >= 90) return `${scores.overall}/100 — AI approved 🏆 Beat my score: ${baseUrl}?ref=${userId}`
         if (scores.overall >= 80) return `${scores.overall}/100 ✨ What's YOUR score? ${baseUrl}?ref=${userId}`
-        return `Just got my fit rated. Your turn 👀 ${baseUrl}?ref=${userId}`
+        if (scores.overall >= 70) return `${scores.overall}/100 — pretty good 👀 Can you beat it? ${baseUrl}?ref=${userId}`
+        return `Got my fit rated: ${scores.overall} 👀 Your turn: ${baseUrl}?ref=${userId}`
       }
     }
 
