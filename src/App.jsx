@@ -117,6 +117,8 @@ export default function App() {
   const [analysisProgress, setAnalysisProgress] = useState(0)
 
   const fileInputRef = useRef(null)
+  const cameraInputRef = useRef(null)
+  const [showCameraChoice, setShowCameraChoice] = useState(false)
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -1050,8 +1052,56 @@ export default function App() {
           </div>
         )}
 
-        {/* Hidden file input */}
-        <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+        {/* Hidden inputs - one for camera, one for gallery */}
+        <input type="file" accept="image/*" capture="environment" ref={cameraInputRef} onChange={handleFileUpload} className="hidden" />
+        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+
+        {/* Camera/Gallery Choice Modal (Desktop) */}
+        {showCameraChoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowCameraChoice(false)}>
+            <div className="bg-[#1a1a2e] rounded-3xl p-8 max-w-sm w-full mx-4 border border-white/10" onClick={e => e.stopPropagation()}>
+              <h3 className="text-xl font-bold text-white text-center mb-6">How do you want to upload?</h3>
+
+              <button
+                onClick={() => {
+                  setShowCameraChoice(false)
+                  cameraInputRef.current?.click()
+                }}
+                className="w-full py-4 mb-3 rounded-2xl text-white font-semibold flex items-center justify-center gap-3 transition-all active:scale-95"
+                style={{
+                  background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : '#00ff88'} 100%)`,
+                  boxShadow: `0 8px 30px ${accentGlow}`
+                }}
+              >
+                <span className="text-2xl">📸</span>
+                Take a Photo
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowCameraChoice(false)
+                  fileInputRef.current?.click()
+                }}
+                className="w-full py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-3 transition-all active:scale-95"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}
+              >
+                <span className="text-2xl">🖼️</span>
+                Choose from Gallery
+              </button>
+
+              <button
+                onClick={() => setShowCameraChoice(false)}
+                className="w-full mt-4 py-2 text-sm transition-all"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Pro Badge - Only indicator kept */}
         {isPro && (
@@ -1092,8 +1142,18 @@ export default function App() {
           onClick={() => {
             playSound('click')
             vibrate(20)
-            if (scansRemaining > 0 || isPro) fileInputRef.current?.click()
-            else setScreen('paywall')
+            if (scansRemaining > 0 || isPro) {
+              // Check if mobile (has touch + small screen = go straight to camera)
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768
+              if (isMobile) {
+                cameraInputRef.current?.click()
+              } else {
+                // Desktop: show choice modal
+                setShowCameraChoice(true)
+              }
+            } else {
+              setScreen('paywall')
+            }
           }}
           disabled={scansRemaining === 0 && !isPro}
           className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all duration-300 disabled:opacity-40 group"
