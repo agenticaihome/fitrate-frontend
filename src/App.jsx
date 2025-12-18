@@ -1538,26 +1538,32 @@ export default function App() {
             </button>
           ))}
 
-          {/* Locked SAVAGE Mode - Pro Only */}
+          {/* SAVAGE Mode - Pro Only */}
           <button
             onClick={() => {
               playSound('click')
               vibrate(15)
-              setShowPaywall(true)
+              if (isPro) {
+                setMode('savage')
+              } else {
+                setShowPaywall(true)
+              }
             }}
-            className="relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 opacity-60"
+            className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${isPro ? '' : 'opacity-60'}`}
             style={{
-              background: 'rgba(255,0,0,0.1)',
-              border: '1px dashed rgba(255,0,0,0.4)'
+              background: mode === 'savage' && isPro ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.1)',
+              border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)'
             }}
           >
-            <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-0.5 rounded-full font-bold" style={{
-              background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-              color: '#000'
-            }}>PRO</span>
-            <span className="text-lg">💀</span>
-            <span className="text-sm font-medium text-gray-400">Savage</span>
-            <span className="text-[10px]">🔒</span>
+            {!isPro && (
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-0.5 rounded-full font-bold" style={{
+                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                color: '#000'
+              }}>PRO</span>
+            )}
+            <span className={`text-lg transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
+            <span className={`text-sm font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Savage</span>
+            {!isPro && <span className="text-[10px]">🔒</span>}
           </button>
         </div>
 
