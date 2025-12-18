@@ -1788,7 +1788,7 @@ export default function App() {
               border: '1px solid rgba(255,215,0,0.3)'
             }}
           >
-            <span>⚡ Upgrade to Elite</span>
+            <span>⚡ Upgrade to Pro</span>
           </button>
         )}
 
@@ -1823,7 +1823,7 @@ export default function App() {
                 onClick={() => setShowPaywall(true)}
                 className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase"
               >
-                Go Unlimited →
+                Go Pro →
               </button>
             )}
           </div>
@@ -1854,7 +1854,7 @@ export default function App() {
                   <h2 className="text-white text-2xl font-black mb-4">Try Pro for less</h2>
 
                   <p className="text-gray-400 mb-4">
-                    Get Unlimited for just <span className="text-yellow-400 font-bold">$1.99/week</span>
+                    Get FitRate Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span>
                     <br />
                     <span className="text-xs">(Regular price $2.99/week, cancel anytime)</span>
                   </p>
@@ -1910,7 +1910,7 @@ export default function App() {
 
               <div className="text-center mb-6">
                 <span className="text-4xl mb-2 block">👑</span>
-                <h2 className="text-white text-2xl font-black">Go Unlimited</h2>
+                <h2 className="text-white text-2xl font-black">Go Pro</h2>
                 <p className="text-gray-400 text-sm mt-1">Get 25 outfit ratings every day</p>
               </div>
 
@@ -1929,32 +1929,33 @@ export default function App() {
                   {/* Shine effect */}
                   <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
 
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-white text-2xl font-black leading-tight">Unlimited</h3>
-                      <p className="text-white/70 text-sm">All features included</p>
+                      <h3 className="text-white text-xl font-black leading-tight">FitRate Pro</h3>
                     </div>
-                    <span className="text-3xl">👑</span>
+                    <span className="text-2xl">👑</span>
                   </div>
 
-                  <div className="space-y-2 mb-6">
+                  <div className="space-y-1.5 mb-4">
                     {[
-                      '25 outfit ratings per day',
-                      'What your style says about you',
-                      'How others see your outfit',
-                      'All modes: Nice, Honest, Roast'
+                      '25 ratings per day',
+                      'Style personality insights',
+                      'Social perception analysis',
+                      'All modes included'
                     ].map((benefit, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs font-bold text-white/90">
-                        <span className="text-white">✓</span>
+                      <div key={i} className="flex items-center gap-2 text-[11px] font-semibold text-white/90">
+                        <span className="text-white text-[10px]">✓</span>
                         <span>{benefit}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex items-end gap-2">
-                    <span className="text-3xl font-black text-white">$2.99</span>
-                    <span className="text-white/60 text-sm mb-1 pb-1">/ week</span>
-                    <span className="ml-auto text-[10px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-white">$2.99</span>
+                      <span className="text-white/60 text-xs">/week</span>
+                    </div>
+                    <span className="text-[9px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
                       Best Value
                     </span>
                   </div>
@@ -2529,9 +2530,9 @@ export default function App() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <div className="text-7xl mb-6">🎉</div>
-        <h2 className="text-4xl font-black text-white mb-3">Welcome to Pro!</h2>
+        <h2 className="text-4xl font-black text-white mb-3">Welcome to FitRate Pro!</h2>
         <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          You're now unlimited
+          You now have 25 ratings per day
         </p>
 
         <div className="p-6 rounded-2xl mb-8 text-center" style={{
@@ -2595,7 +2596,7 @@ export default function App() {
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {timeUntilReset
                 ? `Free fits reset in ${timeUntilReset}`
-                : 'Unlock unlimited outfit ratings'}
+                : 'Get 25 outfit ratings per day'}
             </p>
           </div>
 
@@ -2622,7 +2623,7 @@ export default function App() {
                 boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
               }}
             >
-              ⚡ Pro AI · $2.99/week
+              ⚡ FitRate Pro · $2.99/week
             </a>
           </div>
 
