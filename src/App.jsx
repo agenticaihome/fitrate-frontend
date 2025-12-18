@@ -132,6 +132,7 @@ export default function App() {
   const [cameraError, setCameraError] = useState(null)
   const [countdown, setCountdown] = useState(null) // null = no timer, 3/2/1 = counting
   const [facingMode, setFacingMode] = useState('environment') // 'environment' = rear, 'user' = front
+  const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
 
   // User ID for referrals
   const [userId] = useState(() => {
@@ -728,8 +729,11 @@ export default function App() {
 
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
+
+    // Dynamic dimensions based on format
+    const isSquare = shareFormat === 'feed'
     canvas.width = 1080
-    canvas.height = 1920
+    canvas.height = isSquare ? 1080 : 1920
 
     // Determine viral caption based on score and mode
     const getViralCaption = () => {
@@ -943,7 +947,7 @@ export default function App() {
       setScreen('share-preview')
 
     }, 'image/png')
-  }, [uploadedImage, scores, userId])
+  }, [uploadedImage, scores, userId, shareFormat])
 
   // Helper: wrap text
   const wrapText = (ctx, text, maxWidth) => {
@@ -2178,8 +2182,44 @@ export default function App() {
           </div>
         )}
 
+        {/* Format Toggle - Stories (9:16) vs Feed (1:1) */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => {
+              playSound('click')
+              setShareFormat('story')
+              // Regenerate card for new format
+              generateShareCard()
+            }}
+            className="px-4 py-2 rounded-full text-sm font-medium transition-all"
+            style={{
+              background: shareFormat === 'story' ? 'rgba(0,212,255,0.3)' : 'rgba(255,255,255,0.05)',
+              border: shareFormat === 'story' ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.1)',
+              color: shareFormat === 'story' ? '#00d4ff' : 'rgba(255,255,255,0.5)'
+            }}
+          >
+            📱 Stories
+          </button>
+          <button
+            onClick={() => {
+              playSound('click')
+              setShareFormat('feed')
+              // Regenerate card for new format
+              generateShareCard()
+            }}
+            className="px-4 py-2 rounded-full text-sm font-medium transition-all"
+            style={{
+              background: shareFormat === 'feed' ? 'rgba(0,212,255,0.3)' : 'rgba(255,255,255,0.05)',
+              border: shareFormat === 'feed' ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.1)',
+              color: shareFormat === 'feed' ? '#00d4ff' : 'rgba(255,255,255,0.5)'
+            }}
+          >
+            📐 Feed
+          </button>
+        </div>
+
         {/* Share Card Preview */}
-        <div className="relative w-[50%] max-w-[180px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl mb-6" style={{
+        <div className={`relative rounded-2xl overflow-hidden shadow-2xl mb-6 ${shareFormat === 'feed' ? 'w-[180px] aspect-square' : 'w-[50%] max-w-[180px] aspect-[9/16]'}`} style={{
           border: `2px solid ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`,
           boxShadow: `0 20px 60px ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`
         }}>
