@@ -1544,6 +1544,24 @@ export default function App() {
           <span>🔒</span> Photos analyzed instantly, never stored
         </p>
 
+        {/* Scan Counter with Pro Tease */}
+        {!isPro && (
+          <div className="mt-3 text-center">
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              ⚡ {scansRemaining} free {scansRemaining === 1 ? 'scan' : 'scans'} left today
+            </p>
+            {scansRemaining <= 1 && (
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="text-[10px] mt-1 underline transition-all"
+                style={{ color: 'rgba(255,215,0,0.7)' }}
+              >
+                Pro gets 25 scans/day + savage roasts →
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Scan Status - Tiny, non-intrusive */}
         <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center" style={{
           paddingBottom: 'max(4rem, env(safe-area-inset-bottom, 4rem))'
@@ -1659,6 +1677,31 @@ export default function App() {
         }}>
           {analysisMessages[analysisText]}
         </p>
+
+        {/* Pro Features Checklist - Primes users before results */}
+        {!isPro && (
+          <div className="mt-6 space-y-1.5 text-left">
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              <span className="text-green-400">✓</span><span>Score + sub-ratings</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              <span className="text-green-400">✓</span><span>Celeb style match</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              <span className="text-green-400">✓</span><span>Styling tip</span>
+            </div>
+            <div className="h-px my-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
+              <span>🔒</span><span>Savage Level (Pro)</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
+              <span>🔒</span><span>Item-by-item roasts (Pro)</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
+              <span>🔒</span><span>GPT-4 Vision analysis (Pro)</span>
+            </div>
+          </div>
+        )}
 
         {/* Subtle reassurance */}
         <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
