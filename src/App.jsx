@@ -2495,8 +2495,31 @@ export default function App() {
             onClick={resetApp}
             className="btn-physical w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black uppercase tracking-widest active:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
-            <span>🔄</span> Rate Another Fit
+            <span>🔄</span>
+            {scores.overall >= 85 ? "Can you beat this? Scan again" :
+              scores.overall < 50 ? "Redeem yourself? Try again" :
+                "Rate Another Fit"}
           </button>
+
+          {/* Daily Limit Tracker - Habit Building */}
+          {!isPro && (
+            <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 transition-opacity duration-300" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              {scansRemaining > 0 ? `⚡ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left today` : 'Daily limit reached • Reset in 12h'}
+            </p>
+          )}
+
+          {/* Viral Loop Teaser: Mode Switching */}
+          {!isPro && scores.mode === 'nice' && (
+            <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 delay-1000">
+              <p className="text-[10px] text-white/40 mb-1.5 font-medium">Too nice? Try the viral Roast Mode</p>
+              <button
+                onClick={() => { setMode('roast'); resetApp(); }}
+                className="text-xs text-red-400 font-black uppercase tracking-wider border-b border-red-400/30 pb-0.5 hover:text-red-300 transition-colors"
+              >
+                See what AI really thinks 😈
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Confetti for 90+ */}
