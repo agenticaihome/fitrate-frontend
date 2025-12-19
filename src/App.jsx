@@ -3139,30 +3139,31 @@ export default function App() {
               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
 
               {/* Header: Crown + Title + Price - Mobile Optimized */}
-              {/* Added pr-16 to ensure text doesn't overlap with the absolute positioned badge */}
-              <div className="flex items-center gap-3 mb-3 relative z-10 pr-16">
-                <span className="text-2xl sm:text-3xl flex-shrink-0">👑</span>
-                <div className="flex flex-col min-w-0">
-                  <h3 className="text-black text-lg sm:text-2xl font-black leading-tight truncate">Pro Weekly</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl sm:text-2xl font-black text-black">$2.99</span>
-                    <span className="text-black/60 text-sm font-bold">/wk</span>
+              <div className="flex flex-col w-full relative z-10">
+                <div className="flex items-center gap-3 mb-3 pr-8">
+                  <span className="text-2xl sm:text-3xl flex-shrink-0">👑</span>
+                  <div className="flex flex-col min-w-0">
+                    <h3 className="text-black text-lg sm:text-2xl font-black leading-tight truncate">Pro Weekly</h3>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl sm:text-2xl font-black text-black">$2.99</span>
+                      <span className="text-black/60 text-sm font-bold">/wk</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Benefits */}
-              <div className="space-y-2">
-                {[
-                  'All modes unlocked',
-                  '25 scans per day',
-                  'GPT-4o powered ratings'
-                ].map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
-                    <span className="text-black text-sm flex-shrink-0">✓</span>
-                    <span>{benefit}</span>
-                  </div>
-                ))}
+                {/* Benefits */}
+                <div className="space-y-1.5 pl-1">
+                  {[
+                    'All modes unlocked',
+                    '25 scans per day',
+                    'GPT-4o powered'
+                  ].map((benefit, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
+                      <span className="text-black text-sm flex-shrink-0">✓</span>
+                      <span className="truncate">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </button>
           </div>
