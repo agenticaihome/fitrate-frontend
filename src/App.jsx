@@ -3107,10 +3107,11 @@ export default function App() {
 
               <div className="space-y-2 mb-6">
                 {[
+                  '🤖 Premium GPT-4o AI',
                   '25 outfit ratings/day',
                   'Identity Reflection Insights',
                   'Social Perception Analysis',
-                  'All Modes: Roast, Honest, Nice'
+                  'All Modes: Roast, Honest, Nice, Savage'
                 ].map((benefit, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs font-bold text-white/90">
                     <span className="text-white">✓</span>

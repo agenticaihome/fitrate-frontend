@@ -86,10 +86,11 @@ export const PAYWALL = {
     headline: 'Go Pro',
     subheadline: 'Unlock 25 scans per day',
     benefits: [
+        'Premium GPT-4o AI',
         '25 outfit ratings/day',
         'Identity Reflection Insights',
         'Social Perception Analysis',
-        'All Modes: Roast, Honest, Nice',
+        'All Modes: Roast, Honest, Nice, Savage',
     ],
     reassurance: '🔐 Secure checkout · Cancel anytime',
     outOfScans: 'You\'ve used your free scans for today. Upgrade for unlimited outfit ratings.',
