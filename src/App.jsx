@@ -214,6 +214,13 @@ export default function App() {
     return id
   })
 
+  // Helper: Display a toast notification
+  const displayToast = useCallback((message) => {
+    setToastMessage(message)
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 3000)
+  }, [])
+
   // Check Pro status on load (Identity: Email OR UserId)
   useEffect(() => {
     if (!isPro) {
@@ -226,10 +233,28 @@ export default function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
 
-    // Payment Success
+    // Payment Success: AUTO-LOGIN logic
     if (urlParams.get('success') === 'true') {
-      setScreen('pro-email-prompt')
-      window.history.replaceState({}, '', window.location.pathname)
+      // Show loading while we poll for the webhook to finish
+      setScreen('home'); // Reset to home but show a toast
+      displayToast("⚡ Activating your Pro access...");
+
+      // Clear the param immediately
+      window.history.replaceState({}, '', window.location.pathname);
+
+      // Attempt status check immediately, and again after 2 and 5 seconds (webhook delay)
+      checkProStatus();
+      setTimeout(checkProStatus, 2000);
+      setTimeout(checkProStatus, 5000);
+
+      // If after 8 seconds we still are not pro, then show the email prompt as fallback
+      setTimeout(() => {
+        if (localStorage.getItem('fitrate_pro') !== 'true') {
+          setScreen('pro-email-prompt');
+        } else {
+          setScreen('pro-welcome');
+        }
+      }, 8000);
     }
 
     // Referral Claim
@@ -1087,6 +1112,15 @@ export default function App() {
     ctx.lineWidth = 8
     ctx.stroke()
     ctx.shadowBlur = 0
+
+    // VIRAL WATERMARK - Subtle branding at the top
+    ctx.save()
+    ctx.globalAlpha = 0.4
+    ctx.fillStyle = '#fff'
+    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText('FITRATE.APP', 40, 60)
+    ctx.restore()
 
     // PRO BADGE - Gold banner for Pro users or purchased scans
     if (isPro || scores.savageLevel) {
@@ -2445,9 +2479,27 @@ export default function App() {
             </p>
           </div>
 
-          {/* Purchase Options */}
+          {/* Purchase Options - Optimized Order (One-time first) */}
           <div className="flex flex-col gap-3 mb-5">
-            {/* Primary: One-time Pro Roast */}
+            {/* 1. Pro Scan Packs (Utility - High Trust) */}
+            <div className="grid grid-cols-2 gap-3">
+              <a
+                href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
+                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center"
+              >
+                <span className="text-lg">📦</span>
+                15 Scans • $3.99
+              </a>
+              <a
+                href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
+                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center"
+              >
+                <span className="text-lg">🔥</span>
+                50 Scans • $9.99
+              </a>
+            </div>
+
+            {/* 2. One-time Roast (Impulse Buy) */}
             <a
               href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
               className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95"
@@ -2456,19 +2508,19 @@ export default function App() {
                 boxShadow: '0 8px 30px rgba(255,68,68,0.3)'
               }}
             >
-              🔥 Roast this one · $0.99
+              🚀 Roast this one · $0.99
             </a>
 
-            {/* Secondary: Pro subscription */}
+            {/* 3. Pro Subscription (Expert/Power User) */}
             <a
               href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
-              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+              className="w-full py-3 rounded-xl text-white font-medium text-sm flex items-center justify-center gap-2 transition-all active:scale-95 opacity-80"
               style={{
-                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)'
               }}
             >
-              ⚡ FitRate Pro · $2.99/week
+              ✨ Sub Unlimited · $2.99/wk
             </a>
           </div>
 
