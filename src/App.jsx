@@ -110,6 +110,7 @@ export default function App() {
   const [shareData, setShareData] = useState(null)
   const [mode, setMode] = useState('nice') // 'nice', 'honest', or 'roast'
   const [error, setError] = useState(null)
+  const [displayedScore, setDisplayedScore] = useState(0)
   const [showPaywall, setShowPaywall] = useState(false)
   const [showDeclineOffer, setShowDeclineOffer] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
@@ -230,12 +231,7 @@ export default function App() {
     return id
   })
 
-  // Helper: Display a toast notification
-  const displayToast = useCallback((message) => {
-    setToastMessage(message)
-    setShowToast(true)
-    setTimeout(() => setShowToast(false), 3000)
-  }, [])
+
 
   // Check Pro status on load (Identity: Email OR UserId)
   useEffect(() => {
@@ -475,9 +471,35 @@ export default function App() {
   useEffect(() => {
     if (screen === 'results' && scores) {
       setRevealStage(0)
+      setDisplayedScore(0)
+
+      // Score counting animation
+      const duration = 1200
+      const start = Date.now()
+      const endScore = scores.overall
+
+      const animateScore = () => {
+        const now = Date.now()
+        const elapsed = now - start
+        const progress = Math.min(elapsed / duration, 1)
+
+        // Easing function (easeOutExpo)
+        const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
+        const currentScore = Math.floor(easeProgress * endScore)
+
+        setDisplayedScore(currentScore)
+
+        if (progress < 1) {
+          requestAnimationFrame(animateScore)
+        }
+      }
+
       const timers = [
         setTimeout(() => setRevealStage(1), 200),  // Verdict
-        setTimeout(() => setRevealStage(2), 600),  // Score
+        setTimeout(() => {
+          setRevealStage(2)
+          animateScore()
+        }, 600),  // Score start
         setTimeout(() => setRevealStage(3), 1000), // Aesthetic/Celeb
         setTimeout(() => setRevealStage(4), 1300), // Tip
         setTimeout(() => setRevealStage(5), 1600), // Breakdown
@@ -1030,21 +1052,37 @@ export default function App() {
     const modeColors = getModeAccent()
     const isProCard = isPro || scores.savageLevel
 
-    // Gradient background - Premium for Pro
-    const gradient = ctx.createLinearGradient(0, 0, 0, 1920)
-    if (isProCard) {
-      gradient.addColorStop(0, '#0a0a12')
-      gradient.addColorStop(0.3, '#1a1a2e')
-      gradient.addColorStop(0.5, '#16213e')
-      gradient.addColorStop(0.7, '#1a1a2e')
-      gradient.addColorStop(1, '#0a0a12')
-    } else {
-      gradient.addColorStop(0, '#0a0a0f')
-      gradient.addColorStop(0.4, modeColors.mid)
-      gradient.addColorStop(1, '#0a0a0f')
-    }
-    ctx.fillStyle = gradient
+    // Load user image
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    await new Promise((resolve) => {
+      img.onload = resolve
+      img.onerror = resolve
+      img.src = uploadedImage
+    })
+
+    // DYNAMIC BACKGROUND: Blurred & Darkened version of user photo
+    ctx.save()
+    // Draw image filled to canvas
+    const bgScale = Math.max(1080 / img.width, 1920 / img.height)
+    const bgW = img.width * bgScale
+    const bgH = img.height * bgScale
+    const bgX = (1080 - bgW) / 2
+    const bgY = (1920 - bgH) / 2
+
+    // Apply blur if supported
+    if (ctx.filter) ctx.filter = 'blur(40px) brightness(0.3)'
+    ctx.drawImage(img, bgX, bgY, bgW, bgH)
+    if (ctx.filter) ctx.filter = 'none'
+
+    // Gradient overlay for depth
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, 1920)
+    bgGradient.addColorStop(0, 'rgba(10,10,20,0.4)')
+    bgGradient.addColorStop(0.5, 'rgba(10,10,20,0.2)')
+    bgGradient.addColorStop(1, 'rgba(10,10,20,0.8)')
+    ctx.fillStyle = bgGradient
     ctx.fillRect(0, 0, 1080, 1920)
+    ctx.restore()
 
     // PRO SPARKLE BORDER - Gold glow for Pro users
     if (isProCard) {
@@ -1065,35 +1103,22 @@ export default function App() {
       ctx.stroke()
     }
 
-    // Glow effect behind card
-    const glowColor = isProCard ? 'rgba(255,215,0,0.3)' : modeColors.glow
-    ctx.shadowColor = glowColor
-    ctx.shadowBlur = 120
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'
+    // Mode-specific card accent
+    const cardGlow = isProCard ? 'rgba(255,215,0,0.2)' : modeColors.glow
+    ctx.shadowColor = cardGlow
+    ctx.shadowBlur = 100
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'
     ctx.beginPath()
-    ctx.roundRect(60, 120, 960, 1520, 48)
+    ctx.roundRect(60, 120, 960, 1540, 48)
     ctx.fill()
     ctx.shadowBlur = 0
 
-    // Glassmorphism card
-    ctx.fillStyle = isProCard ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.06)'
-    ctx.beginPath()
-    ctx.roundRect(60, 120, 960, 1520, 48)
-    ctx.fill()
-
-    // Border glow
-    ctx.strokeStyle = isProCard ? 'rgba(255,215,0,0.5)' : (scores.roastMode ? 'rgba(255,68,68,0.6)' : 'rgba(0,212,255,0.6)')
-    ctx.lineWidth = 4
+    // Border
+    ctx.strokeStyle = isProCard ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.1)'
+    ctx.lineWidth = 2
     ctx.stroke()
 
-    // Load user image
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    await new Promise((resolve) => {
-      img.onload = resolve
-      img.onerror = resolve
-      img.src = uploadedImage
-    })
+
 
     // Draw photo with rounded corners - SCALE for format
     const yScale = canvas.height / 1920 // Scale factor for 1:1 vs 9:16
@@ -1129,22 +1154,46 @@ export default function App() {
     ctx.stroke()
     ctx.shadowBlur = 0
 
-    // VIRAL WATERMARK - Subtle branding at the top
+    // PREMIUM BRANDING - "FITRATE AI" Seal
     ctx.save()
-    ctx.globalAlpha = 0.4
     ctx.fillStyle = '#fff'
-    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.textAlign = 'left'
-    ctx.fillText('FITRATE.APP', 40, 60)
+    ctx.font = 'black 28px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.letterSpacing = '12px'
+    ctx.globalAlpha = 0.8
+    ctx.fillText('FITRATE AI', 540, 80)
     ctx.restore()
+
+    // CERTIFIED SEAL for 90+
+    if (scores.overall >= 90) {
+      ctx.save()
+      const sealX = isSquare ? 880 : 920
+      const sealY = isSquare ? 120 : 180
+
+      // Draw Circular Seal
+      ctx.beginPath()
+      ctx.arc(sealX, sealY, 60, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffd700'
+      ctx.shadowColor = 'rgba(255,215,0,0.5)'
+      ctx.shadowBlur = 20
+      ctx.fill()
+
+      ctx.fillStyle = '#000'
+      ctx.font = 'black 14px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('STYLE', sealX, sealY - 10)
+      ctx.font = 'black 18px -apple-system, BlinkMacSystemFont, sans-serif'
+      ctx.fillText('APPROVED', sealX, sealY + 12)
+      ctx.restore()
+    }
 
     // PRO BADGE - Gold banner for Pro users or purchased scans
     if (isPro || scores.savageLevel) {
       // Gold gradient badge background
-      const badgeWidth = 200
-      const badgeHeight = 36
+      const badgeWidth = 220
+      const badgeHeight = 40
       const badgeX = (1080 - badgeWidth) / 2
-      const badgeY = isSquare ? 610 : 925
+      const badgeY = isSquare ? 600 : 915
 
       const goldGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY)
       goldGradient.addColorStop(0, '#ffd700')
@@ -1266,14 +1315,21 @@ export default function App() {
       ctx.fillText(`💡 PRO TIP: ${scores.proTip}`, 540, tipY + 4)
     }
 
+    // SOCIAL PROOF - Percentile on card
+    ctx.font = `bold ${isSquare ? 20 : 26}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.textAlign = 'center'
+    ctx.fillText(`TOP ${100 - scores.percentile}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1810)
+
     // Branding footer (at the very bottom)
-    ctx.fillStyle = 'rgba(255,255,255,0.3)'
-    ctx.font = `${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('Rate your fit in seconds → fitrate.app', 540, isSquare ? 1070 : 1860)
+    ctx.fillStyle = 'rgba(255,255,255,0.2)'
+    ctx.font = `bold ${isSquare ? 14 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('SCAN YOURS @ FITRATE.APP', 540, isSquare ? 1075 : 1870)
 
     // Generate share text - punchy, viral, screenshot-worthy
     const getShareText = () => {
       const baseUrl = 'https://fitrate.app'
+      const inviteText = `Beat my score: ${baseUrl}?ref=${userId}`
       if (scores.roastMode) {
         if (scores.overall < 30) return `AI gave me a ${scores.overall} 💀💀💀 I'm devastated. Your turn? ${baseUrl}?ref=${userId}`
         if (scores.overall < 45) return `${scores.overall}/100 — AI showed NO mercy 💀 ${baseUrl}?ref=${userId}`
@@ -2048,12 +2104,22 @@ export default function App() {
     const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
 
     return (
-      <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden relative" style={{
+        background: '#0a0a0f',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
         paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
         paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
       }}>
+        {/* DOPAMINE GLOW - Dynamic Pulsing Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[150%] h-[150%] rounded-full opacity-20 blur-[120px] animate-pulse"
+            style={{
+              background: `radial-gradient(circle, ${scoreColor} 0%, transparent 70%)`,
+              animationDuration: '4s'
+            }}
+          />
+        </div>
         {/* OVERALL SCORE - BIG at TOP */}
         <div className={`relative mb-3 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
           <div className="relative w-32 h-32">
@@ -2065,7 +2131,7 @@ export default function App() {
                 stroke={scoreColor}
                 strokeWidth="8"
                 strokeLinecap="round"
-                strokeDasharray={`${scores.overall * 2.83} 283`}
+                strokeDasharray={`${displayedScore * 2.83} 283`}
                 style={{
                   transition: 'stroke-dasharray 1s ease-out',
                   filter: `drop-shadow(0 0 15px ${scoreColor})`
@@ -2073,10 +2139,19 @@ export default function App() {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
+              <span className="text-4xl font-black" style={{ color: scoreColor }}>{displayedScore}</span>
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 100</span>
             </div>
           </div>
+
+          {/* Certified Badge on Results Screen */}
+          {scores.overall >= 90 && (
+            <div className="absolute -top-2 -right-6 rotate-12 animate-in zoom-in-50 duration-500 delay-700">
+              <div className="bg-yellow-400 text-black text-[10px] font-black px-2 py-1 rounded-md shadow-lg shadow-yellow-400/20">
+                DRIP APPROVED
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Verdict & Catchphrases - The Heart of the Smile Test */}
@@ -2089,16 +2164,16 @@ export default function App() {
           </p>
 
           {scores.lines && scores.lines.length >= 2 && (
-            <div className="flex flex-col items-center gap-1 mt-2">
-              <p className="text-sm font-medium text-white/70 italic">"{scores.lines[0]}"</p>
-              <p className="text-sm font-medium text-white/70 italic">"{scores.lines[1]}"</p>
+            <div className="flex flex-col items-center gap-1.5 mt-2">
+              <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[0]}"</p>
+              <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[1]}"</p>
             </div>
           )}
 
-          <div className="mt-4 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
-            <p className="text-xs font-black uppercase tracking-[0.2em]" style={{
+          <div className="mt-5 px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-xl">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em]" style={{
               color: scoreColor,
-              textShadow: `0 0 10px ${scoreColor}44`
+              textShadow: `0 0 15px ${scoreColor}66`
             }}>
               {scores.tagline}
             </p>
@@ -2137,6 +2212,10 @@ export default function App() {
         {/* PHOTO PREVIEW */}
         <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="relative group">
+            {/* Shimmering border for top scores */}
+            {scores.overall >= 90 && (
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[34px] opacity-30 blur-sm animate-pulse" />
+            )}
             <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative" style={{
               border: `2px solid ${scoreColor}44`,
               boxShadow: `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${scoreColor}11`
@@ -2161,7 +2240,7 @@ export default function App() {
 
         {/* GOLDEN INSIGHT (PRO) OR TEASER (FREE) */}
         <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-500 ${revealStage >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-          {isPro ? (
+          {isPro && (
             <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-sm">✨</span>
@@ -2182,32 +2261,6 @@ export default function App() {
                 )}
               </div>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowPaywall(true)}
-              className="card-physical w-full p-5 border-dashed border-cyan-500/30 bg-cyan-500/5 active:scale-[0.98] transition-all"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">🔒</span>
-                  <span className="text-[10px] font-black tracking-widest text-cyan-400 uppercase">Pro Benefits</span>
-                </div>
-                <span className="text-[10px] font-black text-cyan-400">UNLOCK</span>
-              </div>
-              <div className="space-y-4 mb-4 text-left">
-                <div>
-                  <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Identity Reflection</span>
-                  <div className="h-4 w-full bg-white/5 rounded blur-[4px]" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Social Perception</span>
-                  <div className="h-4 w-3/4 bg-white/5 rounded blur-[4px]" />
-                </div>
-              </div>
-              <div className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-black text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
-                Unlock Golden Insights 👑
-              </div>
-            </button>
           )}
         </div>
 
