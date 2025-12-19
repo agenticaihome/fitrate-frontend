@@ -214,10 +214,10 @@ export default function App() {
     return id
   })
 
-  // Check Pro status via email on load
+  // Check Pro status on load (Identity: Email OR UserId)
   useEffect(() => {
-    const savedEmail = localStorage.getItem('fitrate_email')
-    if (savedEmail && !isPro) {
+    if (!isPro) {
+      const savedEmail = localStorage.getItem('fitrate_email')
       checkProStatus(savedEmail)
     }
   }, [])
@@ -318,22 +318,32 @@ export default function App() {
     }
   }, [showDeclineOffer])
 
-  // Check if email is Pro
-  const checkProStatus = async (email) => {
+  // Check if user is Pro (via Email OR UserId)
+  const checkProStatus = async (emailToCheck) => {
     try {
       setEmailChecking(true)
+      const payload = {
+        userId,
+        email: emailToCheck || undefined
+      }
+
       const response = await fetch(`${API_BASE}/pro/check`, {
         method: 'POST',
         headers: getApiHeaders(),
-        body: JSON.stringify({ email })
+        body: JSON.stringify(payload)
       })
       const data = await response.json()
 
       if (data.isPro) {
         localStorage.setItem('fitrate_pro', 'true')
-        localStorage.setItem('fitrate_email', email.toLowerCase().trim())
         setIsPro(true)
-        setProEmail(email.toLowerCase().trim())
+
+        // Only update email if we actually got one back/verified one
+        if (data.email) {
+          const cleanEmail = data.email.toLowerCase().trim()
+          localStorage.setItem('fitrate_email', cleanEmail)
+          setProEmail(cleanEmail)
+        }
         return true
       }
       return false
@@ -1903,256 +1913,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Paywall Modal Overlay - Renders on top of home screen */}
-        {showPaywall && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-            background: 'rgba(0,0,0,0.9)',
-            backdropFilter: 'blur(10px)'
-          }}>
-            {/* Decline Offer Popup */}
-            {showDeclineOffer && (
-              <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
-                background: 'rgba(0,0,0,0.95)'
-              }}>
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
-                  boxShadow: '0 0 60px rgba(255,215,0,0.2)'
-                }}>
-                  <p className="text-yellow-400 font-bold text-lg mb-2">✨ Special Offer</p>
-                  <h2 className="text-white text-2xl font-black mb-4">Try Pro for less</h2>
 
-                  <p className="text-gray-400 mb-4">
-                    Get FitRate Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span>
-                    <br />
-                    <span className="text-xs">(Regular price $2.99/week, cancel anytime)</span>
-                  </p>
-
-                  <button
-                    onClick={() => startCheckout('proWeeklyDiscount')}
-                    disabled={checkoutLoading}
-                    className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
-                    style={{
-                      background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
-                      boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
-                    }}
-                  >
-                    {checkoutLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                        Loading...
-                      </span>
-                    ) : 'Get This Deal'}
-                  </button>
-
-                  <p className="text-center text-[10px] text-gray-500 mb-3">
-                    🔐 Secure checkout · Cancel anytime
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      setShowDeclineOffer(false)
-                      setShowPaywall(false)
-                    }}
-                    className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-                  >
-                    Maybe later
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Main Paywall */}
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
-              boxShadow: '0 0 60px rgba(0,212,255,0.1)'
-            }}>
-              {/* Close X */}
-              <button
-                onClick={() => {
-                  playSound('click')
-                  setShowPaywall(false) // Close directly
-                }}
-                className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-
-              <div className="text-center mb-6">
-                <span className="text-4xl mb-2 block">👑</span>
-                <h2 className="text-white text-2xl font-black">Go Pro</h2>
-                <p className="text-gray-400 text-sm mt-1">Get 25 outfit ratings every day</p>
-              </div>
-
-              {/* Pro Subscription Hero Card */}
-              <div className="relative w-full mb-6">
-                <button
-                  onClick={() => startCheckout('proWeekly')}
-                  disabled={checkoutLoading}
-                  className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff 0%, #0077ff 100%)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    boxShadow: 'var(--shadow-physical), 0 0 40px rgba(0,212,255,0.2)'
-                  }}
-                >
-                  {/* Shine effect */}
-                  <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
-
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-white text-xl font-black leading-tight">FitRate Pro</h3>
-                    </div>
-                    <span className="text-2xl">👑</span>
-                  </div>
-
-                  <div className="space-y-1.5 mb-4">
-                    {[
-                      '25 ratings per day',
-                      'Style personality insights',
-                      'Social perception analysis',
-                      'All modes included'
-                    ].map((benefit, i) => (
-                      <div key={i} className="flex items-center gap-2 text-[11px] font-semibold text-white/90">
-                        <span className="text-white text-[10px]">✓</span>
-                        <span>{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-white">$2.99</span>
-                      <span className="text-white/60 text-xs">/week</span>
-                    </div>
-                    <span className="text-[9px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
-                      Best Value
-                    </span>
-                  </div>
-                </button>
-              </div>
-
-              <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR PAY PER RATING —</p>
-
-              {/* Scan Packs Section - Supercell Style Loot Cards */}
-              <div className="grid grid-cols-3 gap-3">
-                {/* Starter Pack */}
-                <button
-                  onClick={() => startCheckout('starterPack')}
-                  disabled={checkoutLoading}
-                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                  }}
-                >
-                  <span className="block text-2xl font-black text-white">5</span>
-                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
-                  <span className="block text-sm font-bold text-white mt-1">$1.99</span>
-                </button>
-
-                {/* Popular Pack - Supercell Highlight */}
-                <button
-                  onClick={() => startCheckout('popularPack')}
-                  disabled={checkoutLoading}
-                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px] relative overflow-hidden"
-                  style={{
-                    background: 'rgba(0,212,255,0.1)',
-                    border: '2px solid #00d4ff',
-                    boxShadow: 'var(--shadow-physical), 0 0 20px rgba(0,212,255,0.2)'
-                  }}
-                >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400" />
-                  <span className="block text-3xl font-black text-cyan-400">15</span>
-                  <span className="block text-[9px] text-cyan-400/70 uppercase font-black">ratings</span>
-                  <span className="block text-sm font-bold text-white mt-1">$3.99</span>
-                </button>
-
-                {/* Power Pack */}
-                <button
-                  onClick={() => startCheckout('powerPack')}
-                  disabled={checkoutLoading}
-                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                  }}
-                >
-                  <span className="block text-2xl font-black text-white">50</span>
-                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
-                  <span className="block text-sm font-bold text-white mt-1">$9.99</span>
-                </button>
-              </div>
-
-              {/* SAVAGE Roast option */}
-              <button
-                onClick={() => startCheckout('proRoast')}
-                disabled={checkoutLoading}
-                className="w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 mt-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
-                style={{
-                  background: 'rgba(255,68,68,0.08)',
-                  border: '1px solid rgba(255,68,68,0.25)'
-                }}
-              >
-                💀 Or get 1 SAVAGE Roast for $0.99
-              </button>
-
-              {/* Invite 3 → Get 15 Free Ratings */}
-              <div className="w-full p-4 rounded-2xl mb-4" style={{
-                background: 'rgba(0,255,136,0.06)',
-                border: '1px dashed rgba(0,255,136,0.3)'
-              }}>
-                <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE RATINGS</p>
-                <p className="text-center text-white text-sm font-bold mb-2">
-                  Invite 3 friends → Get 15 free ratings
-                </p>
-                <div className="flex items-center justify-center gap-1 mb-3">
-                  {[0, 1, 2].map(i => {
-                    const totalReferrals = parseInt(localStorage.getItem('fitrate_total_referrals') || '0')
-                    const filled = i < totalReferrals
-                    return (
-                      <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{
-                        background: filled ? 'rgba(0,255,136,0.3)' : 'rgba(255,255,255,0.1)',
-                        border: filled ? '2px solid #00ff88' : '2px solid rgba(255,255,255,0.2)'
-                      }}>
-                        {filled ? '✓' : '?'}
-                      </div>
-                    )
-                  })}
-                </div>
-                <button
-                  onClick={async () => {
-                    const shareUrl = `https://fitrate.app?ref=${userId}`
-                    if (navigator.share) {
-                      navigator.share({ title: 'Rate my fit!', url: shareUrl })
-                    } else {
-                      await navigator.clipboard.writeText(shareUrl)
-                      displayToast('Link copied! 📋')
-                    }
-                  }}
-                  className="w-full py-3 rounded-2xl text-sm font-bold transition-all duration-100 active:scale-[0.97]"
-                  style={{
-                    background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
-                    color: '#000'
-                  }}
-                >
-                  Share & Invite Friends 🚀
-                </button>
-              </div>
-
-              {/* Reassurance + Close */}
-              <p className="text-center text-[10px] text-gray-500 mb-3">
-                🔐 Secure checkout · Cancel anytime
-              </p>
-              <button
-                onClick={() => {
-                  playSound('click')
-                  setShowPaywall(false)
-                }}
-                className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-              >
-                ← Not now, go back
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     )
   }
