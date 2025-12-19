@@ -1148,14 +1148,14 @@ export default function App() {
 
     // Score number - BIG
     ctx.fillStyle = scoreColor
-    ctx.font = `bold ${isSquare ? 56 : 72}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.font = `bold ${isSquare ? 90 : 120}px -apple-system, BlinkMacSystemFont, sans-serif`
     ctx.textAlign = 'center'
-    ctx.fillText(scores.overall, 540, scoreY + (isSquare ? 18 : 20))
+    ctx.fillText(scores.overall, 540, scoreY + (isSquare ? 25 : 30))
 
-    // "/100" below score
-    ctx.fillStyle = 'rgba(255,255,255,0.5)'
-    ctx.font = `${isSquare ? 22 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('/100', 540, scoreY + (isSquare ? 50 : 60))
+    // "/ 10" below score
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.font = `bold ${isSquare ? 24 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('/ 10', 540, scoreY + (isSquare ? 70 : 90))
 
     // Verdict - HUGE and punchy (positioned based on format)
     const verdictY = isSquare ? 780 : 1140
@@ -1168,138 +1168,47 @@ export default function App() {
       ctx.fillText(line, 540, verdictY + (i * (isSquare ? 42 : 52)))
     })
 
-    // Sub-scores row (Color / Fit / Style) - only on story format (skip for square)
-    const subScoreY = isSquare
-      ? (verdictLines.length > 1 ? 870 : 850)
-      : (verdictLines.length > 1 ? 1210 : 1180)
-
-    if (!isSquare) {
-      // Full subscores for 9:16
-      const subScores = [
-        { label: 'Color', score: scores.color },
-        { label: 'Fit', score: scores.fit },
-        { label: 'Style', score: scores.style }
-      ]
-      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
-      subScores.forEach((sub, i) => {
-        const x = 300 + (i * 240)
-        ctx.fillStyle = 'rgba(255,255,255,0.5)'
-        ctx.fillText(sub.label, x, subScoreY)
-        ctx.fillStyle = scoreColor
-        ctx.fillText(sub.score.toString(), x, subScoreY + 28)
-      })
+    // The Two Lines - Viral Context
+    if (scores.lines && scores.lines.length >= 2) {
+      const lineY = verdictY + (verdictLines.length * (isSquare ? 42 : 52)) + 30
+      ctx.font = `italic ${isSquare ? 26 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'
+      ctx.fillText(`"${scores.lines[0]}"`, 540, lineY)
+      ctx.fillText(`"${scores.lines[1]}"`, 540, lineY + (isSquare ? 38 : 48))
     }
 
-    // PRO EXCLUSIVE: Savage Meter + Item Roast
-    let proContentY = subScoreY + 50
-    if (isProCard && scores.savageLevel) {
-      // Savage meter background
-      const meterX = 180
-      const meterWidth = 720
-      const meterHeight = 28
-      ctx.fillStyle = 'rgba(255,68,68,0.15)'
-      ctx.beginPath()
-      ctx.roundRect(meterX, proContentY, meterWidth, meterHeight, 14)
-      ctx.fill()
+    // The Tagline Pill
+    const taglineY = isSquare ? 920 : 1380
+    ctx.font = `bold ${isSquare ? 22 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
+    const taglineText = (scores.tagline || 'NO NOTES').toUpperCase()
+    const taglineWidth = ctx.measureText(taglineText).width + 60
 
-      // Savage meter fill
-      const fillWidth = (scores.savageLevel / 10) * meterWidth
-      const savageGradient = ctx.createLinearGradient(meterX, 0, meterX + fillWidth, 0)
-      savageGradient.addColorStop(0, '#ff4444')
-      savageGradient.addColorStop(1, '#ff6b6b')
-      ctx.fillStyle = savageGradient
-      ctx.beginPath()
-      ctx.roundRect(meterX, proContentY, fillWidth, meterHeight, 14)
-      ctx.fill()
-
-      // Savage label
-      const fireEmoji = scores.savageLevel >= 9 ? '🔥🔥🔥' : scores.savageLevel >= 7 ? '🔥🔥' : '🔥'
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.textAlign = 'left'
-      ctx.fillText(`${fireEmoji} SAVAGE: ${scores.savageLevel}/10`, meterX + 20, proContentY - 8)
-      ctx.textAlign = 'center'
-
-      proContentY += 50
-    }
-
-    // PRO EXCLUSIVE: Best item roast quote
-    if (isProCard && scores.itemRoasts) {
-      const roasts = scores.itemRoasts
-      // Pick the best roast (shoes usually most visible)
-      const bestRoast = roasts.shoes || roasts.top || roasts.bottom
-      if (bestRoast && bestRoast !== 'N/A') {
-        const truncatedRoast = bestRoast.length > 45 ? bestRoast.slice(0, 42) + '...' : bestRoast
-        ctx.fillStyle = 'rgba(255,215,0,0.15)'
-        ctx.beginPath()
-        ctx.roundRect(140, proContentY, 800, 50, 25)
-        ctx.fill()
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'
-        ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-        ctx.fillText(`💬 "${truncatedRoast}"`, 540, proContentY + 33)
-        proContentY += 60
-      }
-    }
-
-    // Aesthetic + Celeb in pill style (skip for square to save space, or position lower)
-    const pillY = isSquare
-      ? subScoreY + 20
-      : (isProCard && scores.savageLevel ? proContentY : subScoreY + 60)
-
-    if (!isSquare) {
-      ctx.fillStyle = 'rgba(255,255,255,0.1)'
-      ctx.beginPath()
-      ctx.roundRect(140, pillY, 800, 50, 25)
-      ctx.fill()
-      ctx.fillStyle = 'rgba(255,255,255,0.8)'
-      ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
-      const celebText = scores.celebMatch
-      ctx.fillText(`${scores.aesthetic} • ${celebText}`, 540, pillY + 35)
-    }
-
-    // For square: show condensed aesthetic tag
-    if (isSquare) {
-      ctx.fillStyle = 'rgba(255,255,255,0.6)'
-      ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillText(`${scores.aesthetic}`, 540, 900)
-    }
-
-    // Challenge text - THE VIRAL HOOK (dynamic Y)
-    const captionY = isSquare ? 950 : 1350
-    ctx.fillStyle = isProCard ? '#ffd700' : modeColors.light
-    ctx.font = `bold ${isSquare ? 28 : 38}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText(viralCaption, 540, captionY)
-
-    // Hashtags - Pro gets special hashtag (skip for square to save space)
-    if (!isSquare) {
-      ctx.fillStyle = isProCard ? '#ffd700' : modeColors.accent
-      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
-      const proHashtags = isProCard ? '✨ #FitRatePro #OutfitCheck ✨' : hashtags
-      ctx.fillText(proHashtags, 540, 1420)
-    }
-
-    // Call to action box - dynamic for format
-    const ctaY = isSquare ? 990 : 1480
-    const ctaHeight = isSquare ? 70 : 100
-    ctx.fillStyle = modeColors.glow.replace('0.4', '0.2')
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'
     ctx.beginPath()
-    ctx.roundRect(isSquare ? 140 : 180, ctaY, isSquare ? 800 : 720, ctaHeight, 20)
+    ctx.roundRect(540 - taglineWidth / 2, taglineY - 35, taglineWidth, 54, 27)
     ctx.fill()
-    ctx.strokeStyle = modeColors.glow.replace('0.4', '0.5')
-    ctx.lineWidth = 2
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'
     ctx.stroke()
 
-    // CTA text - Made to screenshot positioning
-    ctx.fillStyle = '#ffffff'
-    ctx.font = `bold ${isSquare ? 26 : 34}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('Your turn → fitrate.app', 540, ctaY + (ctaHeight / 2) + 8)
+    ctx.fillStyle = scoreColor
+    ctx.fillText(taglineText, 540, taglineY + 3)
 
-    // Branding footer (skip for square)
-    if (!isSquare) {
-      ctx.fillStyle = 'rgba(255,255,255,0.35)'
-      ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillText('Rate your fit in seconds', 540, 1620)
+    // PRO TIP (If applicable)
+    if (isProCard && scores.proTip) {
+      const tipY = taglineY + (isSquare ? 80 : 120)
+      ctx.fillStyle = 'rgba(0,212,255,0.1)'
+      ctx.beginPath()
+      ctx.roundRect(140, tipY - 40, 800, 64, 32)
+      ctx.fill()
+      ctx.fillStyle = '#00d4ff'
+      ctx.font = `bold ${isSquare ? 20 : 26}px -apple-system, BlinkMacSystemFont, sans-serif`
+      ctx.fillText(`💡 PRO TIP: ${scores.proTip}`, 540, tipY + 4)
     }
+
+    // Branding footer
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'
+    ctx.font = `${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('Rate your fit in seconds → fitrate.app', 540, 1620)
 
     // Generate share text - punchy, viral, screenshot-worthy
     const getShareText = () => {
@@ -2099,20 +2008,36 @@ export default function App() {
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-5xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
-              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>/100</span>
+              <span className="text-4xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 10</span>
             </div>
           </div>
         </div>
 
-        {/* Verdict - Large & Punchy */}
-        <div className={`transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <p className="text-xl font-black text-white text-center mb-2 px-6" style={{
+        {/* Verdict & Catchphrases - The Heart of the Smile Test */}
+        <div className={`flex flex-col items-center gap-2 mb-6 transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-2xl font-black text-white text-center px-4" style={{
             textShadow: `0 0 30px ${modeAccent}66`,
-            lineHeight: 1.3
+            lineHeight: 1.1
           }}>
             {scores.verdict}
           </p>
+
+          {scores.lines && scores.lines.length >= 2 && (
+            <div className="flex flex-col items-center gap-1 mt-2">
+              <p className="text-sm font-medium text-white/70 italic">"{scores.lines[0]}"</p>
+              <p className="text-sm font-medium text-white/70 italic">"{scores.lines[1]}"</p>
+            </div>
+          )}
+
+          <div className="mt-4 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <p className="text-xs font-black uppercase tracking-[0.2em]" style={{
+              color: scoreColor,
+              textShadow: `0 0 10px ${scoreColor}44`
+            }}>
+              {scores.tagline}
+            </p>
+          </div>
         </div>
 
         {/* Social Proof */}
@@ -2144,32 +2069,29 @@ export default function App() {
           </p>
         </div>
 
-        {/* PHOTO & MAIN RESULT CARD */}
-        <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <button
-            onClick={generateShareCard}
-            className="card-physical w-full p-4 group relative overflow-hidden active:scale-[0.98] transition-all text-left"
-            style={{
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: `0 20px 50px rgba(0,0,0,0.3), inset 0 0 40px ${modeAccent}11`
-            }}
-          >
-            <div className="flex gap-4 items-center">
-              <div className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl flex-shrink-0" style={{ border: `1px solid ${scoreColor}44` }}>
-                <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
+        {/* PHOTO PREVIEW */}
+        <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div className="relative group">
+            <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative" style={{
+              border: `2px solid ${scoreColor}44`,
+              boxShadow: `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${scoreColor}11`
+            }}>
+              <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
+
+              {/* Subtle branding on photo */}
+              <div className="absolute top-4 left-4 opacity-40">
+                <span className="text-[10px] font-black text-white tracking-widest uppercase">FitRate.app</span>
               </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-black tracking-widest text-white/30 uppercase mb-2">Style Analysis</p>
-                <p className="text-sm font-bold text-white mb-2 leading-tight">"{scores.tip}"</p>
-                <div className="flex flex-wrap gap-1">
-                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-bold uppercase">{scores.aesthetic}</span>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/60 font-bold uppercase">{scores.celebMatch}</span>
+
+              {/* Pro Tip Overlay (If Pro) */}
+              {isPro && scores.proTip && revealStage >= 4 && (
+                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 animate-in fade-in slide-in-from-bottom-2">
+                  <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest block mb-1">💡 Pro Suggestion</span>
+                  <p className="text-xs text-white/90 font-medium">"{scores.proTip}"</p>
                 </div>
-              </div>
+              )}
             </div>
-            <p className="text-center text-[11px] font-black text-white/40 uppercase tracking-widest mt-4 group-active:text-white/60">Tap to share</p>
-          </button>
+          </div>
         </div>
 
         {/* GOLDEN INSIGHT (PRO) OR TEASER (FREE) */}
