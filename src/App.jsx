@@ -3121,14 +3121,13 @@ export default function App() {
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="btn-physical w-full p-5 rounded-3xl text-left transition-all group relative overflow-hidden"
+              className="btn-physical w-full p-4 rounded-3xl text-left transition-all group relative overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
                 border: '2px solid rgba(255,255,255,0.3)',
                 boxShadow: 'var(--shadow-physical), 0 0 40px rgba(255,215,0,0.25)'
               }}
             >
-              {/* Best Value Badge */}
               {/* Best Value Badge */}
               <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-xl uppercase tracking-wider z-10" style={{
                 boxShadow: '-2px 2px 10px rgba(255,68,68,0.3)'
@@ -3140,10 +3139,11 @@ export default function App() {
               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
 
               {/* Header: Crown + Title + Price - Mobile Optimized */}
-              <div className="flex items-start gap-3 mb-4 relative z-10">
-                <span className="text-3xl fle-shrink-0 mt-1">👑</span>
-                <div className="flex flex-col">
-                  <h3 className="text-black text-xl sm:text-2xl font-black leading-tight">Pro Weekly</h3>
+              {/* Added pr-16 to ensure text doesn't overlap with the absolute positioned badge */}
+              <div className="flex items-center gap-3 mb-3 relative z-10 pr-16">
+                <span className="text-2xl sm:text-3xl flex-shrink-0">👑</span>
+                <div className="flex flex-col min-w-0">
+                  <h3 className="text-black text-lg sm:text-2xl font-black leading-tight truncate">Pro Weekly</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-xl sm:text-2xl font-black text-black">$2.99</span>
                     <span className="text-black/60 text-sm font-bold">/wk</span>
