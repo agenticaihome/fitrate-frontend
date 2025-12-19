@@ -2568,115 +2568,48 @@ export default function App() {
   }
 
   // ============================================
-  // PAYWALL SCREEN - Mobile-Native Bottom Sheet
+  // PAYWALL/LIMIT-REACHED SCREEN - Redirect to Sales Page Modal
   // ============================================
   if (screen === 'paywall' || screen === 'limit-reached') {
+    // Instead of a separate screen, show the paywall modal on home
+    // This ensures all purchase CTAs go through one canonical Sales Page
     return (
-      <div className="min-h-screen flex flex-col items-center justify-end p-0" style={{
+      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
-        {/* Backdrop with photo preview if available */}
-        {uploadedImage && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-20">
-            <img src={uploadedImage} alt="" className="w-64 h-80 object-cover rounded-2xl blur-sm" />
-          </div>
-        )}
+        {/* Auto-open the paywall modal */}
+        {!showPaywall && (() => { setShowPaywall(true); return null; })()}
 
-        {/* Bottom Sheet */}
-        <div className="w-full max-w-md rounded-t-3xl p-6 pb-10 relative z-10" style={{
-          background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(15,15,25,0.99) 100%)',
-          backdropFilter: 'blur(20px)',
-          animation: 'slideUp 0.4s ease-out',
-          paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom, 2.5rem))'
-        }}>
-          {/* Handle bar */}
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-white/20" />
-
-          {/* Close X button */}
-          <button
-            onClick={() => setScreen('home')}
-            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl p-1"
-            aria-label="Close"
-          >
-            ×
-          </button>
-
-          {/* Emotional headline */}
-          <div className="text-center mb-6 mt-4">
-            <span className="text-4xl mb-3 block">{mode === 'roast' ? '🔥' : '✨'}</span>
-            <h2 className="text-2xl font-black text-white mb-2">
-              {mode === 'roast' ? 'Want the brutal truth?' : 'Ready for more?'}
-            </h2>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {timeUntilReset
-                ? `Free fits reset in ${timeUntilReset}`
-                : 'Get 25 outfit ratings per day'}
-            </p>
-          </div>
-
-          {/* Purchase Options - Optimized Order (One-time first) */}
-          <div className="flex flex-col gap-3 mb-5">
-            {/* 1. Pro Scan Packs (Utility - High Trust) */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => startCheckout('popularPack')}
-                disabled={checkoutLoading}
-                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center disabled:opacity-50"
-                style={{ minHeight: '64px' }}
-              >
-                <span className="text-lg">📦</span>
-                15 Scans • $3.99
-              </button>
-              <button
-                onClick={() => startCheckout('powerPack')}
-                disabled={checkoutLoading}
-                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center disabled:opacity-50"
-                style={{ minHeight: '64px' }}
-              >
-                <span className="text-lg">🔥</span>
-                50 Scans • $9.99
-              </button>
-            </div>
-
-            {/* 2. One-time Roast (Impulse Buy) */}
-            <button
-              onClick={() => startCheckout('proRoast')}
-              disabled={checkoutLoading}
-              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-              style={{
-                background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-                boxShadow: '0 8px 30px rgba(255,68,68,0.3)',
-                minHeight: '56px'
-              }}
-            >
-              🚀 Roast this one · $0.99
-            </button>
-
-            {/* 3. Pro Subscription (Expert/Power User) */}
-            <button
-              onClick={() => startCheckout('proWeekly')}
-              disabled={checkoutLoading}
-              className="w-full py-3 rounded-xl text-white font-medium text-sm flex items-center justify-center gap-2 transition-all active:scale-95 opacity-80 disabled:opacity-50"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                minHeight: '48px'
-              }}
-            >
-              ✨ Sub Unlimited · $2.99/wk
-            </button>
-          </div>
-
-          {/* Trust microcopy */}
-          <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Cancel anytime. No commitment.
+        {/* Background content */}
+        <div className="text-center">
+          <span className="text-6xl mb-4 block">{mode === 'roast' ? '🔥' : '✨'}</span>
+          <h2 className="text-2xl font-black text-white mb-2">
+            {screen === 'limit-reached' ? "You've used today's free scans" : 'Upgrade to Pro'}
+          </h2>
+          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Get 25 ratings per day'}
           </p>
+
+          {/* Single CTA to open Sales Page */}
+          <button
+            onClick={() => setShowPaywall(true)}
+            className="px-8 py-4 rounded-2xl text-white font-bold text-lg transition-all active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+              boxShadow: '0 8px 30px rgba(0,212,255,0.3)',
+              minHeight: '56px'
+            }}
+          >
+            👑 View Options
+          </button>
 
           {/* Back button */}
           <button
             onClick={() => setScreen('home')}
-            className="w-full py-3 text-sm font-medium transition-all active:opacity-60"
+            className="w-full mt-4 py-3 text-sm font-medium transition-all active:opacity-60"
             style={{ color: 'rgba(255,255,255,0.4)' }}
           >
             ← Maybe later
