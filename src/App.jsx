@@ -1220,7 +1220,7 @@ export default function App() {
     // CONVERSATION STAMP - Replaces the old "Certified" seal for maximum engagement
     ctx.save()
     const stampX = isSquare ? 880 : 920
-    const stampY = isSquare ? 120 : 180
+    const stampY = isSquare ? 120 : 240 // Moved down for Story safe zone
     // Dynamic Stamp Text & Color
     let stampText = "AGREE?"
     let stampColor = '#fff'
@@ -1385,12 +1385,14 @@ export default function App() {
     ctx.font = `bold ${isSquare ? 20 : 26}px -apple-system, BlinkMacSystemFont, sans-serif`
     ctx.fillStyle = 'rgba(255,255,255,0.4)'
     ctx.textAlign = 'center'
-    ctx.fillText(`TOP ${100 - scores.percentile}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1810)
+    // Rounded up for clean UI
+    const percent = Math.max(1, 100 - scores.percentile)
+    ctx.fillText(`TOP ${percent}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1700) // Moved up for safe zone
 
     // Branding Footer - Strong CTA for Viral Re-scans
     ctx.fillStyle = 'rgba(255,255,255,0.3)'
     ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('TRY IT FREE @ FITRATE.APP', 540, isSquare ? 1075 : 1870)
+    ctx.fillText('TRY IT FREE @ FITRATE.APP', 540, isSquare ? 1070 : 1750) // Moved up for safe zone
 
     // Generate Conversation-Starter Share Text
     const getShareText = () => {
