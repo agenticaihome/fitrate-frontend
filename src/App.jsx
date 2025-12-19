@@ -1729,6 +1729,8 @@ export default function App() {
             {/* Cancel button */}
             <button
               onClick={() => {
+                playSound('click')
+                vibrate(15)
                 stopCamera()
                 setCountdown(null)
                 setScreen('home')
@@ -1741,7 +1743,11 @@ export default function App() {
 
             {/* Capture button - BIG */}
             <button
-              onClick={capturePhoto}
+              onClick={() => {
+                playSound('click')
+                vibrate(30)
+                capturePhoto()
+              }}
               disabled={countdown !== null}
               className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
               style={{
@@ -1756,12 +1762,16 @@ export default function App() {
 
             {/* Timer button */}
             <button
-              onClick={timerCapture}
+              onClick={() => {
+                playSound('click')
+                vibrate(20)
+                timerCapture()
+              }}
               disabled={countdown !== null}
               className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
               aria-label="3 second countdown timer"
             >
-              <span className="text-white text-sm font-bold">3s</span>
+              <span className="text-white text-lg">⏱️</span>
             </button>
           </div>
         </div>
@@ -2723,6 +2733,8 @@ export default function App() {
     }
 
     const shareToTwitter = () => {
+      playSound('click')
+      vibrate(15)
       const text = encodeURIComponent(getShareText())
       const url = encodeURIComponent(getShareUrl())
       trackShare('twitter', 'outfit_rating', scores?.overall)
@@ -2730,12 +2742,16 @@ export default function App() {
     }
 
     const shareToFacebook = () => {
+      playSound('click')
+      vibrate(15)
       const url = encodeURIComponent(getShareUrl())
       trackShare('facebook', 'outfit_rating', scores?.overall)
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
     }
 
     const shareToReddit = () => {
+      playSound('click')
+      vibrate(15)
       const title = encodeURIComponent(getShareText())
       const url = encodeURIComponent(getShareUrl())
       trackShare('reddit', 'outfit_rating', scores?.overall)
@@ -2743,6 +2759,8 @@ export default function App() {
     }
 
     const shareToSMS = () => {
+      playSound('click')
+      vibrate(15)
       const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
       // Use different format for iOS vs Android
       const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -2751,6 +2769,8 @@ export default function App() {
     }
 
     const shareToWhatsApp = () => {
+      playSound('click')
+      vibrate(15)
       const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
       trackShare('whatsapp', 'outfit_rating', scores?.overall)
       window.open(`https://wa.me/?text=${text}`, '_blank')
