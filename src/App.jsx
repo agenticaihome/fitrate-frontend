@@ -2008,53 +2008,55 @@ export default function App() {
         )}
 
         {/* BOTTOM SECTION - COORDINATED LAYOUT */}
-        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6 relative z-10" style={{
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
+        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-4" style={{
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+          position: 'relative',
+          zIndex: 30,
+          pointerEvents: 'auto'
         }}>
-          {/* Scan Status & Pro Upgrade */}
-          <div className="flex flex-col items-center gap-3">
-            {scansRemaining > 0 || isPro ? (
-              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {isPro ? '⚡ 25 ratings per day' : `${scansRemaining} free rating${scansRemaining !== 1 ? 's' : ''} left today`}
-              </p>
-            ) : (
-              <button
-                onClick={() => setShowPaywall(true)}
-                className="btn-physical btn-responsive-text flex items-center gap-2 px-6 py-3 rounded-full animate-pulse-glow relative z-20"
-                style={{
-                  background: 'rgba(255,215,0,0.1)',
-                  border: '1px solid rgba(255,215,0,0.4)',
-                  boxShadow: '0 0 30px rgba(255,215,0,0.1)',
-                  minHeight: '48px'
-                }}
-              >
-                <span className="text-xs font-black" style={{ color: '#ffd700' }}>
-                  GET MORE RATINGS 👑
-                </span>
-              </button>
-            )}
+          {/* Scan Status */}
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {isPro
+              ? '⚡ 25 ratings per day'
+              : scansRemaining > 0
+                ? `${scansRemaining} free rating${scansRemaining !== 1 ? 's' : ''} left today`
+                : `Resets ${timeUntilReset || 'tomorrow'}`}
+          </p>
 
-            {/* Subtle Go Pro link - only when more than 1 scan remaining */}
-            {!isPro && scansRemaining > 1 && (
-              <button
-                onClick={() => setShowPaywall(true)}
-                className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase px-4 py-3 relative z-20"
-                style={{ minHeight: '44px' }}
-              >
-                Go Pro →
-              </button>
-            )}
-          </div>
-
-          {/* Footer Links - Compact */}
-          <div className="flex justify-center gap-6 pb-2">
-            <a href="/privacy" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy</a>
-            <a href="/terms" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Terms</a>
-            <a href="/about" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>About</a>
-          </div>
+          {/* Go Pro Button - ALWAYS visible for non-Pro users */}
+          {!isPro && (
+            <button
+              onClick={() => {
+                console.log('CTA_CLICKED: GoProButton -> Sales Page')
+                playSound('click')
+                vibrate(20)
+                setShowPaywall(true)
+              }}
+              className="flex items-center gap-2 px-6 py-3 rounded-full transition-all active:scale-95"
+              style={{
+                background: scansRemaining === 0
+                  ? 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)'
+                  : 'rgba(255,215,0,0.15)',
+                border: '1px solid rgba(255,215,0,0.4)',
+                boxShadow: scansRemaining === 0 ? '0 0 30px rgba(255,215,0,0.3)' : 'none',
+                minHeight: '48px',
+                color: scansRemaining === 0 ? '#000' : '#ffd700',
+                fontWeight: 'bold',
+                pointerEvents: 'auto',
+                cursor: 'pointer'
+              }}
+            >
+              {scansRemaining === 0 ? '👑 Get More Ratings' : '⚡ Go Pro'}
+            </button>
+          )}
         </div>
 
-
+        {/* Footer Links - Compact */}
+        <div className="flex justify-center gap-6 pb-2">
+          <a href="/privacy" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy</a>
+          <a href="/terms" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Terms</a>
+          <a href="/about" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>About</a>
+        </div>
       </div>
     )
   }
