@@ -1714,7 +1714,7 @@ export default function App() {
         </div>
 
         {/* MODE SELECTOR - Refined, secondary pill */}
-        <div className="mt-6 mb-10 flex items-center gap-2 p-1 rounded-full" style={{
+        <div className="mt-6 mb-10 flex items-center gap-2 p-1 rounded-full overflow-visible" style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
@@ -3079,7 +3079,7 @@ export default function App() {
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-hidden"
+              className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-visible"
               style={{
                 background: 'linear-gradient(135deg, #00d4ff 0%, #0077ff 100%)',
                 border: '1px solid rgba(255,255,255,0.2)',
