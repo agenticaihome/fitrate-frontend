@@ -3143,10 +3143,10 @@ export default function App() {
             ×
           </button>
 
-          {/* HEADER - Clear, Simple */}
+          {/* HEADER - Value Focused */}
           <div className="text-center mb-6">
-            <h2 className="text-white text-2xl font-black mb-2">Unlock More Ratings</h2>
-            <p className="text-gray-400 text-sm">Choose your plan</p>
+            <h2 className="text-white text-2xl font-black mb-1">Unlock Your Full Style Profile</h2>
+            <p className="text-gray-400 text-sm">Get the scores & stats you're missing</p>
           </div>
 
           {/* 👑 PRO SUBSCRIPTION - Best Value */}
@@ -3171,7 +3171,7 @@ export default function App() {
               {/* Shine effect */}
               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
 
-              {/* Header: Crown + Title + Price - Mobile Optimized */}
+              {/* Header: Crown + Title + Price */}
               <div className="flex flex-col w-full relative z-10">
                 <div className="flex items-center gap-3 mb-3 pr-8">
                   <span className="text-2xl sm:text-3xl flex-shrink-0">👑</span>
@@ -3184,12 +3184,29 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Benefits */}
+                {/* Visual Lock Tease - The Core "Non-Greedy" Hook */}
+                <div className="flex items-center gap-2 mb-3 bg-black/10 p-2 rounded-lg">
+                  <span className="text-[10px] uppercase font-black text-black/60 mr-1">Modes:</span>
+                  <div className="flex gap-2 text-lg">
+                    <span title="Nice">😌</span>
+                    <span title="Roast">🔥</span>
+                    <div className="relative">
+                      <span>🧠</span>
+                      <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
+                    </div>
+                    <div className="relative">
+                      <span>😈</span>
+                      <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Benefits - Precision Focus */}
                 <div className="space-y-1.5 pl-1">
                   {[
-                    'All modes unlocked',
-                    '25 scans per day',
-                    'GPT-4o powered'
+                    'Unlock Honest & Savage Modes',
+                    'Precision Scoring (e.g. 87.4)',
+                    'Unlimited Scans (25/day)'
                   ].map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
                       <span className="text-black text-sm flex-shrink-0">✓</span>
@@ -3201,7 +3218,7 @@ export default function App() {
             </button>
           </div>
 
-          <p className="text-center text-[11px] font-bold text-gray-500 mb-4 tracking-wider uppercase">— OR PAY AS YOU GO —</p>
+          <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-wider uppercase">— OR PAY AS YOU GO —</p>
 
           {/* 🎟️ SCAN PACKS - 2-Column Grid */}
           <div className="grid grid-cols-2 gap-3 mb-4">
@@ -3256,7 +3273,7 @@ export default function App() {
             </button>
           </div>
 
-          {/* ☠️ SAVAGE ONE-OFF - Full Card */}
+          {/* ☠️ SAVAGE ONE-OFF - "Curiosity" Framing */}
           <div className="relative w-full mb-5">
             <button
               onClick={() => startCheckout('proRoast')}
@@ -3269,11 +3286,13 @@ export default function App() {
               }}
             >
               <div className="flex flex-col items-center">
-                <span className="text-5xl mb-2">☠️</span>
-                <h3 className="text-red-400 text-2xl font-black mb-1">Savage Roast</h3>
-                <p className="text-red-300/60 text-sm font-bold mb-3">One brutal rating</p>
-                <p className="text-gray-400 text-xs mb-3">GPT-4o powered</p>
-                <span className="text-3xl font-black text-white">$0.99</span>
+                <span className="text-4xl mb-2">☠️</span>
+                <h3 className="text-red-400 text-xl font-black mb-1">Curious? Savage Mode</h3>
+                <p className="text-red-300/60 text-sm font-bold mb-2">Try the brutal truth once</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400 line-through">$2.99</span>
+                  <span className="text-2xl font-black text-white">$0.99</span>
+                </div>
               </div>
             </button>
           </div>
