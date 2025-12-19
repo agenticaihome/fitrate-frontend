@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { playSound, vibrate } from './utils/soundEffects'
+import ButtonTestPage from './ButtonTestPage'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -57,6 +58,12 @@ const SHARE_TIPS = [
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
 
 export default function App() {
+  // Check for button test page
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('test') === 'buttons') {
+    return <ButtonTestPage />
+  }
+
   const [screen, setScreen] = useState('home')
   const [uploadedImage, setUploadedImage] = useState(null)
   const [scores, setScores] = useState(null)
@@ -1728,12 +1735,17 @@ export default function App() {
         {!isPro && scansRemaining <= 1 && (
           <button
             onClick={() => setShowPaywall(true)}
-            className="flex items-center gap-1 text-xs mt-3 px-3 py-1.5 rounded-full transition-all active:scale-95 hover:opacity-100"
+            className="btn-responsive-text flex items-center gap-1 text-xs mt-3 px-3 py-1.5 rounded-full transition-all active:scale-95 hover:opacity-100"
             style={{
               color: '#ffd700',
               background: 'rgba(255,215,0,0.1)',
               border: '1px solid rgba(255,215,0,0.3)'
             }}
+          >
+            ⚡ Go Pro
+          </button>
+        )}
+
         {/* BOTTOM SECTION - COORDINATED LAYOUT */}
         <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6" style={{
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
@@ -1747,7 +1759,7 @@ export default function App() {
             ) : (
               <button
                 onClick={() => setShowPaywall(true)}
-                className="btn-physical flex items-center gap-2 px-6 py-2.5 rounded-full animate-pulse-glow"
+                className="btn-physical btn-responsive-text flex items-center gap-2 px-6 py-2.5 rounded-full animate-pulse-glow"
                 style={{
                   background: 'rgba(255,215,0,0.1)',
                   border: '1px solid rgba(255,215,0,0.4)',
@@ -2527,7 +2539,7 @@ export default function App() {
           <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
             Or share directly to:
           </p>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="share-grid-responsive grid grid-cols-5 gap-2">
             {/* Copy Link */}
             <button
               onClick={copyShareLink}
@@ -2679,7 +2691,7 @@ export default function App() {
               <button
                 onClick={() => startCheckout('proWeeklyDiscount')}
                 disabled={checkoutLoading}
-                className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
+                className="btn-stable-width w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
                 style={{
                   background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
                   boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
@@ -2835,7 +2847,7 @@ export default function App() {
           <button
             onClick={() => startCheckout('proRoast')}
             disabled={checkoutLoading}
-            className="w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
+            className="btn-responsive-text btn-multi-line w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
             style={{
               background: 'rgba(255,68,68,0.08)',
               border: '1px solid rgba(255,68,68,0.25)'
