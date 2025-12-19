@@ -1848,12 +1848,12 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            disabled={scansRemaining === 0 && !isPro && purchasedScans === 0}
-            className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center disabled:opacity-40 group"
+            className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
             style={{
               background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
               border: `3px solid ${accent}99`,
-              boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
+              boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`,
+              opacity: (scansRemaining === 0 && !isPro && purchasedScans === 0) ? 0.6 : 1
             }}
           >
             {/* Pulsing inner glow */}
