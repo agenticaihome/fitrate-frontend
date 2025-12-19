@@ -1968,7 +1968,7 @@ export default function App() {
               <button
                 onClick={() => {
                   playSound('click')
-                  setShowDeclineOffer(true) // Show decline offer instead of closing
+                  setShowPaywall(false) // Close directly
                 }}
                 className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
               >
@@ -2144,11 +2144,11 @@ export default function App() {
               <button
                 onClick={() => {
                   playSound('click')
-                  setShowDeclineOffer(true)
+                  setShowPaywall(false)
                 }}
                 className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
               >
-                Not now
+                ← Not now, go back
               </button>
             </div>
           </div>
