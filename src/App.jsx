@@ -1661,7 +1661,7 @@ export default function App() {
         )}
 
         {/* HERO CTA - Central path of least resistance */}
-        <div className="flex-1 flex flex-col items-center justify-center -mt-12 sm:-mt-20">
+        <div className="flex-1 flex flex-col items-center justify-center">
           <button
             onClick={() => {
               playSound('click')
