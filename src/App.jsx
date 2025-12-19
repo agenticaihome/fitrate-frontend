@@ -3206,9 +3206,10 @@ export default function App() {
                 {/* Benefits - Precision Focus */}
                 <div className="space-y-1.5 pl-1">
                   {[
+                    'GPT-4o High-Fidelity Analysis',
+                    'Expert Style Critique',
                     'Unlock Honest & Savage Modes',
-                    'Precision Scoring (e.g. 87.4)',
-                    'Unlimited Scans (25/day)'
+                    'Precision Scoring (e.g. 87.4)'
                   ].map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
                       <span className="text-black text-sm flex-shrink-0">✓</span>
@@ -3299,28 +3300,29 @@ export default function App() {
             </button>
           </div>
 
-          {/* TRANSPARENCY SECTION */}
-          <div className="mb-5 p-4 rounded-2xl" style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)'
-          }}>
-            <div className="space-y-2">
-              <p className="text-xs text-gray-400 flex items-center gap-2">
-                <span className="text-green-400">✓</span>
-                Free users get Nice & Roast modes
-              </p>
-              <p className="text-xs text-gray-400 flex items-center gap-2">
-                <span className="text-cyan-400">✓</span>
-                Pro unlocks all modes
-              </p>
-              <p className="text-xs text-gray-400 flex items-center gap-2">
-                <span className="text-gray-500">✓</span>
-                No hidden charges
-              </p>
-              <p className="text-xs text-gray-400 flex items-center gap-2">
-                <span className="text-gray-500">✓</span>
-                Cancel anytime
-              </p>
+          {/* MODEL CAPABILITIES COMPARISON - The "Why Control" */}
+          <div className="mb-5 p-4 rounded-2xl bg-black/40 border border-white/10">
+            <h4 className="text-xs font-black text-white/50 uppercase tracking-widest mb-4 text-center">Engine Comparison</h4>
+            <div className="grid grid-cols-3 gap-y-3 text-[11px]">
+              {/* Headers */}
+              <div className="col-span-1 text-gray-500 font-bold">Feature</div>
+              <div className="col-span-1 text-center text-gray-400 font-bold">Free</div>
+              <div className="col-span-1 text-center text-yellow-400 font-black">PRO</div>
+
+              {/* Rows */}
+              {[
+                { label: 'AI Model', free: 'Gemini Flash', pro: 'GPT-4o (Elite)' },
+                { label: 'Style IQ', free: 'Standard', pro: 'High-Fidelity' },
+                { label: 'Critique', free: 'Basic', pro: 'Expert Level' },
+                { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' }
+              ].map((row, i) => (
+                <React.Fragment key={i}>
+                  <div className="col-span-3 h-px bg-white/5 my-1" />
+                  <div className="col-span-1 text-gray-300 font-medium self-center">{row.label}</div>
+                  <div className="col-span-1 text-center text-gray-500 self-center">{row.free}</div>
+                  <div className="col-span-1 text-center text-yellow-400 font-bold self-center">{row.pro}</div>
+                </React.Fragment>
+              ))}
             </div>
           </div>
 
