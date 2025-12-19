@@ -1773,9 +1773,18 @@ export default function App() {
   }
 
   // ============================================
-  // HOME SCREEN - Camera First, Zero Friction
+  // PAYWALL MODAL - Check FIRST before home screen
+  // (The full paywall UI is defined later, but we check the condition here)
   // ============================================
-  if (screen === 'home') {
+  // NOTE: The paywall modal code block was at line 2928 but screens return early
+  // So we need a way to make paywall take priority. We'll do this by NOT
+  // returning from home screen if showPaywall is true - instead show paywall inline.
+
+  // ============================================
+  // HOME SCREEN - Camera First, Zero Friction
+  // Only show if paywall is NOT open (paywall takes priority)
+  // ============================================
+  if (screen === 'home' && !showPaywall) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
@@ -2023,7 +2032,6 @@ export default function App() {
                 e.preventDefault()
                 e.stopPropagation()
                 console.log('🚀 GO PRO CLICKED!')
-                alert('Go Pro clicked! Opening Sales Page...')
                 setShowPaywall(true)
               }}
               style={{
