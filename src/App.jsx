@@ -147,7 +147,6 @@ export default function App() {
         document.referrer.includes('android-app://')
       setIsStandalone(isStandaloneMode)
       if (isStandaloneMode) {
-        console.log('FitRate running in Standalone Mode 📱')
         document.body.classList.add('is-standalone')
       }
     }
@@ -462,8 +461,6 @@ export default function App() {
       powerPack: 9.99
     }
 
-    // Track CTA click for debugging
-    console.log(`CTA_CLICKED: ${product} -> Stripe checkout`)
 
     // GA4 begin_checkout event
     if (typeof window.gtag === 'function') {
@@ -502,6 +499,13 @@ export default function App() {
       return () => clearInterval(interval)
     }
   }, [scansRemaining, isPro])
+
+  // Auto-open paywall when navigating to paywall/limit-reached screen
+  useEffect(() => {
+    if ((screen === 'paywall' || screen === 'limit-reached') && !showPaywall) {
+      setShowPaywall(true)
+    }
+  }, [screen, showPaywall])
 
   // Sequential reveal animation
   useEffect(() => {
@@ -904,6 +908,7 @@ export default function App() {
         setLastScore(data.scores.overall)
 
         setScores(scores)
+        setAnalysisProgress(100)
         setScreen('results')
         return
       } catch (err) {
@@ -940,6 +945,7 @@ export default function App() {
       setDailyStreak(newStreak)
 
       setScores({ ...data.scores, mode, roastMode: mode === 'roast' || mode === 'savage' })
+      setAnalysisProgress(100)
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
@@ -1684,7 +1690,11 @@ export default function App() {
           <div className="flex items-center gap-2">
             {/* Flip camera button */}
             <button
-              onClick={flipCamera}
+              onClick={() => {
+                playSound('click')
+                vibrate(15)
+                flipCamera()
+              }}
               className="w-11 h-11 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm active:scale-95"
               aria-label="Flip camera"
             >
@@ -1694,6 +1704,8 @@ export default function App() {
             {/* Gallery button */}
             <button
               onClick={() => {
+                playSound('click')
+                vibrate(15)
                 stopCamera()
                 setScreen('home')
                 setTimeout(() => fileInputRef.current?.click(), 100)
@@ -1895,17 +1907,17 @@ export default function App() {
           >
             {/* Pulsing inner glow */}
             <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-              background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
+              background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' || mode === 'savage' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
               boxShadow: `0 0 60px ${accentGlow}`,
               animation: 'pulse 2s ease-in-out infinite'
             }} />
 
             {/* Icon */}
             <span className="relative text-8xl mb-4 drop-shadow-2xl">
-              {mode === 'roast' ? '🔥' : mode === 'honest' ? '📊' : '📸'}
+              {mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
             </span>
             <span className="relative text-white text-2xl font-black tracking-widest uppercase">
-              {mode === 'roast' ? 'ROAST MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
+              {mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
             </span>
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
@@ -2031,7 +2043,8 @@ export default function App() {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                console.log('🚀 GO PRO CLICKED!')
+                playSound('click')
+                vibrate(20)
                 setShowPaywall(true)
               }}
               style={{
@@ -2458,20 +2471,13 @@ export default function App() {
         <h2 className="text-2xl font-black mb-4 uppercase tracking-tight">Oops!</h2>
         <p className="text-white/60 text-center mb-8 max-w-xs">{error || "We couldn't rate that one. Try a clearer photo or check your connection."}</p>
 
-        <div className="w-full max-w-xs flex flex-col gap-3">
+        <div className="w-full max-w-xs">
           <button
             onClick={resetApp}
             className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg transition-all active:scale-95"
             style={{ boxShadow: 'var(--shadow-physical)' }}
           >
             Try Again
-          </button>
-
-          <button
-            onClick={resetApp}
-            className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-lg transition-all active:scale-95"
-          >
-            ← Back to Home
           </button>
         </div>
       </div>
@@ -2592,8 +2598,6 @@ export default function App() {
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
-        {/* Auto-open the paywall modal */}
-        {!showPaywall && (() => { setShowPaywall(true); return null; })()}
 
         {/* Background content */}
         <div className="text-center">
