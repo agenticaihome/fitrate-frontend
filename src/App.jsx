@@ -3236,8 +3236,8 @@ export default function App() {
               }}
             >
               <span className="block text-4xl font-black text-cyan-400 mb-1">5</span>
-              <span className="block text-xs text-gray-400 uppercase font-bold mb-3 tracking-wide">Scans</span>
-              <span className="block text-xs text-gray-500 mb-2">Use anytime</span>
+              <span className="block text-xs text-gray-400 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
+              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o for 5 uses</span>
               <span className="block text-lg font-black text-white">$1.99</span>
             </button>
 
@@ -3254,8 +3254,8 @@ export default function App() {
             >
               <div className="absolute top-0 left-0 w-full h-1.5 bg-cyan-400" />
               <span className="block text-5xl font-black text-cyan-400 mb-1">15</span>
-              <span className="block text-xs text-cyan-400/80 uppercase font-bold mb-3 tracking-wide">Scans</span>
-              <span className="block text-xs text-cyan-300/70 mb-2">Use anytime</span>
+              <span className="block text-xs text-cyan-400/80 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
+              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o for 15 uses</span>
               <span className="block text-lg font-black text-white">$3.99</span>
             </button>
 
@@ -3270,8 +3270,8 @@ export default function App() {
               }}
             >
               <span className="block text-5xl font-black text-purple-400 mb-1">50</span>
-              <span className="block text-xs text-purple-400/70 uppercase font-bold mb-3 tracking-wide">Scans</span>
-              <span className="block text-xs text-gray-500 mb-2">Use anytime</span>
+              <span className="block text-xs text-purple-400/70 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
+              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o for 50 uses</span>
               <span className="block text-lg font-black text-white">$9.99</span>
             </button>
           </div>
