@@ -2,13 +2,14 @@
   <defs>
     <!-- Background gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a0a0f"/>
-      <stop offset="100%" style="stop-color:#1a1a2f"/>
+      <stop offset="0%" style="stop-color:#0a0a15"/>
+      <stop offset="50%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#0a0a15"/>
     </linearGradient>
     
     <!-- Neon glow -->
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feGaussianBlur stdDeviation="6" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -20,64 +21,87 @@
       <stop offset="0%" style="stop-color:#00d4ff"/>
       <stop offset="100%" style="stop-color:#00ff88"/>
     </linearGradient>
+
+    <!-- Gold gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="100%" style="stop-color:#ff8c00"/>
+    </linearGradient>
   </defs>
   
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bgGrad)"/>
   
-  <!-- Decorative circles -->
-  <circle cx="100" cy="100" r="200" fill="rgba(0,212,255,0.05)"/>
-  <circle cx="1100" cy="530" r="180" fill="rgba(255,0,128,0.05)"/>
+  <!-- Decorative glows -->
+  <circle cx="150" cy="150" r="250" fill="rgba(0,212,255,0.06)"/>
+  <circle cx="1050" cy="480" r="200" fill="rgba(0,255,136,0.04)"/>
   
-  <!-- Main tagline -->
-  <text x="600" y="220" 
+  <!-- Main title - FitRate -->
+  <text x="600" y="200" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="64" 
+        font-size="72" 
         font-weight="900" 
         fill="white" 
-        text-anchor="middle">
-    Post it... or let us
+        text-anchor="middle"
+        letter-spacing="2">
+    FitRate
   </text>
-  <text x="600" y="300" 
+  
+  <!-- Tagline -->
+  <text x="600" y="260" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="64" 
-        font-weight="900" 
+        font-size="28" 
+        font-weight="600" 
         fill="url(#scoreGrad)" 
         text-anchor="middle"
         filter="url(#glow)">
-    roast it first 😈
+    Your AI Style Coach
   </text>
   
-  <!-- Score badge -->
-  <circle cx="600" cy="430" r="80" fill="none" stroke="url(#scoreGrad)" stroke-width="6" filter="url(#glow)"/>
-  <text x="600" y="450" 
+  <!-- Score circle -->
+  <circle cx="600" cy="400" r="90" fill="none" stroke="url(#scoreGrad)" stroke-width="8" filter="url(#glow)"/>
+  <circle cx="600" cy="400" r="75" fill="rgba(0,212,255,0.1)"/>
+  
+  <!-- Score number -->
+  <text x="600" y="420" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="56" 
+        font-size="64" 
         font-weight="900" 
         fill="white" 
         text-anchor="middle">
-    87
+    92
   </text>
-  <text x="600" y="478" 
+  <text x="600" y="448" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="16" 
-        fill="rgba(255,255,255,0.5)" 
-        text-anchor="middle">
-    YOUR SCORE
+        font-size="14" 
+        fill="rgba(255,255,255,0.4)" 
+        text-anchor="middle"
+        letter-spacing="2">
+    / 100
   </text>
   
-  <!-- Logo -->
-  <text x="600" y="580" 
+  <!-- CTA text -->
+  <text x="600" y="545" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="24" 
+        font-size="22" 
+        font-weight="600" 
+        fill="rgba(255,255,255,0.7)" 
+        text-anchor="middle">
+    Get instant outfit feedback • Free to try
+  </text>
+  
+  <!-- URL -->
+  <text x="600" y="590" 
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
+        font-size="18" 
         font-weight="700" 
-        fill="rgba(255,255,255,0.6)" 
+        fill="rgba(255,255,255,0.4)" 
         text-anchor="middle"
-        letter-spacing="8">
+        letter-spacing="6">
     FITRATE.APP
   </text>
   
-  <!-- Decorative lines -->
-  <line x1="200" y1="350" x2="450" y2="350" stroke="rgba(0,212,255,0.3)" stroke-width="2"/>
-  <line x1="750" y1="350" x2="1000" y2="350" stroke="rgba(255,0,128,0.3)" stroke-width="2"/>
+  <!-- Accent lines -->
+  <line x1="250" y1="300" x2="420" y2="300" stroke="url(#scoreGrad)" stroke-width="2" opacity="0.3"/>
+  <line x1="780" y1="300" x2="950" y2="300" stroke="url(#scoreGrad)" stroke-width="2" opacity="0.3"/>
 </svg>
