@@ -122,6 +122,22 @@ export default function App() {
   const [referralCount, setReferralCount] = useState(0)
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
+  const [isStandalone, setIsStandalone] = useState(false)
+
+  // Detect standalone mode (PWA)
+  useEffect(() => {
+    const checkStandalone = () => {
+      const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true ||
+        document.referrer.includes('android-app://')
+      setIsStandalone(isStandaloneMode)
+      if (isStandaloneMode) {
+        console.log('FitRate running in Standalone Mode 📱')
+        document.body.classList.add('is-standalone')
+      }
+    }
+    checkStandalone()
+  }, [])
 
   // Track last score for "you improved!" messaging
   const [lastScore, setLastScore] = useState(() => {
@@ -1647,7 +1663,9 @@ export default function App() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
+        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
       }}>
         {/* Subtle animated background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -1913,7 +1931,9 @@ export default function App() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
         {/* Photo with glow effect */}
         <div className="relative mb-8">
@@ -2279,23 +2299,31 @@ export default function App() {
   // ============================================
   if (screen === 'error') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0a0a0f] text-white" style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
-        <span className="text-7xl mb-6">👗</span>
-        <p className="text-xl font-semibold text-white mb-2">{error || "Oops! We couldn't rate that one"}</p>
-        <p className="text-sm mb-8 text-center px-4" style={{ color: 'rgba(255,255,255,0.5)' }}>Try a clearer photo or check your connection</p>
-        <button
-          onClick={resetApp}
-          className="btn-physical px-8 py-4 rounded-2xl text-white font-semibold transition-all active:scale-[0.97]"
-          style={{
-            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-            boxShadow: 'var(--shadow-physical), 0 0 30px rgba(0,212,255,0.3)'
-          }}
-        >
-          Try Again
-        </button>
+        <span className="text-6xl mb-6">👗</span>
+        <h2 className="text-2xl font-black mb-4 uppercase tracking-tight">Oops!</h2>
+        <p className="text-white/60 text-center mb-8 max-w-xs">{error || "We couldn't rate that one. Try a clearer photo or check your connection."}</p>
+
+        <div className="w-full max-w-xs flex flex-col gap-3">
+          <button
+            onClick={resetApp}
+            className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg transition-all active:scale-95"
+            style={{ boxShadow: 'var(--shadow-physical)' }}
+          >
+            Try Again
+          </button>
+
+          <button
+            onClick={resetApp}
+            className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-lg transition-all active:scale-95"
+          >
+            ← Back to Home
+          </button>
+        </div>
       </div>
     )
   }
@@ -2305,8 +2333,9 @@ export default function App() {
   // ============================================
   if (screen === 'pro-email-prompt') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0f] text-white" style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <div className="text-6xl mb-6">✅</div>
@@ -2362,8 +2391,10 @@ export default function App() {
   // ============================================
   if (screen === 'pro-welcome') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0f] text-white" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <div className="text-7xl mb-6">🎉</div>
@@ -2626,7 +2657,9 @@ export default function App() {
 
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
+        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
       }}>
         {/* Toast Notification */}
         {showToast && (
@@ -2787,7 +2820,9 @@ export default function App() {
   if (screen === 'share-success') {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+        paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
+        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
       }}>
         <span className="text-6xl mb-4">🎉</span>
         <h2 className="text-2xl font-black mb-2">Shared!</h2>
@@ -2838,7 +2873,9 @@ export default function App() {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
         background: 'rgba(0,0,0,0.9)',
-        backdropFilter: 'blur(10px)'
+        backdropFilter: 'blur(10px)',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
         {/* Decline Offer Popup - higher z-index to overlay main paywall */}
         {showDeclineOffer && (

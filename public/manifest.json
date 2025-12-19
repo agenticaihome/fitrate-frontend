@@ -2,32 +2,47 @@
   "name": "FitRate - AI Outfit Rating",
   "short_name": "FitRate",
   "description": "Get instant AI ratings on your outfits. The Umax for fashion.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#0a0a0f",
-  "theme_color": "#00d4ff",
+  "theme_color": "#0a0a0f",
   "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     },
     {
       "src": "/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["lifestyle", "social"],
-  "screenshots": [],
+  "categories": ["lifestyle", "social", "fashion"],
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
   "shortcuts": [
     {
       "name": "Check Fit",
-      "url": "/",
-      "description": "Rate your outfit with AI"
+      "url": "/?source=shortcut",
+      "description": "Rate your outfit with AI",
+      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
     }
   ]
 }
