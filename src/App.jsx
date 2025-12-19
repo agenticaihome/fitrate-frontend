@@ -59,6 +59,44 @@ const SHARE_TIPS = [
 
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
 
+// ============================================
+// IMAGE COMPRESSION UTILITY
+// Resize and compress images before upload to reduce bandwidth and speed
+// ============================================
+const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        // Calculate new dimensions (maintain aspect ratio)
+        let width = img.width
+        let height = img.height
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+
+        // Create canvas and draw resized image
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+
+        // Convert to JPEG with compression
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+        resolve(compressedDataUrl)
+      }
+      img.onerror = reject
+      img.src = e.target.result
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function App() {
   // Check for button test page
   const urlParams = new URLSearchParams(window.location.search)
@@ -801,24 +839,46 @@ export default function App() {
     }
   }, [mode, isPro, generateMockScores])
 
-  const handleFileUpload = useCallback((e) => {
+  const handleFileUpload = useCallback(async (e) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Prevent double-uploading
+      if (screen === 'analyzing') return
+
       if (file.size > 10 * 1024 * 1024) {
         setError('Image is too large. Please try a smaller photo.')
         setScreen('error')
         return
       }
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        playSound('shutter')
-        vibrate(50)
-        setUploadedImage(e.target?.result)
-        analyzeOutfit(e.target?.result)
+
+      playSound('shutter')
+      vibrate(50)
+
+      try {
+        // Compress image if larger than 500KB
+        let imageData
+        if (file.size > 500 * 1024) {
+          // Large file - compress it
+          imageData = await compressImage(file, 1200, 0.7)
+        } else {
+          // Small file - read directly
+          imageData = await new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = (e) => resolve(e.target.result)
+            reader.onerror = reject
+            reader.readAsDataURL(file)
+          })
+        }
+
+        setUploadedImage(imageData)
+        analyzeOutfit(imageData)
+      } catch (err) {
+        console.error('Image processing error:', err)
+        setError('Something went wrong — try again!')
+        setScreen('error')
       }
-      reader.readAsDataURL(file)
     }
-  }, [analyzeOutfit])
+  }, [analyzeOutfit, screen])
 
   // Reveal Sequence & Sounds
   useEffect(() => {
