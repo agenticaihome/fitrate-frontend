@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'FitRate - AI Outfit Rating',
+        name: 'FitRate - Your AI Style Coach',
         short_name: 'FitRate',
-        description: 'Get instant AI ratings on your outfits',
+        description: 'Your personal AI style coach - instant outfit feedback',
         theme_color: '#0a0a0f',
         background_color: '#0a0a0f',
         display: 'standalone',
@@ -38,5 +38,35 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  // Production optimizations
+  build: {
+    target: 'es2020',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug']
+      }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom']
+        }
+      }
+    },
+    cssCodeSplit: false,
+    sourcemap: false,
+    chunkSizeWarningLimit: 500
+  },
+  // Dev server optimizations
+  server: {
+    hmr: true
+  },
+  // Optimize deps
+  optimizeDeps: {
+    include: ['react', 'react-dom']
+  }
 })

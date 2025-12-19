@@ -1,0 +1,320 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  /* Prevent accidental text selection on mobile */
+}
+
+:root {
+  --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-physical: 0 8px 0 rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.3);
+  --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
+  --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0a0a0f;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Safe area handling - handled at component level for precision */
+body {
+  touch-action: pan-x pan-y;
+  overscroll-behavior-y: none;
+  /* Disable pull-to-refresh for app feel */
+}
+
+/* Standalone (PWA) adjustments */
+.is-standalone {
+  /* Ensure status bar area matches background on iOS */
+  background: #0a0a0f;
+}
+
+.is-standalone .btn-physical {
+  /* Subtle haptic-like feel enhancement for PWA buttons */
+  transition: transform 0.05s linear;
+}
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations */
+@keyframes bounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    top: 0;
+  }
+
+  50% {
+    top: calc(100% - 4px);
+  }
+
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), var(--shadow-physical);
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(0, 212, 255, 0.5), var(--shadow-physical);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2), var(--shadow-physical);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-dot {
+  animation: bounce 1.4s ease-in-out infinite;
+}
+
+.animate-scan-line {
+  animation: scanLine 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Physical UI Components */
+.btn-physical {
+  position: relative;
+  transition: var(--transition-fast);
+  transform: translateY(0);
+  box-shadow: var(--shadow-physical);
+  min-height: 48px;
+  /* Mobile safe tap target */
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.btn-physical:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.card-physical {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  transition: var(--transition-normal);
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.card-physical:active {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.99);
+}
+
+/* Ensure all buttons meet 48px touch requirement */
+button,
+[role="button"] {
+  min-height: 44px;
+  /* Slightly more flexible for inline but target 48px */
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #00d4ff 50%, #ff0080 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================================
+   BUTTON TEXT CONTAINMENT SYSTEM
+   Ensures all button labels stay inside containers
+   ================================================ */
+
+/* Base protection for all buttons */
+button,
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Single-line CTAs - text truncates with ellipsis */
+.btn-single-line {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Multi-line allowed - for cards and secondary buttons */
+.btn-multi-line {
+  white-space: normal;
+  word-break: break-word;
+  hyphens: auto;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Flex container safety - prevents overflow in flex layouts */
+.btn-flex-safe {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Icon + text layout utility */
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon-text>.btn-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Stable width for loading states - prevents layout shift */
+.btn-stable-width {
+  min-width: 140px;
+}
+
+/* Physical button enhancement */
+.btn-physical {
+  position: relative;
+  transition: var(--transition-fast);
+  transform: translateY(0);
+  box-shadow: var(--shadow-physical);
+  min-height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  overflow: hidden;
+  /* Text containment by default */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.btn-physical:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive font sizing for iPhone SE and small screens */
+@media (max-width: 374px) {
+  .btn-responsive-text {
+    font-size: clamp(0.65rem, 3.5vw, 0.875rem) !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  /* Share button grid - stack on very small screens */
+  .share-grid-responsive {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* Paywall buttons - ensure text fits */
+  .paywall-btn-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Medium small screens (375-389px) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .btn-responsive-text {
+    font-size: clamp(0.75rem, 3.8vw, 1rem);
+  }
+}
+
+/* Card buttons - used for paywall plan cards */
+.card-physical {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  transition: var(--transition-normal);
+  cursor: pointer;
+  min-height: 48px;
+  overflow: hidden;
+}
+
+.card-physical:active {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.99);
+}
