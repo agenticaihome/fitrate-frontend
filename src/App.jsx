@@ -761,7 +761,7 @@ export default function App() {
         return
       } catch (err) {
         console.error('Analysis error:', err)
-        setError("Connection issue... try again!")
+        setError("Something went wrong — try again!")
         setScreen('error')
         return
       }
@@ -796,7 +796,7 @@ export default function App() {
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
-      setError("AI's getting dressed... try again!")
+      setError("Something went wrong — try again!")
       setScreen('error')
     }
   }, [mode, isPro, generateMockScores])
@@ -805,7 +805,7 @@ export default function App() {
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        setError('Image too large. Please use under 10MB.')
+        setError('Image is too large. Please try a smaller photo.')
         setScreen('error')
         return
       }
