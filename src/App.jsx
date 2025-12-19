@@ -1760,7 +1760,7 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-1.5 px-3 py-2 rounded-2xl transition-all duration-300 ${isPro ? '' : 'opacity-70'}`}
+            className={`relative flex items-center gap-1.5 px-3 py-2 rounded-2xl transition-all duration-300 overflow-visible ${isPro ? '' : 'opacity-70'}`}
             style={{
               background: mode === 'savage' && isPro ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.1)',
               border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)',
@@ -1775,7 +1775,7 @@ export default function App() {
             )}
             <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-60'}`}>💀</span>
             <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-60 text-gray-400'}`}>Savage</span>
-            {!isPro && <span className="text-[10px] ml-0.5">🔒</span>}
+            {!isPro && <span className="text-[11px] ml-1">🔒</span>}
           </button>
         </div>
 
