@@ -2523,6 +2523,14 @@ export default function App() {
         <p className="text-xs mt-6 text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
           Your Pro access will work across all devices
         </p>
+
+        {/* Skip button to return home */}
+        <button
+          onClick={() => setScreen('home')}
+          className="mt-4 text-sm text-gray-500 hover:text-white transition-all"
+        >
+          ← Skip for now
+        </button>
       </div>
     )
   }
