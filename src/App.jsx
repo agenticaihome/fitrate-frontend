@@ -2602,6 +2602,15 @@ export default function App() {
           {/* Handle bar */}
           <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-white/20" />
 
+          {/* Close X button */}
+          <button
+            onClick={() => setScreen('home')}
+            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl p-1"
+            aria-label="Close"
+          >
+            ×
+          </button>
+
           {/* Emotional headline */}
           <div className="text-center mb-6 mt-4">
             <span className="text-4xl mb-3 block">{mode === 'roast' ? '🔥' : '✨'}</span>
@@ -2649,7 +2658,7 @@ export default function App() {
 
           {/* Back button */}
           <button
-            onClick={resetApp}
+            onClick={() => setScreen('home')}
             className="w-full py-3 text-sm font-medium transition-all active:opacity-60"
             style={{ color: 'rgba(255,255,255,0.4)' }}
           >
