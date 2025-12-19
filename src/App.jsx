@@ -3102,14 +3102,14 @@ export default function App() {
               {/* Shine effect */}
               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
 
-              {/* Header: Crown + Title + Price all in one row */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl flex-shrink-0">👑</span>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-black text-2xl font-black leading-tight">Pro Weekly</h3>
+              {/* Header: Crown + Title + Price - stacks on mobile */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
+                <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                  <span className="text-3xl flex-shrink-0">👑</span>
+                  <h3 className="text-black text-xl sm:text-2xl font-black leading-tight">Pro Weekly</h3>
                 </div>
-                <div className="flex-shrink-0 text-right">
-                  <span className="text-2xl font-black text-black">$2.99</span>
+                <div className="flex-shrink-0 pl-10 sm:pl-0 sm:text-right">
+                  <span className="text-xl sm:text-2xl font-black text-black">$2.99</span>
                   <span className="text-black/60 text-sm font-bold">/wk</span>
                 </div>
               </div>
