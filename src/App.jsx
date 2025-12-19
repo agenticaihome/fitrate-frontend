@@ -2988,9 +2988,20 @@ export default function App() {
           <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
             background: 'rgba(0,0,0,0.95)'
           }}>
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30 relative" style={{
               boxShadow: '0 0 60px rgba(255,215,0,0.2)'
             }}>
+              {/* Close X for decline offer */}
+              <button
+                onClick={() => {
+                  setShowDeclineOffer(false)
+                  setShowPaywall(false)
+                }}
+                className="absolute top-3 right-3 text-gray-500 hover:text-white text-xl p-1"
+                aria-label="Close"
+              >
+                ×
+              </button>
               <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
               <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
 
@@ -3035,7 +3046,7 @@ export default function App() {
                 }}
                 className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
               >
-                No thanks, I'll pay full price later
+                No thanks
               </button>
             </div>
           </div>
@@ -3045,13 +3056,14 @@ export default function App() {
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
           boxShadow: '0 0 60px rgba(0,212,255,0.1)'
         }}>
-          {/* Close X */}
+          {/* Close X - directly closes paywall */}
           <button
             onClick={() => {
               playSound('click')
-              setShowDeclineOffer(true) // Show decline offer instead of closing
+              setShowPaywall(false)
             }}
-            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
+            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl p-1"
+            aria-label="Close paywall"
           >
             ×
           </button>
