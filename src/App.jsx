@@ -1934,11 +1934,12 @@ export default function App() {
         {!isPro && scansRemaining === 1 && (
           <button
             onClick={() => setShowPaywall(true)}
-            className="btn-responsive-text flex items-center gap-1 text-xs mt-3 px-3 py-1.5 rounded-full transition-all active:scale-95 hover:opacity-100"
+            className="btn-responsive-text flex items-center gap-1 text-xs mt-3 px-4 py-3 rounded-full transition-all active:scale-95 hover:opacity-100 relative z-20"
             style={{
               color: '#ffd700',
               background: 'rgba(255,215,0,0.1)',
-              border: '1px solid rgba(255,215,0,0.3)'
+              border: '1px solid rgba(255,215,0,0.3)',
+              minHeight: '44px'
             }}
           >
             <span>⚡ Go Pro</span>
@@ -1946,7 +1947,7 @@ export default function App() {
         )}
 
         {/* BOTTOM SECTION - COORDINATED LAYOUT */}
-        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6" style={{
+        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-6 relative z-10" style={{
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
         }}>
           {/* Scan Status & Pro Upgrade */}
@@ -1958,11 +1959,12 @@ export default function App() {
             ) : (
               <button
                 onClick={() => setShowPaywall(true)}
-                className="btn-physical btn-responsive-text flex items-center gap-2 px-6 py-2.5 rounded-full animate-pulse-glow"
+                className="btn-physical btn-responsive-text flex items-center gap-2 px-6 py-3 rounded-full animate-pulse-glow relative z-20"
                 style={{
                   background: 'rgba(255,215,0,0.1)',
                   border: '1px solid rgba(255,215,0,0.4)',
-                  boxShadow: '0 0 30px rgba(255,215,0,0.1)'
+                  boxShadow: '0 0 30px rgba(255,215,0,0.1)',
+                  minHeight: '48px'
                 }}
               >
                 <span className="text-xs font-black" style={{ color: '#ffd700' }}>
@@ -1975,7 +1977,8 @@ export default function App() {
             {!isPro && scansRemaining > 1 && (
               <button
                 onClick={() => setShowPaywall(true)}
-                className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase"
+                className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase px-4 py-3 relative z-20"
+                style={{ minHeight: '44px' }}
               >
                 Go Pro →
               </button>
