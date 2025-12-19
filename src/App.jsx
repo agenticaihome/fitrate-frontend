@@ -1217,28 +1217,39 @@ export default function App() {
     ctx.fillText('FITRATE AI', 540, 80)
     ctx.restore()
 
-    // CERTIFIED SEAL for 90+
-    if (scores.overall >= 90) {
-      ctx.save()
-      const sealX = isSquare ? 880 : 920
-      const sealY = isSquare ? 120 : 180
-
-      // Draw Circular Seal
-      ctx.beginPath()
-      ctx.arc(sealX, sealY, 60, 0, Math.PI * 2)
-      ctx.fillStyle = '#ffd700'
-      ctx.shadowColor = 'rgba(255,215,0,0.5)'
-      ctx.shadowBlur = 20
-      ctx.fill()
-
-      ctx.fillStyle = '#000'
-      ctx.font = 'black 14px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('STYLE', sealX, sealY - 10)
-      ctx.font = 'black 18px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.fillText('APPROVED', sealX, sealY + 12)
-      ctx.restore()
+    // CONVERSATION STAMP - Replaces the old "Certified" seal for maximum engagement
+    ctx.save()
+    const stampX = isSquare ? 880 : 920
+    const stampY = isSquare ? 120 : 180
+    // Dynamic Stamp Text & Color
+    let stampText = "AGREE?"
+    let stampColor = '#fff'
+    if (scores.mode === 'roast' || scores.mode === 'savage') {
+      stampText = scores.overall < 50 ? "COOKED?" : "SURVIVED?"
+      stampColor = '#ff4444'
+    } else {
+      stampText = scores.overall >= 90 ? "VALID?" : "ROBBED?"
+      stampColor = scores.overall >= 90 ? '#ffd700' : '#ff8800'
     }
+
+    ctx.translate(stampX, stampY)
+    ctx.rotate(15 * Math.PI / 180) // Slight tilt
+
+    // Stamp Box
+    ctx.fillStyle = stampColor
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'
+    ctx.shadowBlur = 20
+    ctx.beginPath()
+    ctx.roundRect(-70, -30, 140, 60, 10)
+    ctx.fill()
+
+    // Stamp Text
+    ctx.fillStyle = '#000'
+    ctx.font = 'black 24px -apple-system, BlinkMacSystemFont, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(stampText, 0, 2)
+    ctx.restore()
 
     // PRO BADGE - Gold banner for Pro users or purchased scans
     if (isPro || scores.savageLevel) {
@@ -1261,7 +1272,7 @@ export default function App() {
       ctx.fillStyle = '#000'
       ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText('⚡ PRO ANALYSIS', 540, isSquare ? 635 : 950)
+      ctx.fillText('⚡ PRO ANALYSIS', 540, isSquare ? 627 : 942)
     }
 
     // Score number - BIG (centered in circle)
@@ -1376,36 +1387,35 @@ export default function App() {
     ctx.textAlign = 'center'
     ctx.fillText(`TOP ${100 - scores.percentile}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1810)
 
-    // Branding footer (at the very bottom)
-    ctx.fillStyle = 'rgba(255,255,255,0.2)'
-    ctx.font = `bold ${isSquare ? 14 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('SCAN YOURS @ FITRATE.APP', 540, isSquare ? 1075 : 1870)
+    // Branding Footer - Strong CTA for Viral Re-scans
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('TRY IT FREE @ FITRATE.APP', 540, isSquare ? 1075 : 1870)
 
-    // Generate share text - punchy, viral, screenshot-worthy
+    // Generate Conversation-Starter Share Text
     const getShareText = () => {
       const baseUrl = 'https://fitrate.app'
-      const inviteText = `Beat my score: ${baseUrl}?ref=${userId}`
-      if (scores.roastMode) {
-        if (scores.mode === 'savage') {
-          if (scores.overall < 20) return `AI absolutely ANNIHILATED me 💀 ${scores.overall}/100 on Savage. Can you survive? ${baseUrl}?ref=${userId}`
-          if (scores.overall < 40) return `Savage mode showed no mercy: ${scores.overall}/100 💀 ${baseUrl}?ref=${userId}`
-          return `I survived Savage Mode! (Barely) 💀 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
-        }
-        if (scores.overall < 30) return `AI gave me a ${scores.overall} 💀💀💀 I'm devastated. Your turn? ${baseUrl}?ref=${userId}`
-        if (scores.overall < 45) return `${scores.overall}/100 — AI showed NO mercy 💀 ${baseUrl}?ref=${userId}`
-        if (scores.overall < 60) return `AI humbled me 💀 ${scores.overall}/100. Your turn? ${baseUrl}?ref=${userId}`
-        return `Survived Roast Mode 😏 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
-      } else if (scores.mode === 'honest') {
-        if (scores.overall >= 90) return `Honest mode gave me ${scores.overall}/100 📊 No cap. ${baseUrl}?ref=${userId}`
-        if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊 What's YOUR honest score? ${baseUrl}?ref=${userId}`
-        return `Got my honest rating: ${scores.overall} 📊 ${baseUrl}?ref=${userId}`
-      } else {
-        if (scores.overall >= 95) return `${scores.overall}/100 💅 I'm literally perfect. Beat that: ${baseUrl}?ref=${userId}`
-        if (scores.overall >= 90) return `${scores.overall}/100 — AI approved 🏆 Beat my score: ${baseUrl}?ref=${userId}`
-        if (scores.overall >= 80) return `${scores.overall}/100 ✨ What's YOUR score? ${baseUrl}?ref=${userId}`
-        if (scores.overall >= 70) return `${scores.overall}/100 — pretty good 👀 Can you beat it? ${baseUrl}?ref=${userId}`
-        return `Got my fit rated: ${scores.overall} 👀 Your turn: ${baseUrl}?ref=${userId}`
+      const link = `${baseUrl}?ref=${userId}`
+
+      // Roast / Savage Strategy: Disagreement & Shock
+      if (scores.roastMode || scores.mode === 'savage') {
+        if (scores.overall < 35) return `FitRate gave me a ${scores.overall}/100. Is it really that bad? 💀 ${link}`
+        if (scores.overall < 60) return `They said I have NPC energy. Agree or disagree? 👇 ${link}`
+        return `Rated ${scores.overall}/100. Be honest... am I cooked? 🍳 ${link}`
       }
+
+      // Nice / Honest Strategy: Validation & "Robbed" Debate
+      if (scores.mode === 'honest') {
+        if (scores.overall < 70) return `Honest mode gave me ${scores.overall}. I feel robbed. Thoughts? 🤨 ${link}`
+        return `Got a ${scores.overall}/100 honestly. Accurate? 📊 ${link}`
+      }
+
+      // High Scores Strategy: Humble Brag / Challenge
+      if (scores.overall >= 90) return `FitRate says ${scores.overall}/100. Can anyone beat this? 🏆 ${link}`
+      if (scores.overall >= 80) return `Rated ${scores.overall}/100. Valid or glazed? 👀 ${link}`
+
+      // Default / Low-Mid Nice
+      return `Got rated ${scores.overall}/100 on FitRate. Thoughts? 👇 ${link}`
     }
 
     // Convert and share
