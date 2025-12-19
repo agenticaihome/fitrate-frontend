@@ -452,6 +452,28 @@ export default function App() {
 
   // Open Stripe checkout
   const startCheckout = (product) => {
+    // Product price mapping for GA4
+    const PRODUCT_PRICES = {
+      proWeekly: 2.99,
+      proWeeklyDiscount: 1.99,
+      proRoast: 0.99,
+      starterPack: 1.99,
+      popularPack: 3.99,
+      powerPack: 9.99
+    }
+
+    // Track CTA click for debugging
+    console.log(`CTA_CLICKED: ${product} -> Stripe checkout`)
+
+    // GA4 begin_checkout event
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'begin_checkout', {
+        currency: 'USD',
+        value: PRODUCT_PRICES[product] || 0,
+        items: [{ item_id: product, item_name: product }]
+      })
+    }
+
     const url = STRIPE_LINKS[product]
     if (url && !url.includes('placeholder')) {
       // Add userId for webhook tracking
@@ -2597,45 +2619,53 @@ export default function App() {
           <div className="flex flex-col gap-3 mb-5">
             {/* 1. Pro Scan Packs (Utility - High Trust) */}
             <div className="grid grid-cols-2 gap-3">
-              <a
-                href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
-                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center"
+              <button
+                onClick={() => startCheckout('popularPack')}
+                disabled={checkoutLoading}
+                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center disabled:opacity-50"
+                style={{ minHeight: '64px' }}
               >
                 <span className="text-lg">📦</span>
                 15 Scans • $3.99
-              </a>
-              <a
-                href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
-                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center"
+              </button>
+              <button
+                onClick={() => startCheckout('powerPack')}
+                disabled={checkoutLoading}
+                className="py-4 rounded-2xl text-white font-bold text-sm bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1 transition-all active:scale-95 text-center disabled:opacity-50"
+                style={{ minHeight: '64px' }}
               >
                 <span className="text-lg">🔥</span>
                 50 Scans • $9.99
-              </a>
+              </button>
             </div>
 
             {/* 2. One-time Roast (Impulse Buy) */}
-            <a
-              href="https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01"
-              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+            <button
+              onClick={() => startCheckout('proRoast')}
+              disabled={checkoutLoading}
+              className="w-full py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
               style={{
                 background: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-                boxShadow: '0 8px 30px rgba(255,68,68,0.3)'
+                boxShadow: '0 8px 30px rgba(255,68,68,0.3)',
+                minHeight: '56px'
               }}
             >
               🚀 Roast this one · $0.99
-            </a>
+            </button>
 
             {/* 3. Pro Subscription (Expert/Power User) */}
-            <a
-              href="https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02"
-              className="w-full py-3 rounded-xl text-white font-medium text-sm flex items-center justify-center gap-2 transition-all active:scale-95 opacity-80"
+            <button
+              onClick={() => startCheckout('proWeekly')}
+              disabled={checkoutLoading}
+              className="w-full py-3 rounded-xl text-white font-medium text-sm flex items-center justify-center gap-2 transition-all active:scale-95 opacity-80 disabled:opacity-50"
               style={{
                 background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)'
+                border: '1px solid rgba(255,255,255,0.1)',
+                minHeight: '48px'
               }}
             >
               ✨ Sub Unlimited · $2.99/wk
-            </a>
+            </button>
           </div>
 
           {/* Trust microcopy */}
