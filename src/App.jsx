@@ -2238,7 +2238,34 @@ export default function App() {
   // ============================================
   if (screen === 'results' && scores) {
     const scoreColor = getScoreColor(scores.overall)
-    const modeAccent = scores.roastMode ? '#ff4444' : '#00d4ff'
+
+    // Mode-specific accent colors for distinct visual identity per mode
+    const modeAccent = (() => {
+      switch (scores.mode) {
+        case 'savage': return '#8b00ff' // Purple
+        case 'roast': return '#ff4444'  // Red
+        case 'honest': return '#0077ff' // Blue
+        default: return '#00d4ff'       // Cyan (Nice)
+      }
+    })()
+
+    const modeGlow = (() => {
+      switch (scores.mode) {
+        case 'savage': return 'rgba(139,0,255,0.4)' // Purple glow
+        case 'roast': return 'rgba(255,68,68,0.4)'  // Red glow
+        case 'honest': return 'rgba(0,119,255,0.4)' // Blue glow
+        default: return 'rgba(0,212,255,0.4)'       // Cyan glow (Nice)
+      }
+    })()
+
+    const modeGradientEnd = (() => {
+      switch (scores.mode) {
+        case 'savage': return '#ff0044' // Dark red
+        case 'roast': return '#ff8800'  // Orange
+        case 'honest': return '#00d4ff' // Cyan
+        default: return '#00ff88'       // Green (Nice)
+      }
+    })()
 
     return (
       <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden relative" style={{
@@ -2247,12 +2274,12 @@ export default function App() {
         paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
         paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
       }}>
-        {/* DOPAMINE GLOW - Dynamic Pulsing Background */}
+        {/* DOPAMINE GLOW - Mode-Specific Pulsing Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[150%] h-[150%] rounded-full opacity-20 blur-[120px] animate-pulse"
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[150%] h-[150%] rounded-full opacity-25 blur-[120px] animate-pulse"
             style={{
-              background: `radial-gradient(circle, ${scoreColor} 0%, transparent 70%)`,
+              background: `radial-gradient(circle, ${modeAccent} 0%, ${modeGradientEnd} 40%, transparent 70%)`,
               animationDuration: '4s'
             }}
           />
@@ -2265,18 +2292,18 @@ export default function App() {
               <circle
                 cx="50" cy="50" r="45"
                 fill="none"
-                stroke={scoreColor}
+                stroke={modeAccent}
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={`${displayedScore * 2.83} 283`}
                 style={{
                   transition: 'stroke-dasharray 1s ease-out',
-                  filter: `drop-shadow(0 0 15px ${scoreColor})`
+                  filter: `drop-shadow(0 0 15px ${modeAccent})`
                 }}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black" style={{ color: scoreColor }}>{displayedScore}</span>
+              <span className="text-4xl font-black" style={{ color: modeAccent }}>{displayedScore}</span>
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 100</span>
             </div>
           </div>
@@ -2307,10 +2334,12 @@ export default function App() {
             </div>
           )}
 
-          <div className="mt-5 px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-xl">
+          <div className="mt-5 px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-xl" style={{
+            borderColor: `${modeAccent}33`
+          }}>
             <p className="text-[11px] font-black uppercase tracking-[0.3em]" style={{
-              color: scoreColor,
-              textShadow: `0 0 15px ${scoreColor}66`
+              color: modeAccent,
+              textShadow: `0 0 15px ${modeAccent}66`
             }}>
               {scores.tagline}
             </p>
@@ -2360,8 +2389,8 @@ export default function App() {
               <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[34px] opacity-30 blur-sm animate-pulse" />
             )}
             <div className={`w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative ${scores.overall >= 95 ? 'card-golden' : ''}`} style={{
-              border: scores.overall >= 95 ? 'none' : `2px solid ${scoreColor}44`,
-              boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${scoreColor}11`
+              border: scores.overall >= 95 ? 'none' : `2px solid ${modeAccent}44`,
+              boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${modeAccent}11`
             }}>
               <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
 
@@ -2372,8 +2401,10 @@ export default function App() {
 
               {/* Pro Tip Overlay (If Pro) */}
               {isPro && scores.proTip && revealStage >= 4 && (
-                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/60 backdrop-blur-md border border-white/10 animate-in fade-in slide-in-from-bottom-2">
-                  <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest block mb-1">💡 Pro Suggestion</span>
+                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/60 backdrop-blur-md border animate-in fade-in slide-in-from-bottom-2" style={{
+                  borderColor: `${modeAccent}33`
+                }}>
+                  <span className="text-[9px] font-black uppercase tracking-widest block mb-1" style={{ color: modeAccent }}>💡 Pro Suggestion</span>
                   <p className="text-xs text-white/90 font-medium">"{scores.proTip}"</p>
                 </div>
               )}
@@ -2384,10 +2415,14 @@ export default function App() {
         {/* GOLDEN INSIGHT (PRO) OR TEASER (FREE) */}
         <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-500 ${revealStage >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           {isPro && (
-            <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]">
+            <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]" style={{
+              borderColor: `${modeAccent}50`,
+              backgroundColor: `${modeAccent}15`,
+              boxShadow: `0 0 40px ${modeGlow}`
+            }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-sm">✨</span>
-                <span className="text-[10px] font-black tracking-widest text-cyan-400 uppercase">Golden Insight</span>
+                <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: modeAccent }}>Golden Insight</span>
               </div>
               <div className="space-y-4 text-left">
                 {scores.identityReflection && (
@@ -2445,10 +2480,11 @@ export default function App() {
         <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
           <button
             onClick={generateShareCard}
-            className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl text-black font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
+            className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
             style={{
-              background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
-              boxShadow: '0 10px 40px rgba(0, 212, 255, 0.4), var(--shadow-physical)'
+              background: `linear-gradient(135deg, ${modeGradientEnd} 0%, ${modeAccent} 100%)`,
+              boxShadow: `0 10px 40px ${modeGlow}, var(--shadow-physical)`,
+              color: (scores.mode === 'roast' || scores.mode === 'savage') ? 'white' : 'black'
             }}
           >
             <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -2472,7 +2508,7 @@ export default function App() {
                 top: `${-20 - Math.random() * 50}px`,
                 width: '8px',
                 height: '8px',
-                background: ['#ffd700', '#00ff88', '#00d4ff'][i % 3],
+                background: ['#ffd700', modeGradientEnd, modeAccent][i % 3],
                 borderRadius: '50%',
                 animation: `fall ${2 + Math.random() * 3}s linear infinite`,
                 animationDelay: `${Math.random() * 3}s`
