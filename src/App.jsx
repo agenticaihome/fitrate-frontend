@@ -3080,7 +3080,7 @@ export default function App() {
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="btn-physical w-full p-6 rounded-3xl text-left transition-all group overflow-visible relative"
+              className="btn-physical w-full p-5 rounded-3xl text-left transition-all group relative overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
                 border: '2px solid rgba(255,255,255,0.3)',
@@ -3088,39 +3088,39 @@ export default function App() {
               }}
             >
               {/* Best Value Badge */}
-              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider" style={{
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider z-10" style={{
                 boxShadow: '0 4px 12px rgba(255,68,68,0.4)'
               }}>
                 Best Value
               </div>
 
               {/* Shine effect */}
-              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
+              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
 
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-black text-3xl font-black leading-tight">Pro</h3>
-                  <p className="text-black/70 text-base font-bold">Unlimited ratings daily</p>
+              {/* Header: Crown + Title + Price all in one row */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl flex-shrink-0">👑</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-black text-2xl font-black leading-tight">Pro Weekly</h3>
                 </div>
-                <span className="text-4xl">👑</span>
+                <div className="flex-shrink-0 text-right">
+                  <span className="text-2xl font-black text-black">$2.99</span>
+                  <span className="text-black/60 text-sm font-bold">/wk</span>
+                </div>
               </div>
 
-              <div className="space-y-2.5 mb-5">
+              {/* Benefits */}
+              <div className="space-y-2">
                 {[
                   'All modes unlocked',
                   '25 scans per day',
                   'GPT-4o powered ratings'
                 ].map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-sm font-bold text-black/90">
-                    <span className="text-black text-base">✓</span>
+                  <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
+                    <span className="text-black text-sm flex-shrink-0">✓</span>
                     <span>{benefit}</span>
                   </div>
                 ))}
-              </div>
-
-              <div className="flex items-end gap-2">
-                <span className="text-4xl font-black text-black">$2.99</span>
-                <span className="text-black/70 text-base font-bold mb-1 pb-0.5">/ week</span>
               </div>
             </button>
           </div>
