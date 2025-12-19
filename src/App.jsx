@@ -917,7 +917,7 @@ export default function App() {
       localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
       setDailyStreak(newStreak)
 
-      setScores({ ...data.scores, mode, roastMode: mode === 'roast' })
+      setScores({ ...data.scores, mode, roastMode: mode === 'roast' || mode === 'savage' })
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
@@ -1358,6 +1358,11 @@ export default function App() {
       const baseUrl = 'https://fitrate.app'
       const inviteText = `Beat my score: ${baseUrl}?ref=${userId}`
       if (scores.roastMode) {
+        if (scores.mode === 'savage') {
+          if (scores.overall < 20) return `AI absolutely ANNIHILATED me 💀 ${scores.overall}/100 on Savage. Can you survive? ${baseUrl}?ref=${userId}`
+          if (scores.overall < 40) return `Savage mode showed no mercy: ${scores.overall}/100 💀 ${baseUrl}?ref=${userId}`
+          return `I survived Savage Mode! (Barely) 💀 ${scores.overall}/100 ${baseUrl}?ref=${userId}`
+        }
         if (scores.overall < 30) return `AI gave me a ${scores.overall} 💀💀💀 I'm devastated. Your turn? ${baseUrl}?ref=${userId}`
         if (scores.overall < 45) return `${scores.overall}/100 — AI showed NO mercy 💀 ${baseUrl}?ref=${userId}`
         if (scores.overall < 60) return `AI humbled me 💀 ${scores.overall}/100. Your turn? ${baseUrl}?ref=${userId}`
@@ -2239,10 +2244,16 @@ export default function App() {
           }}>
             {(() => {
               if (scores.roastMode) {
+                if (scores.mode === 'savage') {
+                  if (scores.overall >= 40) return '💀 YOU SURVIVED (Barely)'
+                  if (scores.overall >= 20) return '🩸 AI drew blood'
+                  return '☠️ ABSOLUTE ANNIHILATION'
+                }
                 if (scores.overall >= 60) return '😏 You survived'
                 if (scores.overall >= 45) return '💀 Rough day for your closet'
                 return '☠️ AI showed no mercy'
               } else if (scores.mode === 'honest') {
+                if (scores.overall >= 95) return '💎 STYLE GOD — Pure Perfection'
                 if (scores.overall >= 85) return '🔥 Post this immediately'
                 if (scores.overall >= 70) return '👍 Solid fit, respectable'
                 if (scores.overall >= 55) return '📊 Average range'
