@@ -1704,7 +1704,7 @@ export default function App() {
               {mode === 'roast' ? '🔥' : mode === 'honest' ? '📊' : '📸'}
             </span>
             <span className="relative text-white text-2xl font-black tracking-widest uppercase">
-              {mode === 'roast' ? 'ROAST ME' : mode === 'honest' ? 'ANALYZE' : 'RATE ME'}
+              {mode === 'roast' ? 'ROAST MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
             </span>
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
