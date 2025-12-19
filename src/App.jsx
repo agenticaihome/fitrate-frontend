@@ -3069,172 +3069,167 @@ export default function App() {
             ×
           </button>
 
+          {/* HEADER - Clear, Simple */}
           <div className="text-center mb-6">
-            <span className="text-4xl mb-2 block">👑</span>
-            <h2 className="text-white text-2xl font-black">Go Pro</h2>
-            <p className="text-gray-400 text-sm mt-1">Unlock 25 scans per day</p>
+            <h2 className="text-white text-2xl font-black mb-2">Unlock More Ratings</h2>
+            <p className="text-gray-400 text-sm">Choose your plan</p>
           </div>
 
-          {/* Pro Subscription Hero Card */}
-          <div className="relative w-full mb-6">
+          {/* 👑 PRO SUBSCRIPTION - Best Value */}
+          <div className="relative w-full mb-5">
             <button
               onClick={() => startCheckout('proWeekly')}
               disabled={checkoutLoading}
-              className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-visible"
+              className="btn-physical w-full p-6 rounded-3xl text-left transition-all group overflow-visible relative"
               style={{
-                background: 'linear-gradient(135deg, #00d4ff 0%, #0077ff 100%)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                boxShadow: 'var(--shadow-physical), 0 0 40px rgba(0,212,255,0.2)'
+                background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
+                border: '2px solid rgba(255,255,255,0.3)',
+                boxShadow: 'var(--shadow-physical), 0 0 40px rgba(255,215,0,0.25)'
               }}
             >
+              {/* Best Value Badge */}
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider" style={{
+                boxShadow: '0 4px 12px rgba(255,68,68,0.4)'
+              }}>
+                Best Value
+              </div>
+
               {/* Shine effect */}
-              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
+              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
 
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-white text-2xl font-black leading-tight">Elite Pro</h3>
-                  <p className="text-white/70 text-sm">Full psycho-analysis access</p>
+                  <h3 className="text-black text-3xl font-black leading-tight">Pro</h3>
+                  <p className="text-black/70 text-base font-bold">Unlimited ratings daily</p>
                 </div>
-                <span className="text-3xl">👑</span>
+                <span className="text-4xl">👑</span>
               </div>
 
-              <div className="space-y-2 mb-6">
+              <div className="space-y-2.5 mb-5">
                 {[
-                  '🤖 Premium GPT-4o AI',
-                  '25 outfit ratings/day',
-                  'Identity Reflection Insights',
-                  'Social Perception Analysis',
-                  'All Modes: Roast, Honest, Nice, Savage'
+                  'All modes unlocked',
+                  '25 scans per day',
+                  'GPT-4o powered ratings'
                 ].map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs font-bold text-white/90">
-                    <span className="text-white">✓</span>
+                  <div key={i} className="flex items-center gap-2.5 text-sm font-bold text-black/90">
+                    <span className="text-black text-base">✓</span>
                     <span>{benefit}</span>
                   </div>
                 ))}
               </div>
 
               <div className="flex items-end gap-2">
-                <span className="text-3xl font-black text-white">$2.99</span>
-                <span className="text-white/60 text-sm mb-1 pb-1">/ week</span>
-                <span className="ml-auto text-[10px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
-                  Most Popular
-                </span>
+                <span className="text-4xl font-black text-black">$2.99</span>
+                <span className="text-black/70 text-base font-bold mb-1 pb-0.5">/ week</span>
               </div>
             </button>
           </div>
 
-          <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR GRAB A SCAN PACK —</p>
+          <p className="text-center text-[11px] font-bold text-gray-500 mb-4 tracking-wider uppercase">— OR PAY AS YOU GO —</p>
 
-
-          {/* Scan Packs Section - Supercell Style Loot Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            {/* Starter Pack */}
+          {/* 🎟️ SCAN PACKS - 2-Column Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* 5 Scans */}
             <button
               onClick={() => startCheckout('starterPack')}
               disabled={checkoutLoading}
-              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px]"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)'
+                background: 'rgba(100,200,255,0.08)',
+                border: '1.5px solid rgba(100,200,255,0.3)'
               }}
             >
-              <span className="block text-2xl font-black text-white">5</span>
-              <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
-              <span className="block text-sm font-bold text-white mt-1">$1.99</span>
+              <span className="block text-4xl font-black text-cyan-400 mb-1">5</span>
+              <span className="block text-xs text-gray-400 uppercase font-bold mb-3 tracking-wide">Scans</span>
+              <span className="block text-xs text-gray-500 mb-2">Use anytime</span>
+              <span className="block text-lg font-black text-white">$1.99</span>
             </button>
 
-            {/* Popular Pack - Supercell Highlight */}
+            {/* 15 Scans - Highlighted */}
             <button
               onClick={() => startCheckout('popularPack')}
               disabled={checkoutLoading}
-              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px] relative overflow-hidden"
+              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden"
               style={{
-                background: 'rgba(0,212,255,0.1)',
+                background: 'rgba(0,212,255,0.15)',
                 border: '2px solid #00d4ff',
-                boxShadow: 'var(--shadow-physical), 0 0 20px rgba(0,212,255,0.2)'
+                boxShadow: 'var(--shadow-physical), 0 0 25px rgba(0,212,255,0.3)'
               }}
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400" />
-              <span className="block text-3xl font-black text-cyan-400">15</span>
-              <span className="block text-[9px] text-cyan-400/70 uppercase font-black">scans</span>
-              <span className="block text-sm font-bold text-white mt-1">$3.99</span>
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-cyan-400" />
+              <span className="block text-5xl font-black text-cyan-400 mb-1">15</span>
+              <span className="block text-xs text-cyan-400/80 uppercase font-bold mb-3 tracking-wide">Scans</span>
+              <span className="block text-xs text-cyan-300/70 mb-2">Use anytime</span>
+              <span className="block text-lg font-black text-white">$3.99</span>
             </button>
 
-            {/* Power Pack */}
+            {/* 50 Scans */}
             <button
               onClick={() => startCheckout('powerPack')}
               disabled={checkoutLoading}
-              className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] col-span-2"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)'
+                background: 'rgba(138,75,255,0.1)',
+                border: '1.5px solid rgba(138,75,255,0.4)'
               }}
             >
-              <span className="block text-2xl font-black text-white">50</span>
-              <span className="block text-[9px] text-gray-500 uppercase font-black">scans</span>
-              <span className="block text-sm font-bold text-white mt-1">$9.99</span>
+              <span className="block text-5xl font-black text-purple-400 mb-1">50</span>
+              <span className="block text-xs text-purple-400/70 uppercase font-bold mb-3 tracking-wide">Scans</span>
+              <span className="block text-xs text-gray-500 mb-2">Use anytime</span>
+              <span className="block text-lg font-black text-white">$9.99</span>
             </button>
           </div>
 
-          {/* SAVAGE Roast option */}
-          <button
-            onClick={() => startCheckout('proRoast')}
-            disabled={checkoutLoading}
-            className="btn-responsive-text btn-multi-line w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
-            style={{
-              background: 'rgba(255,68,68,0.08)',
-              border: '1px solid rgba(255,68,68,0.25)'
-            }}
-          >
-            💀 Or get 1 SAVAGE Roast for $0.99
-          </button>
-
-          {/* Invite 3 → Get 15 Free Scans */}
-          <div className="w-full p-4 rounded-2xl mb-4" style={{
-            background: 'rgba(0,255,136,0.06)',
-            border: '1px dashed rgba(0,255,136,0.3)'
-          }}>
-            <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE SCANS</p>
-            <p className="text-center text-white text-sm font-bold mb-2">
-              Invite 3 friends → Get 15 free scans
-            </p>
-            <div className="flex items-center justify-center gap-1 mb-3">
-              {[0, 1, 2].map(i => {
-                const totalReferrals = parseInt(localStorage.getItem('fitrate_total_referrals') || '0')
-                const filled = i < totalReferrals
-                return (
-                  <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{
-                    background: filled ? 'rgba(0,255,136,0.3)' : 'rgba(255,255,255,0.1)',
-                    border: filled ? '2px solid #00ff88' : '2px solid rgba(255,255,255,0.2)'
-                  }}>
-                    {filled ? '✓' : '?'}
-                  </div>
-                )
-              })}
-            </div>
+          {/* ☠️ SAVAGE ONE-OFF - Full Card */}
+          <div className="relative w-full mb-5">
             <button
-              onClick={async () => {
-                const shareUrl = `https://fitrate.app?ref=${userId}`
-                if (navigator.share) {
-                  navigator.share({ title: 'Rate my fit!', url: shareUrl })
-                } else {
-                  await navigator.clipboard.writeText(shareUrl)
-                  displayToast('Link copied! 📋')
-                }
-              }}
-              className="w-full py-3 rounded-2xl text-sm font-bold transition-all duration-100 active:scale-[0.97]"
+              onClick={() => startCheckout('proRoast')}
+              disabled={checkoutLoading}
+              className="btn-physical w-full p-5 rounded-2xl text-center transition-all group"
               style={{
-                background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
-                color: '#000'
+                background: 'linear-gradient(135deg, #1a0000 0%, #330000 100%)',
+                border: '2px solid rgba(255,68,68,0.5)',
+                boxShadow: 'var(--shadow-physical), 0 0 30px rgba(255,68,68,0.2)'
               }}
             >
-              Share & Invite Friends 🚀
+              <div className="flex flex-col items-center">
+                <span className="text-5xl mb-2">☠️</span>
+                <h3 className="text-red-400 text-2xl font-black mb-1">Savage Roast</h3>
+                <p className="text-red-300/60 text-sm font-bold mb-3">One brutal rating</p>
+                <p className="text-gray-400 text-xs mb-3">GPT-4o powered</p>
+                <span className="text-3xl font-black text-white">$0.99</span>
+              </div>
             </button>
+          </div>
+
+          {/* TRANSPARENCY SECTION */}
+          <div className="mb-5 p-4 rounded-2xl" style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)'
+          }}>
+            <div className="space-y-2">
+              <p className="text-xs text-gray-400 flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                Free users get Nice & Roast modes
+              </p>
+              <p className="text-xs text-gray-400 flex items-center gap-2">
+                <span className="text-cyan-400">✓</span>
+                Pro unlocks all modes
+              </p>
+              <p className="text-xs text-gray-400 flex items-center gap-2">
+                <span className="text-gray-500">✓</span>
+                No hidden charges
+              </p>
+              <p className="text-xs text-gray-400 flex items-center gap-2">
+                <span className="text-gray-500">✓</span>
+                Cancel anytime
+              </p>
+            </div>
           </div>
 
           {/* Reassurance + Close */}
           <p className="text-center text-[10px] text-gray-500 mb-3">
-            🔐 Secure checkout · Cancel anytime
+            🔐 Secure checkout · Instant access
           </p>
           <button
             onClick={() => {
