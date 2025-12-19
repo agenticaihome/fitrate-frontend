@@ -1954,43 +1954,48 @@ export default function App() {
           </button>
         </div>
 
-        {/* MODE SELECTOR - Refined, secondary pill */}
-        <div className="mt-6 mb-10 flex items-center gap-2 p-1 rounded-full overflow-visible" style={{
+        {/* MODE SELECTOR - 2x2 Grid: Free on top, Pro on bottom */}
+        <div className="mt-6 mb-10 grid grid-cols-2 gap-2 p-2 rounded-2xl" style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
-          {/* FREE MODES: Nice & Roast */}
-          {[
-            { key: 'nice', emoji: '😇', label: 'Nice' },
-            { key: 'roast', emoji: '😈', label: 'Roast' }
-          ].map((m) => (
-            <button
-              key={m.key}
-              onClick={() => {
-                playSound('click')
-                vibrate(15)
-                setMode(m.key)
-              }}
-              className={`flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 active:scale-[0.97] ${mode === m.key ? 'opacity-100' : 'opacity-60'}`}
-              style={{
-                background: mode === m.key
-                  ? m.key === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(0,212,255,0.25)'
-                  : 'rgba(255,255,255,0.05)',
-                border: mode === m.key
-                  ? `1px solid ${m.key === 'roast' ? '#ff4444' : '#00d4ff'}`
-                  : '1px solid transparent'
-              }}
-            >
-              <span className={`text-sm transition-opacity ${mode === m.key ? 'opacity-100' : 'opacity-50'}`}>
-                {m.emoji}
-              </span>
-              <span className={`text-xs font-medium transition-opacity ${mode === m.key ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>
-                {m.label}
-              </span>
-            </button>
-          ))}
+          {/* TOP ROW: FREE MODES */}
+          {/* Nice Mode */}
+          <button
+            onClick={() => {
+              playSound('click')
+              vibrate(15)
+              setMode('nice')
+            }}
+            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
+            style={{
+              background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
+              border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
+            }}
+          >
+            <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`}>😇</span>
+            <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
+          </button>
 
-          {/* PRO-ONLY: Honest Mode */}
+          {/* Roast Mode */}
+          <button
+            onClick={() => {
+              playSound('click')
+              vibrate(15)
+              setMode('roast')
+            }}
+            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
+            style={{
+              background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
+              border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
+            }}
+          >
+            <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`}>😈</span>
+            <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
+          </button>
+
+          {/* BOTTOM ROW: PRO MODES */}
+          {/* Honest Mode */}
           <button
             onClick={() => {
               playSound('click')
@@ -2001,18 +2006,18 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
             style={{
               background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
               border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
             }}
           >
-            <span className={`text-sm ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`}>📊</span>
-            <span className={`text-xs font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
-            {!isPro && <span className="text-[8px] ml-0.5 text-yellow-400 font-bold">PRO</span>}
+            <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`}>📊</span>
+            <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
+            {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
           </button>
 
-          {/* PRO-ONLY: Savage Mode - Uniform styling with Honest */}
+          {/* Savage Mode */}
           <button
             onClick={() => {
               playSound('click')
@@ -2023,15 +2028,15 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
             style={{
               background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
               border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
             }}
           >
-            <span className={`text-sm ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
-            <span className={`text-xs font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
-            {!isPro && <span className="text-[8px] ml-0.5 text-yellow-400 font-bold">PRO</span>}
+            <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
+            <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
+            {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
           </button>
         </div>
 
