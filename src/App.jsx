@@ -1152,10 +1152,10 @@ export default function App() {
     ctx.textAlign = 'center'
     ctx.fillText(scores.overall, 540, scoreY + (isSquare ? 25 : 30))
 
-    // "/ 10" below score
+    // "/ 100" below score
     ctx.fillStyle = 'rgba(255,255,255,0.4)'
     ctx.font = `bold ${isSquare ? 24 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('/ 10', 540, scoreY + (isSquare ? 70 : 90))
+    ctx.fillText('/ 100', 540, scoreY + (isSquare ? 70 : 90))
 
     // Verdict - HUGE and punchy (positioned based on format)
     const verdictY = isSquare ? 780 : 1140
@@ -1193,6 +1193,51 @@ export default function App() {
     ctx.fillStyle = scoreColor
     ctx.fillText(taglineText, 540, taglineY + 3)
 
+    // --- RE-ADDED STUFF ---
+    // Sub-scores row (Color / Fit / Style)
+    const subScoreY = isSquare ? 980 : 1450
+    if (scores.color !== undefined) {
+      const subScores = [
+        { label: 'Color', score: scores.color },
+        { label: 'Fit', score: scores.fit },
+        { label: 'Style', score: scores.style }
+      ]
+      ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
+      subScores.forEach((sub, i) => {
+        const x = 340 + (i * 200)
+        ctx.fillStyle = 'rgba(255,255,255,0.4)'
+        ctx.fillText(sub.label.toUpperCase(), x, subScoreY)
+        ctx.fillStyle = getScoreColor(sub.score)
+        ctx.fillText(sub.score.toString(), x, subScoreY + (isSquare ? 25 : 32))
+      })
+    }
+
+    // Aesthetic + Celeb match pill
+    const pillY = subScoreY + (isSquare ? 60 : 80)
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'
+    ctx.beginPath()
+    ctx.roundRect(180, pillY, 720, isSquare ? 44 : 54, 27)
+    ctx.fill()
+    ctx.fillStyle = '#fff'
+    ctx.font = `bold ${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, pillY + (isSquare ? 28 : 36))
+
+    // PRO EXCLUSIVE: Savage Meter + Item Roast
+    if (isProCard && scores.savageLevel) {
+      const proY = pillY + (isSquare ? 70 : 100)
+      ctx.font = `bold ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+      ctx.fillStyle = '#ff4444'
+      ctx.fillText(`SAVAGE LEVEL: ${scores.savageLevel}/10 🔥`, 540, proY - 10)
+
+      if (scores.itemRoasts) {
+        const roast = scores.itemRoasts.shoes || scores.itemRoasts.top || "No notes."
+        ctx.font = `italic ${isSquare ? 16 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
+        ctx.fillStyle = 'rgba(255,255,255,0.6)'
+        ctx.fillText(`"${roast}"`, 540, proY + 25)
+      }
+    }
+    // -----------------------
+
     // PRO TIP (If applicable)
     if (isProCard && scores.proTip) {
       const tipY = taglineY + (isSquare ? 80 : 120)
@@ -1205,10 +1250,10 @@ export default function App() {
       ctx.fillText(`💡 PRO TIP: ${scores.proTip}`, 540, tipY + 4)
     }
 
-    // Branding footer
-    ctx.fillStyle = 'rgba(255,255,255,0.35)'
-    ctx.font = `${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('Rate your fit in seconds → fitrate.app', 540, 1620)
+    // Branding footer (at the very bottom)
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.font = `${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
+    ctx.fillText('Rate your fit in seconds → fitrate.app', 540, isSquare ? 1070 : 1860)
 
     // Generate share text - punchy, viral, screenshot-worthy
     const getShareText = () => {
@@ -2009,7 +2054,7 @@ export default function App() {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-4xl font-black" style={{ color: scoreColor }}>{scores.overall}</span>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 10</span>
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 100</span>
             </div>
           </div>
         </div>
