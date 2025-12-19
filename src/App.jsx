@@ -1882,9 +1882,9 @@ export default function App() {
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
+          {/* FREE MODES: Nice & Roast */}
           {[
             { key: 'nice', emoji: '😇', label: 'Nice' },
-            { key: 'honest', emoji: '📊', label: 'Honest' },
             { key: 'roast', emoji: '😈', label: 'Roast' }
           ].map((m) => (
             <button
@@ -1897,10 +1897,10 @@ export default function App() {
               className={`flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 active:scale-[0.97] ${mode === m.key ? 'opacity-100' : 'opacity-60'}`}
               style={{
                 background: mode === m.key
-                  ? m.key === 'roast' ? 'rgba(255,68,68,0.25)' : m.key === 'honest' ? 'rgba(74,144,217,0.25)' : 'rgba(0,212,255,0.25)'
+                  ? m.key === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(0,212,255,0.25)'
                   : 'rgba(255,255,255,0.05)',
                 border: mode === m.key
-                  ? `1px solid ${m.key === 'roast' ? '#ff4444' : m.key === 'honest' ? '#4A90D9' : '#00d4ff'}`
+                  ? `1px solid ${m.key === 'roast' ? '#ff4444' : '#00d4ff'}`
                   : '1px solid transparent'
               }}
             >
@@ -1912,6 +1912,28 @@ export default function App() {
               </span>
             </button>
           ))}
+
+          {/* PRO-ONLY: Honest Mode */}
+          <button
+            onClick={() => {
+              playSound('click')
+              vibrate(15)
+              if (isPro) {
+                setMode('honest')
+              } else {
+                setShowPaywall(true)
+              }
+            }}
+            className={`relative flex items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+            style={{
+              background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
+              border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
+            }}
+          >
+            <span className={`text-sm ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`}>📊</span>
+            <span className={`text-xs font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
+            {!isPro && <span className="text-[8px] ml-0.5 text-yellow-400">PRO</span>}
+          </button>
 
           {/* SAVAGE Mode - Pro Only */}
           <button
