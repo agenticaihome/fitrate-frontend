@@ -1560,6 +1560,7 @@ export default function App() {
   }, [])
 
   const getScoreColor = (score) => {
+    if (score >= 95) return '#ffd700' // Gold for legendary
     if (score >= 80) return '#00ff88'
     if (score >= 60) return '#00d4ff'
     return '#ff4444'
@@ -2267,9 +2268,9 @@ export default function App() {
             {scores.overall >= 90 && (
               <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[34px] opacity-30 blur-sm animate-pulse" />
             )}
-            <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative" style={{
-              border: `2px solid ${scoreColor}44`,
-              boxShadow: `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${scoreColor}11`
+            <div className={`w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative ${scores.overall >= 95 ? 'card-golden' : ''}`} style={{
+              border: scores.overall >= 95 ? 'none' : `2px solid ${scoreColor}44`,
+              boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${scoreColor}11`
             }}>
               <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
 
