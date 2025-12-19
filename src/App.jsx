@@ -3133,13 +3133,14 @@ export default function App() {
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
           boxShadow: '0 0 60px rgba(0,212,255,0.1)'
         }}>
-          {/* Close X - directly closes paywall */}
+          {/* Close X - directly closes paywall - STICKY */}
           <button
             onClick={() => {
               playSound('click')
               setShowPaywall(false)
             }}
-            className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl p-1"
+            className="sticky top-0 float-right text-gray-400 hover:text-white text-3xl p-2 bg-slate-900/80 rounded-full z-10"
+            style={{ marginRight: '-0.5rem', marginTop: '-0.5rem' }}
             aria-label="Close paywall"
           >
             ×
@@ -3315,11 +3316,11 @@ export default function App() {
           <button
             onClick={() => {
               playSound('click')
-              setShowDeclineOffer(true)
+              setShowPaywall(false)
             }}
             className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
           >
-            Not now
+            ← Not now, go back
           </button>
         </div>
       </div>
