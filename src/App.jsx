@@ -1091,6 +1091,12 @@ export default function App() {
     ctx.fillStyle = accentGlow
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+    // Format-aware dimensions
+    const cardHeight = isSquare ? 840 : 1540
+    const cardY = isSquare ? 60 : 120
+    const borderHeight = isSquare ? 1020 : 1860
+    const innerBorderHeight = isSquare ? 1000 : 1840
+
     // PRO SPARKLE BORDER - Gold glow for Pro users
     if (isProCard) {
       ctx.shadowColor = '#ffd700'
@@ -1098,7 +1104,7 @@ export default function App() {
       ctx.strokeStyle = '#ffd700'
       ctx.lineWidth = 6
       ctx.beginPath()
-      ctx.roundRect(30, 30, 1020, 1860, 40)
+      ctx.roundRect(30, 30, 1020, borderHeight, 40)
       ctx.stroke()
       ctx.shadowBlur = 0
 
@@ -1106,7 +1112,7 @@ export default function App() {
       ctx.strokeStyle = 'rgba(255,215,0,0.3)'
       ctx.lineWidth = 2
       ctx.beginPath()
-      ctx.roundRect(40, 40, 1000, 1840, 36)
+      ctx.roundRect(40, 40, 1000, innerBorderHeight, 36)
       ctx.stroke()
     }
 
@@ -1116,7 +1122,7 @@ export default function App() {
     ctx.shadowBlur = 100
     ctx.fillStyle = 'rgba(255,255,255,0.04)'
     ctx.beginPath()
-    ctx.roundRect(60, 120, 960, 1540, 48)
+    ctx.roundRect(60, cardY, 960, cardHeight, 48)
     ctx.fill()
     ctx.shadowBlur = 0
 
@@ -1125,26 +1131,38 @@ export default function App() {
     ctx.lineWidth = 2
     ctx.stroke()
 
-
-
-    // Draw photo with rounded corners - SCALE for format
-    const yScale = canvas.height / 1920 // Scale factor for 1:1 vs 9:16
-    const imgWidth = isSquare ? 500 : 580
-    const imgHeight = isSquare ? 500 : 720
+    // Draw photo with rounded corners - FIXED for both formats
+    // Use cover-style scaling (fills container, may crop)
+    const imgWidth = isSquare ? 400 : 580
+    const imgHeight = isSquare ? 400 : 720
     const imgX = (1080 - imgWidth) / 2
-    const imgY = isSquare ? 100 : 180
+    const imgY = isSquare ? 90 : 180
 
     ctx.save()
     ctx.beginPath()
     ctx.roundRect(imgX, imgY, imgWidth, imgHeight, 28)
     ctx.clip()
 
-    const scale = Math.max(imgWidth / img.width, imgHeight / img.height)
-    const scaledW = img.width * scale
-    const scaledH = img.height * scale
-    const offsetX = imgX + (imgWidth - scaledW) / 2
-    const offsetY = imgY + (imgHeight - scaledH) / 2
-    ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH)
+    // Calculate cover scaling - maintains aspect ratio, fills container
+    const imgAspect = img.width / img.height
+    const targetAspect = imgWidth / imgHeight
+    let drawWidth, drawHeight, drawX, drawY
+
+    if (imgAspect > targetAspect) {
+      // Image is wider - fit to height, center horizontally
+      drawHeight = imgHeight
+      drawWidth = imgHeight * imgAspect
+      drawX = imgX + (imgWidth - drawWidth) / 2
+      drawY = imgY
+    } else {
+      // Image is taller - fit to width, center vertically
+      drawWidth = imgWidth
+      drawHeight = imgWidth / imgAspect
+      drawX = imgX
+      drawY = imgY + (imgHeight - drawHeight) / 2
+    }
+
+    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
     ctx.restore()
 
     // Score circle with glow - POSITION SCALED
