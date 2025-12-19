@@ -1991,62 +1991,64 @@ export default function App() {
           <span>🔒</span> Photos analyzed instantly, never stored
         </p>
 
-        {/* Pro Tease - shows when exactly 1 scan remaining */}
-        {!isPro && scansRemaining === 1 && (
-          <button
-            onClick={() => setShowPaywall(true)}
-            className="btn-responsive-text flex items-center gap-1 text-xs mt-3 px-4 py-3 rounded-full transition-all active:scale-95 hover:opacity-100 relative z-20"
-            style={{
-              color: '#ffd700',
-              background: 'rgba(255,215,0,0.1)',
-              border: '1px solid rgba(255,215,0,0.3)',
-              minHeight: '44px'
-            }}
-          >
-            <span>⚡ Go Pro</span>
-          </button>
-        )}
-
-        {/* BOTTOM SECTION - COORDINATED LAYOUT */}
-        <div className="w-full mt-auto pt-4 flex flex-col items-center gap-4" style={{
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+        {/* BOTTOM SECTION - Simple counter + Go Pro button */}
+        <div style={{
+          width: '100%',
+          marginTop: 'auto',
+          paddingTop: '16px',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
           position: 'relative',
-          zIndex: 30,
-          pointerEvents: 'auto'
+          zIndex: 50
         }}>
-          {/* Scan Status */}
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          {/* Simple scan counter */}
+          <p style={{
+            fontSize: '12px',
+            color: 'rgba(255,255,255,0.5)',
+            margin: 0
+          }}>
             {isPro
-              ? '⚡ 25 ratings per day'
-              : scansRemaining > 0
-                ? `${scansRemaining} free rating${scansRemaining !== 1 ? 's' : ''} left today`
-                : `Resets ${timeUntilReset || 'tomorrow'}`}
+              ? '⚡ Pro: 25 ratings/day'
+              : `${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left`}
           </p>
 
-          {/* Go Pro Button - ALWAYS visible for non-Pro users */}
+          {/* GO PRO BUTTON - Super simple, always visible for non-Pro */}
           {!isPro && (
             <button
-              onClick={() => {
-                console.log('CTA_CLICKED: GoProButton -> Sales Page')
-                playSound('click')
-                vibrate(20)
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                console.log('🚀 GO PRO CLICKED!')
+                alert('Go Pro clicked! Opening Sales Page...')
                 setShowPaywall(true)
               }}
-              className="flex items-center gap-2 px-6 py-3 rounded-full transition-all active:scale-95"
               style={{
-                background: scansRemaining === 0
-                  ? 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)'
-                  : 'rgba(255,215,0,0.15)',
-                border: '1px solid rgba(255,215,0,0.4)',
-                boxShadow: scansRemaining === 0 ? '0 0 30px rgba(255,215,0,0.3)' : 'none',
-                minHeight: '48px',
-                color: scansRemaining === 0 ? '#000' : '#ffd700',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '14px 28px',
+                backgroundColor: '#ffd700',
+                color: '#000',
+                fontSize: '16px',
                 fontWeight: 'bold',
-                pointerEvents: 'auto',
-                cursor: 'pointer'
+                borderRadius: '50px',
+                border: 'none',
+                cursor: 'pointer',
+                minHeight: '52px',
+                minWidth: '160px',
+                boxShadow: '0 4px 20px rgba(255,215,0,0.4)',
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation',
+                userSelect: 'none',
+                zIndex: 100
               }}
             >
-              {scansRemaining === 0 ? '👑 Get More Ratings' : '⚡ Go Pro'}
+              👑 Go Pro
             </button>
           )}
         </div>
