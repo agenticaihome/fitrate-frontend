@@ -97,6 +97,20 @@ const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
   })
 }
 
+// ============================================
+// GA4 SHARE TRACKING
+// Track share events for virality analytics
+// ============================================
+const trackShare = (method, contentType = 'outfit_rating', score = null) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'share', {
+      method: method,
+      content_type: contentType,
+      item_id: score ? `score_${score}` : 'unknown'
+    })
+  }
+}
+
 export default function App() {
   // Check for button test page
   const urlParams = new URLSearchParams(window.location.search)
@@ -2631,11 +2645,13 @@ export default function App() {
           }
 
           await navigator.share(data)
+          trackShare('native_share', 'outfit_rating', scores?.overall)
           setScreen('share-success')
         } catch (err) {
           if (err.name !== 'AbortError') {
             // Fallback: download + copy
             downloadImage(shareData.imageBlob, shareData.text)
+            trackShare('download', 'outfit_rating', scores?.overall)
             showCopiedToast('Image saved! Caption copied ✅')
           }
         }
@@ -2643,6 +2659,7 @@ export default function App() {
         // Desktop fallback
         downloadImage(shareData.imageBlob, shareData.text)
         navigator.clipboard.writeText(shareData.text)
+        trackShare('download', 'outfit_rating', scores?.overall)
         showCopiedToast('Image saved! Caption copied ✅')
         setTimeout(() => setScreen('share-success'), 1500)
       }
@@ -2672,6 +2689,7 @@ export default function App() {
         await navigator.clipboard.writeText(getShareUrl())
         playSound('click')
         showCopiedToast('Link copied! 📋')
+        trackShare('copy_link', 'outfit_rating', scores?.overall)
       } catch (err) {
         showCopiedToast("Couldn't copy 😕")
       }
@@ -2680,17 +2698,20 @@ export default function App() {
     const shareToTwitter = () => {
       const text = encodeURIComponent(getShareText())
       const url = encodeURIComponent(getShareUrl())
+      trackShare('twitter', 'outfit_rating', scores?.overall)
       window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
     }
 
     const shareToFacebook = () => {
       const url = encodeURIComponent(getShareUrl())
+      trackShare('facebook', 'outfit_rating', scores?.overall)
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
     }
 
     const shareToReddit = () => {
       const title = encodeURIComponent(getShareText())
       const url = encodeURIComponent(getShareUrl())
+      trackShare('reddit', 'outfit_rating', scores?.overall)
       window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank')
     }
 
@@ -2698,11 +2719,13 @@ export default function App() {
       const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
       // Use different format for iOS vs Android
       const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+      trackShare('sms', 'outfit_rating', scores?.overall)
       window.location.href = isIOS ? `sms:&body=${text}` : `sms:?body=${text}`
     }
 
     const shareToWhatsApp = () => {
       const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
+      trackShare('whatsapp', 'outfit_rating', scores?.overall)
       window.open(`https://wa.me/?text=${text}`, '_blank')
     }
 
