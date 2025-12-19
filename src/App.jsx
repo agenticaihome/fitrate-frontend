@@ -3129,8 +3129,9 @@ export default function App() {
               }}
             >
               {/* Best Value Badge */}
-              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider z-10" style={{
-                boxShadow: '0 4px 12px rgba(255,68,68,0.4)'
+              {/* Best Value Badge */}
+              <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-xl uppercase tracking-wider z-10" style={{
+                boxShadow: '-2px 2px 10px rgba(255,68,68,0.3)'
               }}>
                 Best Value
               </div>
