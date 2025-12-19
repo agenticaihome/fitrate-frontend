@@ -3023,7 +3023,7 @@ export default function App() {
               setMode('roast')
               setScreen('home')
             } else {
-              resetApp()
+              setScreen('home')
             }
           }}
           className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
@@ -3041,7 +3041,7 @@ export default function App() {
 
         {/* Back to home */}
         <button
-          onClick={resetApp}
+          onClick={() => setScreen('home')}
           className="text-sm font-medium transition-all active:opacity-60"
           style={{ color: 'rgba(255,255,255,0.4)' }}
         >
@@ -3060,9 +3060,9 @@ export default function App() {
         background: 'rgba(0,0,0,0.9)',
         backdropFilter: 'blur(10px)'
       }}>
-        {/* Decline Offer Popup */}
+        {/* Decline Offer Popup - higher z-index to overlay main paywall */}
         {showDeclineOffer && (
-          <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{
             background: 'rgba(0,0,0,0.95)'
           }}>
             <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30 relative" style={{
