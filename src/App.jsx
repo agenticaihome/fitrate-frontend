@@ -1599,26 +1599,44 @@ export default function App() {
     return '#ff4444'
   }
 
-  // Accent colors based on mode
+  // Accent colors based on mode - DISTINCT per mode for instant recognition
   const getModeColor = () => {
-    if (mode === 'roast') return '#ff4444'
-    if (mode === 'honest') return '#4A90D9'
-    return '#00d4ff'
+    switch (mode) {
+      case 'savage': return '#8b00ff' // Purple
+      case 'roast': return '#ff4444'  // Red
+      case 'honest': return '#0077ff' // Blue
+      default: return '#00d4ff'       // Cyan (Nice)
+    }
   }
   const getModeGlow = () => {
-    if (mode === 'roast') return 'rgba(255,68,68,0.4)'
-    if (mode === 'honest') return 'rgba(74,144,217,0.4)'
-    return 'rgba(0,212,255,0.4)'
+    switch (mode) {
+      case 'savage': return 'rgba(139,0,255,0.4)' // Purple glow
+      case 'roast': return 'rgba(255,68,68,0.4)'  // Red glow
+      case 'honest': return 'rgba(0,119,255,0.4)' // Blue glow
+      default: return 'rgba(0,212,255,0.4)'       // Cyan glow (Nice)
+    }
+  }
+  // Secondary gradient color per mode
+  const getModeGradientEnd = () => {
+    switch (mode) {
+      case 'savage': return '#ff0044' // Dark red
+      case 'roast': return '#ff8800'  // Orange
+      case 'honest': return '#00d4ff' // Cyan
+      default: return '#00ff88'       // Green (Nice)
+    }
   }
   const accent = getModeColor()
   const accentGlow = getModeGlow()
+  const accentEnd = getModeGradientEnd()
 
   // Analysis messages for analyzing screen - High-status dopamine feedback
-  const analysisMessages = mode === 'roast'
-    ? ['Synthesizing social suicide...', 'Detecting fabric failure...', 'Calculating ego damage...', 'Calibrating savagery...', 'Finalizing the damage...']
-    : mode === 'honest'
-      ? ['Analyzing social positioning...', 'Calculating wardrobe ROI...', 'Synthesizing aesthetic metrics...', 'Detecting style efficiency...', 'Finalizing objective data...']
-      : ['Detecting main character signal...', 'Optimizing social ROI...', 'Synthesizing aesthetic value...', 'Calculating aura level...', 'Finalizing the flex...']
+  const analysisMessages = mode === 'savage'
+    ? ['Preparing total destruction...', 'Loading maximum violence...', 'Calculating devastation...', 'Arming nuclear roasts...', 'Deploying fashion death....']
+    : mode === 'roast'
+      ? ['Synthesizing social suicide...', 'Detecting fabric failure...', 'Calculating ego damage...', 'Calibrating savagery...', 'Finalizing the damage...']
+      : mode === 'honest'
+        ? ['Analyzing social positioning...', 'Calculating wardrobe ROI...', 'Synthesizing aesthetic metrics...', 'Detecting style efficiency...', 'Finalizing objective data...']
+        : ['Detecting main character signal...', 'Optimizing social ROI...', 'Synthesizing aesthetic value...', 'Calculating aura level...', 'Finalizing the flex...']
 
   // Progress and text animation effect for analyzing screen
   // IMPORTANT: This must be BEFORE any early returns to avoid hooks order issues
@@ -1917,7 +1935,7 @@ export default function App() {
           >
             {/* Pulsing inner glow */}
             <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-              background: `linear-gradient(135deg, ${accent} 0%, ${mode === 'roast' || mode === 'savage' ? '#ff0080' : mode === 'honest' ? '#00d4ff' : '#00ff88'} 100%)`,
+              background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
               boxShadow: `0 0 60px ${accentGlow}`,
               animation: 'pulse 2s ease-in-out infinite'
             }} />
