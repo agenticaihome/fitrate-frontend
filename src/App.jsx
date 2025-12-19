@@ -41,18 +41,20 @@ const getPercentile = (score) => {
   return Math.floor(score * 0.4)
 }
 
-// Helper: Random share tips for virality
+// Helper: Random share tips for virality (universal appeal)
 const SHARE_TIPS = [
   "Challenge a friend to beat this 👀",
-  "Post to your story 📸",
+  "Share with friends 📸",
   "Tag someone who needs a rating",
-  "Drop this in the group chat",
-  "Your followers need to see this",
-  "This score goes crazy",
-  "Bet you can't get higher 🔥",
-  "Send to someone who thinks they dress better",
-  "Post it 😏",
-  "Your friends need to try this"
+  "Send this to your group chat",
+  "Show your friends this score",
+  "Think you can do better? Try again!",
+  "Bet a friend can't beat this 🔥",
+  "Send to someone stylish",
+  "Share your results!",
+  "Get your friends to try it too",
+  "Compare scores with friends",
+  "Who has the best style? Find out!"
 ]
 
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
@@ -410,6 +412,7 @@ export default function App() {
     }
 
     const roastVerdicts = [
+      // Gen Z roasts
       "Bro really said 'I'll figure it out later' 💀",
       "The colors are in a toxic relationship",
       "This fit is giving... participation trophy",
@@ -419,24 +422,33 @@ export default function App() {
       "The fit that texts back 'k'",
       "This outfit has a 2.3 GPA 📉",
       "Sir this is a Wendy's 💀",
-      "Main NPC energy tbh",
-      "Giving clearance rack at 9pm",
       "The algorithm buried this one",
-      "This fit ghosted the vibe check",
       "Colors are screaming for help",
       "You wore this on purpose? 💀",
       "Fabric said 'I give up'",
-      "The fit forgot the assignment",
       "This is a cry for help",
       "Outfit buffering... forever",
       "Did the lighting dirty you or... 😬",
       "Proportions left the chat",
       "This fit has a villain origin story",
       "Styled by throwing darts at the closet",
-      "The vibes are confused and scared"
+      // Universal roasts (funny but accessible)
+      "Did your mirror break this morning? 😅",
+      "Bold choice. Very bold.",
+      "The outfit equivalent of a Monday",
+      "I've seen better... at the laundromat",
+      "Were you in a rush? Be honest.",
+      "This needs a do-over",
+      "Interesting... and not in a good way",
+      "Even the mannequin would say no",
+      "Your closet deserves an apology",
+      "Confidence is great, but so is a mirror",
+      "This is a fashion emergency 🚨",
+      "Let's pretend this didn't happen"
     ]
 
     const niceVerdicts = [
+      // Gen Z favorites
       "Main character energy ✨",
       "Clean and confident 🔥",
       "Understated fire detected",
@@ -449,60 +461,82 @@ export default function App() {
       "Immaculate vibes only",
       "Serving looks",
       "The coordination is *chefs kiss*",
-      "The drip is real 💧",
       "Outfit understood the assignment",
       "You chose fashion today",
-      "The fit ate",
-      "That friend everyone screenshots",
       "Effortless but intentional",
       "Pinterest would be proud",
       "Straight off a mood board",
-      "The silhouette is perfect",
       "Casual done right",
       "Nailed it 🎯",
-      "Main character rights earned"
+      // Universal appeal
+      "Looking sharp! Ready for anything",
+      "Great style choices here",
+      "Well put together 👏",
+      "This outfit works beautifully",
+      "Classic meets modern — love it",
+      "Confident and polished",
+      "You've got great taste",
+      "Style on point today",
+      "This look is a winner",
+      "Really well coordinated",
+      "A+ for effort and execution",
+      "Sharp and stylish"
     ]
 
     const shareTips = [
+      // Share prompts for all ages
       "Challenge a friend to beat this 👀",
-      "Post to your story 📸",
+      "Share with friends 📸",
       "Tag someone who needs a rating",
-      "Drop this in the group chat",
-      "Your followers need to see this",
-      "This score goes crazy",
-      "Bet you can't get higher 🔥",
-      "Send to someone who thinks they dress better",
-      "Post it 😏",
-      "Your friends need to try this"
+      "Send this to your group chat",
+      "Show your friends this score",
+      "Think you can do better? Try again!",
+      "Bet a friend can't beat this 🔥",
+      "Send to someone stylish",
+      "Share your results!",
+      "Get your friends to try it too",
+      "Compare scores with friends",
+      "Who has the best style? Find out!"
     ]
 
     const roastTips = [
+      // Funny but understandable for all ages
       "Start over. Please.",
       "Have you considered... literally anything else?",
       "Less is more. Way less.",
-      "Google 'how to dress' and return",
+      "A quick search for 'outfit ideas' might help",
       "Maybe try the other shirt next time",
-      "The fit clinic is now open 💀",
-      "Iron exists for a reason bestie",
-      "Delete this and try again",
-      "Stick to monochrome for a bit",
-      "Accessories can't save this"
+      "Time for a wardrobe intervention",
+      "An iron might be your new best friend",
+      "Try again tomorrow",
+      "Stick to simpler colors for now",
+      "Accessories won't save this one",
+      "Phone a stylish friend",
+      "When in doubt, go with basics",
+      "Perhaps consult a mirror first?",
+      "This is a learning opportunity"
     ]
 
     const niceTips = [
+      // Style tips that work for everyone
       "Cuff the jeans for cleaner lines",
-      "A chunky watch would elevate",
+      "A nice watch would elevate this",
       "Try layering with a light jacket",
-      "White sneakers would slap here",
-      "Add a simple chain necklace",
-      "Roll those sleeves up 🔥",
-      "This with sunglasses = 💯",
-      "The right bag would complete this",
-      "Try French tucking the shirt",
-      "Add a belt to define the waist"
+      "Clean white sneakers work great here",
+      "A simple accessory could add polish",
+      "Rolling the sleeves adds a relaxed vibe",
+      "Sunglasses would complete the look",
+      "The right bag would tie this together",
+      "Try tucking in the front of your shirt",
+      "A belt would add nice definition",
+      "Consider adding a pop of color",
+      "This would pair well with a blazer",
+      "Minimal jewelry keeps it elegant",
+      "Great canvas for accessories"
     ]
 
     const honestVerdicts = [
+      // Constructive feedback
       "Solid, but room to improve",
       "Almost there, just needs polish",
       "Good bones, execution varies",
@@ -512,20 +546,35 @@ export default function App() {
       "Shows effort, needs refinement",
       "Close but missing something",
       "Functional, not exceptional",
-      "Average execution of good idea"
+      "Average execution of good idea",
+      // Universal honest feedback
+      "Decent foundation to build on",
+      "Some nice elements, some misses",
+      "A few tweaks could elevate this",
+      "Good start, room to grow",
+      "Not bad, but could be better",
+      "Respectable effort overall",
+      "Works for the occasion",
+      "Middle of the road — safe bet",
+      "Has potential with adjustments"
     ]
 
     const honestTips = [
-      "The proportions need work",
-      "Consider a different wash",
-      "Colors are fighting a bit",
-      "Fit could be more intentional",
-      "Accessories would help here",
+      // Constructive suggestions for all ages
+      "The proportions could use adjustment",
+      "Consider a different color palette",
+      "These colors clash slightly",
+      "The fit could be more tailored",
+      "The right accessories would help",
       "Try a different silhouette",
-      "The layers need balance",
-      "Consider tailoring this piece",
-      "Material upgrade would help",
-      "Simpler might be better here"
+      "Balance the layers better",
+      "Tailoring would make a big difference",
+      "Higher quality fabric would elevate this",
+      "Simpler might work better here",
+      "Check the overall balance",
+      "Iron or steam for a polished look",
+      "Match your shoes to the outfit tone",
+      "Less is more in this case"
     ]
 
     // Wider score range for variety - honest mode uses full natural range
@@ -1588,8 +1637,11 @@ export default function App() {
           WebkitTextFillColor: 'transparent'
         }}>FITRATE</h1>
 
-        <p className="text-xs mb-8 tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          Post it... or let us roast it first 😈
+        <p className="text-sm mb-2 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          Your AI style coach
+        </p>
+        <p className="text-xs mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          Snap a photo • Get instant feedback • Have fun
         </p>
 
         {/* Challenge Banner - when friend shared a challenge link */}
@@ -1616,7 +1668,7 @@ export default function App() {
         )}
 
         {/* HERO CTA - Central path of least resistance */}
-        <div className="flex-1 flex flex-col items-center justify-center -mt-20">
+        <div className="flex-1 flex flex-col items-center justify-center">
           <button
             onClick={() => {
               playSound('click')
@@ -1655,14 +1707,14 @@ export default function App() {
               {mode === 'roast' ? 'ROAST ME' : mode === 'honest' ? 'ANALYZE' : 'RATE ME'}
             </span>
 
-            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] animate-pulse">Tap to Start</p>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+              <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">Tap to Start</p>
             </div>
           </button>
         </div>
 
         {/* MODE SELECTOR - Refined, secondary pill */}
-        <div className="mb-10 flex items-center gap-2 p-1 rounded-full" style={{
+        <div className="mt-6 mb-10 flex items-center gap-2 p-1 rounded-full" style={{
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.1)'
         }}>
@@ -1708,26 +1760,27 @@ export default function App() {
                 setShowPaywall(true)
               }
             }}
-            className={`relative flex items-center gap-1 px-2 py-1.5 rounded-full transition-all duration-300 ${isPro ? '' : 'opacity-60'}`}
+            className={`relative flex items-center gap-1.5 px-3 py-2 rounded-2xl transition-all duration-300 ${isPro ? '' : 'opacity-70'}`}
             style={{
               background: mode === 'savage' && isPro ? 'rgba(255,0,0,0.3)' : 'rgba(255,0,0,0.1)',
-              border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)'
+              border: mode === 'savage' && isPro ? '1px solid #ff0000' : '1px dashed rgba(255,0,0,0.4)',
+              marginTop: !isPro ? '4px' : '0'
             }}
           >
             {!isPro && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[6px] px-1 py-0.5 rounded-full font-bold" style={{
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap z-10" style={{
                 background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
                 color: '#000'
               }}>PRO</span>
             )}
-            <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
-            <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Savage</span>
-            {!isPro && <span className="text-[10px]">🔒</span>}
+            <span className={`text-sm transition-opacity ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-60'}`}>💀</span>
+            <span className={`text-xs font-medium transition-opacity ${mode === 'savage' && isPro ? 'opacity-100 text-white' : 'opacity-60 text-gray-400'}`}>Savage</span>
+            {!isPro && <span className="text-[10px] ml-0.5">🔒</span>}
           </button>
         </div>
 
         {/* Trust Message */}
-        <p className="mt-6 text-[10px] flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+        <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
           <span>🔒</span> Photos analyzed instantly, never stored
         </p>
 
@@ -1742,7 +1795,7 @@ export default function App() {
               border: '1px solid rgba(255,215,0,0.3)'
             }}
           >
-            ⚡ Go Pro
+            <span>⚡ Go Pro</span>
           </button>
         )}
 
@@ -1754,7 +1807,7 @@ export default function App() {
           <div className="flex flex-col items-center gap-3">
             {scansRemaining > 0 || isPro ? (
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {isPro ? '⚡ Unlimited Elite Scans' : `${scansRemaining} free fit${scansRemaining !== 1 ? 's' : ''} left today`}
+                {isPro ? '⚡ 25 ratings per day' : `${scansRemaining} free rating${scansRemaining !== 1 ? 's' : ''} left today`}
               </p>
             ) : (
               <button
@@ -1767,7 +1820,7 @@ export default function App() {
                 }}
               >
                 <span className="text-xs font-black" style={{ color: '#ffd700' }}>
-                  REFILL SCANS · UNLOCK PRO 👑
+                  GET MORE RATINGS 👑
                 </span>
               </button>
             )}
@@ -1775,20 +1828,271 @@ export default function App() {
             {!isPro && scansRemaining > 0 && (
               <button
                 onClick={() => setShowPaywall(true)}
-                className="text-[10px] font-black tracking-[0.2em] text-orange-400 opacity-60 hover:opacity-100 transition-opacity uppercase"
+                className="text-[11px] font-black tracking-[0.15em] text-orange-400 opacity-70 hover:opacity-100 transition-opacity uppercase"
               >
-                Get Unlimited Savage Scans →
+                Go Pro →
               </button>
             )}
           </div>
 
           {/* Footer Links - Compact */}
           <div className="flex justify-center gap-6 pb-2">
-            <a href="/privacy" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Privacy</a>
-            <a href="/terms" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>Terms</a>
-            <a href="/about" className="text-[10px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.2)' }}>About</a>
+            <a href="/privacy" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy</a>
+            <a href="/terms" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Terms</a>
+            <a href="/about" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>About</a>
           </div>
         </div>
+
+        {/* Paywall Modal Overlay - Renders on top of home screen */}
+        {showPaywall && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+            background: 'rgba(0,0,0,0.9)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            {/* Decline Offer Popup */}
+            {showDeclineOffer && (
+              <div className="absolute inset-0 z-60 flex items-center justify-center p-4" style={{
+                background: 'rgba(0,0,0,0.95)'
+              }}>
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30" style={{
+                  boxShadow: '0 0 60px rgba(255,215,0,0.2)'
+                }}>
+                  <p className="text-yellow-400 font-bold text-lg mb-2">✨ Special Offer</p>
+                  <h2 className="text-white text-2xl font-black mb-4">Try Pro for less</h2>
+
+                  <p className="text-gray-400 mb-4">
+                    Get FitRate Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span>
+                    <br />
+                    <span className="text-xs">(Regular price $2.99/week, cancel anytime)</span>
+                  </p>
+
+                  <button
+                    onClick={() => startCheckout('proWeeklyDiscount')}
+                    disabled={checkoutLoading}
+                    className="w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
+                    style={{
+                      background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
+                      boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
+                    }}
+                  >
+                    {checkoutLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+                        Loading...
+                      </span>
+                    ) : 'Get This Deal'}
+                  </button>
+
+                  <p className="text-center text-[10px] text-gray-500 mb-3">
+                    🔐 Secure checkout · Cancel anytime
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      setShowDeclineOffer(false)
+                      setShowPaywall(false)
+                    }}
+                    className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
+                  >
+                    Maybe later
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Main Paywall */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
+              boxShadow: '0 0 60px rgba(0,212,255,0.1)'
+            }}>
+              {/* Close X */}
+              <button
+                onClick={() => {
+                  playSound('click')
+                  setShowDeclineOffer(true) // Show decline offer instead of closing
+                }}
+                className="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+
+              <div className="text-center mb-6">
+                <span className="text-4xl mb-2 block">👑</span>
+                <h2 className="text-white text-2xl font-black">Go Pro</h2>
+                <p className="text-gray-400 text-sm mt-1">Get 25 outfit ratings every day</p>
+              </div>
+
+              {/* Pro Subscription Hero Card */}
+              <div className="relative w-full mb-6">
+                <button
+                  onClick={() => startCheckout('proWeekly')}
+                  disabled={checkoutLoading}
+                  className="btn-physical w-full p-6 pb-8 rounded-3xl text-left transition-all group overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #00d4ff 0%, #0077ff 100%)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    boxShadow: 'var(--shadow-physical), 0 0 40px rgba(0,212,255,0.2)'
+                  }}
+                >
+                  {/* Shine effect */}
+                  <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000" />
+
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-white text-xl font-black leading-tight">FitRate Pro</h3>
+                    </div>
+                    <span className="text-2xl">👑</span>
+                  </div>
+
+                  <div className="space-y-1.5 mb-4">
+                    {[
+                      '25 ratings per day',
+                      'Style personality insights',
+                      'Social perception analysis',
+                      'All modes included'
+                    ].map((benefit, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[11px] font-semibold text-white/90">
+                        <span className="text-white text-[10px]">✓</span>
+                        <span>{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-white">$2.99</span>
+                      <span className="text-white/60 text-xs">/week</span>
+                    </div>
+                    <span className="text-[9px] font-black px-2 py-1 rounded-full bg-white/20 text-white uppercase tracking-wider">
+                      Best Value
+                    </span>
+                  </div>
+                </button>
+              </div>
+
+              <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">— OR PAY PER RATING —</p>
+
+              {/* Scan Packs Section - Supercell Style Loot Cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {/* Starter Pack */}
+                <button
+                  onClick={() => startCheckout('starterPack')}
+                  disabled={checkoutLoading}
+                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}
+                >
+                  <span className="block text-2xl font-black text-white">5</span>
+                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
+                  <span className="block text-sm font-bold text-white mt-1">$1.99</span>
+                </button>
+
+                {/* Popular Pack - Supercell Highlight */}
+                <button
+                  onClick={() => startCheckout('popularPack')}
+                  disabled={checkoutLoading}
+                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px] relative overflow-hidden"
+                  style={{
+                    background: 'rgba(0,212,255,0.1)',
+                    border: '2px solid #00d4ff',
+                    boxShadow: 'var(--shadow-physical), 0 0 20px rgba(0,212,255,0.2)'
+                  }}
+                >
+                  <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400" />
+                  <span className="block text-3xl font-black text-cyan-400">15</span>
+                  <span className="block text-[9px] text-cyan-400/70 uppercase font-black">ratings</span>
+                  <span className="block text-sm font-bold text-white mt-1">$3.99</span>
+                </button>
+
+                {/* Power Pack */}
+                <button
+                  onClick={() => startCheckout('powerPack')}
+                  disabled={checkoutLoading}
+                  className="btn-physical p-4 rounded-2xl text-center flex flex-col items-center justify-between min-h-[110px]"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}
+                >
+                  <span className="block text-2xl font-black text-white">50</span>
+                  <span className="block text-[9px] text-gray-500 uppercase font-black">ratings</span>
+                  <span className="block text-sm font-bold text-white mt-1">$9.99</span>
+                </button>
+              </div>
+
+              {/* SAVAGE Roast option */}
+              <button
+                onClick={() => startCheckout('proRoast')}
+                disabled={checkoutLoading}
+                className="w-full py-4 rounded-2xl text-red-400 font-bold text-sm mb-4 mt-4 transition-all duration-100 active:scale-[0.97] disabled:opacity-50"
+                style={{
+                  background: 'rgba(255,68,68,0.08)',
+                  border: '1px solid rgba(255,68,68,0.25)'
+                }}
+              >
+                💀 Or get 1 SAVAGE Roast for $0.99
+              </button>
+
+              {/* Invite 3 → Get 15 Free Ratings */}
+              <div className="w-full p-4 rounded-2xl mb-4" style={{
+                background: 'rgba(0,255,136,0.06)',
+                border: '1px dashed rgba(0,255,136,0.3)'
+              }}>
+                <p className="text-center text-xs text-green-400/80 mb-2">🎁 OR GET FREE RATINGS</p>
+                <p className="text-center text-white text-sm font-bold mb-2">
+                  Invite 3 friends → Get 15 free ratings
+                </p>
+                <div className="flex items-center justify-center gap-1 mb-3">
+                  {[0, 1, 2].map(i => {
+                    const totalReferrals = parseInt(localStorage.getItem('fitrate_total_referrals') || '0')
+                    const filled = i < totalReferrals
+                    return (
+                      <div key={i} className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{
+                        background: filled ? 'rgba(0,255,136,0.3)' : 'rgba(255,255,255,0.1)',
+                        border: filled ? '2px solid #00ff88' : '2px solid rgba(255,255,255,0.2)'
+                      }}>
+                        {filled ? '✓' : '?'}
+                      </div>
+                    )
+                  })}
+                </div>
+                <button
+                  onClick={async () => {
+                    const shareUrl = `https://fitrate.app?ref=${userId}`
+                    if (navigator.share) {
+                      navigator.share({ title: 'Rate my fit!', url: shareUrl })
+                    } else {
+                      await navigator.clipboard.writeText(shareUrl)
+                      displayToast('Link copied! 📋')
+                    }
+                  }}
+                  className="w-full py-3 rounded-2xl text-sm font-bold transition-all duration-100 active:scale-[0.97]"
+                  style={{
+                    background: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
+                    color: '#000'
+                  }}
+                >
+                  Share & Invite Friends 🚀
+                </button>
+              </div>
+
+              {/* Reassurance + Close */}
+              <p className="text-center text-[10px] text-gray-500 mb-3">
+                🔐 Secure checkout · Cancel anytime
+              </p>
+              <button
+                onClick={() => {
+                  playSound('click')
+                  setShowDeclineOffer(true)
+                }}
+                className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
+              >
+                Not now
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -1886,7 +2190,7 @@ export default function App() {
               <span>🔒</span><span>Item-by-item roasts (Pro)</span>
             </div>
             <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-              <span>🔒</span><span>GPT-4 Vision analysis (Pro)</span>
+              <span>🔒</span><span>Advanced AI analysis (Pro)</span>
             </div>
           </div>
         )}
@@ -2009,7 +2313,7 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <p className="text-center text-[9px] font-black text-white/20 uppercase tracking-widest mt-4 group-active:text-white/40">Tap card to share</p>
+            <p className="text-center text-[11px] font-black text-white/40 uppercase tracking-widest mt-4 group-active:text-white/60">Tap to share</p>
           </button>
         </div>
 
@@ -2158,15 +2462,14 @@ export default function App() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <span className="text-7xl mb-6">👗</span>
-        <p className="text-xl font-semibold text-white mb-2">{error || "Something went wrong"}</p>
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>Give it another shot</p>
+        <p className="text-xl font-semibold text-white mb-2">{error || "Oops! We couldn't rate that one"}</p>
+        <p className="text-sm mb-8 text-center px-4" style={{ color: 'rgba(255,255,255,0.5)' }}>Try a clearer photo or check your connection</p>
         <button
           onClick={resetApp}
-          className="px-8 py-4 rounded-2xl text-white font-semibold transition-all hover:scale-105"
+          className="btn-physical px-8 py-4 rounded-2xl text-white font-semibold transition-all active:scale-[0.97]"
           style={{
-            background: 'rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+            boxShadow: 'var(--shadow-physical), 0 0 30px rgba(0,212,255,0.3)'
           }}
         >
           Try Again
@@ -2234,9 +2537,9 @@ export default function App() {
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
       }}>
         <div className="text-7xl mb-6">🎉</div>
-        <h2 className="text-4xl font-black text-white mb-3">Welcome to FitPass!</h2>
+        <h2 className="text-4xl font-black text-white mb-3">Welcome to FitRate Pro!</h2>
         <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          25 AI outfit ratings per day unlocked
+          You now have 25 ratings per day
         </p>
 
         <div className="p-6 rounded-2xl mb-8 text-center" style={{
@@ -2245,9 +2548,9 @@ export default function App() {
           backdropFilter: 'blur(10px)'
         }}>
           <p className="text-base" style={{ color: '#00ff88' }}>
-            ✨ 25 scans per day<br />
-            🤖 Real GPT-4 Vision AI<br />
-            🔥 vs 1 free scan for non-Pro
+            ✨ 25 ratings per day<br />
+            🤖 Advanced AI analysis<br />
+            🔥 All modes unlocked
           </p>
         </div>
 
@@ -2300,7 +2603,7 @@ export default function App() {
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               {timeUntilReset
                 ? `Free fits reset in ${timeUntilReset}`
-                : 'Unlock unlimited outfit ratings'}
+                : 'Get 25 outfit ratings per day'}
             </p>
           </div>
 
@@ -2327,7 +2630,7 @@ export default function App() {
                 boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
               }}
             >
-              ⚡ Pro AI · $2.99/week
+              ⚡ FitRate Pro · $2.99/week
             </a>
           </div>
 
@@ -2456,6 +2759,11 @@ export default function App() {
       window.location.href = isIOS ? `sms:&body=${text}` : `sms:?body=${text}`
     }
 
+    const shareToWhatsApp = () => {
+      const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
+      window.open(`https://wa.me/?text=${text}`, '_blank')
+    }
+
     // Check if native share is available
     const hasNativeShare = typeof navigator.share === 'function'
 
@@ -2539,55 +2847,66 @@ export default function App() {
           <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
             Or share directly to:
           </p>
-          <div className="share-grid-responsive grid grid-cols-5 gap-2">
-            {/* Copy Link */}
+          <div className="share-grid-responsive grid grid-cols-3 gap-3 mb-3">
+            {/* WhatsApp - Primary */}
             <button
-              onClick={copyShareLink}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              onClick={shareToWhatsApp}
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(37,211,102,0.15)', border: '1px solid rgba(37,211,102,0.3)' }}
             >
-              <span className="text-xl mb-1">🔗</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Copy</span>
+              <span className="text-2xl mb-1">💬</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>WhatsApp</span>
             </button>
 
             {/* SMS/Text */}
             <button
               onClick={shareToSMS}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
               style={{ background: 'rgba(255,255,255,0.1)' }}
             >
-              <span className="text-xl mb-1">💬</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Text</span>
+              <span className="text-2xl mb-1">📱</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Message</span>
             </button>
 
+            {/* Copy Link */}
+            <button
+              onClick={copyShareLink}
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
+              style={{ background: 'rgba(255,255,255,0.1)' }}
+            >
+              <span className="text-2xl mb-1">🔗</span>
+              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Copy Link</span>
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
             {/* X (Twitter) */}
             <button
               onClick={shareToTwitter}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">𝕏</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>X</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>X</span>
             </button>
 
             {/* Facebook */}
             <button
               onClick={shareToFacebook}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">📘</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>FB</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Facebook</span>
             </button>
 
             {/* Reddit */}
             <button
               onClick={shareToReddit}
               className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
+              style={{ background: 'rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl mb-1">🤖</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.6)' }}>Reddit</span>
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Reddit</span>
             </button>
           </div>
         </div>
