@@ -5,6 +5,25 @@ import ModalHeader from './components/common/ModalHeader'
 import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
 import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
+import { getScoreColor, getPercentile } from './utils/scoreUtils'
+import { compressImage } from './utils/imageUtils'
+import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
+import { trackShare } from './utils/analytics'
+
+// Screens
+import ResultsScreen from './screens/ResultsScreen'
+import AnalyzingScreen from './screens/AnalyzingScreen'
+import HomeScreen from './screens/HomeScreen'
+import ErrorScreen from './screens/ErrorScreen'
+import ProEmailPromptScreen from './screens/ProEmailPromptScreen'
+import ProWelcomeScreen from './screens/ProWelcomeScreen'
+import SharePreviewScreen from './screens/SharePreviewScreen'
+import ShareSuccessScreen from './screens/ShareSuccessScreen'
+import PaywallScreen from './screens/PaywallScreen'
+
+// Modals
+import PaywallModal from './components/modals/PaywallModal'
+import LeaderboardModal from './components/modals/LeaderboardModal'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -32,18 +51,7 @@ const CELEBRITIES = [
   'Dua Lipa going to dinner', 'Jacob Elordi casual', 'Sydney Sweeney brunch'
 ]
 
-// Helper: Social proof percentile based on score
-const getPercentile = (score) => {
-  if (score >= 95) return 99
-  if (score >= 90) return 96
-  if (score >= 85) return 91
-  if (score >= 80) return 84
-  if (score >= 75) return 73
-  if (score >= 70) return 61
-  if (score >= 65) return 48
-  if (score >= 60) return 35
-  return Math.floor(score * 0.4)
-}
+// Helper: Social proof percentile logic moved to utils/scoreUtils.js
 
 // Helper: Random share tips for virality (universal appeal)
 const SHARE_TIPS = [
@@ -64,82 +72,11 @@ const SHARE_TIPS = [
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
 
 // ============================================
-// IMAGE COMPRESSION UTILITY
-// Resize and compress images before upload to reduce bandwidth and speed
-// ============================================
-const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        // Calculate new dimensions (maintain aspect ratio)
-        let width = img.width
-        let height = img.height
-
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width
-          width = maxWidth
-        }
-
-        // Create canvas and draw resized image
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, width, height)
-
-        // Convert to JPEG with compression
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
-        resolve(compressedDataUrl)
-      }
-      img.onerror = reject
-      img.src = e.target.result
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
-// ============================================
 // GA4 SHARE TRACKING
 // Track share events for virality analytics
 // ============================================
-const trackShare = (method, contentType = 'outfit_rating', score = null) => {
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', 'share', {
-      method: method,
-      content_type: contentType,
-      item_id: score ? `score_${score}` : 'unknown'
-    })
-  }
-}
 
 export default function App() {
-  // Check for button test page
-  const urlParams = new URLSearchParams(window.location.search)
-  if (urlParams.get('test') === 'buttons') {
-    return <ButtonTestPage />
-  }
-
-  const [screen, setScreen] = useState('home')
-  const [uploadedImage, setUploadedImage] = useState(null)
-  const [scores, setScores] = useState(null)
-  const [shareData, setShareData] = useState(null)
-  const [mode, setMode] = useState('nice') // 'nice', 'honest', or 'roast'
-  const [error, setError] = useState(null)
-  const [displayedScore, setDisplayedScore] = useState(0)
-  const [showPaywall, setShowPaywall] = useState(false)
-  const [showRules, setShowRules] = useState(false)
-  const [showDeclineOffer, setShowDeclineOffer] = useState(false)
-  const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const [revealStage, setRevealStage] = useState(0)
-  const [timeUntilReset, setTimeUntilReset] = useState('')
-  const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
-  const [proEmail, setProEmail] = useState(() => localStorage.getItem('fitrate_email') || '')
-  const [emailInput, setEmailInput] = useState('')
-  const [emailChecking, setEmailChecking] = useState(false)
-  const [referralCount, setReferralCount] = useState(0)
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [isStandalone, setIsStandalone] = useState(false)
@@ -221,16 +158,8 @@ export default function App() {
   const [proRoasts, setProRoasts] = useState(0)
 
   // Analyzing screen state (must be at component level for hooks rules)
-  const [analysisText, setAnalysisText] = useState(0)
-  const [analysisProgress, setAnalysisProgress] = useState(0)
 
-  const fileInputRef = useRef(null)
-  const videoRef = useRef(null)
-  const canvasRef = useRef(null)
-  const [cameraStream, setCameraStream] = useState(null)
-  const [cameraError, setCameraError] = useState(null)
-  const [countdown, setCountdown] = useState(null) // null = no timer, 3/2/1 = counting
-  const [facingMode, setFacingMode] = useState('environment') // 'environment' = rear, 'user' = front
+
   const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
@@ -442,19 +371,7 @@ export default function App() {
     }
   }, [currentEvent, userId])
 
-  // Helper: Format time remaining
-  const formatTimeRemaining = (endDate) => {
-    if (!endDate) return ''
-    const end = new Date(endDate)
-    const now = new Date()
-    const diff = end - now
-    if (diff <= 0) return 'Ended'
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    if (days > 0) return `${days}d ${hours}h`
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    return `${hours}h ${mins}m`
-  }
+  // Helper: Format time remaining moved to utils/dateUtils
 
   // Check if user is Pro (via Email OR UserId)
   const checkProStatus = async (emailToCheck) => {
@@ -586,51 +503,7 @@ export default function App() {
     }
   }, [screen, showPaywall])
 
-  // Sequential reveal animation
-  useEffect(() => {
-    if (screen === 'results' && scores) {
-      setRevealStage(0)
-      setDisplayedScore(0)
 
-      // Score counting animation
-      const duration = 1200
-      const start = Date.now()
-      const endScore = scores.overall
-
-      const animateScore = () => {
-        const now = Date.now()
-        const elapsed = now - start
-        const progress = Math.min(elapsed / duration, 1)
-
-        // Easing function (easeOutExpo)
-        const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-        const currentScore = Math.floor(easeProgress * endScore)
-
-        setDisplayedScore(currentScore)
-
-        if (progress < 1) {
-          requestAnimationFrame(animateScore)
-        }
-      }
-
-      const timers = [
-        setTimeout(() => setRevealStage(1), 200),  // Verdict
-        setTimeout(() => {
-          setRevealStage(2)
-          animateScore()
-        }, 600),  // Score start
-        setTimeout(() => setRevealStage(3), 1000), // Aesthetic/Celeb
-        setTimeout(() => setRevealStage(4), 1300), // Tip
-        setTimeout(() => setRevealStage(5), 1600), // Breakdown
-        setTimeout(() => setRevealStage(6), 2000), // Share button
-      ]
-      // Vibrate on reveal if available
-      if (navigator.vibrate) {
-        setTimeout(() => navigator.vibrate(50), 600)
-      }
-      return () => timers.forEach(t => clearTimeout(t))
-    }
-  }, [screen, scores])
 
   // Mock scores for free users - Maximum variety!
   const generateMockScores = useCallback(() => {
@@ -1039,646 +912,49 @@ export default function App() {
     }
   }, [mode, isPro, generateMockScores])
 
-  const handleFileUpload = useCallback(async (e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      // Prevent double-uploading
-      if (screen === 'analyzing') return
 
-      if (file.size > 10 * 1024 * 1024) {
-        setError('Image is too large. Please try a smaller photo.')
-        setScreen('error')
-        return
-      }
 
-      playSound('shutter')
-      vibrate(50)
 
-      try {
-        // Compress image if larger than 500KB
-        let imageData
-        if (file.size > 500 * 1024) {
-          // Large file - compress it
-          imageData = await compressImage(file, 1200, 0.7)
-        } else {
-          // Small file - read directly
-          imageData = await new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = (e) => resolve(e.target.result)
-            reader.onerror = reject
-            reader.readAsDataURL(file)
-          })
-        }
 
-        setUploadedImage(imageData)
-        analyzeOutfit(imageData)
-      } catch (err) {
-        console.error('Image processing error:', err)
-        setError('Something went wrong — try again!')
-        setScreen('error')
-      }
-    }
-  }, [analyzeOutfit, screen])
-
-  // Reveal Sequence & Sounds
-  useEffect(() => {
-    if (screen === 'results' && scores) {
-      setRevealStage(0)
-
-      // Stage 1: Verdict (Instant)
-      const sound = scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
-      setTimeout(() => {
-        playSound(sound)
-        vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
-        setRevealStage(1)
-      }, 100)
-
-      // Stage 2: Photo
-      setTimeout(() => {
-        playSound('pop')
-        vibrate(10)
-        setRevealStage(2)
-      }, 600)
-
-      // Stage 3: Details
-      setTimeout(() => {
-        playSound('pop')
-        setRevealStage(3)
-      }, 1000)
-
-      // Stage 4: Tip
-      setTimeout(() => {
-        setRevealStage(4)
-      }, 1400)
-
-      // Stage 5: Breakdown
-      setTimeout(() => {
-        setRevealStage(5)
-      }, 1800)
-    }
-  }, [screen, scores])
-
+  // Generate viral share card
   // Generate viral share card
   const generateShareCard = useCallback(async () => {
     // Satisfying feedback when generating
     playSound('share')
     vibrate(30)
 
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-
-    // Dynamic dimensions based on format
-    const isSquare = shareFormat === 'feed'
-    canvas.width = 1080
-    canvas.height = isSquare ? 1080 : 1920
-
-    // Determine viral caption based on score and mode
-    const getViralCaption = () => {
-      if (scores.roastMode) {
-        if (scores.overall < 30) return "I got DESTROYED 💀💀💀"
-        if (scores.overall < 45) return "AI showed no mercy 💀"
-        if (scores.overall < 60) return "AI humbled me 💀 Your turn?"
-        return "Survived Roast Mode 😏"
-      } else if (scores.mode === 'honest') {
-        if (scores.overall >= 90) return `${scores.overall}/100 — Honest mode approved 📊`
-        if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊`
-        if (scores.overall >= 60) return `Honest score: ${scores.overall} — thoughts? 📊`
-        return `Got my honest rating 📊 Your turn?`
-      } else {
-        if (scores.overall >= 95) return `${scores.overall}/100 — I'm literally perfect 💅`
-        if (scores.overall >= 90) return `${scores.overall}/100 — beat that 🏆`
-        if (scores.overall >= 80) return "AI approved ✨ What's yours?"
-        if (scores.overall >= 70) return "Pretty good 👀 Can you beat it?"
-        return "Your turn 👀"
-      }
-    }
-
-    // Smart hashtags based on mode and score
-    const getHashtags = () => {
-      const base = '#FitRate #RateMyFit'
-      if (scores.roastMode) {
-        if (scores.overall < 40) return `${base} #Destroyed #AIRoast`
-        return `${base} #RoastMode #AIRoast`
-      }
-      if (scores.mode === 'honest') {
-        return `${base} #HonestRating #RealTalk`
-      }
-      if (scores.overall >= 95) return `${base} #Perfect #FitCheck`
-      if (scores.overall >= 90) return `${base} #FitCheck #OOTD`
-      if (scores.overall >= 80) return `${base} #FitRateChallenge`
-      return `${base} #FitCheck`
-    }
-    const hashtags = getHashtags()
-    const viralCaption = getViralCaption()
-    // Mode-specific colors
-    const getModeAccent = () => {
-      if (scores.roastMode) return { mid: '#2a1a1a', glow: 'rgba(255,68,68,0.4)', accent: '#ff4444', light: '#ff6666' }
-      if (scores.mode === 'honest') return { mid: '#1a1a2a', glow: 'rgba(74,144,217,0.4)', accent: '#4A90D9', light: '#6BA8E8' }
-      return { mid: '#1a1a2e', glow: 'rgba(0,212,255,0.4)', accent: '#00d4ff', light: '#00ff88' }
-    }
-    const modeColors = getModeAccent()
-    const isProCard = isPro || scores.savageLevel
-
-    // Load user image
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    await new Promise((resolve) => {
-      img.onload = resolve
-      img.onerror = resolve
-      img.src = uploadedImage
-    })
-
-    // SIMPLE DARK GRADIENT BACKGROUND (single image approach)
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-    bgGradient.addColorStop(0, '#0a0a15')
-    bgGradient.addColorStop(0.3, '#0f0f1a')
-    bgGradient.addColorStop(0.7, '#0f0f1a')
-    bgGradient.addColorStop(1, '#0a0a15')
-    ctx.fillStyle = bgGradient
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    // Subtle accent glow at top
-    const accentGlow = ctx.createRadialGradient(540, 200, 0, 540, 200, 600)
-    accentGlow.addColorStop(0, modeColors.glow)
-    accentGlow.addColorStop(1, 'transparent')
-    ctx.fillStyle = accentGlow
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    // Format-aware dimensions
-    const cardHeight = isSquare ? 840 : 1540
-    const cardY = isSquare ? 60 : 120
-    const borderHeight = isSquare ? 1020 : 1860
-    const innerBorderHeight = isSquare ? 1000 : 1840
-
-    // PRO SPARKLE BORDER - Gold glow for Pro users
-    if (isProCard) {
-      ctx.shadowColor = '#ffd700'
-      ctx.shadowBlur = 40
-      ctx.strokeStyle = '#ffd700'
-      ctx.lineWidth = 6
-      ctx.beginPath()
-      ctx.roundRect(30, 30, 1020, borderHeight, 40)
-      ctx.stroke()
-      ctx.shadowBlur = 0
-
-      // Inner sparkle line
-      ctx.strokeStyle = 'rgba(255,215,0,0.3)'
-      ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.roundRect(40, 40, 1000, innerBorderHeight, 36)
-      ctx.stroke()
-    }
-
-    // Mode-specific card accent
-    const cardGlow = isProCard ? 'rgba(255,215,0,0.2)' : modeColors.glow
-    ctx.shadowColor = cardGlow
-    ctx.shadowBlur = 100
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'
-    ctx.beginPath()
-    ctx.roundRect(60, cardY, 960, cardHeight, 48)
-    ctx.fill()
-    ctx.shadowBlur = 0
-
-    // Border
-    ctx.strokeStyle = isProCard ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.1)'
-    ctx.lineWidth = 2
-    ctx.stroke()
-
-    // Draw photo with rounded corners - FIXED for both formats
-    // Use cover-style scaling (fills container, may crop)
-    const imgWidth = isSquare ? 400 : 580
-    const imgHeight = isSquare ? 400 : 720
-    const imgX = (1080 - imgWidth) / 2
-    const imgY = isSquare ? 90 : 180
-
-    ctx.save()
-    ctx.beginPath()
-    ctx.roundRect(imgX, imgY, imgWidth, imgHeight, 28)
-    ctx.clip()
-
-    // Calculate cover scaling - maintains aspect ratio, fills container
-    const imgAspect = img.width / img.height
-    const targetAspect = imgWidth / imgHeight
-    let drawWidth, drawHeight, drawX, drawY
-
-    if (imgAspect > targetAspect) {
-      // Image is wider - fit to height, center horizontally
-      drawHeight = imgHeight
-      drawWidth = imgHeight * imgAspect
-      drawX = imgX + (imgWidth - drawWidth) / 2
-      drawY = imgY
-    } else {
-      // Image is taller - fit to width, center vertically
-      drawWidth = imgWidth
-      drawHeight = imgWidth / imgAspect
-      drawX = imgX
-      drawY = imgY + (imgHeight - drawHeight) / 2
-    }
-
-    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-    ctx.restore()
-
-    // Score circle with glow - POSITION SCALED
-    const scoreY = isSquare ? 660 : 980
-    const scoreColor = scores.overall >= 80 ? '#00ff88' : scores.overall >= 60 ? '#00d4ff' : '#ff4444'
-    ctx.shadowColor = scoreColor
-    ctx.shadowBlur = 40
-    ctx.beginPath()
-    ctx.arc(540, scoreY, isSquare ? 80 : 100, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.8)'
-    ctx.fill()
-    ctx.strokeStyle = scoreColor
-    ctx.lineWidth = 8
-    ctx.stroke()
-    ctx.shadowBlur = 0
-
-    // PREMIUM BRANDING - "FITRATE AI" Seal
-    ctx.save()
-    ctx.fillStyle = '#fff'
-    ctx.font = 'black 28px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.textAlign = 'center'
-    ctx.letterSpacing = '12px'
-    ctx.globalAlpha = 0.8
-    ctx.fillText('FITRATE AI', 540, 80)
-    ctx.restore()
-
-    // CONVERSATION STAMP - Replaces the old "Certified" seal for maximum engagement
-    ctx.save()
-    const stampX = isSquare ? 880 : 920
-    const stampY = isSquare ? 120 : 240 // Moved down for Story safe zone
-    // Dynamic Stamp Text & Color
-    let stampText = "AGREE?"
-    let stampColor = '#fff'
-    if (scores.mode === 'roast' || scores.mode === 'savage') {
-      stampText = scores.overall < 50 ? "COOKED?" : "SURVIVED?"
-      stampColor = '#ff4444'
-    } else {
-      stampText = scores.overall >= 90 ? "VALID?" : "ROBBED?"
-      stampColor = scores.overall >= 90 ? '#ffd700' : '#ff8800'
-    }
-
-    ctx.translate(stampX, stampY)
-    ctx.rotate(15 * Math.PI / 180) // Slight tilt
-
-    // Stamp Box
-    ctx.fillStyle = stampColor
-    ctx.shadowColor = 'rgba(0,0,0,0.5)'
-    ctx.shadowBlur = 20
-    ctx.beginPath()
-    ctx.roundRect(-70, -30, 140, 60, 10)
-    ctx.fill()
-
-    // Stamp Text
-    ctx.fillStyle = '#000'
-    ctx.font = 'black 24px -apple-system, BlinkMacSystemFont, sans-serif'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(stampText, 0, 2)
-    ctx.restore()
-
-    // PRO BADGE - Gold banner for Pro users or purchased scans
-    if (isPro || scores.savageLevel) {
-      // Gold gradient badge background
-      const badgeWidth = 220
-      const badgeHeight = 40
-      const badgeX = (1080 - badgeWidth) / 2
-      const badgeY = isSquare ? 600 : 915
-
-      const goldGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY)
-      goldGradient.addColorStop(0, '#ffd700')
-      goldGradient.addColorStop(1, '#ff8c00')
-
-      ctx.fillStyle = goldGradient
-      ctx.beginPath()
-      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 18)
-      ctx.fill()
-
-      // Badge text
-      ctx.fillStyle = '#000'
-      ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('⚡ PRO ANALYSIS', 540, isSquare ? 627 : 942)
-    }
-
-    // Score number - BIG (centered in circle)
-    ctx.fillStyle = scoreColor
-    ctx.font = `bold ${isSquare ? 70 : 90}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(scores.overall, 540, scoreY)
-    ctx.textBaseline = 'alphabetic' // Reset for other text
-
-    // "/ 100" below score
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.font = `bold ${isSquare ? 24 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('/ 100', 540, scoreY + (isSquare ? 70 : 90))
-
-    // Verdict - HUGE and punchy (positioned based on format)
-    const verdictY = isSquare ? 780 : 1140
-    ctx.fillStyle = '#ffffff'
-    ctx.font = `bold ${isSquare ? 36 : 46}px -apple-system, BlinkMacSystemFont, sans-serif`
-    // Word wrap for long verdicts
-    const maxWidth = isSquare ? 800 : 900
-    const verdictLines = wrapText(ctx, scores.verdict, maxWidth)
-    verdictLines.forEach((line, i) => {
-      ctx.fillText(line, 540, verdictY + (i * (isSquare ? 42 : 52)))
-    })
-
-    // The Two Lines - Viral Context
-    if (scores.lines && scores.lines.length >= 2) {
-      const lineY = verdictY + (verdictLines.length * (isSquare ? 42 : 52)) + 30
-      ctx.font = `italic ${isSquare ? 26 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
-      ctx.fillStyle = 'rgba(255,255,255,0.7)'
-      ctx.fillText(`"${scores.lines[0]}"`, 540, lineY)
-      ctx.fillText(`"${scores.lines[1]}"`, 540, lineY + (isSquare ? 38 : 48))
-    }
-
-    // The Tagline Pill
-    const taglineY = isSquare ? 920 : 1380
-    ctx.font = `bold ${isSquare ? 22 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
-    const taglineText = (scores.tagline || 'NO NOTES').toUpperCase()
-    const taglineWidth = ctx.measureText(taglineText).width + 60
-
-    ctx.fillStyle = 'rgba(255,255,255,0.05)'
-    ctx.beginPath()
-    ctx.roundRect(540 - taglineWidth / 2, taglineY - 35, taglineWidth, 54, 27)
-    ctx.fill()
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)'
-    ctx.stroke()
-
-    ctx.fillStyle = scoreColor
-    ctx.fillText(taglineText, 540, taglineY + 3)
-
-    // --- RE-ADDED STUFF ---
-    // Sub-scores row (Color / Fit / Style)
-    const subScoreY = isSquare ? 980 : 1450
-    if (scores.color !== undefined) {
-      const subScores = [
-        { label: 'Color', score: scores.color },
-        { label: 'Fit', score: scores.fit },
-        { label: 'Style', score: scores.style }
-      ]
-      ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
-      subScores.forEach((sub, i) => {
-        const x = 340 + (i * 200)
-        ctx.fillStyle = 'rgba(255,255,255,0.4)'
-        ctx.fillText(sub.label.toUpperCase(), x, subScoreY)
-        ctx.fillStyle = getScoreColor(sub.score)
-        ctx.fillText(sub.score.toString(), x, subScoreY + (isSquare ? 25 : 32))
+    try {
+      const { file, text, url, imageBlob } = await generateShareCardUtil({
+        scores,
+        shareFormat,
+        uploadedImage,
+        userId,
+        isPro: isPro || false
       })
-    }
-
-    // Aesthetic + Celeb match pill
-    const pillY = subScoreY + (isSquare ? 60 : 80)
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'
-    ctx.beginPath()
-    ctx.roundRect(180, pillY, 720, isSquare ? 44 : 54, 27)
-    ctx.fill()
-    ctx.fillStyle = '#fff'
-    ctx.font = `bold ${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText(`${scores.aesthetic} • ${scores.celebMatch}`, 540, pillY + (isSquare ? 28 : 36))
-
-    // PRO EXCLUSIVE: Savage Meter + Item Roast
-    if (isProCard && scores.savageLevel) {
-      const proY = pillY + (isSquare ? 70 : 100)
-      ctx.font = `bold ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
-      ctx.fillStyle = '#ff4444'
-      ctx.fillText(`SAVAGE LEVEL: ${scores.savageLevel}/10 🔥`, 540, proY - 10)
-
-      if (scores.itemRoasts) {
-        const roast = scores.itemRoasts.shoes || scores.itemRoasts.top || "No notes."
-        ctx.font = `italic ${isSquare ? 16 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
-        ctx.fillStyle = 'rgba(255,255,255,0.6)'
-        ctx.fillText(`"${roast}"`, 540, proY + 25)
-      }
-    }
-    // -----------------------
-
-    // PRO TIP (If applicable)
-    if (isProCard && scores.proTip) {
-      const tipY = taglineY + (isSquare ? 80 : 120)
-      ctx.fillStyle = 'rgba(0,212,255,0.1)'
-      ctx.beginPath()
-      ctx.roundRect(140, tipY - 40, 800, 64, 32)
-      ctx.fill()
-      ctx.fillStyle = '#00d4ff'
-      ctx.font = `bold ${isSquare ? 20 : 26}px -apple-system, BlinkMacSystemFont, sans-serif`
-      ctx.fillText(`💡 PRO TIP: ${scores.proTip}`, 540, tipY + 4)
-    }
-
-    // SOCIAL PROOF - Percentile on card
-    ctx.font = `bold ${isSquare ? 20 : 26}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.textAlign = 'center'
-    // Rounded up for clean UI
-    const percent = Math.max(1, 100 - scores.percentile)
-    ctx.fillText(`TOP ${percent}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1700) // Moved up for safe zone
-
-    // Branding Footer - Strong CTA for Viral Re-scans
-    ctx.fillStyle = 'rgba(255,255,255,0.3)'
-    ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
-    ctx.fillText('TRY IT FREE @ FITRATE.APP', 540, isSquare ? 1070 : 1750) // Moved up for safe zone
-
-    // Generate Conversation-Starter Share Text
-    const getShareText = () => {
-      const baseUrl = 'https://fitrate.app'
-      const link = `${baseUrl}?ref=${userId}`
-
-      // Roast / Savage Strategy: Disagreement & Shock
-      if (scores.roastMode || scores.mode === 'savage') {
-        if (scores.overall < 35) return `FitRate gave me a ${scores.overall}/100. Is it really that bad? 💀 ${link}`
-        if (scores.overall < 60) return `They said I have NPC energy. Agree or disagree? 👇 ${link}`
-        return `Rated ${scores.overall}/100. Be honest... am I cooked? 🍳 ${link}`
-      }
-
-      // Nice / Honest Strategy: Validation & "Robbed" Debate
-      if (scores.mode === 'honest') {
-        if (scores.overall < 70) return `Honest mode gave me ${scores.overall}. I feel robbed. Thoughts? 🤨 ${link}`
-        return `Got a ${scores.overall}/100 honestly. Accurate? 📊 ${link}`
-      }
-
-      // High Scores Strategy: Humble Brag / Challenge
-      if (scores.overall >= 90) return `FitRate says ${scores.overall}/100. Can anyone beat this? 🏆 ${link}`
-      if (scores.overall >= 80) return `Rated ${scores.overall}/100. Valid or glazed? 👀 ${link}`
-
-      // Default / Low-Mid Nice
-      return `Got rated ${scores.overall}/100 on FitRate. Thoughts? 👇 ${link}`
-    }
-
-    // Convert and share
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
-      const text = getShareText()
-      const url = `https://fitrate.app?ref=${userId}`
 
       setShareData({
         file,
         text,
         url,
-        imageBlob: blob // Keep blob for downloading
+        imageBlob
       })
       setScreen('share-preview')
-
-    }, 'image/png')
-  }, [uploadedImage, scores, userId, shareFormat])
-
-  // Helper: wrap text
-  const wrapText = (ctx, text, maxWidth) => {
-    const words = text.split(' ')
-    const lines = []
-    let currentLine = ''
-
-    words.forEach(word => {
-      const testLine = currentLine + (currentLine ? ' ' : '') + word
-      if (ctx.measureText(testLine).width > maxWidth && currentLine) {
-        lines.push(currentLine)
-        currentLine = word
-      } else {
-        currentLine = testLine
-      }
-    })
-    if (currentLine) lines.push(currentLine)
-    return lines
-  }
-
-  const downloadImage = (blob, shareText) => {
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'fitrate-score.png'
-    a.click()
-    URL.revokeObjectURL(url)
-    // Copy caption to clipboard for desktop users
-    if (shareText && navigator.clipboard) {
-      navigator.clipboard.writeText(shareText)
+    } catch (error) {
+      console.error("Share card generation failed", error)
+      setToastMessage("Failed to generate card. Please try again.")
+      setShowToast(true)
     }
-  }
+  }, [uploadedImage, scores, userId, shareFormat, isPro])
+
+  // Helpers wrapText and downloadImage moved to utils/shareUtils and utils/imageUtils
 
   // Camera functions for live webcam capture
-  const startCamera = useCallback(async (facing = facingMode) => {
-    setCameraError(null)
-    // Stop any existing stream first
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop())
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: facing
-          // Let browser choose best resolution - prevent zoom/crop issues
-        },
-        audio: false
-      })
-      setCameraStream(stream)
-      setFacingMode(facing)
-      setScreen('camera')
-
-      // Connect stream to video element after screen renders
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          videoRef.current.play()
-        }
-      }, 100)
-    } catch (err) {
-      console.error('Camera error:', err)
-      // Camera not available - fall back to file picker
-      setCameraError(err.message)
-      fileInputRef.current?.click()
-    }
-  }, [facingMode, cameraStream])
-
-  const flipCamera = useCallback(() => {
-    const newFacing = facingMode === 'environment' ? 'user' : 'environment'
-    startCamera(newFacing)
-  }, [facingMode, startCamera])
-
-  const stopCamera = useCallback(() => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop())
-      setCameraStream(null)
-    }
-  }, [cameraStream])
-
-  const capturePhoto = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current) {
-      console.error('Video or canvas ref not available')
-      return
-    }
-
-    const video = videoRef.current
-
-    // Check if video is ready
-    if (video.readyState < 2) {
-      console.error('Video not ready yet')
-      return
-    }
-
-    playSound('shutter')
-    vibrate(50)
-
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-
-    // Set canvas size to match video
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-
-    // Draw video frame to canvas (flip for front camera to match preview)
-    if (facingMode === 'user') {
-      ctx.save()
-      ctx.scale(-1, 1)
-      ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height)
-      ctx.restore()
-    } else {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-    }
-
-    // Get image data as base64
-    const imageData = canvas.toDataURL('image/jpeg', 0.9)
-
-    // Stop camera and analyze
-    stopCamera()
-    setCountdown(null)
-    setUploadedImage(imageData)
-    analyzeOutfit(imageData)
-  }, [stopCamera, analyzeOutfit, facingMode])
-
-  // Timer capture - 3 second countdown then capture
-  const timerCapture = useCallback(() => {
-    if (countdown !== null) return // Already counting
-
-    playSound('tick')
-    vibrate(20)
-    setCountdown(3)
-
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev === null) {
-          clearInterval(timer)
-          return null
-        }
-        if (prev <= 1) {
-          clearInterval(timer)
-          setTimeout(() => capturePhoto(), 100)
-          return null
-        }
-        playSound('tick')
-        vibrate(20)
-        return prev - 1
-      })
-    }, 1000)
-  }, [countdown, capturePhoto])
-
   const resetApp = useCallback(() => {
-    stopCamera()
     setScreen('home')
     setUploadedImage(null)
     setScores(null)
     setError(null)
-    setRevealStage(0)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }, [stopCamera])
+  }, [])
 
   // Global toast notification (replaces browser alerts)
   const displayToast = useCallback((message, duration = 2500) => {
@@ -1714,200 +990,12 @@ export default function App() {
     }
   }
   // Secondary gradient color per mode
-  const getModeGradientEnd = () => {
-    switch (mode) {
-      case 'savage': return '#ff0044' // Dark red
-      case 'roast': return '#ff8800'  // Orange
-      case 'honest': return '#00d4ff' // Cyan
-      default: return '#00ff88'       // Green (Nice)
-    }
-  }
-  const accent = getModeColor()
-  const accentGlow = getModeGlow()
-  const accentEnd = getModeGradientEnd()
 
-  // Analysis messages for analyzing screen - High-status dopamine feedback
-  const analysisMessages = mode === 'savage'
-    ? ['Preparing total destruction...', 'Loading maximum violence...', 'Calculating devastation...', 'Arming nuclear roasts...', 'Deploying fashion death....']
-    : mode === 'roast'
-      ? ['Synthesizing social suicide...', 'Detecting fabric failure...', 'Calculating ego damage...', 'Calibrating savagery...', 'Finalizing the damage...']
-      : mode === 'honest'
-        ? ['Analyzing social positioning...', 'Calculating wardrobe ROI...', 'Synthesizing aesthetic metrics...', 'Detecting style efficiency...', 'Finalizing objective data...']
-        : ['Detecting main character signal...', 'Optimizing social ROI...', 'Synthesizing aesthetic value...', 'Calculating aura level...', 'Finalizing the flex...']
-
-  // Progress and text animation effect for analyzing screen
-  // IMPORTANT: This must be BEFORE any early returns to avoid hooks order issues
-  useEffect(() => {
-    if (screen !== 'analyzing') return
-
-    // Reset progress when entering analyzing screen
-    setAnalysisProgress(0)
-    setAnalysisText(0)
-
-    // Progress animation (0-90 over ~8-10s, caps at 90% until API responds)
-    const progressInterval = setInterval(() => {
-      setAnalysisProgress(p => {
-        if (p >= 90) return 90  // Cap at 90%, API response will complete it
-        // Slow ramp: 0.5-2% per tick for realistic ~10s duration
-        const increment = Math.random() * 1.5 + 0.5
-        const next = p + increment
-        if (p < 50 && next >= 50) {
-          vibrate(20)
-        }
-        if (p < 80 && next >= 80) {
-          vibrate(30)
-          playSound('tick')
-        }
-        return Math.min(90, next)
-      })
-    }, 200)  // Slower interval: 200ms instead of 100ms
-
-    // Rotating text (slightly slower)
-    const textInterval = setInterval(() => {
-      setAnalysisText(t => (t + 1) % 5)
-    }, 1200)  // 1.2s instead of 0.6s for more readable messages
-
-    return () => {
-      clearInterval(progressInterval)
-      clearInterval(textInterval)
-    }
-  }, [screen])
 
   // ============================================
   // CAMERA SCREEN - Full screen live camera
   // ============================================
-  if (screen === 'camera') {
-    return (
-      <div className="fixed inset-0 bg-black z-50 flex flex-col" style={{
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}>
-        {/* Live camera preview */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
-        />
 
-        {/* Top bar - Mode indicator & buttons */}
-        <div className="relative z-10 flex items-center justify-between px-4 pt-4">
-          {/* Mode indicator */}
-          <div className="px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
-            <span className="text-white text-sm font-medium">
-              {mode === 'roast' ? '🔥 Roast' : mode === 'honest' ? '📊 Honest' : '✨ Nice'}
-            </span>
-          </div>
-
-          {/* Top right buttons */}
-          <div className="flex items-center gap-2">
-            {/* Flip camera button */}
-            <button
-              onClick={() => {
-                playSound('click')
-                vibrate(15)
-                flipCamera()
-              }}
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm active:scale-95"
-              aria-label="Flip camera"
-            >
-              <span className="text-white text-lg">🔄</span>
-            </button>
-
-            {/* Gallery button */}
-            <button
-              onClick={() => {
-                playSound('click')
-                vibrate(15)
-                stopCamera()
-                setScreen('home')
-                setTimeout(() => fileInputRef.current?.click(), 100)
-              }}
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-black/50 backdrop-blur-sm active:scale-95"
-              aria-label="Open gallery"
-            >
-              <span className="text-white text-lg">🖼️</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Spacer to push controls to bottom */}
-        <div className="flex-1" />
-
-        {/* Bottom controls */}
-        <div className="relative z-10 pb-6">
-          <div className="flex items-center justify-center gap-6 py-4" style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)'
-          }}>
-            {/* Cancel button */}
-            <button
-              onClick={() => {
-                playSound('click')
-                vibrate(15)
-                stopCamera()
-                setCountdown(null)
-                setScreen('home')
-              }}
-              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95"
-              aria-label="Cancel and go back"
-            >
-              <span className="text-white text-xl">✕</span>
-            </button>
-
-            {/* Capture button - BIG */}
-            <button
-              onClick={() => {
-                playSound('click')
-                vibrate(30)
-                capturePhoto()
-              }}
-              disabled={countdown !== null}
-              className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
-              style={{
-                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                boxShadow: '0 0 30px rgba(0,212,255,0.5)',
-                border: '4px solid white'
-              }}
-              aria-label="Capture photo"
-            >
-              <span className="text-3xl">📸</span>
-            </button>
-
-            {/* Timer button */}
-            <button
-              onClick={() => {
-                playSound('click')
-                vibrate(20)
-                timerCapture()
-              }}
-              disabled={countdown !== null}
-              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
-              aria-label="3 second countdown timer"
-            >
-              <span className="text-white text-lg">⏱️</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Countdown overlay */}
-        {countdown !== null && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <div className="text-8xl font-black text-white" style={{
-              textShadow: '0 0 40px rgba(0,212,255,0.8), 0 0 80px rgba(0,212,255,0.5)',
-              animation: 'pulse 0.5s ease-in-out'
-            }}>
-              {countdown}
-            </div>
-          </div>
-        )}
-
-        {/* Hidden canvas for photo capture */}
-        <canvas ref={canvasRef} className="hidden" />
-      </div>
-    )
-  }
 
   // ============================================
   // PAYWALL MODAL - Check FIRST before home screen
@@ -1930,387 +1018,31 @@ export default function App() {
   // ============================================
   if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
-      }}>
-        {/* Subtle animated background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute w-[500px] h-[500px] rounded-full opacity-20" style={{
-            background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
-            top: '50%', left: '50%',
-            transform: 'translate(-50%, -50%)',
-            animation: 'pulse 4s ease-in-out infinite'
-          }} />
-        </div>
-
-        {/* Toast Notification */}
-        {showToast && (
-          <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60 animate-bounce" style={{
-            background: 'rgba(0,255,136,0.9)',
-            boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
-          }}>
-            <span className="text-black font-bold text-sm">{toastMessage}</span>
-          </div>
-        )}
-
-        {/* Mobile camera input (uses native camera app) */}
-        <input type="file" accept="image/*" capture="environment" id="mobileCameraInput" onChange={handleFileUpload} className="hidden" />
-
-        {/* Desktop/gallery file input */}
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-
-        {/* Hidden canvas for photo capture */}
-        <canvas ref={canvasRef} className="hidden" />
-
-        {/* Pro Badge - Only indicator kept */}
-        {isPro && (
-          <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full" style={{
-            background: 'rgba(0,255,136,0.15)',
-            border: '1px solid rgba(0,255,136,0.3)'
-          }}>
-            <span className="text-xs font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
-          </div>
-        )}
-
-        {/* Logo - Small and subtle */}
-        <h1 className="text-3xl font-black mb-1 tracking-tight" style={{
-          background: `linear-gradient(135deg, #fff 0%, ${accent} 100%)`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}>FITRATE</h1>
-
-        <p className="text-sm mb-2 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          Your AI style coach
-        </p>
-        <p className="text-xs mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>
-          Snap a photo • Get instant feedback • Have fun
-        </p>
-
-        {/* Install App Banner - Show only for non-PWA users */}
-        {showInstallBanner && (
-          <div className="mb-6 w-full max-w-sm px-4 py-3 rounded-2xl relative" style={{
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
-            border: '1px solid rgba(139, 92, 246, 0.3)'
-          }}>
-            <button
-              onClick={() => {
-                setShowInstallBanner(false)
-                localStorage.setItem('fitrate_install_dismissed', 'true')
-                vibrate(10)
-              }}
-              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10"
-            >
-              <span className="text-white/50 text-xs">✕</span>
-            </button>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">📲</span>
-              <div>
-                <p className="text-sm font-bold text-white mb-0.5">Install FitRate</p>
-                <p className="text-[10px] text-gray-400">
-                  {/iPhone|iPad/.test(navigator.userAgent)
-                    ? 'Tap Share ↗ then "Add to Home Screen"'
-                    : /Android/.test(navigator.userAgent)
-                      ? 'Tap ⋮ menu then "Install app"'
-                      : 'Add to your home screen for quick access'}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Challenge Banner - when friend shared a challenge link */}
-        {challengeScore && (
-          <div className="mb-8 px-6 py-4 rounded-2xl text-center" style={{
-            background: 'linear-gradient(135deg, rgba(255,68,68,0.2) 0%, rgba(255,136,0,0.2) 100%)',
-            border: '1px solid rgba(255,136,0,0.4)'
-          }}>
-            <p className="text-2xl font-black text-white mb-1">👊 Beat {challengeScore}?</p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              Your friend scored {challengeScore}/100 — can you do better?
-            </p>
-          </div>
-        )}
-
-        {/* Weekly Event Bar - moved below mode selector */}
-        {dailyStreak > 0 && (
-          <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_20px_rgba(255,165,0,0.1)]">
-              <span className="text-sm">🔥</span>
-              <span className="text-xs font-black text-orange-400 uppercase tracking-widest">{dailyStreak} DAY STREAK</span>
-            </div>
-          </div>
-        )}
-
-        {/* HERO CTA - Central path of least resistance */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <button
-            onClick={() => {
-              playSound('click')
-              vibrate(20)
-              if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-                if (isMobile) {
-                  document.getElementById('mobileCameraInput')?.click()
-                } else {
-                  startCamera()
-                }
-              } else {
-                setShowPaywall(true)
-              }
-            }}
-            className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
-            style={{
-              background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
-              border: `3px solid ${accent}99`,
-              boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`,
-              opacity: (scansRemaining === 0 && !isPro && purchasedScans === 0) ? 0.6 : 1
-            }}
-          >
-            {/* Pulsing inner glow */}
-            <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-              background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
-              boxShadow: `0 0 60px ${accentGlow}`,
-              animation: 'pulse 2s ease-in-out infinite'
-            }} />
-
-            {/* Icon */}
-            <span className="relative text-8xl mb-4 drop-shadow-2xl">
-              {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
-            </span>
-            <span className="relative text-white text-2xl font-black tracking-widest uppercase">
-              {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
-            </span>
-
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">
-                {eventMode ? 'Submit for Leaderboard' : 'Tap to Start'}
-              </p>
-            </div>
-          </button>
-        </div>
-
-        {/* MODE SELECTOR - 2x2 Grid: Free on top, Pro on bottom */}
-        <div className="mt-6 mb-10 grid grid-cols-2 gap-2 p-2 rounded-2xl" style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          {/* TOP ROW: FREE MODES */}
-          {/* Nice Mode */}
-          <button
-            onClick={() => {
-              playSound('click')
-              vibrate(15)
-              setMode('nice')
-            }}
-            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
-            style={{
-              background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
-              border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
-            }}
-          >
-            <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`}>😇</span>
-            <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
-          </button>
-
-          {/* Roast Mode */}
-          <button
-            onClick={() => {
-              playSound('click')
-              vibrate(15)
-              setMode('roast')
-            }}
-            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
-            style={{
-              background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
-              border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
-            }}
-          >
-            <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`}>😈</span>
-            <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
-          </button>
-
-          {/* BOTTOM ROW: PRO MODES */}
-          {/* Honest Mode */}
-          <button
-            onClick={() => {
-              playSound('click')
-              vibrate(15)
-              if (isPro) {
-                setMode('honest')
-              } else {
-                setShowPaywall(true)
-              }
-            }}
-            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-            style={{
-              background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
-              border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
-            }}
-          >
-            <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`}>📊</span>
-            <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
-            {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
-          </button>
-
-          {/* Savage Mode */}
-          <button
-            onClick={() => {
-              playSound('click')
-              vibrate(15)
-              if (isPro) {
-                setMode('savage')
-              } else {
-                setShowPaywall(true)
-              }
-            }}
-            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-            style={{
-              background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
-              border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
-            }}
-          >
-            <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
-            <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
-            {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
-          </button>
-        </div>
-
-        {/* Weekly Event Bar - Acts as 5th mode toggle (Pro only) */}
-        {currentEvent && (
-          <button
-            onClick={() => {
-              vibrate(15)
-              playSound('click')
-              if (isPro) {
-                // Toggle event mode
-                setEventMode(!eventMode)
-              } else {
-                setShowPaywall(true)
-              }
-            }}
-            className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode && isPro ? 'ring-2 ring-emerald-400' : ''}`}
-            style={{
-              background: eventMode && isPro
-                ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.25) 100%)'
-                : isPro
-                  ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
-                  : 'linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)',
-              border: eventMode && isPro
-                ? '1px solid rgba(16, 185, 129, 0.5)'
-                : isPro
-                  ? '1px solid rgba(16, 185, 129, 0.25)'
-                  : '1px dashed rgba(251, 191, 36, 0.4)'
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm">{currentEvent.themeEmoji}</span>
-              <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
-              {isPro ? (
-                <span className={`text-[10px] font-bold uppercase ${eventMode ? 'text-emerald-300' : 'text-emerald-400'}`}>
-                  {eventMode ? '✓ ACTIVE' : 'Event'}
-                </span>
-              ) : (
-                <span className="text-[10px] text-amber-400 font-bold uppercase">PRO</span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
-              {isPro ? (
-                <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '+'}</span>
-              ) : (
-                <span className="text-amber-400 text-sm">🔒</span>
-              )}
-            </div>
-          </button>
-        )}
-
-        {/* Leaderboard Link - Always accessible */}
-        {currentEvent && (
-          <button
-            onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
-            className="mt-2 text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
-          >
-            <span>🏆</span> See Leaderboard
-          </button>
-        )}
-
-        {/* Trust Message */}
-        <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          <span>🔒</span> Photos analyzed instantly, never stored
-        </p>
-
-        {/* BOTTOM SECTION - Simple counter + Go Pro button */}
-        <div style={{
-          width: '100%',
-          marginTop: 'auto',
-          paddingTop: '16px',
-          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px',
-          position: 'relative',
-          zIndex: 50
-        }}>
-          {/* Simple scan counter */}
-          <p style={{
-            fontSize: '12px',
-            color: 'rgba(255,255,255,0.5)',
-            margin: 0
-          }}>
-            {isPro
-              ? '⚡ Pro: 25 ratings/day'
-              : `${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left`}
-          </p>
-
-          {/* GO PRO BUTTON - Super simple, always visible for non-Pro */}
-          {!isPro && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                playSound('click')
-                vibrate(20)
-                setShowPaywall(true)
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '14px 28px',
-                backgroundColor: '#ffd700',
-                color: '#000',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                borderRadius: '50px',
-                border: 'none',
-                cursor: 'pointer',
-                minHeight: '52px',
-                minWidth: '160px',
-                boxShadow: '0 4px 20px rgba(255,215,0,0.4)',
-                WebkitTapHighlightColor: 'transparent',
-                touchAction: 'manipulation',
-                userSelect: 'none',
-                zIndex: 100
-              }}
-            >
-              👑 Go Pro
-            </button>
-          )}
-        </div>
-
-        {/* Footer Links - Compact */}
-        <div className="flex justify-center gap-6 pb-2">
-          <a href="/privacy" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy</a>
-          <a href="/terms" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Terms</a>
-          <a href="/about" className="text-[11px] uppercase tracking-widest font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>About</a>
-        </div>
-      </div>
+      <HomeScreen
+        mode={mode}
+        setMode={setMode}
+        isPro={isPro}
+        scansRemaining={scansRemaining}
+        dailyStreak={dailyStreak}
+        currentEvent={currentEvent}
+        eventMode={eventMode}
+        setEventMode={setEventMode}
+        purchasedScans={purchasedScans}
+        challengeScore={challengeScore}
+        showToast={showToast}
+        toastMessage={toastMessage}
+        showInstallBanner={showInstallBanner}
+        onShowInstallBanner={setShowInstallBanner}
+        onImageSelected={(img) => {
+          setUploadedImage(img)
+          setScreen('analyzing')
+          analyzeOutfit(img)
+        }}
+        onShowPaywall={() => setShowPaywall(true)}
+        onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
+        onShowRules={() => setShowRules(true)}
+        onError={(msg) => { setError(msg); setScreen('error'); }}
+      />
     )
   }
 
@@ -2319,516 +1051,68 @@ export default function App() {
   // ============================================
   if (screen === 'analyzing') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}>
-        {/* Photo with glow effect */}
-        <div className="relative mb-8">
-          <div className="w-44 h-60 rounded-2xl overflow-hidden" style={{
-            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 60px ${accentGlow}`,
-            border: `2px solid ${accent}44`
-          }}>
-            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-          </div>
-
-          {/* Scanning overlay effect */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden">
-            <div className="absolute left-0 right-0 h-1" style={{
-              background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-              boxShadow: `0 0 20px ${accent}`,
-              animation: 'scanLine 1.2s ease-in-out infinite'
-            }} />
-          </div>
-
-          {/* Corner brackets */}
-          <div className="absolute -top-2 -left-2 w-5 h-5 border-l-2 border-t-2 rounded-tl-lg" style={{ borderColor: accent }} />
-          <div className="absolute -top-2 -right-2 w-5 h-5 border-r-2 border-t-2 rounded-tr-lg" style={{ borderColor: accent }} />
-          <div className="absolute -bottom-2 -left-2 w-5 h-5 border-l-2 border-b-2 rounded-bl-lg" style={{ borderColor: accent }} />
-          <div className="absolute -bottom-2 -right-2 w-5 h-5 border-r-2 border-b-2 rounded-br-lg" style={{ borderColor: accent }} />
-        </div>
-
-        {/* Progress Ring */}
-        <div className="relative w-24 h-24 mb-6">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-            {/* Background ring */}
-            <circle
-              cx="50" cy="50" r="45"
-              fill="none"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="8"
-            />
-            {/* Progress ring */}
-            <circle
-              cx="50" cy="50" r="45"
-              fill="none"
-              stroke={accent}
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={`${analysisProgress * 2.83} 283`}
-              style={{
-                filter: `drop-shadow(0 0 10px ${accent})`,
-                transition: 'stroke-dasharray 0.1s ease-out'
-              }}
-            />
-          </svg>
-          {/* Percentage text */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl font-black" style={{ color: accent }}>
-              {Math.round(analysisProgress)}%
-            </span>
-          </div>
-        </div>
-
-        {/* Rotating analysis text */}
-        <p className="text-lg font-semibold text-white text-center h-7 transition-opacity duration-300" style={{
-          textShadow: `0 0 20px ${accentGlow}`
-        }}>
-          {analysisMessages[analysisText]}
-        </p>
-
-        {/* Pro Features Checklist - Primes users before results */}
-        {!isPro && (
-          <div className="mt-6 space-y-1.5 text-left">
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              <span className="text-green-400">✓</span><span>Score + sub-ratings</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              <span className="text-green-400">✓</span><span>Celeb style match</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              <span className="text-green-400">✓</span><span>Styling tip</span>
-            </div>
-            <div className="h-px my-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-              <span>🔒</span><span>Savage Level (Pro)</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-              <span>🔒</span><span>Item-by-item roasts (Pro)</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-              <span>🔒</span><span>Advanced AI analysis (Pro)</span>
-            </div>
-          </div>
-        )}
-
-        {/* Subtle reassurance */}
-        <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-          {mode === 'roast' ? 'Brutally honest AI incoming...' : mode === 'honest' ? 'Analyzing objectively...' : 'AI analyzing your style...'}
-        </p>
-
-        <Footer className="opacity-50" />
-        <style>{`
-          @keyframes scanLine { 
-            0% { top: 0; } 
-            50% { top: calc(100% - 4px); } 
-            100% { top: 0; } 
-          }
-        `}</style>
-      </div>
+      <AnalyzingScreen
+        uploadedImage={uploadedImage}
+        mode={mode}
+        isPro={isPro}
+      />
     )
   }
 
   // ============================================
   // RESULTS SCREEN - The Viral Engine
   // ============================================
+  // ============================================
+  // RESULTS SCREEN - The Viral Engine
+  // ============================================
   if (screen === 'results' && scores) {
-    const scoreColor = getScoreColor(scores.overall)
-
-    // Mode-specific accent colors for distinct visual identity per mode
-    const modeAccent = (() => {
-      switch (scores.mode) {
-        case 'savage': return '#8b00ff' // Purple
-        case 'roast': return '#ff4444'  // Red
-        case 'honest': return '#0077ff' // Blue
-        default: return '#00d4ff'       // Cyan (Nice)
-      }
-    })()
-
-    const modeGlow = (() => {
-      switch (scores.mode) {
-        case 'savage': return 'rgba(139,0,255,0.4)' // Purple glow
-        case 'roast': return 'rgba(255,68,68,0.4)'  // Red glow
-        case 'honest': return 'rgba(0,119,255,0.4)' // Blue glow
-        default: return 'rgba(0,212,255,0.4)'       // Cyan glow (Nice)
-      }
-    })()
-
-    const modeGradientEnd = (() => {
-      switch (scores.mode) {
-        case 'savage': return '#ff0044' // Dark red
-        case 'roast': return '#ff8800'  // Orange
-        case 'honest': return '#00d4ff' // Cyan
-        default: return '#00ff88'       // Green (Nice)
-      }
-    })()
-
     return (
-      <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden relative" style={{
-        background: '#0a0a0f',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
-      }}>
-        {/* DOPAMINE GLOW - Mode-Specific Pulsing Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[150%] h-[150%] rounded-full opacity-25 blur-[120px] animate-pulse"
-            style={{
-              background: `radial-gradient(circle, ${modeAccent} 0%, ${modeGradientEnd} 40%, transparent 70%)`,
-              animationDuration: '4s'
-            }}
-          />
-        </div>
-        {/* OVERALL SCORE - BIG at TOP */}
-        <div className={`relative mb-3 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-          <div className="relative w-32 h-32">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-              <circle
-                cx="50" cy="50" r="45"
-                fill="none"
-                stroke={modeAccent}
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${displayedScore * 2.83} 283`}
-                style={{
-                  transition: 'stroke-dasharray 1s ease-out',
-                  filter: `drop-shadow(0 0 15px ${modeAccent})`
-                }}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black" style={{ color: modeAccent }}>{displayedScore}</span>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 100</span>
-            </div>
-          </div>
-
-          {/* Certified Badge on Results Screen */}
-          {scores.overall >= 90 && (
-            <div className="absolute -top-2 -right-6 rotate-12 animate-in zoom-in-50 duration-500 delay-700">
-              <div className="bg-yellow-400 text-black text-[10px] font-black px-2 py-1 rounded-md shadow-lg shadow-yellow-400/20">
-                DRIP APPROVED
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Verdict & Catchphrases - The Heart of the Smile Test */}
-        <div className={`flex flex-col items-center gap-2 mb-6 transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <p className="text-2xl font-black text-white text-center px-4" style={{
-            textShadow: `0 0 30px ${modeAccent}66`,
-            lineHeight: 1.1
-          }}>
-            {scores.verdict}
-          </p>
-
-          {scores.lines && scores.lines.length >= 2 && (
-            <div className="flex flex-col items-center gap-1.5 mt-2">
-              <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[0]}"</p>
-              <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[1]}"</p>
-            </div>
-          )}
-
-          <div className="mt-5 px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-xl" style={{
-            borderColor: `${modeAccent}33`
-          }}>
-            <p className="text-[11px] font-black uppercase tracking-[0.3em]" style={{
-              color: modeAccent,
-              textShadow: `0 0 15px ${modeAccent}66`
-            }}>
-              {scores.tagline}
-            </p>
-          </div>
-        </div>
-
-        {/* Social Proof */}
-        <div className={`mb-4 transition-all duration-500 delay-200 text-center ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-          <p className="text-sm font-bold mb-1" style={{
-            color: scores.overall >= 80 ? '#00ff88' : (scores.overall >= 60 ? '#00d4ff' : '#ff6b6b')
-          }}>
-            {(() => {
-              if (scores.roastMode) {
-                if (scores.mode === 'savage') {
-                  if (scores.overall >= 40) return '💀 YOU SURVIVED (Barely)'
-                  if (scores.overall >= 20) return '🩸 AI drew blood'
-                  return '☠️ ABSOLUTE ANNIHILATION'
-                }
-                if (scores.overall >= 60) return '😏 You survived'
-                if (scores.overall >= 45) return '💀 Rough day for your closet'
-                return '☠️ AI showed no mercy'
-              } else if (scores.mode === 'honest') {
-                if (scores.overall >= 95) return '💎 STYLE GOD — Pure Perfection'
-                if (scores.overall >= 85) return '🔥 Post this immediately'
-                if (scores.overall >= 70) return '👍 Solid fit, respectable'
-                if (scores.overall >= 55) return '📊 Average range'
-                return '📉 Needs work'
-              } else {
-                if (scores.overall >= 90) return '🔥 LEGENDARY — Post this NOW'
-                if (scores.overall >= 80) return '✨ Main character energy'
-                if (scores.overall >= 70) return '💅 Serve! TikTok would approve'
-                if (scores.overall >= 60) return '👀 Cute! Minor tweaks = viral'
-                return '💪 Good foundation, keep styling!'
-              }
-            })()}
-          </p>
-          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Better than {scores.percentile}% of fits today
-          </p>
-        </div>
-
-        {/* PHOTO PREVIEW */}
-        <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="relative group">
-            {/* Shimmering border for top scores */}
-            {scores.overall >= 90 && (
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[34px] opacity-30 blur-sm animate-pulse" />
-            )}
-            <div className={`w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative ${scores.overall >= 95 ? 'card-golden' : ''}`} style={{
-              border: scores.overall >= 95 ? 'none' : `2px solid ${modeAccent}44`,
-              boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${modeAccent}11`
-            }}>
-              <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
-
-              {/* Subtle branding on photo */}
-              <div className="absolute top-4 left-4 opacity-40">
-                <span className="text-[10px] font-black text-white tracking-widest uppercase">FitRate.app</span>
-              </div>
-
-              {/* Pro Tip Overlay (If Pro) */}
-              {isPro && scores.proTip && revealStage >= 4 && (
-                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/60 backdrop-blur-md border animate-in fade-in slide-in-from-bottom-2" style={{
-                  borderColor: `${modeAccent}33`
-                }}>
-                  <span className="text-[9px] font-black uppercase tracking-widest block mb-1" style={{ color: modeAccent }}>💡 Pro Suggestion</span>
-                  <p className="text-xs text-white/90 font-medium">"{scores.proTip}"</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* GOLDEN INSIGHT (PRO) OR TEASER (FREE) */}
-        <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-500 ${revealStage >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-          {isPro && (
-            <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]" style={{
-              borderColor: `${modeAccent}50`,
-              backgroundColor: `${modeAccent}15`,
-              boxShadow: `0 0 40px ${modeGlow}`
-            }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm">✨</span>
-                <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: modeAccent }}>Golden Insight</span>
-              </div>
-              <div className="space-y-4 text-left">
-                {scores.identityReflection && (
-                  <div>
-                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Identity Reflection</span>
-                    <p className="text-sm text-white font-medium leading-relaxed">{scores.identityReflection}</p>
-                  </div>
-                )}
-                {scores.socialPerception && (
-                  <div>
-                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Social Perception</span>
-                    <p className="text-sm text-white font-medium leading-relaxed">{scores.socialPerception}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* SUB-RATINGS & ROASTS */}
-        <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {[{ l: 'Color', s: scores.color }, { l: 'Fit', s: scores.fit }, { l: 'Style', s: scores.style }].map(x => (
-              <div key={x.l} className="text-center p-2 rounded-xl bg-white/5">
-                <p className="text-[9px] text-white/30 uppercase font-black mb-1">{x.l}</p>
-                <p className="text-lg font-bold" style={{ color: getScoreColor(x.s) }}>{x.s}</p>
-              </div>
-            ))}
-          </div>
-
-          {scores.savageLevel && (
-            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 mb-4 text-left">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Savage Level</span>
-                <span className="text-lg font-black text-red-500">{scores.savageLevel}/10 🔥</span>
-              </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-red-500" style={{ width: `${scores.savageLevel * 10}%` }} />
-              </div>
-              {scores.itemRoasts && (
-                <div className="mt-4 space-y-2">
-                  {Object.entries(scores.itemRoasts).filter(([_, r]) => r && r !== 'N/A').map(([k, v]) => (
-                    <div key={k} className="text-xs text-white/80 leading-snug">
-                      <span className="font-black text-red-500/70 uppercase text-[9px] mr-2">{k}:</span>
-                      {v}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* PRIMARY CTA: SHARE BEFORE SELL */}
-        <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-          <button
-            onClick={generateShareCard}
-            className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
-            style={{
-              background: `linear-gradient(135deg, ${modeGradientEnd} 0%, ${modeAccent} 100%)`,
-              boxShadow: `0 10px 40px ${modeGlow}, var(--shadow-physical)`,
-              color: (scores.mode === 'roast' || scores.mode === 'savage') ? 'white' : 'black'
-            }}
-          >
-            <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <span className="text-2xl">📤</span> SHARE THIS FIT
-          </button>
-
-          <button
-            onClick={resetApp}
-            className="btn-physical w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black uppercase tracking-widest active:bg-white/10 transition-all flex items-center justify-center gap-2"
-          >
-            <span>🔄</span>
-            {scores.overall >= 85 ? "Can you beat this? Scan again" :
-              scores.overall < 50 ? "Redeem yourself? Try again" :
-                "Rate Another Fit"}
-          </button>
-
-          {/* Daily Limit Tracker - Habit Building */}
-          {!isPro && (
-            <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 transition-opacity duration-300" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              {scansRemaining > 0 ? `⚡ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left today` : 'Daily limit reached • Reset in 12h'}
-            </p>
-          )}
-
-          {/* Viral Loop Teaser: Mode Switching */}
-          {!isPro && scores.mode === 'nice' && (
-            <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 delay-1000">
-              <p className="text-[10px] text-white/40 mb-1.5 font-medium">Too nice? Try the viral Roast Mode</p>
-              <button
-                onClick={() => { setMode('roast'); resetApp(); }}
-                className="text-xs text-red-400 font-black uppercase tracking-wider border-b border-red-400/30 pb-0.5 hover:text-red-300 transition-colors"
-              >
-                See what AI really thinks 😈
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Confetti for 90+ */}
-        {scores.overall >= 90 && (
-          <div className="fixed inset-0 pointer-events-none overflow-hidden">
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className="absolute animate-bounce" style={{
-                left: `${Math.random() * 100}%`,
-                top: `${-20 - Math.random() * 50}px`,
-                width: '8px',
-                height: '8px',
-                background: ['#ffd700', modeGradientEnd, modeAccent][i % 3],
-                borderRadius: '50%',
-                animation: `fall ${2 + Math.random() * 3}s linear infinite`,
-                animationDelay: `${Math.random() * 3}s`
-              }} />
-            ))}
-          </div>
-        )}
-
-        <style>{`
-          @keyframes fall {
-            to { transform: translateY(100vh) rotate(360deg); }
-          }
-        `}</style>
-      </div>
+      <ResultsScreen
+        scores={scores}
+        mode={mode}
+        uploadedImage={uploadedImage}
+        isPro={isPro}
+        scansRemaining={scansRemaining}
+        onReset={resetApp}
+        onSetMode={setMode}
+        onGenerateShareCard={generateShareCard}
+        onShowPaywall={() => setShowPaywall(true)}
+        playSound={playSound}
+        vibrate={vibrate}
+      />
     )
   }
 
   // ============================================
   // ERROR SCREEN
   // ============================================
+  // ============================================
+  // ERROR SCREEN
+  // ============================================
   if (screen === 'error') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0a0a0f] text-white" style={{
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-      }}>
-        <span className="text-6xl mb-6">👗</span>
-        <h2 className="text-2xl font-black mb-4 uppercase tracking-tight">Oops!</h2>
-        <p className="text-white/60 text-center mb-8 max-w-xs">{error || "We couldn't rate that one. Try a clearer photo or check your connection."}</p>
-
-        <div className="w-full max-w-xs">
-          <button
-            onClick={resetApp}
-            className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg transition-all active:scale-95"
-            style={{ boxShadow: 'var(--shadow-physical)' }}
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
+      <ErrorScreen
+        error={error}
+        onReset={resetApp}
+      />
     )
   }
 
   // ============================================
   // PRO EMAIL PROMPT SCREEN
   // ============================================
+  // ============================================
+  // PRO EMAIL PROMPT SCREEN
+  // ============================================
   if (screen === 'pro-email-prompt') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0f] text-white" style={{
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-      }}>
-        <div className="text-6xl mb-6">✅</div>
-        <h2 className="text-3xl font-bold text-white mb-2">Payment Successful!</h2>
-        <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-          Enter the email you used to pay<br />to activate your Pro access
-        </p>
-
-        <form onSubmit={handleEmailSubmit} className="w-full max-w-sm">
-          <input
-            type="email"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full px-5 py-4 rounded-xl text-white text-lg mb-4"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              outline: 'none'
-            }}
-            required
-          />
-          <button
-            type="submit"
-            disabled={emailChecking || !emailInput.trim()}
-            className="w-full py-4 rounded-xl text-white font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-              boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
-            }}
-          >
-            {emailChecking ? 'Checking...' : 'Activate Pro ⚡'}
-          </button>
-        </form>
-
-        <p className="text-xs mt-6 text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          Your Pro access will work across all devices
-        </p>
-
-        {/* Skip button to return home */}
-        <button
-          onClick={() => setScreen('home')}
-          className="mt-4 text-sm text-gray-500 hover:text-white transition-all"
-        >
-          ← Skip for now
-        </button>
-      </div>
+      <ProEmailPromptScreen
+        emailInput={emailInput}
+        setEmailInput={setEmailInput}
+        onSubmit={handleEmailSubmit}
+        checking={emailChecking}
+        onSkip={() => setScreen('home')}
+      />
     )
   }
 
@@ -2878,307 +1162,39 @@ export default function App() {
   // ============================================
   // PAYWALL/LIMIT-REACHED SCREEN - Redirect to Sales Page Modal
   // ============================================
+  // ============================================
+  // PAYWALL/LIMIT-REACHED SCREEN
+  // ============================================
   if (screen === 'paywall' || screen === 'limit-reached') {
-    // Instead of a separate screen, show the paywall modal on home
-    // This ensures all purchase CTAs go through one canonical Sales Page
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{
-        background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 100%)',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}>
-
-        {/* Background content */}
-        <div className="text-center">
-          <span className="text-6xl mb-4 block">{mode === 'roast' ? '🔥' : '✨'}</span>
-          <h2 className="text-2xl font-black text-white mb-2">
-            {screen === 'limit-reached' ? "You've used today's free scans" : 'Upgrade to Pro'}
-          </h2>
-          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Get 25 ratings per day'}
-          </p>
-
-          {/* Single CTA to open Sales Page */}
-          <button
-            onClick={() => setShowPaywall(true)}
-            className="px-8 py-4 rounded-2xl text-white font-bold text-lg transition-all active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-              boxShadow: '0 8px 30px rgba(0,212,255,0.3)',
-              minHeight: '56px'
-            }}
-          >
-            👑 View Options
-          </button>
-
-          {/* Back button */}
-          <button
-            onClick={() => setScreen('home')}
-            className="w-full mt-4 py-3 text-sm font-medium transition-all active:opacity-60"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
-          >
-            ← Maybe later
-          </button>
-        </div>
-
-        <Footer className="opacity-50 pb-8" />
-        <style>{`
-          @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-          }
-        `}</style>
-      </div>
+      <PaywallScreen
+        screen={screen}
+        mode={mode}
+        timeUntilReset={timeUntilReset}
+        onShowPaywall={() => setShowPaywall(true)}
+        onClose={() => setScreen('home')}
+      />
     )
   }
 
   // ============================================
   // SHARE PREVIEW SCREEN - Ultimate Share Experience
   // ============================================
+  // ============================================
+  // SHARE PREVIEW SCREEN
+  // ============================================
   if (screen === 'share-preview' && shareData) {
-    const showCopiedToast = (message) => {
-      setToastMessage(message)
-      setShowToast(true)
-      playSound('pop')
-      vibrate(20)
-      setTimeout(() => setShowToast(false), 2000)
-    }
-
-    const handleShare = async () => {
-      playSound('share')
-      vibrate(30)
-
-      if (navigator.share) {
-        try {
-          // Always try to share with image first
-          const data = {
-            title: 'My FitRate Score',
-            text: shareData.text,
-          }
-
-          // Check if we can share files (most mobile browsers)
-          if (navigator.canShare && navigator.canShare({ files: [shareData.file] })) {
-            data.files = [shareData.file]
-          }
-
-          await navigator.share(data)
-          trackShare('native_share', 'outfit_rating', scores?.overall)
-          setScreen('share-success')
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            // Fallback: download + copy
-            downloadImage(shareData.imageBlob, shareData.text)
-            trackShare('download', 'outfit_rating', scores?.overall)
-            showCopiedToast('Image saved! Caption copied ✅')
-          }
-        }
-      } else {
-        // Desktop fallback
-        downloadImage(shareData.imageBlob, shareData.text)
-        navigator.clipboard.writeText(shareData.text)
-        trackShare('download', 'outfit_rating', scores?.overall)
-        showCopiedToast('Image saved! Caption copied ✅')
-        setTimeout(() => setScreen('share-success'), 1500)
-      }
-    }
-
-    const copyCaption = async () => {
-      try {
-        await navigator.clipboard.writeText(shareData.text)
-        showCopiedToast('Caption copied ✅')
-      } catch (err) {
-        showCopiedToast('Couldn\'t copy 😕')
-      }
-    }
-
-    // Share helpers with UTM tracking
-    const getShareUrl = () => {
-      const baseUrl = `${window.location.origin}?challenge=${scores?.overall || 85}`
-      return `${baseUrl}&utm_source=share&utm_medium=social&utm_campaign=fitrate`
-    }
-
-    const getShareText = () => {
-      return `I got ${scores?.overall || 85}/100 on FitRate! 🔥 Think you can beat it?`
-    }
-
-    const copyShareLink = async () => {
-      try {
-        await navigator.clipboard.writeText(getShareUrl())
-        playSound('click')
-        showCopiedToast('Link copied! 📋')
-        trackShare('copy_link', 'outfit_rating', scores?.overall)
-      } catch (err) {
-        showCopiedToast("Couldn't copy 😕")
-      }
-    }
-
-    const shareToTwitter = () => {
-      playSound('click')
-      vibrate(15)
-      const text = encodeURIComponent(getShareText())
-      const url = encodeURIComponent(getShareUrl())
-      trackShare('twitter', 'outfit_rating', scores?.overall)
-      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
-    }
-
-    const shareToFacebook = () => {
-      playSound('click')
-      vibrate(15)
-      const url = encodeURIComponent(getShareUrl())
-      trackShare('facebook', 'outfit_rating', scores?.overall)
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
-    }
-
-    const shareToReddit = () => {
-      playSound('click')
-      vibrate(15)
-      const title = encodeURIComponent(getShareText())
-      const url = encodeURIComponent(getShareUrl())
-      trackShare('reddit', 'outfit_rating', scores?.overall)
-      window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank')
-    }
-
-    const shareToSMS = () => {
-      playSound('click')
-      vibrate(15)
-      const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
-      // Use different format for iOS vs Android
-      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
-      trackShare('sms', 'outfit_rating', scores?.overall)
-      window.location.href = isIOS ? `sms:&body=${text}` : `sms:?body=${text}`
-    }
-
-    const shareToWhatsApp = () => {
-      playSound('click')
-      vibrate(15)
-      const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`)
-      trackShare('whatsapp', 'outfit_rating', scores?.overall)
-      window.open(`https://wa.me/?text=${text}`, '_blank')
-    }
-
-    // Check if native share is available
-    const hasNativeShare = typeof navigator.share === 'function'
-
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
-        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
-      }}>
-        {/* Toast Notification */}
-        {showToast && (
-          <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60 animate-bounce" style={{
-            background: 'rgba(0,255,136,0.9)',
-            boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
-          }}>
-            <span className="text-black font-bold text-sm">{toastMessage}</span>
-          </div>
-        )}
-
-        {/* Share Card Preview */}
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6 w-[50%] max-w-[180px] aspect-[9/16]" style={{
-          border: `2px solid ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`,
-          boxShadow: `0 20px 60px ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`
-        }}>
-          <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
-        </div>
-
-        {/* Caption Preview */}
-        <p className="text-xs text-center mb-4 px-4 max-w-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          "{shareData.text.slice(0, 60)}..."
-        </p>
-
-        {/* Primary Share CTA - Native Share with Image */}
-        <button
-          onClick={handleShare}
-          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-4"
-          style={{
-            background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
-            boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
-          }}
-        >
-          <span className="text-xl">📤</span> {hasNativeShare ? 'Share with Image' : 'Download & Share'}
-        </button>
-
-        {/* Fallback Share Buttons - Always visible for more options */}
-        <div className="w-full max-w-xs mb-6">
-          <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Or share directly to:
-          </p>
-          <div className="share-grid-responsive grid grid-cols-3 gap-3 mb-3">
-            {/* WhatsApp - Primary */}
-            <button
-              onClick={shareToWhatsApp}
-              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(37,211,102,0.15)', border: '1px solid rgba(37,211,102,0.3)' }}
-            >
-              <span className="text-2xl mb-1">💬</span>
-              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>WhatsApp</span>
-            </button>
-
-            {/* SMS/Text */}
-            <button
-              onClick={shareToSMS}
-              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
-            >
-              <span className="text-2xl mb-1">📱</span>
-              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Message</span>
-            </button>
-
-            {/* Copy Link */}
-            <button
-              onClick={copyShareLink}
-              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.1)' }}
-            >
-              <span className="text-2xl mb-1">🔗</span>
-              <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Copy Link</span>
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {/* X (Twitter) */}
-            <button
-              onClick={shareToTwitter}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-            >
-              <span className="text-xl mb-1">𝕏</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>X</span>
-            </button>
-
-            {/* Facebook */}
-            <button
-              onClick={shareToFacebook}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-            >
-              <span className="text-xl mb-1">📘</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Facebook</span>
-            </button>
-
-            {/* Reddit */}
-            <button
-              onClick={shareToReddit}
-              className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-            >
-              <span className="text-xl mb-1">🤖</span>
-              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Reddit</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Back */}
-        <button
-          onClick={() => setScreen('results')}
-          className="text-sm transition-all active:opacity-60"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-        >
-          ← Back to Results
-        </button>
-      </div>
+      <SharePreviewScreen
+        shareData={shareData}
+        scores={scores}
+        onShareSuccess={() => setScreen('share-success')}
+        onClose={() => setScreen('results')}
+        showToast={showToast}
+        toastMessage={toastMessage}
+        setToastMessage={setToastMessage}
+        setShowToast={setShowToast}
+      />
     )
   }
 
@@ -3186,445 +1202,56 @@ export default function App() {
   // ============================================
   // SHARE SUCCESS - One Follow-up Option
   // ============================================
+  // ============================================
+  // SHARE SUCCESS SCREEN
+  // ============================================
   if (screen === 'share-success') {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-        paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
-        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
-      }}>
-        <span className="text-6xl mb-4">🎉</span>
-        <h2 className="text-2xl font-black mb-2">Shared!</h2>
-        <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Let's see if they can beat it
-        </p>
-
-        {/* ONE Follow-up Option */}
-        <button
-          onClick={() => {
-            // If they used Nice mode, suggest Roast. Otherwise, rate another.
-            if (mode !== 'roast') {
-              setMode('roast')
-              setScreen('home')
-            } else {
-              setScreen('home')
-            }
-          }}
-          className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
-          style={{
-            background: mode === 'roast'
-              ? 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)'
-              : 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-            boxShadow: mode === 'roast'
-              ? '0 8px 30px rgba(0,212,255,0.3)'
-              : '0 8px 30px rgba(255,68,68,0.3)'
-          }}
-        >
-          {mode === 'roast' ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
-        </button>
-
-        {/* Back to home */}
-        <button
-          onClick={() => setScreen('home')}
-          className="text-sm font-medium transition-all active:opacity-60"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-        >
-          ← Done
-        </button>
-      </div>
+      <ShareSuccessScreen
+        mode={mode}
+        setMode={setMode}
+        setScreen={setScreen}
+      />
     )
   }
 
   // ============================================
   // PAYWALL MODAL - Pro upgrade with decline offer
   // ============================================
+  // ============================================
+  // PAYWALL MODAL
+  // ============================================
   if (showPaywall) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-        background: 'rgba(0,0,0,0.9)',
-        backdropFilter: 'blur(10px)',
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)'
-      }}>
-        {/* Decline Offer Popup - higher z-index to overlay main paywall */}
-        {showDeclineOffer && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{
-            background: 'rgba(0,0,0,0.95)'
-          }}>
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30 relative" style={{
-              boxShadow: '0 0 60px rgba(255,215,0,0.2)'
-            }}>
-              {/* Close X for decline offer */}
-              <button
-                onClick={() => {
-                  setShowDeclineOffer(false)
-                  setShowPaywall(false)
-                }}
-                className="absolute top-3 right-3 text-gray-500 hover:text-white text-xl p-1"
-                aria-label="Close"
-              >
-                ×
-              </button>
-              <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
-              <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
-
-              <p className="text-gray-400 mb-2">
-                Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
-                <br />
-                <span className="text-xs">(then ${PRICES.PRO_WEEKLY}/week, cancel anytime)</span>
-              </p>
-
-              {/* Countdown Timer */}
-              {declineCountdown && (
-                <p className="text-center mb-4 text-yellow-400/80 font-bold">
-                  ⏳ Offer expires in {Math.floor(declineCountdown / 60)}:{String(declineCountdown % 60).padStart(2, '0')}
-                </p>
-              )}
-
-              <button
-                onClick={() => startCheckout('proWeeklyDiscount')}
-                disabled={checkoutLoading}
-                className="btn-stable-width w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
-                style={{
-                  background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
-                  boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
-                }}
-              >
-                {checkoutLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                    Loading...
-                  </span>
-                ) : '🔥 Claim This Deal'}
-              </button>
-
-              <p className="text-center text-[10px] text-gray-500 mb-3">
-                🔐 Secure checkout · Cancel anytime
-              </p>
-
-              <button
-                onClick={() => {
-                  setShowDeclineOffer(false)
-                  setShowPaywall(false)
-                }}
-                className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-              >
-                No thanks
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Main Paywall */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
-          boxShadow: '0 0 60px rgba(0,212,255,0.1)'
-        }}>
-          <ModalHeader
-            title="Unlock Pro"
-            subtitle="Get the full breakdown"
-            icon="⚡"
-            onClose={() => {
-              playSound('click')
-              setShowPaywall(false)
-            }}
-          />
-
-          {/* 👑 PRO SUBSCRIPTION - Best Value */}
-          <div className="relative w-full mb-5">
-            <button
-              onClick={() => startCheckout('proWeekly')}
-              disabled={checkoutLoading}
-              className="btn-physical w-full p-4 rounded-3xl text-left transition-all group relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
-                border: '2px solid rgba(255,255,255,0.3)',
-                boxShadow: 'var(--shadow-physical), 0 0 40px rgba(255,215,0,0.25)'
-              }}
-            >
-              {/* Best Value Badge */}
-              <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-black px-3 py-1.5 rounded-bl-xl uppercase tracking-wider z-10" style={{
-                boxShadow: '-2px 2px 10px rgba(255,68,68,0.3)'
-              }}>
-                Best Value
-              </div>
-
-              {/* Shine effect */}
-              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 pointer-events-none" />
-
-              {/* Header: Crown + Title + Price */}
-              <div className="flex flex-col w-full relative z-10">
-                <div className="flex items-center gap-3 mb-3 pr-8">
-                  <span className="text-2xl sm:text-3xl flex-shrink-0">👑</span>
-                  <div className="flex flex-col min-w-0">
-                    <h3 className="text-black text-lg sm:text-2xl font-black leading-tight truncate">Pro Weekly</h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xl sm:text-2xl font-black text-black">${PRICES.PRO_WEEKLY}</span>
-                      <span className="text-black/60 text-sm font-bold">/wk</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Visual Lock Tease - The Core "Non-Greedy" Hook */}
-                <div className="flex items-center gap-2 mb-3 bg-black/10 p-2 rounded-lg">
-                  <span className="text-[10px] uppercase font-black text-black/60 mr-1">Modes:</span>
-                  <div className="flex gap-2 text-lg">
-                    <span title="Nice">😌</span>
-                    <span title="Roast">🔥</span>
-                    <div className="relative">
-                      <span>🧠</span>
-                      <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
-                    </div>
-                    <div className="relative">
-                      <span>😈</span>
-                      <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Benefits - Precision Focus */}
-                <div className="space-y-1.5 pl-1">
-                  {[
-                    'GPT-4o High-Fidelity Analysis',
-                    'Expert Style Critique',
-                    'Unlock Honest & Savage Modes',
-                    'Precision Scoring (e.g. 87.4)'
-                  ].map((benefit, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
-                      <span className="text-black text-sm flex-shrink-0">✓</span>
-                      <span className="truncate">{benefit}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <p className="text-center text-[10px] font-bold text-gray-500 mb-4 tracking-wider uppercase">— OR PAY AS YOU GO —</p>
-
-          {/* 🎟️ SCAN PACKS - 2-Column Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {/* 5 Scans */}
-            <button
-              onClick={() => startCheckout('starterPack')}
-              disabled={checkoutLoading}
-              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px]"
-              style={{
-                background: 'rgba(100,200,255,0.08)',
-                border: '1.5px solid rgba(100,200,255,0.3)'
-              }}
-            >
-              <span className="block text-4xl font-black text-cyan-400 mb-1">5</span>
-              <span className="block text-xs text-gray-400 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
-              <span className="block text-lg font-black text-white">$1.99</span>
-            </button>
-
-            {/* 15 Scans - Highlighted */}
-            <button
-              onClick={() => startCheckout('popularPack')}
-              disabled={checkoutLoading}
-              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden"
-              style={{
-                background: 'rgba(0,212,255,0.15)',
-                border: '2px solid #00d4ff',
-                boxShadow: 'var(--shadow-physical), 0 0 25px rgba(0,212,255,0.3)'
-              }}
-            >
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-cyan-400" />
-              <span className="block text-5xl font-black text-cyan-400 mb-1">15</span>
-              <span className="block text-xs text-cyan-400/80 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
-              <span className="block text-lg font-black text-white">$3.99</span>
-            </button>
-
-            {/* 50 Scans */}
-            <button
-              onClick={() => startCheckout('powerPack')}
-              disabled={checkoutLoading}
-              className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] col-span-2"
-              style={{
-                background: 'rgba(138,75,255,0.1)',
-                border: '1.5px solid rgba(138,75,255,0.4)'
-              }}
-            >
-              <span className="block text-5xl font-black text-purple-400 mb-1">50</span>
-              <span className="block text-xs text-purple-400/70 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-              <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
-              <span className="block text-lg font-black text-white">${PRICES.SCAN_PACK_50}</span>
-            </button>
-          </div>
-
-          {/* ☠️ SAVAGE ONE-OFF - "Curiosity" Framing */}
-          <div className="relative w-full mb-5">
-            <button
-              onClick={() => startCheckout('proRoast')}
-              disabled={checkoutLoading}
-              className="btn-physical w-full p-5 rounded-2xl text-center transition-all group"
-              style={{
-                background: 'linear-gradient(135deg, #1a0000 0%, #330000 100%)',
-                border: '2px solid rgba(255,68,68,0.5)',
-                boxShadow: 'var(--shadow-physical), 0 0 30px rgba(255,68,68,0.2)'
-              }}
-            >
-              <div className="flex flex-col items-center">
-                <span className="text-4xl mb-2">☠️</span>
-                <h3 className="text-red-400 text-xl font-black mb-1">Curious? Savage Mode</h3>
-                <p className="text-red-300/60 text-sm font-bold mb-2">Try the brutal truth once</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 line-through">${PRICES.PRO_WEEKLY}</span>
-                  <span className="text-2xl font-black text-white">$0.99</span>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          {/* MODEL CAPABILITIES COMPARISON - The "Why Control" */}
-          <div className="mb-5 p-4 rounded-2xl bg-black/40 border border-white/10">
-            <h4 className="text-xs font-black text-white/50 uppercase tracking-widest mb-4 text-center">Engine Comparison</h4>
-            <div className="grid grid-cols-3 gap-y-3 text-[11px]">
-              {/* Headers */}
-              <div className="col-span-1 text-gray-500 font-bold">Feature</div>
-              <div className="col-span-1 text-center text-gray-400 font-bold">Free</div>
-              <div className="col-span-1 text-center text-yellow-400 font-black">PRO</div>
-
-              {/* Rows */}
-              {[
-                { label: 'AI Model', free: 'Gemini Flash', pro: 'GPT-4o (Elite)' },
-                { label: 'Style IQ', free: 'Standard', pro: 'High-Fidelity' },
-                { label: 'Critique', free: 'Basic', pro: 'Expert Level' },
-                { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' }
-              ].map((row, i) => (
-                <React.Fragment key={i}>
-                  <div className="col-span-3 h-px bg-white/5 my-1" />
-                  <div className="col-span-1 text-gray-300 font-medium self-center">{row.label}</div>
-                  <div className="col-span-1 text-center text-gray-500 self-center">{row.free}</div>
-                  <div className="col-span-1 text-center text-yellow-400 font-bold self-center">{row.pro}</div>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-
-          {/* Reassurance + Close */}
-          <p className="text-center text-[10px] text-gray-500 mb-3">
-            🔐 Secure checkout · Instant access
-          </p>
-          <button
-            onClick={() => {
-              playSound('click')
-              setShowPaywall(false)
-            }}
-            className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-          >
-            ← Not now, go back
-          </button>
-        </div>
-      </div>
+      <PaywallModal
+        showPaywall={showPaywall}
+        setShowPaywall={setShowPaywall}
+        showDeclineOffer={showDeclineOffer}
+        setShowDeclineOffer={setShowDeclineOffer}
+        declineCountdown={declineCountdown}
+        checkoutLoading={checkoutLoading}
+        startCheckout={startCheckout}
+      />
     )
   }
 
   // ============================================
   // LEADERBOARD MODAL
   // ============================================
+  // ============================================
+  // LEADERBOARD MODAL
+  // ============================================
   if (showLeaderboard) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-        background: 'rgba(0,0,0,0.9)',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <div className="w-full max-w-sm rounded-3xl p-6 relative" style={{
-          background: 'linear-gradient(180deg, #12121f 0%, #0a0a0f 100%)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
-        }}>
-          <ModalHeader
-            title="Leaderboard"
-            subtitle={currentEvent?.theme}
-            icon="🏆"
-            onClose={() => { setShowLeaderboard(false); vibrate(10); }}
-          />
-
-          {/* Leaderboard List */}
-          <div className="space-y-2 mb-4">
-            {leaderboard.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No entries yet — be the first!
-              </div>
-            ) : (
-              leaderboard.map((entry) => (
-                <div
-                  key={entry.rank}
-                  className="flex items-center p-3 rounded-xl"
-                  style={{
-                    background: entry.rank <= 3 ? 'linear-gradient(90deg, rgba(251,191,36,0.1) 0%, transparent 100%)' : 'rgba(255,255,255,0.03)',
-                    border: entry.rank === 1 ? '1px solid rgba(251,191,36,0.3)' : '1px solid transparent'
-                  }}
-                >
-                  <span className="w-8 text-xl">
-                    {entry.rank === 1 ? '👑' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}`}
-                  </span>
-                  <span className="flex-1 font-medium text-white">{entry.displayName}</span>
-                  <span className="font-bold text-lg text-white mr-2">{entry.score?.toFixed(1)}</span>
-                  {entry.isPro && (
-                    <span className="text-[10px] bg-amber-500 text-black px-2 py-0.5 rounded-full font-bold">PRO</span>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* User's Rank (if not in Top 5) */}
-          {userEventStatus?.participating && (!userEventStatus.inTop5 || userEventStatus.rank > 5) && isPro && (
-            <div className="bg-cyan-900/20 border border-cyan-500/30 p-3 rounded-xl mb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-cyan-400 text-sm">Your rank</span>
-                <span className="font-bold text-xl text-white">#{userEventStatus.rank}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Free User Upsell */}
-          {!isPro && userEventStatus?.participating && (
-            <div className="bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl mb-4 text-center">
-              <span className="text-amber-400 text-xs">
-                ⭐ Go Pro to see your exact rank
-              </span>
-            </div>
-          )}
-
-          {/* Participant Count */}
-          <p className="text-center text-gray-500 text-xs mb-4">
-            {currentEvent?.totalParticipants || 0} participants this week
-          </p>
-
-          {/* Coming Next Week Preview */}
-          {upcomingEvent && (
-            <div className="mb-4 p-3 rounded-xl" style={{
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(219, 39, 119, 0.1) 100%)',
-              border: '1px solid rgba(139, 92, 246, 0.2)'
-            }}>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm">{upcomingEvent.themeEmoji}</span>
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Coming Next Week</span>
-              </div>
-              <h4 className="text-sm font-bold text-white mb-1">{upcomingEvent.theme}</h4>
-              <p className="text-[10px] text-gray-400">{upcomingEvent.themeDescription}</p>
-              <p className="text-[10px] text-purple-400 mt-2">
-                🗓️ Starts in {upcomingEvent.startsIn} day{upcomingEvent.startsIn !== 1 ? 's' : ''}
-              </p>
-            </div>
-          )}
-
-          {/* Rules Button */}
-          <button
-            onClick={() => { setShowEventRules(true); vibrate(10); }}
-            className="w-full py-3 text-sm text-gray-400 font-medium transition-all active:opacity-60"
-          >
-            📋 View Event Rules
-          </button>
-        </div>
-
-
-      </div>
+      <LeaderboardModal
+        showLeaderboard={showLeaderboard}
+        setShowLeaderboard={setShowLeaderboard}
+        currentEvent={currentEvent}
+        leaderboard={leaderboard}
+        userEventStatus={userEventStatus}
+        isPro={isPro}
+        upcomingEvent={upcomingEvent}
+      />
     )
   }
 
