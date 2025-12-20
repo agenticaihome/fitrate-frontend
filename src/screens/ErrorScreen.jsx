@@ -20,6 +20,12 @@ const ERROR_CONFIG = {
         message: 'Try a clearer outfit photo (JPEG, PNG, or WebP under 10MB)',
         showUpgrade: false
     },
+    INVALID_OUTFIT: {
+        emoji: '👕',
+        title: 'Can\'t See Your Outfit',
+        message: 'Make sure your photo shows clothing clearly! Try a full-body or mirror selfie.',
+        showUpgrade: false
+    },
     INVALID_SPAM_BLOCKED: {
         emoji: '🚫',
         title: 'Too Many Attempts',
@@ -40,14 +46,38 @@ const ERROR_CONFIG = {
     }
 };
 
-export default function ErrorScreen({ error, errorCode, onReset, onUpgrade }) {
-    // Get config for this error code, or use default
-    const config = ERROR_CONFIG[errorCode] || {
+// Check if error message indicates outfit not visible
+function getErrorConfig(errorCode, errorMessage) {
+    // First check for explicit error code
+    if (errorCode && ERROR_CONFIG[errorCode]) {
+        return ERROR_CONFIG[errorCode];
+    }
+
+    // Check error message for outfit-related issues
+    if (errorMessage) {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('outfit') || lower.includes('clothing') || lower.includes('clothes')) {
+            return {
+                emoji: '👕',
+                title: 'Need to See Your Outfit!',
+                message: errorMessage,
+                showUpgrade: false
+            };
+        }
+    }
+
+    // Default fallback - show actual error if available
+    return {
         emoji: '👗',
         title: 'Oops!',
-        message: error || "We couldn't rate that one. Try a clearer photo or check your connection.",
+        message: errorMessage || "We couldn't rate that one. Try a clearer outfit photo!",
         showUpgrade: false
     };
+}
+
+export default function ErrorScreen({ error, errorCode, onReset, onUpgrade }) {
+    // Get config for this error code or message
+    const config = getErrorConfig(errorCode, error);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0a0a0f] text-white" style={{
