@@ -138,6 +138,7 @@ export default function App() {
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [isStandalone, setIsStandalone] = useState(false)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
 
   // Detect standalone mode (PWA)
   useEffect(() => {
@@ -148,6 +149,11 @@ export default function App() {
       setIsStandalone(isStandaloneMode)
       if (isStandaloneMode) {
         document.body.classList.add('is-standalone')
+      }
+      // Show install banner if not standalone and not dismissed
+      const dismissed = localStorage.getItem('fitrate_install_dismissed')
+      if (!isStandaloneMode && !dismissed) {
+        setShowInstallBanner(true)
       }
     }
     checkStandalone()
@@ -1979,6 +1985,38 @@ export default function App() {
         <p className="text-xs mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>
           Snap a photo • Get instant feedback • Have fun
         </p>
+
+        {/* Install App Banner - Show only for non-PWA users */}
+        {showInstallBanner && (
+          <div className="mb-6 w-full max-w-sm px-4 py-3 rounded-2xl relative" style={{
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
+            border: '1px solid rgba(139, 92, 246, 0.3)'
+          }}>
+            <button
+              onClick={() => {
+                setShowInstallBanner(false)
+                localStorage.setItem('fitrate_install_dismissed', 'true')
+                vibrate(10)
+              }}
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10"
+            >
+              <span className="text-white/50 text-xs">✕</span>
+            </button>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📲</span>
+              <div>
+                <p className="text-sm font-bold text-white mb-0.5">Install FitRate</p>
+                <p className="text-[10px] text-gray-400">
+                  {/iPhone|iPad/.test(navigator.userAgent)
+                    ? 'Tap Share ↗ then "Add to Home Screen"'
+                    : /Android/.test(navigator.userAgent)
+                      ? 'Tap ⋮ menu then "Install app"'
+                      : 'Add to your home screen for quick access'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Challenge Banner - when friend shared a challenge link */}
         {challengeScore && (
