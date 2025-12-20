@@ -24,6 +24,9 @@
           stroke="url(#gradient1)"
           stroke-width="8"
           stroke-linecap="round"/>
+    
+    <!-- Notification dot (near hook - brand signature) -->
+    <circle cx="115" cy="8" r="8" fill="#00d4ff"/>
   </g>
 
   <!-- FitRate.app Text -->

@@ -1,15 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#0a0a0f"/>
+  
+  <!-- Hanger Icon - centered and scaled for 512x512 -->
+  <g transform="translate(256, 150)">
+    <!-- Hanger hook (curved) -->
+    <path d="M 0 20 Q 0 -10, 25 -10 Q 50 -10, 50 20"
+          stroke="url(#hangerGrad512)"
+          stroke-width="16"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <!-- Hanger circle (top) -->
+    <circle cx="50" cy="10" r="16" fill="url(#hangerGrad512)"/>
+    
+    <!-- Hanger body (triangle shape) -->
+    <path d="M 50 20 L -80 150 L 180 150 L 50 20 Z"
+          stroke="url(#hangerGrad512)"
+          stroke-width="16"
+          fill="none"
+          stroke-linejoin="round"
+          stroke-linecap="round"/>
+    
+    <!-- Bottom bar -->
+    <line x1="-80" y1="150" x2="180" y2="150"
+          stroke="url(#hangerGrad512)"
+          stroke-width="16"
+          stroke-linecap="round"/>
+  </g>
+  
+  <!-- Notification dot (near hook) -->
+  <circle cx="345" cy="148" r="26" fill="#00d4ff"/>
+  
+  <!-- Gradients -->
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0a0a0f"/>
-      <stop offset="100%" style="stop-color:#1a1a2e"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d4ff"/>
-      <stop offset="100%" style="stop-color:#ff0080"/>
+    <linearGradient id="hangerGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0088ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b00ff;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
-  <text x="256" y="320" font-family="SF Pro Display, -apple-system, sans-serif" font-size="200" font-weight="800" text-anchor="middle" fill="url(#accent)">F</text>
-  <circle cx="256" cy="420" r="20" fill="#00d4ff"/>
 </svg>
