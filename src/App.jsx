@@ -19,6 +19,7 @@ import PaywallScreen from './screens/PaywallScreen'
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
+import EventExplainerModal from './components/modals/EventExplainerModal'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -169,6 +170,12 @@ export default function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [leaderboard, setLeaderboard] = useState([])
   const [showEventRules, setShowEventRules] = useState(false)
+  const [showEventExplainer, setShowEventExplainer] = useState(false)
+
+  // Track if user has been introduced to weekly events (persisted)
+  const [hasSeenEventExplainer, setHasSeenEventExplainer] = useState(() => {
+    return localStorage.getItem('fitrate_seen_event_explainer') === 'true'
+  })
 
   // User ID for referrals
   // SECURITY: Use crypto.randomUUID for cryptographically secure IDs
@@ -770,7 +777,7 @@ export default function App() {
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
-  if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules) {
+  if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules && !showEventExplainer) {
     return (
       <HomeScreen
         mode={mode}
@@ -787,6 +794,8 @@ export default function App() {
         toastMessage={toastMessage}
         showInstallBanner={showInstallBanner}
         onShowInstallBanner={setShowInstallBanner}
+        hasSeenEventExplainer={hasSeenEventExplainer}
+        onShowEventExplainer={() => setShowEventExplainer(true)}
         onImageSelected={(img) => {
           setUploadedImage(img)
           setScreen('analyzing')
@@ -1012,6 +1021,38 @@ export default function App() {
 
   if (showRules) {
     return <RulesModal onClose={() => setShowRules(false)} />
+  }
+
+  // ============================================
+  // EVENT EXPLAINER MODAL - First-time event introduction
+  // ============================================
+  if (showEventExplainer && currentEvent) {
+    return (
+      <EventExplainerModal
+        event={currentEvent}
+        isPro={isPro}
+        onJoin={() => {
+          // Mark as seen and enable event mode
+          localStorage.setItem('fitrate_seen_event_explainer', 'true')
+          setHasSeenEventExplainer(true)
+          setEventMode(true)
+          setShowEventExplainer(false)
+        }}
+        onClose={() => {
+          // Mark as seen even if they dismiss
+          localStorage.setItem('fitrate_seen_event_explainer', 'true')
+          setHasSeenEventExplainer(true)
+          setShowEventExplainer(false)
+        }}
+        onUpgrade={() => {
+          // Mark as seen and show paywall
+          localStorage.setItem('fitrate_seen_event_explainer', 'true')
+          setHasSeenEventExplainer(true)
+          setShowEventExplainer(false)
+          setShowPaywall(true)
+        }}
+      />
+    )
   }
 
   return null
