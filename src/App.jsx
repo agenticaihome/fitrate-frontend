@@ -161,6 +161,7 @@ export default function App() {
 
 
   const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
+  const [showRules, setShowRules] = useState(false)
   const [showDeclineOffer, setShowDeclineOffer] = useState(false)
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
@@ -1268,6 +1269,10 @@ export default function App() {
         upcomingEvent={upcomingEvent}
       />
     )
+  }
+
+  if (showRules) {
+    return <RulesModal onClose={() => setShowRules(false)} />
   }
 
   return null
