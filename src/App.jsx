@@ -818,6 +818,7 @@ export default function App() {
   const analyzeOutfit = useCallback(async (imageData) => {
     setScreen('analyzing')
     setError(null)
+    setErrorCode(null) // Reset error code for fresh analysis
 
     // Optimistic check
     if (!isPro && scansRemaining <= 0) {
@@ -855,6 +856,9 @@ export default function App() {
         }
 
         if (!data.success) {
+          // Extract error code for better UX in ErrorScreen (was missing for free tier!)
+          const code = data.code || 'SERVER_ERROR'
+          setErrorCode(code)
           setError(data.error || 'Analysis failed')
           setScreen('error')
           return
