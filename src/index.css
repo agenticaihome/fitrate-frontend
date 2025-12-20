@@ -18,6 +18,110 @@
   --shadow-physical: 0 8px 0 rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.3);
   --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
   --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+  
+  /* Accessibility: Focus ring colors */
+  --focus-color: #00d4ff;
+  --focus-color-alt: #00ff88;
+  
+  /* Accessibility: Improved contrast text colors */
+  --text-muted: rgba(255, 255, 255, 0.7);      /* Was 0.5, now 4.5:1 contrast */
+  --text-muted-strong: rgba(255, 255, 255, 0.85);
+  --text-subtle: rgba(255, 255, 255, 0.6);     /* Was 0.4, improved */
+}
+
+/* ============================================ */
+/* ACCESSIBILITY: Focus Indicators             */
+/* WCAG 2.2 AA compliant visible focus states  */
+/* ============================================ */
+
+/* Global focus-visible styling (keyboard users only) */
+:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* Enhanced focus for buttons and interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(0, 212, 255, 0.25);
+}
+
+/* Remove default outline (we're replacing with focus-visible) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip to content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--focus-color);
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Make sr-only content visible when focused */
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --text-muted: rgba(255, 255, 255, 0.9);
+    --text-subtle: rgba(255, 255, 255, 0.8);
+  }
+  
+  button, [role="button"] {
+    border: 2px solid white !important;
+  }
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Layout */

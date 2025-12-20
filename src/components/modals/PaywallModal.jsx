@@ -15,12 +15,18 @@ export default function PaywallModal({
     if (!showPaywall) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
-            background: 'rgba(0,0,0,0.9)',
-            backdropFilter: 'blur(10px)',
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)'
-        }}>
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="paywall-title"
+            style={{
+                background: 'rgba(0,0,0,0.9)',
+                backdropFilter: 'blur(10px)',
+                paddingTop: 'env(safe-area-inset-top)',
+                paddingBottom: 'env(safe-area-inset-bottom)'
+            }}
+        >
             {/* Decline Offer Popup - higher z-index to overlay main paywall */}
             {showDeclineOffer && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{
@@ -109,6 +115,7 @@ export default function PaywallModal({
                     <button
                         onClick={() => startCheckout('proWeekly')}
                         disabled={checkoutLoading}
+                        aria-label={`Subscribe to Pro Weekly for ${PRICES.PRO_WEEKLY} dollars per week. Best value option.`}
                         className="btn-physical w-full p-4 rounded-3xl text-left transition-all group relative overflow-hidden"
                         style={{
                             background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
@@ -182,6 +189,7 @@ export default function PaywallModal({
                     <button
                         onClick={() => startCheckout('starterPack')}
                         disabled={checkoutLoading}
+                        aria-label="Buy 5 Pro scans for $1.99"
                         className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px]"
                         style={{
                             background: 'rgba(100,200,255,0.08)',
@@ -198,6 +206,7 @@ export default function PaywallModal({
                     <button
                         onClick={() => startCheckout('popularPack')}
                         disabled={checkoutLoading}
+                        aria-label="Buy 15 Pro scans for $3.99. Popular choice."
                         className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden"
                         style={{
                             background: 'rgba(0,212,255,0.15)',
@@ -216,6 +225,7 @@ export default function PaywallModal({
                     <button
                         onClick={() => startCheckout('powerPack')}
                         disabled={checkoutLoading}
+                        aria-label={`Buy 50 Pro scans for ${PRICES.SCAN_PACK_50} dollars`}
                         className="btn-physical p-5 rounded-2xl text-center flex flex-col items-center justify-center min-h-[140px] col-span-2"
                         style={{
                             background: 'rgba(138,75,255,0.1)',
@@ -234,6 +244,7 @@ export default function PaywallModal({
                     <button
                         onClick={() => startCheckout('proRoast')}
                         disabled={checkoutLoading}
+                        aria-label="Try Savage Mode once for $0.99"
                         className="btn-physical w-full p-5 rounded-2xl text-center transition-all group"
                         style={{
                             background: 'linear-gradient(135deg, #1a0000 0%, #330000 100%)',
@@ -288,6 +299,7 @@ export default function PaywallModal({
                         playSound('click')
                         setShowPaywall(false)
                     }}
+                    aria-label="Close upgrade options and go back"
                     className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
                 >
                     ← Not now, go back

@@ -147,7 +147,7 @@ export default function SharePreviewScreen({
                 border: `2px solid ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`,
                 boxShadow: `0 20px 60px ${scores?.roastMode ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}`
             }}>
-                <img src={URL.createObjectURL(shareData.imageBlob)} alt="Share Preview" className="w-full h-full object-cover" />
+                <img src={URL.createObjectURL(shareData.imageBlob)} alt="Your outfit rating share card preview" className="w-full h-full object-cover" />
             </div>
 
             {/* Caption Preview */}
@@ -158,13 +158,14 @@ export default function SharePreviewScreen({
             {/* Primary Share CTA - Native Share with Image */}
             <button
                 onClick={handleShare}
+                aria-label={hasNativeShare ? 'Share your rating with image to other apps' : 'Download share card and copy caption'}
                 className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 mb-4"
                 style={{
                     background: `linear-gradient(135deg, ${scores?.roastMode ? '#ff4444' : '#00d4ff'} 0%, ${scores?.roastMode ? '#ff0080' : '#00ff88'} 100%)`,
                     boxShadow: `0 8px 30px ${scores?.roastMode ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'}`
                 }}
             >
-                <span className="text-xl">📤</span> {hasNativeShare ? 'Share with Image' : 'Download & Share'}
+                <span className="text-xl" aria-hidden="true">📤</span> {hasNativeShare ? 'Share with Image' : 'Download & Share'}
             </button>
 
             {/* Fallback Share Buttons - Always visible for more options */}
@@ -172,65 +173,71 @@ export default function SharePreviewScreen({
                 <p className="text-xs text-center mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
                     Or share directly to:
                 </p>
-                <div className="share-grid-responsive grid grid-cols-3 gap-3 mb-3">
+                <div className="share-grid-responsive grid grid-cols-3 gap-3 mb-3" role="group" aria-label="Primary sharing options">
                     {/* WhatsApp - Primary */}
                     <button
                         onClick={shareToWhatsApp}
+                        aria-label="Share to WhatsApp"
                         className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(37,211,102,0.15)', border: '1px solid rgba(37,211,102,0.3)' }}
                     >
-                        <span className="text-2xl mb-1">💬</span>
+                        <span className="text-2xl mb-1" aria-hidden="true">💬</span>
                         <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>WhatsApp</span>
                     </button>
 
                     {/* SMS/Text */}
                     <button
                         onClick={shareToSMS}
+                        aria-label="Share via text message"
                         className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(255,255,255,0.1)' }}
                     >
-                        <span className="text-2xl mb-1">📱</span>
+                        <span className="text-2xl mb-1" aria-hidden="true">📱</span>
                         <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Message</span>
                     </button>
 
                     {/* Copy Link */}
                     <button
                         onClick={copyShareLink}
+                        aria-label="Copy share link to clipboard"
                         className="flex flex-col items-center justify-center p-4 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(255,255,255,0.1)' }}
                     >
-                        <span className="text-2xl mb-1">🔗</span>
+                        <span className="text-2xl mb-1" aria-hidden="true">🔗</span>
                         <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>Copy Link</span>
                     </button>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-3" role="group" aria-label="Social media sharing">
                     {/* X (Twitter) */}
                     <button
                         onClick={shareToTwitter}
+                        aria-label="Share to X, formerly Twitter"
                         className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(255,255,255,0.08)' }}
                     >
-                        <span className="text-xl mb-1">𝕏</span>
+                        <span className="text-xl mb-1" aria-hidden="true">𝕏</span>
                         <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>X</span>
                     </button>
 
                     {/* Facebook */}
                     <button
                         onClick={shareToFacebook}
+                        aria-label="Share to Facebook"
                         className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(255,255,255,0.08)' }}
                     >
-                        <span className="text-xl mb-1">📘</span>
+                        <span className="text-xl mb-1" aria-hidden="true">📘</span>
                         <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Facebook</span>
                     </button>
 
                     {/* Reddit */}
                     <button
                         onClick={shareToReddit}
+                        aria-label="Share to Reddit"
                         className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95"
                         style={{ background: 'rgba(255,255,255,0.08)' }}
                     >
-                        <span className="text-xl mb-1">🤖</span>
+                        <span className="text-xl mb-1" aria-hidden="true">🤖</span>
                         <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Reddit</span>
                     </button>
                 </div>
@@ -239,6 +246,7 @@ export default function SharePreviewScreen({
             {/* Back */}
             <button
                 onClick={onClose}
+                aria-label="Go back to results screen"
                 className="text-sm transition-all active:opacity-60"
                 style={{ color: 'rgba(255,255,255,0.4)' }}
             >

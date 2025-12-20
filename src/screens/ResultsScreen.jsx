@@ -244,7 +244,7 @@ export default function ResultsScreen({
                         border: scores.overall >= 95 ? 'none' : `2px solid ${modeAccent}44`,
                         boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${modeAccent}11`
                     }}>
-                        <img src={uploadedImage} alt="Your fit" className="w-full h-full object-cover" />
+                        <img src={uploadedImage} alt="Your outfit being rated" className="w-full h-full object-cover" />
 
                         {/* Branding */}
                         <div className="absolute top-4 left-4 opacity-40">
@@ -332,6 +332,7 @@ export default function ResultsScreen({
             <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                 <button
                     onClick={onGenerateShareCard}
+                    aria-label="Share your outfit rating to social media"
                     className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
                     style={{
                         background: `linear-gradient(135deg, ${modeGradientEnd} 0%, ${modeAccent} 100%)`,
@@ -339,15 +340,16 @@ export default function ResultsScreen({
                         color: (scores.mode === 'roast' || scores.mode === 'savage') ? 'white' : 'black'
                     }}
                 >
-                    <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <span className="text-2xl">📤</span> SHARE THIS FIT
+                    <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" aria-hidden="true" />
+                    <span className="text-2xl" aria-hidden="true">📤</span> SHARE THIS FIT
                 </button>
 
                 <button
                     onClick={onReset}
+                    aria-label="Rate another outfit"
                     className="btn-physical w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black uppercase tracking-widest active:bg-white/10 transition-all flex items-center justify-center gap-2"
                 >
-                    <span>🔄</span>
+                    <span aria-hidden="true">🔄</span>
                     {scores.overall >= 85 ? "Can you beat this? Scan again" :
                         scores.overall < 50 ? "Redeem yourself? Try again" :
                             "Rate Another Fit"}
@@ -366,9 +368,10 @@ export default function ResultsScreen({
                         <p className="text-[10px] text-white/40 mb-1.5 font-medium">Too nice? Try the viral Roast Mode</p>
                         <button
                             onClick={() => { onSetMode('roast'); onReset(); }}
+                            aria-label="Try Roast Mode for more honest feedback"
                             className="text-xs text-red-400 font-black uppercase tracking-wider border-b border-red-400/30 pb-0.5 hover:text-red-300 transition-colors"
                         >
-                            See what AI really thinks 😈
+                            See what AI really thinks <span aria-hidden="true">😈</span>
                         </button>
                     </div>
                 )}

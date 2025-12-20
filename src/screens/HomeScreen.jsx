@@ -265,8 +265,9 @@ export default function HomeScreen({
                         <button
                             onClick={() => { playSound('click'); vibrate(10); flipCamera(); }}
                             className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-95"
+                            aria-label="Flip camera to front or back"
                         >
-                            <span className="text-xl">🔄</span>
+                            <span className="text-xl" aria-hidden="true">🔄</span>
                         </button>
                     </div>
                 </div>
@@ -283,8 +284,9 @@ export default function HomeScreen({
                         <button
                             onClick={() => { playSound('click'); vibrate(15); stopCamera(); }}
                             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95"
+                            aria-label="Cancel and return to home"
                         >
-                            <span className="text-white text-xl">✕</span>
+                            <span className="text-white text-xl" aria-hidden="true">✕</span>
                         </button>
 
                         {/* Capture */}
@@ -292,13 +294,14 @@ export default function HomeScreen({
                             onClick={() => { playSound('click'); vibrate(30); capturePhoto(); }}
                             disabled={countdown !== null}
                             className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
+                            aria-label="Take photo"
                             style={{
                                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                                 boxShadow: '0 0 30px rgba(0,212,255,0.5)',
                                 border: '4px solid white'
                             }}
                         >
-                            <span className="text-3xl">📸</span>
+                            <span className="text-3xl" aria-hidden="true">📸</span>
                         </button>
 
                         {/* Timer */}
@@ -306,8 +309,9 @@ export default function HomeScreen({
                             onClick={() => { playSound('click'); vibrate(20); timerCapture(); }}
                             disabled={countdown !== null}
                             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
+                            aria-label="Start 3 second countdown timer"
                         >
-                            <span className="text-white text-lg">⏱️</span>
+                            <span className="text-white text-lg" aria-hidden="true">⏱️</span>
                         </button>
                     </div>
                 </div>
@@ -483,6 +487,10 @@ export default function HomeScreen({
                 ) : (
                     <button
                         onClick={handleStart}
+                        aria-label={eventMode && currentEvent
+                            ? `Submit outfit for ${currentEvent.theme} event in ${mode} mode`
+                            : `Take a photo to rate your outfit in ${mode} mode`
+                        }
                         className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
                         style={{
                             background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
@@ -495,10 +503,10 @@ export default function HomeScreen({
                             background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
                             boxShadow: `0 0 60px ${accentGlow}`,
                             animation: 'pulse 2s ease-in-out infinite'
-                        }} />
+                        }} aria-hidden="true" />
 
                         {/* Icon & Text */}
-                        <span className="relative text-8xl mb-4 drop-shadow-2xl">
+                        <span className="relative text-8xl mb-4 drop-shadow-2xl" aria-hidden="true">
                             {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
                         </span>
                         <span className="relative text-white text-2xl font-black tracking-widest uppercase">
@@ -522,26 +530,30 @@ export default function HomeScreen({
                 {/* Nice */}
                 <button
                     onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
+                    aria-label="Nice mode - get encouraging feedback"
+                    aria-pressed={mode === 'nice'}
                     className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
                     style={{
                         background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
                         border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
                     }}
                 >
-                    <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`}>😇</span>
+                    <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😇</span>
                     <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
                 </button>
 
                 {/* Roast */}
                 <button
                     onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
+                    aria-label="Roast mode - get humorous critiques"
+                    aria-pressed={mode === 'roast'}
                     className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
                     style={{
                         background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
                         border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
                     }}
                 >
-                    <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`}>😈</span>
+                    <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😈</span>
                     <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
                 </button>
 
@@ -552,15 +564,17 @@ export default function HomeScreen({
                         if (isPro) { setMode('honest'); setEventMode(false); }
                         else onShowPaywall();
                     }}
+                    aria-label={isPro ? "Honest mode - get balanced analysis" : "Honest mode - Pro feature, tap to upgrade"}
+                    aria-pressed={mode === 'honest' && isPro}
                     className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
                     style={{
                         background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
                         border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
                     }}
                 >
-                    <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`}>📊</span>
+                    <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">📊</span>
                     <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
+                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
                 </button>
 
                 {/* PRO: Savage */}
@@ -570,19 +584,20 @@ export default function HomeScreen({
                         if (isPro) { setMode('savage'); setEventMode(false); }
                         else onShowPaywall();
                     }}
+                    aria-label={isPro ? "Savage mode - get brutally honest feedback" : "Savage mode - Pro feature, tap to upgrade"}
+                    aria-pressed={mode === 'savage' && isPro}
                     className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
                     style={{
                         background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
                         border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
                     }}
                 >
-                    <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`}>💀</span>
+                    <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">💀</span>
                     <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
+                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
                 </button>
             </div>
 
-            {/* Weekly Event Bar */}
             {currentEvent && (
                 <button
                     onClick={() => {
@@ -590,6 +605,11 @@ export default function HomeScreen({
                         if (isPro) setEventMode(!eventMode);
                         else onShowPaywall();
                     }}
+                    aria-label={isPro
+                        ? `${currentEvent.theme} weekly event - ${eventMode ? 'currently active, tap to deactivate' : 'tap to join'}`
+                        : `${currentEvent.theme} weekly event - Pro feature, tap to upgrade`
+                    }
+                    aria-pressed={eventMode && isPro}
                     className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode && isPro ? 'ring-2 ring-emerald-400' : ''}`}
                     style={{
                         background: eventMode && isPro
@@ -605,7 +625,7 @@ export default function HomeScreen({
                     }}
                 >
                     <div className="flex items-center gap-2">
-                        <span className="text-sm">{currentEvent.themeEmoji}</span>
+                        <span className="text-sm" aria-hidden="true">{currentEvent.themeEmoji}</span>
                         <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
                         {isPro ? (
                             <span className={`text-[10px] font-bold uppercase ${eventMode ? 'text-emerald-300' : 'text-emerald-400'}`}>
@@ -624,15 +644,17 @@ export default function HomeScreen({
                         )}
                     </div>
                 </button>
-            )}
+            )
+            }
 
             {/* Leaderboard Link */}
             {currentEvent && (
                 <button
                     onClick={() => { onShowLeaderboard(); vibrate(10); }}
+                    aria-label="View weekly event leaderboard"
                     className="mt-2 text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
                 >
-                    <span>🏆</span> See Leaderboard
+                    <span aria-hidden="true">🏆</span> See Leaderboard
                 </button>
             )}
 
@@ -688,6 +710,6 @@ export default function HomeScreen({
             </div>
 
             <Footer className="opacity-50" />
-        </div>
+        </div >
     )
 }
