@@ -448,37 +448,70 @@ export default function HomeScreen({
 
             {/* MAIN ACTION CTA */}
             <div className="flex-1 flex flex-col items-center justify-center">
-                <button
-                    onClick={handleStart}
-                    className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
-                    style={{
-                        background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
-                        border: `3px solid ${accent}99`,
-                        boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`,
-                        opacity: (scansRemaining === 0 && !isPro && purchasedScans === 0) ? 0.6 : 1
-                    }}
-                >
-                    {/* Inner pulse */}
-                    <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-                        background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
-                        boxShadow: `0 0 60px ${accentGlow}`,
-                        animation: 'pulse 2s ease-in-out infinite'
-                    }} />
-
-                    {/* Icon & Text */}
-                    <span className="relative text-8xl mb-4 drop-shadow-2xl">
-                        {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
-                    </span>
-                    <span className="relative text-white text-2xl font-black tracking-widest uppercase">
-                        {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
-                    </span>
-
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                        <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">
-                            {eventMode ? 'Submit for Leaderboard' : 'Tap to Start'}
-                        </p>
+                {/* Out of scans state */}
+                {scansRemaining === 0 && !isPro && purchasedScans === 0 ? (
+                    <div className="relative w-72 h-72 rounded-full flex flex-col items-center justify-center"
+                        style={{
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '3px dashed rgba(255,255,255,0.2)',
+                            cursor: 'not-allowed'
+                        }}
+                    >
+                        <span className="text-6xl mb-4 opacity-40">⏳</span>
+                        <span className="text-white/60 text-lg font-bold uppercase tracking-wide text-center px-8">
+                            Out of Scans
+                        </span>
+                        <span className="text-white/40 text-sm mt-2 text-center px-8">
+                            Try again tomorrow or upgrade
+                        </span>
+                        <button
+                            onClick={() => { playSound('click'); vibrate(15); onShowPaywall(); }}
+                            className="mt-4 px-6 py-2 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95"
+                            style={{
+                                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                                color: '#000'
+                            }}
+                        >
+                            Upgrade to Pro
+                        </button>
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                            <p className="text-[11px] font-medium text-white/40">
+                                ⏱️ Resets at midnight
+                            </p>
+                        </div>
                     </div>
-                </button>
+                ) : (
+                    <button
+                        onClick={handleStart}
+                        className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
+                        style={{
+                            background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
+                            border: `3px solid ${accent}99`,
+                            boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
+                        }}
+                    >
+                        {/* Inner pulse */}
+                        <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
+                            background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
+                            boxShadow: `0 0 60px ${accentGlow}`,
+                            animation: 'pulse 2s ease-in-out infinite'
+                        }} />
+
+                        {/* Icon & Text */}
+                        <span className="relative text-8xl mb-4 drop-shadow-2xl">
+                            {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
+                        </span>
+                        <span className="relative text-white text-2xl font-black tracking-widest uppercase">
+                            {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
+                        </span>
+
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                            <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">
+                                {eventMode ? 'Submit for Leaderboard' : 'Tap to Start'}
+                            </p>
+                        </div>
+                    </button>
+                )}
             </div>
 
             {/* Mode Selectors */}
