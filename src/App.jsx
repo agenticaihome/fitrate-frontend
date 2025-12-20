@@ -176,6 +176,7 @@ export default function App() {
   const [shareData, setShareData] = useState(null)
   const [emailInput, setEmailInput] = useState('')
   const [error, setError] = useState(null)
+  const [errorCode, setErrorCode] = useState(null) // Track API error codes for better UX
 
   // Weekly Event Mode state
   const [currentEvent, setCurrentEvent] = useState(null)
@@ -923,6 +924,9 @@ export default function App() {
       const data = await response.json()
 
       if (!response.ok || !data.success) {
+        // Extract error code for better UX in ErrorScreen
+        const code = data.code || (response.status === 429 ? 'LIMIT_REACHED' : 'SERVER_ERROR')
+        setErrorCode(code)
         throw new Error(data.error || 'Analysis failed')
       }
 
@@ -950,8 +954,10 @@ export default function App() {
       console.error('Analysis error:', err)
       if (err.name === 'AbortError') {
         setError("Request timed out — please try again!")
+        setErrorCode('PROVIDER_ERROR')
       } else {
-        setError("Something went wrong — try again!")
+        setError(err.message || "Something went wrong — try again!")
+        // errorCode may have been set above from API response
       }
       setScreen('error')
     }
@@ -1138,7 +1144,9 @@ export default function App() {
     return (
       <ErrorScreen
         error={error}
+        errorCode={errorCode}
         onReset={resetApp}
+        onUpgrade={() => setShowPaywall(true)}
       />
     )
   }
