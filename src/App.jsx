@@ -1923,9 +1923,9 @@ export default function App() {
 
   // ============================================
   // HOME SCREEN - Camera First, Zero Friction
-  // Only show if paywall is NOT open (paywall takes priority)
+  // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
-  if (screen === 'home' && !showPaywall) {
+  if (screen === 'home' && !showPaywall && !showLeaderboard) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
