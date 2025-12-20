@@ -378,8 +378,11 @@ export default function HomeScreen({
             {/* Title */}
             <h1 className="text-3xl font-black mb-1 tracking-tight" style={{
                 background: `linear-gradient(135deg, #fff 0%, ${accent} 100%)`,
+                backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                WebkitTextFillColor: 'transparent',
+                color: '#ffffff', // Fallback for browsers that don't support clip
+                display: 'inline-block' // Fixes some clipping rendering bugs
             }}>FITRATE</h1>
             <p className="text-sm mb-2 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 Your AI style coach
