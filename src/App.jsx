@@ -223,6 +223,15 @@ export default function App() {
   const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
+  // Weekly Event Mode state
+  const [currentEvent, setCurrentEvent] = useState(null)
+  const [upcomingEvent, setUpcomingEvent] = useState(null)
+  const [eventMode, setEventMode] = useState(true) // Default: opt-in to event
+  const [userEventStatus, setUserEventStatus] = useState(null)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [leaderboard, setLeaderboard] = useState([])
+  const [showEventRules, setShowEventRules] = useState(false)
+
   // User ID for referrals
   // SECURITY: Use crypto.randomUUID for cryptographically secure IDs
   const [userId] = useState(() => {
@@ -367,6 +376,74 @@ export default function App() {
       setDeclineCountdown(null)
     }
   }, [showDeclineOffer])
+
+  // Fetch current event on load
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/event`, { headers: getApiHeaders() })
+        const data = await res.json()
+        if (data.success && data.event) {
+          setCurrentEvent(data.event)
+        }
+        if (data.upcoming) {
+          setUpcomingEvent(data.upcoming)
+        }
+      } catch (e) {
+        console.error('Failed to fetch event:', e)
+      }
+    }
+    fetchEvent()
+  }, [])
+
+  // Fetch user's event status
+  const fetchUserEventStatus = async () => {
+    if (!userId || !currentEvent) return
+    try {
+      const res = await fetch(`${API_BASE}/event/status?userId=${userId}`, { headers: getApiHeaders() })
+      const data = await res.json()
+      if (data.success) {
+        setUserEventStatus(data)
+      }
+    } catch (e) {
+      console.error('Failed to fetch event status:', e)
+    }
+  }
+
+  // Fetch leaderboard
+  const fetchLeaderboard = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/event/leaderboard`, { headers: getApiHeaders() })
+      const data = await res.json()
+      if (data.success) {
+        setLeaderboard(data.leaderboard || [])
+        if (data.event) setCurrentEvent(prev => ({ ...prev, ...data.event }))
+      }
+    } catch (e) {
+      console.error('Failed to fetch leaderboard:', e)
+    }
+  }
+
+  // Fetch user event status when event loads
+  useEffect(() => {
+    if (currentEvent && userId) {
+      fetchUserEventStatus()
+    }
+  }, [currentEvent, userId])
+
+  // Helper: Format time remaining
+  const formatTimeRemaining = (endDate) => {
+    if (!endDate) return ''
+    const end = new Date(endDate)
+    const now = new Date()
+    const diff = end - now
+    if (diff <= 0) return 'Ended'
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    if (days > 0) return `${days}d ${hours}h`
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    return `${hours}h ${mins}m`
+  }
 
   // Check if user is Pro (via Email OR UserId)
   const checkProStatus = async (emailToCheck) => {
@@ -924,7 +1001,7 @@ export default function App() {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: getApiHeaders(),
-        body: JSON.stringify({ image: imageData, mode })
+        body: JSON.stringify({ image: imageData, mode, eventMode: eventMode && currentEvent ? true : false })
       })
       const data = await response.json()
 
@@ -946,6 +1023,12 @@ export default function App() {
 
       setScores({ ...data.scores, mode, roastMode: mode === 'roast' || mode === 'savage' })
       setAnalysisProgress(100)
+
+      // Refresh event status if user participated in event mode
+      if (eventMode && currentEvent) {
+        fetchUserEventStatus()
+      }
+
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
@@ -1910,7 +1993,43 @@ export default function App() {
           </div>
         )}
 
-        {/* STREAK PILL - Soft Loop Retention */}
+        {/* Weekly Event Banner */}
+        {currentEvent && (
+          <div className="mb-6 w-full max-w-sm animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+            <div
+              className="p-4 rounded-2xl cursor-pointer"
+              onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)'
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{currentEvent.themeEmoji}</span>
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Weekly Event</span>
+                </div>
+                <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">{currentEvent.theme}</h3>
+              <p className="text-xs text-gray-400 mb-3">{currentEvent.themeDescription}</p>
+
+              <div className="flex items-center justify-between">
+                {userEventStatus?.participating ? (
+                  <div className="text-emerald-400 text-xs font-medium">
+                    ✓ Rank #{userEventStatus.rank || '—'} • Best: {userEventStatus.bestScore?.toFixed(1) || '—'}
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-xs">Submit outfit to join!</div>
+                )}
+                <div className="text-cyan-400 text-xs font-medium">
+                  View Top 5 →
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {dailyStreak > 0 && (
           <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_20px_rgba(255,165,0,0.1)]">
@@ -3340,6 +3459,166 @@ export default function App() {
             ← Not now, go back
           </button>
         </div>
+      </div>
+    )
+  }
+
+  // ============================================
+  // LEADERBOARD MODAL
+  // ============================================
+  if (showLeaderboard) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
+        background: 'rgba(0,0,0,0.9)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <div className="w-full max-w-sm rounded-3xl p-6 relative" style={{
+          background: 'linear-gradient(180deg, #12121f 0%, #0a0a0f 100%)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+        }}>
+          {/* Close Button */}
+          <button
+            onClick={() => { setShowLeaderboard(false); vibrate(10); }}
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10"
+          >
+            <span className="text-white text-lg">✕</span>
+          </button>
+
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">🏆</span>
+            <div>
+              <h2 className="text-xl font-bold text-white">Leaderboard</h2>
+              <p className="text-xs text-gray-400">{currentEvent?.theme}</p>
+            </div>
+          </div>
+
+          {/* Leaderboard List */}
+          <div className="space-y-2 mb-4">
+            {leaderboard.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No entries yet — be the first!
+              </div>
+            ) : (
+              leaderboard.map((entry) => (
+                <div
+                  key={entry.rank}
+                  className="flex items-center p-3 rounded-xl"
+                  style={{
+                    background: entry.rank <= 3 ? 'linear-gradient(90deg, rgba(251,191,36,0.1) 0%, transparent 100%)' : 'rgba(255,255,255,0.03)',
+                    border: entry.rank === 1 ? '1px solid rgba(251,191,36,0.3)' : '1px solid transparent'
+                  }}
+                >
+                  <span className="w-8 text-xl">
+                    {entry.rank === 1 ? '👑' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}`}
+                  </span>
+                  <span className="flex-1 font-medium text-white">{entry.displayName}</span>
+                  <span className="font-bold text-lg text-white mr-2">{entry.score?.toFixed(1)}</span>
+                  {entry.isPro && (
+                    <span className="text-[10px] bg-amber-500 text-black px-2 py-0.5 rounded-full font-bold">PRO</span>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* User's Rank (if not in Top 5) */}
+          {userEventStatus?.participating && (!userEventStatus.inTop5 || userEventStatus.rank > 5) && isPro && (
+            <div className="bg-cyan-900/20 border border-cyan-500/30 p-3 rounded-xl mb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-cyan-400 text-sm">Your rank</span>
+                <span className="font-bold text-xl text-white">#{userEventStatus.rank}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Free User Upsell */}
+          {!isPro && userEventStatus?.participating && (
+            <div className="bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl mb-4 text-center">
+              <span className="text-amber-400 text-xs">
+                ⭐ Go Pro to see your exact rank
+              </span>
+            </div>
+          )}
+
+          {/* Participant Count */}
+          <p className="text-center text-gray-500 text-xs mb-4">
+            {currentEvent?.totalParticipants || 0} participants this week
+          </p>
+
+          {/* Coming Next Week Preview */}
+          {upcomingEvent && (
+            <div className="mb-4 p-3 rounded-xl" style={{
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(219, 39, 119, 0.1) 100%)',
+              border: '1px solid rgba(139, 92, 246, 0.2)'
+            }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm">{upcomingEvent.themeEmoji}</span>
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Coming Next Week</span>
+              </div>
+              <h4 className="text-sm font-bold text-white mb-1">{upcomingEvent.theme}</h4>
+              <p className="text-[10px] text-gray-400">{upcomingEvent.themeDescription}</p>
+              <p className="text-[10px] text-purple-400 mt-2">
+                🗓️ Starts in {upcomingEvent.startsIn} day{upcomingEvent.startsIn !== 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
+
+          {/* Rules Button */}
+          <button
+            onClick={() => { setShowEventRules(true); vibrate(10); }}
+            className="w-full py-3 text-sm text-gray-400 font-medium transition-all active:opacity-60"
+          >
+            📋 View Event Rules
+          </button>
+        </div>
+
+        {/* Event Rules Modal */}
+        {showEventRules && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4" style={{
+            background: 'rgba(0,0,0,0.95)'
+          }}>
+            <div className="w-full max-w-sm rounded-3xl p-6 bg-slate-900 border border-white/10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">📋 Event Rules</h3>
+                <button
+                  onClick={() => { setShowEventRules(false); vibrate(10); }}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10"
+                >
+                  <span className="text-white">✕</span>
+                </button>
+              </div>
+
+              <div className="space-y-4 text-sm">
+                <div>
+                  <h4 className="text-emerald-400 font-bold mb-1">✅ What Gets Judged</h4>
+                  <p className="text-gray-400">Clothing, styling, and theme alignment</p>
+                </div>
+                <div>
+                  <h4 className="text-red-400 font-bold mb-1">❌ What Is NEVER Judged</h4>
+                  <p className="text-gray-400">Body, weight, age, gender, identity</p>
+                </div>
+                <div>
+                  <h4 className="text-cyan-400 font-bold mb-1">📊 How It Works</h4>
+                  <ul className="text-gray-400 space-y-1">
+                    <li>• Submit outfits during the week</li>
+                    <li>• AI scores based on theme + style</li>
+                    <li>• Only your best score counts</li>
+                    <li>• Top 5 featured on leaderboard</li>
+                  </ul>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setShowEventRules(false); vibrate(10); }}
+                className="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-bold"
+              >
+                Got It ✓
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
