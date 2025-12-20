@@ -2224,6 +2224,16 @@ export default function App() {
           </button>
         )}
 
+        {/* Leaderboard Link - Always accessible */}
+        {currentEvent && (
+          <button
+            onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
+            className="mt-2 text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+          >
+            <span>🏆</span> See Leaderboard
+          </button>
+        )}
+
         {/* Trust Message */}
         <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
           <span>🔒</span> Photos analyzed instantly, never stored
