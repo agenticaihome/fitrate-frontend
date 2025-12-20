@@ -333,6 +333,16 @@ export default function App() {
     }
   }, [showDeclineOffer])
 
+  // Mock event for fallback/testing
+  const MOCK_EVENT = {
+    id: 'mock-holiday',
+    theme: 'Holiday Glam',
+    themeEmoji: '✨',
+    themeDescription: 'Sparkles, velvet, and festive vibes! Show us your best holiday party look.',
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    totalParticipants: 1240
+  }
+
   // Fetch current event on load
   useEffect(() => {
     const fetchEvent = async () => {
@@ -341,12 +351,16 @@ export default function App() {
         const data = await res.json()
         if (data.success && data.event) {
           setCurrentEvent(data.event)
+        } else {
+          console.log('Using mock event (no event from API)')
+          setCurrentEvent(MOCK_EVENT)
         }
         if (data.upcoming) {
           setUpcomingEvent(data.upcoming)
         }
       } catch (e) {
-        console.error('Failed to fetch event:', e)
+        console.error('Failed to fetch event, using mock:', e)
+        setCurrentEvent(MOCK_EVENT)
       }
     }
     fetchEvent()
