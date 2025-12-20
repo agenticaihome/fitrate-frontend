@@ -1993,43 +1993,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Weekly Event Banner */}
-        {currentEvent && (
-          <div className="mb-6 w-full max-w-sm animate-fade-in-up" style={{ animationDelay: '150ms' }}>
-            <div
-              className="p-4 rounded-2xl cursor-pointer"
-              onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
-              style={{
-                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
-                border: '1px solid rgba(16, 185, 129, 0.2)',
-                boxShadow: '0 0 20px rgba(16, 185, 129, 0.1)'
-              }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{currentEvent.themeEmoji}</span>
-                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Weekly Event</span>
-                </div>
-                <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
-              </div>
-              <h3 className="text-lg font-bold text-white mb-1">{currentEvent.theme}</h3>
-              <p className="text-xs text-gray-400 mb-3">{currentEvent.themeDescription}</p>
-
-              <div className="flex items-center justify-between">
-                {userEventStatus?.participating ? (
-                  <div className="text-emerald-400 text-xs font-medium">
-                    ✓ Rank #{userEventStatus.rank || '—'} • Best: {userEventStatus.bestScore?.toFixed(1) || '—'}
-                  </div>
-                ) : (
-                  <div className="text-gray-400 text-xs">Submit outfit to join!</div>
-                )}
-                <div className="text-cyan-400 text-xs font-medium">
-                  View Top 5 →
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Weekly Event Bar - moved below mode selector */}
         {dailyStreak > 0 && (
           <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_20px_rgba(255,165,0,0.1)]">
@@ -2170,6 +2134,28 @@ export default function App() {
             {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold">PRO</span>}
           </button>
         </div>
+
+        {/* Weekly Event Bar - Slim, one-line */}
+        {currentEvent && (
+          <button
+            onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
+            className="w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.25)'
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{currentEvent.themeEmoji}</span>
+              <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
+              <span className="text-[10px] text-emerald-400 font-bold uppercase">Event</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
+              <span className="text-cyan-400 text-sm">→</span>
+            </div>
+          </button>
+        )}
 
         {/* Trust Message */}
         <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
