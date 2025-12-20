@@ -485,7 +485,7 @@ export default function HomeScreen({
             }}>
                 {/* Nice */}
                 <button
-                    onClick={() => { playSound('click'); vibrate(15); setMode('nice'); }}
+                    onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
                     className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
                     style={{
                         background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
@@ -498,7 +498,7 @@ export default function HomeScreen({
 
                 {/* Roast */}
                 <button
-                    onClick={() => { playSound('click'); vibrate(15); setMode('roast'); }}
+                    onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
                     className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
                     style={{
                         background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
@@ -513,7 +513,7 @@ export default function HomeScreen({
                 <button
                     onClick={() => {
                         playSound('click'); vibrate(15);
-                        if (isPro) setMode('honest');
+                        if (isPro) { setMode('honest'); setEventMode(false); }
                         else onShowPaywall();
                     }}
                     className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
@@ -531,7 +531,7 @@ export default function HomeScreen({
                 <button
                     onClick={() => {
                         playSound('click'); vibrate(15);
-                        if (isPro) setMode('savage');
+                        if (isPro) { setMode('savage'); setEventMode(false); }
                         else onShowPaywall();
                     }}
                     className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}

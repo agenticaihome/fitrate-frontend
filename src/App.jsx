@@ -161,7 +161,22 @@ export default function App() {
 
 
   const [shareFormat, setShareFormat] = useState('story') // 'story' = 9:16, 'feed' = 1:1
+  const [showDeclineOffer, setShowDeclineOffer] = useState(false)
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
+
+  const [screen, setScreen] = useState('home')
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
+  const [emailChecking, setEmailChecking] = useState(false)
+  const [proEmail, setProEmail] = useState('')
+  const [referralCount, setReferralCount] = useState(0)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [scores, setScores] = useState(null)
+  const [uploadedImage, setUploadedImage] = useState(null)
+  const [mode, setMode] = useState('nice') // 'nice', 'roast', 'honest', 'savage'
+  const [timeUntilReset, setTimeUntilReset] = useState(null)
+  const [shareData, setShareData] = useState(null)
+  const [emailInput, setEmailInput] = useState('')
 
   // Weekly Event Mode state
   const [currentEvent, setCurrentEvent] = useState(null)
