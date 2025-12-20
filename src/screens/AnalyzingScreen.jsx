@@ -74,69 +74,59 @@ export default function AnalyzingScreen({
 
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-8 overflow-hidden relative" style={{
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative" style={{
             background: '#0a0a0f',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
         }}>
-            {/* Background Image Blur */}
-            {uploadedImage && (
-                <div className="absolute inset-0 opacity-20 blur-3xl scale-110 pointer-events-none">
-                    <img src={uploadedImage} alt="Background" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/60" />
-                </div>
-            )}
+            {/* Full Screen Scanning Container */}
+            <div className="relative w-full max-w-sm aspect-[3/4] mb-8 rounded-2xl overflow-hidden" style={{
+                border: `2px solid ${accent}40`,
+                boxShadow: `0 0 40px ${accentGlow}, inset 0 0 60px rgba(0,0,0,0.5)`
+            }}>
+                {/* Full Image */}
+                {uploadedImage && (
+                    <img
+                        src={uploadedImage}
+                        alt="Analyzing"
+                        className="w-full h-full object-cover"
+                    />
+                )}
 
-            {/* Scanning Animation Container */}
-            <div className="relative w-64 h-64 mb-12">
-                {/* Central Photo */}
-                <div className="absolute inset-4 rounded-full overflow-hidden border-4 z-10 shadow-[0_0_50px_rgba(0,0,0,0.5)]" style={{
-                    borderColor: `${accent}40`,
-                    boxShadow: `0 0 30px ${accentGlow}`
-                }}>
-                    <img src={uploadedImage} alt="Analyzing" className="w-full h-full object-cover opacity-80" />
-                    {/* Scanning overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent w-full h-1/4 animate-[scanLine_2s_linear_infinite]" style={{
-                        boxShadow: `0 0 20px ${accent}`
-                    }} />
-                </div>
+                {/* Scanning Line Animation */}
+                <div
+                    className="absolute left-0 right-0 h-1 pointer-events-none"
+                    style={{
+                        background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+                        boxShadow: `0 0 20px ${accent}, 0 0 40px ${accent}`,
+                        animation: 'scanLine 2.5s ease-in-out infinite'
+                    }}
+                />
 
-                {/* Outer Rotating Rings */}
-                <svg className="absolute inset-0 w-full h-full animate-spin-slow" viewBox="0 0 100 100">
-                    <circle
-                        cx="50" cy="50" r="48"
-                        fill="none"
-                        stroke={accent}
-                        strokeWidth="1"
-                        strokeDasharray="10 5"
-                        className="opacity-50"
-                    />
-                </svg>
-                <svg className="absolute inset-0 w-full h-full animate-reverse-spin" viewBox="0 0 100 100">
-                    <circle
-                        cx="50" cy="50" r="45"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="8"
-                    />
-                    {/* Progress ring */}
-                    <circle
-                        cx="50" cy="50" r="45"
-                        fill="none"
-                        stroke={accent}
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                        strokeDasharray={`${analysisProgress * 2.83} 283`}
-                        style={{
-                            filter: `drop-shadow(0 0 10px ${accent})`,
-                            transition: 'stroke-dasharray 0.1s ease-out'
-                        }}
-                    />
-                </svg>
-                {/* Percentage text */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-black" style={{ color: accent }}>
-                        {Math.round(analysisProgress)}%
-                    </span>
+                {/* Corner Brackets */}
+                <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2" style={{ borderColor: accent }} />
+                <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2" style={{ borderColor: accent }} />
+                <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2" style={{ borderColor: accent }} />
+                <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2" style={{ borderColor: accent }} />
+
+                {/* Progress Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                    {/* Progress Bar */}
+                    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mb-2">
+                        <div
+                            className="h-full rounded-full transition-all duration-200"
+                            style={{
+                                width: `${analysisProgress}%`,
+                                background: `linear-gradient(90deg, ${accent}, ${accent}cc)`,
+                                boxShadow: `0 0 10px ${accent}`
+                            }}
+                        />
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold" style={{ color: accent }}>
+                            {Math.round(analysisProgress)}%
+                        </span>
+                        <span className="text-xs text-white/50">ANALYZING</span>
+                    </div>
                 </div>
             </div>
 
@@ -189,3 +179,4 @@ export default function AnalyzingScreen({
         </div>
     )
 }
+
