@@ -1,14 +1,11 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { playSound, vibrate } from './utils/soundEffects'
-import ButtonTestPage from './ButtonTestPage'
-import ModalHeader from './components/common/ModalHeader'
 import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
 import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
-import { getScoreColor, getPercentile } from './utils/scoreUtils'
+import { getScoreColor } from './utils/scoreUtils'
 import { compressImage } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
-import { trackShare } from './utils/analytics'
 
 // Screens
 import ResultsScreen from './screens/ResultsScreen'
@@ -353,7 +350,6 @@ export default function App() {
         if (data.success && data.event) {
           setCurrentEvent(data.event)
         } else {
-          console.log('Using mock event (no event from API)')
           setCurrentEvent(MOCK_EVENT)
         }
         if (data.upcoming) {
