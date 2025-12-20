@@ -827,6 +827,10 @@ export default function App() {
     // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
       try {
+        // Add timeout to prevent infinite loading
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 30000)
+
         // Call real AI endpoint (backend routes free users to Gemini)
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -835,8 +839,10 @@ export default function App() {
             image: imageData,
             mode,
             userId
-          })
+          }),
+          signal: controller.signal
         })
+        clearTimeout(timeoutId)
 
         const data = await response.json()
 
@@ -891,7 +897,11 @@ export default function App() {
         return
       } catch (err) {
         console.error('Analysis error:', err)
-        setError("Something went wrong — try again!")
+        if (err.name === 'AbortError') {
+          setError("Request timed out — please try again!")
+        } else {
+          setError("Something went wrong — try again!")
+        }
         setScreen('error')
         return
       }
@@ -899,11 +909,17 @@ export default function App() {
 
     // Pro users: call real AI
     try {
+      // Add timeout to prevent infinite loading
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000)
+
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: getApiHeaders(),
-        body: JSON.stringify({ image: imageData, mode, eventMode: eventMode && currentEvent ? true : false })
+        body: JSON.stringify({ image: imageData, mode, userId, eventMode: eventMode && currentEvent ? true : false }),
+        signal: controller.signal
       })
+      clearTimeout(timeoutId)
       const data = await response.json()
 
       if (!response.ok || !data.success) {
@@ -932,10 +948,14 @@ export default function App() {
       setScreen('results')
     } catch (err) {
       console.error('Analysis error:', err)
-      setError("Something went wrong — try again!")
+      if (err.name === 'AbortError') {
+        setError("Request timed out — please try again!")
+      } else {
+        setError("Something went wrong — try again!")
+      }
       setScreen('error')
     }
-  }, [mode, isPro, generateMockScores])
+  }, [mode, isPro, eventMode, currentEvent, userId])
 
 
 
