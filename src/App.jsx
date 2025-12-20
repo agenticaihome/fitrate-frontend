@@ -2075,14 +2075,16 @@ export default function App() {
 
             {/* Icon */}
             <span className="relative text-8xl mb-4 drop-shadow-2xl">
-              {mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
+              {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
             </span>
             <span className="relative text-white text-2xl font-black tracking-widest uppercase">
-              {mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
+              {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
             </span>
 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">Tap to Start</p>
+              <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">
+                {eventMode ? 'Submit for Leaderboard' : 'Tap to Start'}
+              </p>
             </div>
           </button>
         </div>
@@ -2173,24 +2175,51 @@ export default function App() {
           </button>
         </div>
 
-        {/* Weekly Event Bar - Slim, one-line */}
+        {/* Weekly Event Bar - Acts as 5th mode toggle (Pro only) */}
         {currentEvent && (
           <button
-            onClick={() => { setShowLeaderboard(true); fetchLeaderboard(); vibrate(10); }}
-            className="w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98]"
+            onClick={() => {
+              vibrate(15)
+              playSound('click')
+              if (isPro) {
+                // Toggle event mode
+                setEventMode(!eventMode)
+              } else {
+                setShowPaywall(true)
+              }
+            }}
+            className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode && isPro ? 'ring-2 ring-emerald-400' : ''}`}
             style={{
-              background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
-              border: '1px solid rgba(16, 185, 129, 0.25)'
+              background: eventMode && isPro
+                ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.25) 100%)'
+                : isPro
+                  ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
+                  : 'linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)',
+              border: eventMode && isPro
+                ? '1px solid rgba(16, 185, 129, 0.5)'
+                : isPro
+                  ? '1px solid rgba(16, 185, 129, 0.25)'
+                  : '1px dashed rgba(251, 191, 36, 0.4)'
             }}
           >
             <div className="flex items-center gap-2">
               <span className="text-sm">{currentEvent.themeEmoji}</span>
               <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
-              <span className="text-[10px] text-emerald-400 font-bold uppercase">Event</span>
+              {isPro ? (
+                <span className={`text-[10px] font-bold uppercase ${eventMode ? 'text-emerald-300' : 'text-emerald-400'}`}>
+                  {eventMode ? '✓ ACTIVE' : 'Event'}
+                </span>
+              ) : (
+                <span className="text-[10px] text-amber-400 font-bold uppercase">PRO</span>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
-              <span className="text-cyan-400 text-sm">→</span>
+              {isPro ? (
+                <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '+'}</span>
+              ) : (
+                <span className="text-amber-400 text-sm">🔒</span>
+              )}
             </div>
           </button>
         )}
