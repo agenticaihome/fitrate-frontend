@@ -237,14 +237,14 @@ export default function App() {
       setTimeout(checkProStatus, 2000);
       setTimeout(checkProStatus, 5000);
 
-      // If after 8 seconds we still are not pro, then show the email prompt as fallback
+      // If after 15 seconds we still are not pro, then show the email prompt as fallback
       setTimeout(() => {
         if (localStorage.getItem('fitrate_pro') !== 'true') {
           setScreen('pro-email-prompt');
         } else {
           setScreen('pro-welcome');
         }
-      }, 8000);
+      }, 15000);
     }
 
     // Referral Claim
@@ -1141,7 +1141,6 @@ export default function App() {
         setEmailInput={setEmailInput}
         onSubmit={handleEmailSubmit}
         checking={emailChecking}
-        onSkip={() => setScreen('home')}
       />
     )
   }
