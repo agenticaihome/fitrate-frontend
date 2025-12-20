@@ -1,6 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { playSound, vibrate } from './utils/soundEffects'
 import ButtonTestPage from './ButtonTestPage'
+import ModalHeader from './components/common/ModalHeader'
+import RulesModal from './components/RulesModal'
+import Footer from './components/common/Footer'
+import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -126,6 +130,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [displayedScore, setDisplayedScore] = useState(0)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showRules, setShowRules] = useState(false)
   const [showDeclineOffer, setShowDeclineOffer] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [revealStage, setRevealStage] = useState(0)
@@ -207,9 +212,9 @@ export default function App() {
     const stored = localStorage.getItem('fitrate_scans')
     if (stored) {
       const { date, count } = JSON.parse(stored)
-      if (date === today) return Math.max(0, 2 - count)  // Changed to 2 free/day
+      if (date === today) return Math.max(0, LIMITS.FREE_SCANS_DAILY - count)
     }
-    return 2  // 2 free scans per day
+    return LIMITS.FREE_SCANS_DAILY
   })
 
   // Pro Roasts available (from referrals or $0.99 purchase)
@@ -521,16 +526,7 @@ export default function App() {
     }
   }
 
-  // Stripe Payment Links
-  const STRIPE_LINKS = {
-    proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',        // $2.99/week
-    proWeeklyDiscount: 'https://buy.stripe.com/8x214p2SI8AX8PtfztfYY03', // $1.99/week (decline offer)
-    proRoast: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',         // $0.99 one-time
-    // Scan Packs (one-time)
-    starterPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04',      // 5 scans - $1.99
-    popularPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05',      // 15 scans - $3.99
-    powerPack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06'         // 50 scans - $9.99
-  }
+
 
   // Open Stripe checkout
   const startCheckout = (product) => {
@@ -915,7 +911,7 @@ export default function App() {
       if (date === today) count = storedCount + 1
     }
     localStorage.setItem('fitrate_scans', JSON.stringify({ date: today, count }))
-    setScansRemaining(Math.max(0, 2 - count))  // Changed to 2 free/day
+    setScansRemaining(Math.max(0, LIMITS.FREE_SCANS_DAILY - count))
   }
 
   const analyzeOutfit = useCallback(async (imageData) => {
@@ -1922,10 +1918,17 @@ export default function App() {
   // returning from home screen if showPaywall is true - instead show paywall inline.
 
   // ============================================
+  // EVENT RULES MODAL
+  // ============================================
+  if (showEventRules) {
+    return <RulesModal event={currentEvent} onClose={() => setShowEventRules(false)} />
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
-  if (screen === 'home' && !showPaywall && !showLeaderboard) {
+  if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
         background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
@@ -2416,6 +2419,7 @@ export default function App() {
           {mode === 'roast' ? 'Brutally honest AI incoming...' : mode === 'honest' ? 'Analyzing objectively...' : 'AI analyzing your style...'}
         </p>
 
+        <Footer className="opacity-50" />
         <style>{`
           @keyframes scanLine { 
             0% { top: 0; } 
@@ -2918,6 +2922,7 @@ export default function App() {
           </button>
         </div>
 
+        <Footer className="opacity-50 pb-8" />
         <style>{`
           @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
@@ -3266,7 +3271,7 @@ export default function App() {
               <p className="text-gray-400 mb-2">
                 Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
                 <br />
-                <span className="text-xs">(then $2.99/week, cancel anytime)</span>
+                <span className="text-xs">(then ${PRICES.PRO_WEEKLY}/week, cancel anytime)</span>
               </p>
 
               {/* Countdown Timer */}
@@ -3314,24 +3319,15 @@ export default function App() {
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
           boxShadow: '0 0 60px rgba(0,212,255,0.1)'
         }}>
-          {/* Close X - directly closes paywall - STICKY */}
-          <button
-            onClick={() => {
+          <ModalHeader
+            title="Unlock Pro"
+            subtitle="Get the full breakdown"
+            icon="⚡"
+            onClose={() => {
               playSound('click')
               setShowPaywall(false)
             }}
-            className="sticky top-0 float-right text-gray-400 hover:text-white text-3xl p-2 bg-slate-900/80 rounded-full z-10"
-            style={{ marginRight: '-0.5rem', marginTop: '-0.5rem' }}
-            aria-label="Close paywall"
-          >
-            ×
-          </button>
-
-          {/* HEADER - Value Focused */}
-          <div className="text-center mb-6">
-            <h2 className="text-white text-2xl font-black mb-1">Unlock Your Full Style Profile</h2>
-            <p className="text-gray-400 text-sm">Get the scores & stats you're missing</p>
-          </div>
+          />
 
           {/* 👑 PRO SUBSCRIPTION - Best Value */}
           <div className="relative w-full mb-5">
@@ -3362,7 +3358,7 @@ export default function App() {
                   <div className="flex flex-col min-w-0">
                     <h3 className="text-black text-lg sm:text-2xl font-black leading-tight truncate">Pro Weekly</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xl sm:text-2xl font-black text-black">$2.99</span>
+                      <span className="text-xl sm:text-2xl font-black text-black">${PRICES.PRO_WEEKLY}</span>
                       <span className="text-black/60 text-sm font-bold">/wk</span>
                     </div>
                   </div>
@@ -3454,7 +3450,7 @@ export default function App() {
               <span className="block text-5xl font-black text-purple-400 mb-1">50</span>
               <span className="block text-xs text-purple-400/70 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
               <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
-              <span className="block text-lg font-black text-white">$9.99</span>
+              <span className="block text-lg font-black text-white">${PRICES.SCAN_PACK_50}</span>
             </button>
           </div>
 
@@ -3475,7 +3471,7 @@ export default function App() {
                 <h3 className="text-red-400 text-xl font-black mb-1">Curious? Savage Mode</h3>
                 <p className="text-red-300/60 text-sm font-bold mb-2">Try the brutal truth once</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400 line-through">$2.99</span>
+                  <span className="text-xs text-gray-400 line-through">${PRICES.PRO_WEEKLY}</span>
                   <span className="text-2xl font-black text-white">$0.99</span>
                 </div>
               </div>
@@ -3540,22 +3536,12 @@ export default function App() {
           border: '1px solid rgba(255,255,255,0.1)',
           boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
         }}>
-          {/* Close Button */}
-          <button
-            onClick={() => { setShowLeaderboard(false); vibrate(10); }}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10"
-          >
-            <span className="text-white text-lg">✕</span>
-          </button>
-
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🏆</span>
-            <div>
-              <h2 className="text-xl font-bold text-white">Leaderboard</h2>
-              <p className="text-xs text-gray-400">{currentEvent?.theme}</p>
-            </div>
-          </div>
+          <ModalHeader
+            title="Leaderboard"
+            subtitle={currentEvent?.theme}
+            icon="🏆"
+            onClose={() => { setShowLeaderboard(false); vibrate(10); }}
+          />
 
           {/* Leaderboard List */}
           <div className="space-y-2 mb-4">
@@ -3637,51 +3623,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* Event Rules Modal */}
-        {showEventRules && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4" style={{
-            background: 'rgba(0,0,0,0.95)'
-          }}>
-            <div className="w-full max-w-sm rounded-3xl p-6 bg-slate-900 border border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">📋 Event Rules</h3>
-                <button
-                  onClick={() => { setShowEventRules(false); vibrate(10); }}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10"
-                >
-                  <span className="text-white">✕</span>
-                </button>
-              </div>
 
-              <div className="space-y-4 text-sm">
-                <div>
-                  <h4 className="text-emerald-400 font-bold mb-1">✅ What Gets Judged</h4>
-                  <p className="text-gray-400">Clothing, styling, and theme alignment</p>
-                </div>
-                <div>
-                  <h4 className="text-red-400 font-bold mb-1">❌ What Is NEVER Judged</h4>
-                  <p className="text-gray-400">Body, weight, age, gender, identity</p>
-                </div>
-                <div>
-                  <h4 className="text-cyan-400 font-bold mb-1">📊 How It Works</h4>
-                  <ul className="text-gray-400 space-y-1">
-                    <li>• Submit outfits during the week</li>
-                    <li>• AI scores based on theme + style</li>
-                    <li>• Only your best score counts</li>
-                    <li>• Top 5 featured on leaderboard</li>
-                  </ul>
-                </div>
-              </div>
-
-              <button
-                onClick={() => { setShowEventRules(false); vibrate(10); }}
-                className="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-bold"
-              >
-                Got It ✓
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     )
   }
