@@ -522,24 +522,24 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Mode Selectors */}
-            <div className="mt-6 mb-10 grid grid-cols-2 gap-2 p-2 rounded-2xl" style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)'
+            {/* Mode Selectors - Glassmorphism Style */}
+            <div className="mt-6 mb-10 grid grid-cols-2 gap-2 p-3 rounded-3xl glass-card" style={{
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
             }}>
                 {/* Nice */}
                 <button
                     onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
                     aria-label="Nice mode - get encouraging feedback"
                     aria-pressed={mode === 'nice'}
-                    className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
+                    className={`flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl transition-all duration-200 active:scale-[0.97] ${mode === 'nice' ? '' : 'opacity-60 hover:opacity-80'}`}
                     style={{
-                        background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
-                        border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
+                        background: mode === 'nice' ? 'linear-gradient(135deg, rgba(0,212,255,0.25) 0%, rgba(0,255,136,0.15) 100%)' : 'rgba(255,255,255,0.03)',
+                        border: mode === 'nice' ? '1px solid rgba(0,212,255,0.5)' : '1px solid rgba(255,255,255,0.05)',
+                        boxShadow: mode === 'nice' ? '0 4px 20px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.1)' : 'none'
                     }}
                 >
-                    <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😇</span>
-                    <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
+                    <span className={`text-lg transition-all ${mode === 'nice' ? 'opacity-100 scale-110' : 'opacity-50'}`} aria-hidden="true">😇</span>
+                    <span className={`text-sm font-bold transition-opacity ${mode === 'nice' ? 'text-white' : 'text-gray-400'}`}>Nice</span>
                 </button>
 
                 {/* Roast */}
@@ -547,14 +547,15 @@ export default function HomeScreen({
                     onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
                     aria-label="Roast mode - get humorous critiques"
                     aria-pressed={mode === 'roast'}
-                    className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
+                    className={`flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl transition-all duration-200 active:scale-[0.97] ${mode === 'roast' ? '' : 'opacity-60 hover:opacity-80'}`}
                     style={{
-                        background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
-                        border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
+                        background: mode === 'roast' ? 'linear-gradient(135deg, rgba(255,68,68,0.25) 0%, rgba(255,136,0,0.15) 100%)' : 'rgba(255,255,255,0.03)',
+                        border: mode === 'roast' ? '1px solid rgba(255,68,68,0.5)' : '1px solid rgba(255,255,255,0.05)',
+                        boxShadow: mode === 'roast' ? '0 4px 20px rgba(255,68,68,0.2), inset 0 1px 0 rgba(255,255,255,0.1)' : 'none'
                     }}
                 >
-                    <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😈</span>
-                    <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
+                    <span className={`text-lg transition-all ${mode === 'roast' ? 'opacity-100 scale-110' : 'opacity-50'}`} aria-hidden="true">😈</span>
+                    <span className={`text-sm font-bold transition-opacity ${mode === 'roast' ? 'text-white' : 'text-gray-400'}`}>Roast</span>
                 </button>
 
                 {/* PRO: Honest */}
@@ -566,15 +567,16 @@ export default function HomeScreen({
                     }}
                     aria-label={isPro ? "Honest mode - get balanced analysis" : "Honest mode - Pro feature, tap to upgrade"}
                     aria-pressed={mode === 'honest' && isPro}
-                    className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                    className={`relative flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl transition-all duration-200 active:scale-[0.97] ${isPro ? (mode === 'honest' ? '' : 'opacity-60 hover:opacity-80') : 'opacity-50'}`}
                     style={{
-                        background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
-                        border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
+                        background: mode === 'honest' && isPro ? 'linear-gradient(135deg, rgba(74,144,217,0.25) 0%, rgba(0,212,255,0.15) 100%)' : 'rgba(74,144,217,0.08)',
+                        border: mode === 'honest' && isPro ? '1px solid rgba(74,144,217,0.5)' : '1px dashed rgba(74,144,217,0.3)',
+                        boxShadow: mode === 'honest' && isPro ? '0 4px 20px rgba(74,144,217,0.2), inset 0 1px 0 rgba(255,255,255,0.1)' : 'none'
                     }}
                 >
-                    <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">📊</span>
-                    <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
+                    <span className={`text-lg transition-all ${mode === 'honest' && isPro ? 'opacity-100 scale-110' : 'opacity-50'}`} aria-hidden="true">📊</span>
+                    <span className={`text-sm font-bold ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
+                    {!isPro && <span className="text-[8px] ml-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 font-black" aria-hidden="true">PRO</span>}
                 </button>
 
                 {/* PRO: Savage */}
@@ -586,15 +588,16 @@ export default function HomeScreen({
                     }}
                     aria-label={isPro ? "Savage mode - get brutally honest feedback" : "Savage mode - Pro feature, tap to upgrade"}
                     aria-pressed={mode === 'savage' && isPro}
-                    className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                    className={`relative flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl transition-all duration-200 active:scale-[0.97] ${isPro ? (mode === 'savage' ? '' : 'opacity-60 hover:opacity-80') : 'opacity-50'}`}
                     style={{
-                        background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
-                        border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
+                        background: mode === 'savage' && isPro ? 'linear-gradient(135deg, rgba(139,0,255,0.25) 0%, rgba(255,0,68,0.15) 100%)' : 'rgba(139,0,255,0.08)',
+                        border: mode === 'savage' && isPro ? '1px solid rgba(139,0,255,0.5)' : '1px dashed rgba(139,0,255,0.3)',
+                        boxShadow: mode === 'savage' && isPro ? '0 4px 20px rgba(139,0,255,0.2), inset 0 1px 0 rgba(255,255,255,0.1)' : 'none'
                     }}
                 >
-                    <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">💀</span>
-                    <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
+                    <span className={`text-lg transition-all ${mode === 'savage' && isPro ? 'opacity-100 scale-110' : 'opacity-50'}`} aria-hidden="true">💀</span>
+                    <span className={`text-sm font-bold ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
+                    {!isPro && <span className="text-[8px] ml-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 font-black" aria-hidden="true">PRO</span>}
                 </button>
             </div>
 
@@ -686,7 +689,7 @@ export default function HomeScreen({
                         : `${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left`}
                 </p>
 
-                {/* GO PRO BUTTON */}
+                {/* GO PRO BUTTON - Premium Design */}
                 {!isPro && (
                     <button
                         type="button"
@@ -695,13 +698,18 @@ export default function HomeScreen({
                             playSound('click'); vibrate(20);
                             onShowPaywall();
                         }}
+                        className="btn-physical btn-shine relative overflow-hidden"
                         style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                            padding: '14px 28px', backgroundColor: '#ffd700', color: '#000',
-                            fontSize: '16px', fontWeight: 'bold', borderRadius: '50px', border: 'none',
-                            cursor: 'pointer', minHeight: '52px', minWidth: '160px',
-                            boxShadow: '0 4px 20px rgba(255,215,0,0.4)',
-                            zIndex: 100
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                            padding: '16px 32px',
+                            background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                            color: '#000',
+                            fontSize: '16px', fontWeight: '800', borderRadius: '50px', border: 'none',
+                            cursor: 'pointer', minHeight: '56px', minWidth: '180px',
+                            boxShadow: '0 6px 0 rgba(180,130,0,0.5), 0 8px 30px rgba(255,215,0,0.4)',
+                            zIndex: 100,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em'
                         }}
                     >
                         👑 Go Pro
