@@ -182,7 +182,7 @@ export default function App() {
   // Weekly Event Mode state
   const [currentEvent, setCurrentEvent] = useState(null)
   const [upcomingEvent, setUpcomingEvent] = useState(null)
-  const [eventMode, setEventMode] = useState(true) // Default: opt-in to event
+  const [eventMode, setEventMode] = useState(false) // Default: opt-out of event, show normal mode
   const [userEventStatus, setUserEventStatus] = useState(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [leaderboard, setLeaderboard] = useState([])
