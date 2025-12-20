@@ -178,6 +178,7 @@ export default function App() {
   const [timeUntilReset, setTimeUntilReset] = useState(null)
   const [shareData, setShareData] = useState(null)
   const [emailInput, setEmailInput] = useState('')
+  const [error, setError] = useState(null)
 
   // Weekly Event Mode state
   const [currentEvent, setCurrentEvent] = useState(null)
@@ -890,7 +891,6 @@ export default function App() {
         setLastScore(data.scores.overall)
 
         setScores(scores)
-        setAnalysisProgress(100)
         setScreen('results')
         return
       } catch (err) {
@@ -927,7 +927,6 @@ export default function App() {
       setDailyStreak(newStreak)
 
       setScores({ ...data.scores, mode, roastMode: mode === 'roast' || mode === 'savage' })
-      setAnalysisProgress(100)
 
       // Refresh event status if user participated in event mode
       if (eventMode && currentEvent) {
