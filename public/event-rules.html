@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title>Event Rules | FitRate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back:hover {
+            color: #00d4ff;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .updated {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            color: #10b981;
+        }
+
+        p,
+        li {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        .highlight-green {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-red {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-green p,
+        .highlight-red p {
+            margin: 0;
+        }
+
+        .highlight-green p {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .highlight-red p {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .emoji-list li {
+            list-style: none;
+            margin-left: -1.5rem;
+            padding-left: 0;
+        }
+
+        a {
+            color: #00d4ff;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            margin: 0 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="back">← Back to FitRate</a>
+
+        <h1>🏆 Weekly Event Rules</h1>
+        <p class="updated">FitRate Weekly Outfit Competition</p>
+
+        <div class="highlight-green">
+            <p>✅ Events are for entertainment only — no monetary prizes, just bragging rights!</p>
+        </div>
+
+        <h2>What Gets Judged</h2>
+        <ul class="emoji-list">
+            <li>✅ Clothing choices and styling</li>
+            <li>✅ How well your outfit matches the weekly theme</li>
+            <li>✅ Color coordination and outfit cohesion</li>
+            <li>✅ Fashion creativity and expression</li>
+        </ul>
+
+        <div class="highlight-red">
+            <p>❌ We NEVER judge: Body, weight, age, gender, race, or identity</p>
+        </div>
+
+        <h2>What Is NEVER Judged</h2>
+        <ul class="emoji-list">
+            <li>❌ Your body shape or size</li>
+            <li>❌ Your weight or fitness</li>
+            <li>❌ Your age or appearance</li>
+            <li>❌ Your gender or identity</li>
+            <li>❌ Your race or ethnicity</li>
+        </ul>
+        <p>Our AI is programmed to focus <strong>exclusively on clothing</strong>. If our AI ever makes inappropriate
+            comments, please report it and we will address it immediately.</p>
+
+        <h2>How It Works</h2>
+        <ul>
+            <li><strong>Weekly Themes</strong> — Each week has a new theme (e.g., "Holiday Glam", "Streetwear")</li>
+            <li><strong>Submit Outfits</strong> — Upload outfit photos throughout the week</li>
+            <li><strong>AI Scoring</strong> — Our AI rates your outfit based on theme alignment + styling</li>
+            <li><strong>Best Score Counts</strong> — Only your highest score per week is tracked</li>
+            <li><strong>Top 5 Leaderboard</strong> — The highest scores are featured on the leaderboard</li>
+            <li><strong>Weekly Reset</strong> — Leaderboards reset every Monday at 00:00 UTC</li>
+        </ul>
+
+        <h2>Participation Rules</h2>
+        <ul>
+            <li><strong>Pro users</strong> can compete in weekly events</li>
+            <li><strong>One account per person</strong> — Multiple accounts are not allowed</li>
+            <li><strong>Original photos only</strong> — No stock photos or images you don't own</li>
+            <li><strong>Outfit photos only</strong> — No selfies, objects, or non-outfit images</li>
+            <li><strong>Appropriate content</strong> — No explicit, offensive, or harmful content</li>
+        </ul>
+
+        <h2>Leaderboard & Privacy</h2>
+        <ul>
+            <li><strong>Anonymous by default</strong> — Your rank shows a fun alias (e.g., "Fashionista #1")</li>
+            <li><strong>No personal info shared</strong> — Your email, name, and identity are private</li>
+            <li><strong>Top 5 visibility</strong> — Only Top 5 placements are shown publicly</li>
+        </ul>
+
+        <h2>Disqualification</h2>
+        <p>FitRate may disqualify entries that:</p>
+        <ul>
+            <li>Violate our Terms of Service</li>
+            <li>Contain inappropriate or offensive content</li>
+            <li>Are not original outfit photos</li>
+            <li>Attempt to game or manipulate the system</li>
+        </ul>
+
+        <h2>Changes & Cancellation</h2>
+        <p>FitRate reserves the right to:</p>
+        <ul>
+            <li>Modify event themes, timing, or rules</li>
+            <li>Cancel events at any time</li>
+            <li>Update scoring criteria to improve fairness</li>
+        </ul>
+
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> FitRate weekly events are for entertainment purposes only. AI-generated scores
+            are subjective and should not be taken as professional fashion advice. No monetary prizes are awarded. By
+            participating, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy
+                Policy</a>.
+        </div>
+
+        <div class="footer">
+            <a href="/">Home</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/about">About</a>
+        </div>
+    </div>
+</body>
+
+</html>
