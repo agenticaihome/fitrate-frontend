@@ -63,8 +63,28 @@ const Confetti = ({ count, colors }) => {
     )
 }
 
-// Stat Pill Component
-const StatPill = ({ label, value, icon, delay }) => (
+// Rating Bar Component - Animated fill bars
+const RatingBar = ({ value, color, delay }) => {
+    const percentage = Math.min(100, Math.max(0, value))
+    return (
+        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mt-2">
+            <div
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{
+                    width: `${percentage}%`,
+                    background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
+                    boxShadow: `0 0 8px ${color}66`,
+                    animation: `barFill 1s ease-out ${delay}s forwards`,
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'left'
+                }}
+            />
+        </div>
+    )
+}
+
+// Stat Pill Component with Rating Bar
+const StatPill = ({ label, value, icon, delay, color }) => (
     <div
         className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm"
         style={{
@@ -73,8 +93,9 @@ const StatPill = ({ label, value, icon, delay }) => (
         }}
     >
         <div className="text-lg mb-1">{icon}</div>
-        <div className="text-2xl font-black" style={{ color: getScoreColor(value) }}>{value}</div>
+        <div className="text-2xl font-black" style={{ color: color || getScoreColor(value) }}>{value}</div>
         <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-1">{label}</div>
+        <RatingBar value={value} color={color || getScoreColor(value)} delay={delay + 0.3} />
     </div>
 )
 
@@ -373,9 +394,9 @@ export default function ResultsScreen({
 
                     {/* Stats - Takes 2 columns */}
                     <div className="col-span-2 flex flex-col gap-2">
-                        <StatPill label="Color" value={scores.color} icon="🎨" delay={0.1} />
-                        <StatPill label="Fit" value={scores.fit} icon="📐" delay={0.2} />
-                        <StatPill label="Style" value={scores.style} icon="✨" delay={0.3} />
+                        <StatPill label="Color" value={scores.color} icon="🎨" delay={0.1} color="#ff6b9d" />
+                        <StatPill label="Fit" value={scores.fit} icon="📐" delay={0.2} color="#00d4ff" />
+                        <StatPill label="Style" value={scores.style} icon="✨" delay={0.3} color="#ffd700" />
                     </div>
                 </div>
             </div>
