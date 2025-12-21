@@ -943,7 +943,9 @@ export default function App() {
           percentile: data.scores.percentile ?? getPercentile(overall),
           isLegendary: overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
           shareTip: getRandomShareTip(),
-          previousScore: lastScore // For "you improved!" messaging
+          previousScore: lastScore, // For "you improved!" messaging
+          // Include eventInfo if present in the response (for weekly challenge tracking)
+          eventInfo: data.eventInfo
         }
 
         // Save this score as the new lastScore
@@ -1016,7 +1018,9 @@ export default function App() {
         style: data.scores.style ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
         percentile: data.scores.percentile ?? getPercentile(overall),
         isLegendary: overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
-        shareTip: getRandomShareTip()
+        shareTip: getRandomShareTip(),
+        // Include eventInfo if present in the response (for weekly challenge tracking)
+        eventInfo: data.eventInfo
       })
 
       // Refresh event status if user participated in event mode
