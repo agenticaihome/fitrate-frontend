@@ -1,7 +1,103 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Footer from '../components/common/Footer'
 import { getScoreColor, getPercentile } from '../utils/scoreUtils'
-import { downloadImage } from '../utils/imageUtils'
+
+// Tier Badge Component - Big and Bold
+const TierBadge = ({ tier, score }) => {
+    const tierConfig = {
+        legendary: { label: '👑 LEGENDARY', bg: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', text: '#000', glow: '#ffd700' },
+        fire: { label: '🔥 FIRE', bg: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)', text: '#fff', glow: '#ff6b35' },
+        great: { label: '✨ GREAT', bg: 'linear-gradient(135deg, #00d4ff 0%, #0066ff 100%)', text: '#fff', glow: '#00d4ff' },
+        good: { label: '👍 GOOD', bg: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)', text: '#000', glow: '#00ff88' },
+        mid: { label: '😐 MID', bg: 'linear-gradient(135deg, #ffaa00 0%, #ff6b00 100%)', text: '#000', glow: '#ffaa00' },
+        low: { label: '💀 ROUGH', bg: 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)', text: '#fff', glow: '#ff4444' }
+    }
+    const config = tierConfig[tier] || tierConfig.mid
+
+    return (
+        <div
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-base tracking-wide shadow-2xl"
+            style={{
+                background: config.bg,
+                color: config.text,
+                boxShadow: `0 8px 32px ${config.glow}66, 0 4px 16px rgba(0,0,0,0.3)`
+            }}
+        >
+            {config.label}
+        </div>
+    )
+}
+
+// Enhanced Confetti
+const Confetti = ({ count, colors }) => {
+    const pieces = useMemo(() =>
+        Array.from({ length: count }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            delay: Math.random() * 2,
+            duration: 2.5 + Math.random() * 2,
+            size: 8 + Math.random() * 10,
+            color: colors[i % colors.length],
+            rotation: Math.random() * 360,
+        })), [count, colors]
+    )
+
+    return (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+            {pieces.map(p => (
+                <div
+                    key={p.id}
+                    className="confetti-piece"
+                    style={{
+                        left: `${p.left}%`,
+                        width: p.size,
+                        height: p.size,
+                        background: p.color,
+                        borderRadius: p.id % 2 === 0 ? '50%' : '2px',
+                        animationDelay: `${p.delay}s`,
+                        animationDuration: `${p.duration}s`,
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
+// Rating Bar Component - Animated fill bars
+const RatingBar = ({ value, color, delay }) => {
+    const percentage = Math.min(100, Math.max(0, value))
+    return (
+        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mt-2">
+            <div
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{
+                    width: `${percentage}%`,
+                    background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
+                    boxShadow: `0 0 8px ${color}66`,
+                    animation: `barFill 1s ease-out ${delay}s forwards`,
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'left'
+                }}
+            />
+        </div>
+    )
+}
+
+// Stat Pill Component with Rating Bar
+const StatPill = ({ label, value, icon, delay, color }) => (
+    <div
+        className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm"
+        style={{
+            animation: `cardSlideUp 0.5s ease-out ${delay}s forwards`,
+            opacity: 0
+        }}
+    >
+        <div className="text-lg mb-1">{icon}</div>
+        <div className="text-2xl font-black" style={{ color: color || getScoreColor(value) }}>{value}</div>
+        <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-1">{label}</div>
+        <RatingBar value={value} color={color || getScoreColor(value)} delay={delay + 0.3} />
+    </div>
+)
 
 export default function ResultsScreen({
     scores,
@@ -13,395 +109,429 @@ export default function ResultsScreen({
     onSetMode,
     onGenerateShareCard,
     onShowPaywall,
-    onBack, // If applicable
+    onBack,
     playSound,
     vibrate
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
 
-    // Merged Animation Logic
+    // Animation sequence
     useEffect(() => {
         if (!scores) return
 
         setRevealStage(0)
         setDisplayedScore(0)
 
-        // Sound & Haptics for Verdict (Immediate)
         const sound = scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
-        // Slight delay for sound to match verdict reveal
-        const initialTimer = setTimeout(() => {
-            playSound(sound)
-            vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
-            setRevealStage(1) // Verdict Reveal
-        }, 100)
 
-        // Score Counting Animation
+        const timers = [
+            setTimeout(() => {
+                playSound(sound)
+                vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
+                setRevealStage(1)
+            }, 100),
+            setTimeout(() => {
+                setRevealStage(2)
+                playSound('pop')
+                vibrate(10)
+            }, 400),
+            setTimeout(() => {
+                setRevealStage(3)
+                playSound('pop')
+            }, 800),
+            setTimeout(() => setRevealStage(4), 1100),
+            setTimeout(() => setRevealStage(5), 1400),
+            setTimeout(() => setRevealStage(6), 1700),
+        ]
+
+        // Score counting animation
         const duration = 1200
-        const start = Date.now() + 600 // Start after 600ms delay
+        const startTime = Date.now() + 400
         const endScore = scores.overall
-
         let animationFrameId
 
         const animateScore = () => {
-            const now = Date.now()
-            const elapsed = now - start
+            const elapsed = Date.now() - startTime
             if (elapsed < 0) {
                 animationFrameId = requestAnimationFrame(animateScore)
                 return
             }
-
             const progress = Math.min(elapsed / duration, 1)
-            // EaseOutExpo
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-            const currentScore = Math.floor(easeProgress * endScore)
-
-            setDisplayedScore(currentScore)
-
-            if (progress < 1) {
-                animationFrameId = requestAnimationFrame(animateScore)
-            }
+            setDisplayedScore(Math.floor(easeProgress * endScore))
+            if (progress < 1) animationFrameId = requestAnimationFrame(animateScore)
         }
 
-        const timers = [
-            initialTimer,
-            setTimeout(() => {
-                setRevealStage(2) // Photo & Score Start
-                requestAnimationFrame(animateScore)
-                playSound('pop')
-                vibrate(10)
-            }, 600),
-            setTimeout(() => {
-                setRevealStage(3) // Details
-                playSound('pop')
-            }, 1000),
-            setTimeout(() => setRevealStage(4), 1300), // Tip
-            setTimeout(() => setRevealStage(5), 1600), // Breakdown
-            setTimeout(() => setRevealStage(6), 2000), // Share Button
-        ]
-
-        if (navigator.vibrate) {
-            setTimeout(() => navigator.vibrate(50), 600)
-        }
+        const scoreTimer = setTimeout(() => requestAnimationFrame(animateScore), 400)
 
         return () => {
             timers.forEach(t => clearTimeout(t))
+            clearTimeout(scoreTimer)
             cancelAnimationFrame(animationFrameId)
         }
-    }, [scores, playSound, vibrate]) // Re-run if scores change
+    }, [scores, playSound, vibrate])
 
-    // Helpers for Mode Styles
-    const modeAccent = (() => {
-        switch (scores.mode) {
-            case 'savage': return '#8b00ff'
-            case 'roast': return '#ff4444'
-            case 'honest': return '#0077ff'
-            default: return '#00d4ff'
-        }
-    })()
+    // Score tier
+    const scoreTier = useMemo(() => {
+        if (!scores) return 'mid'
+        if (scores.overall >= 95 || scores.isLegendary) return 'legendary'
+        if (scores.overall >= 85) return 'fire'
+        if (scores.overall >= 75) return 'great'
+        if (scores.overall >= 60) return 'good'
+        if (scores.overall >= 40) return 'mid'
+        return 'low'
+    }, [scores?.overall, scores?.isLegendary])
 
-    const modeGlow = (() => {
-        switch (scores.mode) {
-            case 'savage': return 'rgba(139,0,255,0.4)'
-            case 'roast': return 'rgba(255,68,68,0.4)'
-            case 'honest': return 'rgba(0,119,255,0.4)'
-            default: return 'rgba(0,212,255,0.4)'
+    // Theme colors based on mode
+    const theme = useMemo(() => {
+        const themes = {
+            savage: { accent: '#8b00ff', end: '#ff0044', glow: 'rgba(139,0,255,0.5)' },
+            roast: { accent: '#ff4444', end: '#ff8800', glow: 'rgba(255,68,68,0.5)' },
+            honest: { accent: '#0077ff', end: '#00d4ff', glow: 'rgba(0,119,255,0.5)' },
+            nice: { accent: '#00d4ff', end: '#00ff88', glow: 'rgba(0,212,255,0.5)' }
         }
-    })()
+        return themes[scores?.mode] || themes.nice
+    }, [scores?.mode])
 
-    const modeGradientEnd = (() => {
-        switch (scores.mode) {
-            case 'savage': return '#ff0044'
-            case 'roast': return '#ff8800'
-            case 'honest': return '#00d4ff'
-            default: return '#00ff88'
+    // Background gradient based on tier
+    const bgGradient = useMemo(() => {
+        const gradients = {
+            legendary: 'radial-gradient(ellipse at top, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.08) 40%, #0a0a0f 70%)',
+            fire: 'radial-gradient(ellipse at top, rgba(255,107,53,0.12) 0%, rgba(255,0,128,0.06) 40%, #0a0a0f 70%)',
+            great: 'radial-gradient(ellipse at top, rgba(0,212,255,0.12) 0%, rgba(0,102,255,0.06) 40%, #0a0a0f 70%)',
+            good: 'radial-gradient(ellipse at top, rgba(0,255,136,0.1) 0%, rgba(0,212,255,0.05) 40%, #0a0a0f 70%)',
+            mid: 'radial-gradient(ellipse at top, rgba(255,170,0,0.1) 0%, rgba(255,107,0,0.05) 40%, #0a0a0f 70%)',
+            low: 'radial-gradient(ellipse at top, rgba(255,68,68,0.12) 0%, rgba(204,0,0,0.06) 40%, #0a0a0f 70%)'
         }
-    })()
+        return gradients[scoreTier]
+    }, [scoreTier])
+
+    // Social proof message
+    const socialProof = useMemo(() => {
+        if (!scores) return { msg: '', color: '#fff' }
+        if (scores.roastMode) {
+            if (scores.mode === 'savage') {
+                if (scores.overall >= 40) return { msg: '💀 YOU SURVIVED (Barely)', color: '#ffaa00' }
+                if (scores.overall >= 20) return { msg: '🩸 AI drew blood', color: '#ff6b6b' }
+                return { msg: '☠️ ABSOLUTE ANNIHILATION', color: '#ff4444' }
+            }
+            if (scores.overall >= 60) return { msg: '😏 You survived the roast', color: '#00d4ff' }
+            if (scores.overall >= 45) return { msg: '💀 Rough day for your closet', color: '#ffaa00' }
+            return { msg: '☠️ AI showed no mercy', color: '#ff6b6b' }
+        } else if (scores.mode === 'honest') {
+            if (scores.overall >= 95) return { msg: '💎 STYLE GOD — Pure Perfection', color: '#ffd700' }
+            if (scores.overall >= 85) return { msg: '🔥 Post this immediately', color: '#ff6b35' }
+            if (scores.overall >= 70) return { msg: '👍 Solid fit, respectable', color: '#00d4ff' }
+            if (scores.overall >= 55) return { msg: '📊 Average range', color: '#ffaa00' }
+            return { msg: '📉 Needs some work', color: '#ff6b6b' }
+        } else {
+            if (scores.overall >= 95) return { msg: '👑 ICONIC — Internet-breaking fit', color: '#ffd700' }
+            if (scores.overall >= 85) return { msg: '🔥 LEGENDARY — Post this NOW', color: '#ff6b35' }
+            if (scores.overall >= 75) return { msg: '✨ Main character energy', color: '#00d4ff' }
+            if (scores.overall >= 65) return { msg: '💅 Serve! TikTok would approve', color: '#00ff88' }
+            if (scores.overall >= 50) return { msg: '👀 Cute! Minor tweaks = viral', color: '#ffaa00' }
+            return { msg: '💪 Good foundation, keep styling!', color: '#ff6b6b' }
+        }
+    }, [scores])
+
+    if (!scores) return null
+
+    const isLegendary = scoreTier === 'legendary'
+    const isLow = scoreTier === 'low'
 
     return (
-        <div className="min-h-screen flex flex-col items-center p-4 overflow-x-hidden relative" style={{
-            background: '#0a0a0f',
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-            paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-            paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
-        }}>
-            {/* DOPAMINE GLOW */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+            className="min-h-screen flex flex-col items-center overflow-x-hidden relative"
+            style={{
+                background: bgGradient,
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                paddingTop: 'max(1rem, env(safe-area-inset-top))',
+                paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+            }}
+        >
+            {/* ===== HERO SECTION: GIANT SCORE ===== */}
+            <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+
+                {/* MASSIVE Score Ring */}
+                <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
+                    {/* Outer glow */}
+                    <div
+                        className="absolute inset-[-30px] rounded-full"
+                        style={{
+                            background: `radial-gradient(circle, ${theme.accent}50 0%, transparent 70%)`,
+                            filter: 'blur(30px)',
+                            animation: revealStage >= 2 ? 'scoreGlowPulse 2.5s ease-in-out infinite' : 'none'
+                        }}
+                    />
+
+                    <div className="relative w-48 h-48 md:w-56 md:h-56">
+                        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            {/* Background track */}
+                            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+
+                            {/* Gradient def */}
+                            <defs>
+                                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor={theme.accent} />
+                                    <stop offset="100%" stopColor={theme.end} />
+                                </linearGradient>
+                                <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="4" result="blur" />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            {/* Progress ring */}
+                            <circle
+                                cx="50" cy="50" r="42"
+                                fill="none"
+                                stroke="url(#ringGrad)"
+                                strokeWidth="8"
+                                strokeLinecap="round"
+                                strokeDasharray="264"
+                                strokeDashoffset={264 - (displayedScore * 2.64)}
+                                filter="url(#ringGlow)"
+                            />
+                        </svg>
+
+                        {/* Score Number - HUGE */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span
+                                className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
+                                style={{
+                                    color: isLegendary ? undefined : theme.accent,
+                                    textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`,
+                                    animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
+                                }}
+                            >
+                                {displayedScore}
+                            </span>
+                            <span className="text-sm font-bold text-white/30 tracking-widest">/ 100</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tier Badge */}
+                <div className={`transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                    <TierBadge tier={scoreTier} score={scores.overall} />
+                </div>
+            </div>
+
+            {/* ===== VERDICT CARD ===== */}
+            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 <div
-                    className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[150%] h-[150%] rounded-full opacity-25 blur-[120px] animate-pulse"
+                    className="p-5 rounded-3xl border backdrop-blur-xl text-center"
                     style={{
-                        background: `radial-gradient(circle, ${modeAccent} 0%, ${modeGradientEnd} 40%, transparent 70%)`,
-                        animationDuration: '4s'
+                        background: 'rgba(255,255,255,0.03)',
+                        borderColor: `${theme.accent}22`,
+                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)`
                     }}
-                />
-            </div>
+                >
+                    <h1 className={`text-2xl md:text-3xl font-black mb-3 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
+                        {scores.verdict}
+                    </h1>
 
-            {/* OVERALL SCORE */}
-            <div className={`relative mb-3 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                <div className="relative w-32 h-32">
-                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-                        <circle
-                            cx="50" cy="50" r="45"
-                            fill="none"
-                            stroke={modeAccent}
-                            strokeWidth="8"
-                            strokeLinecap="round"
-                            strokeDasharray={`${displayedScore * 2.83} 283`}
-                            style={{
-                                transition: 'stroke-dasharray 1s ease-out',
-                                filter: `drop-shadow(0 0 15px ${modeAccent})`
-                            }}
-                        />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-4xl font-black" style={{ color: modeAccent }}>{displayedScore}</span>
-                        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)', marginTop: '-4px' }}>/ 100</span>
-                    </div>
-                </div>
-
-                {/* Certified Badge */}
-                {scores.overall >= 90 && (
-                    <div className="absolute -top-2 -right-6 rotate-12 animate-in zoom-in-50 duration-500 delay-700">
-                        <div className="bg-yellow-400 text-black text-[10px] font-black px-2 py-1 rounded-md shadow-lg shadow-yellow-400/20">
-                            DRIP APPROVED
+                    {scores.lines && scores.lines.length >= 2 && (
+                        <div className="space-y-1 mb-4">
+                            <p className="text-sm text-white/60 italic">"{scores.lines[0]}"</p>
+                            <p className="text-sm text-white/60 italic">"{scores.lines[1]}"</p>
                         </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Verdict & Tagline */}
-            <div className={`flex flex-col items-center gap-2 mb-6 transition-all duration-700 delay-100 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <p className="text-2xl font-black text-white text-center px-4" style={{
-                    textShadow: `0 0 30px ${modeAccent}66`,
-                    lineHeight: 1.1
-                }}>
-                    {scores.verdict}
-                </p>
-
-                {scores.lines && scores.lines.length >= 2 && (
-                    <div className="flex flex-col items-center gap-1.5 mt-2">
-                        <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[0]}"</p>
-                        <p className="text-sm font-semibold text-white/80 italic text-center max-w-[280px]">"{scores.lines[1]}"</p>
-                    </div>
-                )}
-
-                <div className="mt-5 px-6 py-2 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md shadow-xl" style={{
-                    borderColor: `${modeAccent}33`
-                }}>
-                    <p className="text-[11px] font-black uppercase tracking-[0.3em]" style={{
-                        color: modeAccent,
-                        textShadow: `0 0 15px ${modeAccent}66`
-                    }}>
-                        {scores.tagline}
-                    </p>
-                </div>
-            </div>
-
-            {/* Social Proof */}
-            <div className={`mb-4 transition-all duration-500 delay-200 text-center ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-                <p className="text-sm font-bold mb-1" style={{
-                    color: scores.overall >= 80 ? '#00ff88' : (scores.overall >= 60 ? '#00d4ff' : '#ff6b6b')
-                }}>
-                    {(() => {
-                        if (scores.roastMode) {
-                            if (scores.mode === 'savage') {
-                                if (scores.overall >= 40) return '💀 YOU SURVIVED (Barely)'
-                                if (scores.overall >= 20) return '🩸 AI drew blood'
-                                return '☠️ ABSOLUTE ANNIHILATION'
-                            }
-                            if (scores.overall >= 60) return '😏 You survived'
-                            if (scores.overall >= 45) return '💀 Rough day for your closet'
-                            return '☠️ AI showed no mercy'
-                        } else if (scores.mode === 'honest') {
-                            if (scores.overall >= 95) return '💎 STYLE GOD — Pure Perfection'
-                            if (scores.overall >= 85) return '🔥 Post this immediately'
-                            if (scores.overall >= 70) return '👍 Solid fit, respectable'
-                            if (scores.overall >= 55) return '📊 Average range'
-                            return '📉 Needs work'
-                        } else {
-                            if (scores.overall >= 90) return '🔥 LEGENDARY — Post this NOW'
-                            if (scores.overall >= 80) return '✨ Main character energy'
-                            if (scores.overall >= 70) return '💅 Serve! TikTok would approve'
-                            if (scores.overall >= 60) return '👀 Cute! Minor tweaks = viral'
-                            return '💪 Good foundation, keep styling!'
-                        }
-                    })()}
-                </p>
-                <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Better than {scores.percentile}% of fits today
-                </p>
-            </div>
-
-            {/* PHOTO PREVIEW */}
-            <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-300 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                <div className="relative group">
-                    {/* Shimmering border for top scores */}
-                    {scores.overall >= 90 && (
-                        <div className="absolute -inset-1.5 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[34px] opacity-30 blur-sm animate-pulse" />
                     )}
-                    <div className={`w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl relative ${scores.overall >= 95 ? 'card-golden' : ''}`} style={{
-                        border: scores.overall >= 95 ? 'none' : `2px solid ${modeAccent}44`,
-                        boxShadow: scores.overall >= 95 ? undefined : `0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px ${modeAccent}11`
-                    }}>
-                        <img src={uploadedImage} alt="Your outfit being rated" className="w-full h-full object-cover" />
 
-                        {/* Branding */}
-                        <div className="absolute top-4 left-4 opacity-40">
-                            <span className="text-[10px] font-black text-white tracking-widest uppercase">FitRate.app</span>
-                        </div>
+                    {/* Tagline */}
+                    <div
+                        className="inline-block px-4 py-1.5 rounded-full border"
+                        style={{
+                            borderColor: `${theme.accent}33`,
+                            background: `${theme.accent}11`
+                        }}
+                    >
+                        <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
+                            {scores.tagline}
+                        </span>
+                    </div>
 
-                        {/* Pro Tip Overlay */}
-                        {isPro && scores.proTip && revealStage >= 4 && (
-                            <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/60 backdrop-blur-md border animate-in fade-in slide-in-from-bottom-2" style={{
-                                borderColor: `${modeAccent}33`
-                            }}>
-                                <span className="text-[9px] font-black uppercase tracking-widest block mb-1" style={{ color: modeAccent }}>💡 Pro Suggestion</span>
-                                <p className="text-xs text-white/90 font-medium">"{scores.proTip}"</p>
-                            </div>
-                        )}
+                    {/* Social Proof */}
+                    <div className="mt-4 pt-4 border-t border-white/5">
+                        <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
+                        <p className="text-xs text-white/40 mt-1">Better than {scores.percentile}% of fits today</p>
                     </div>
                 </div>
             </div>
 
-            {/* GOLDEN INSIGHT (PRO) */}
-            <div className={`w-full max-w-xs mb-6 transition-all duration-700 delay-500 ${revealStage >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-                {isPro && (
-                    <div className="card-physical p-5 border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_40px_rgba(0,212,255,0.15)]" style={{
-                        borderColor: `${modeAccent}50`,
-                        backgroundColor: `${modeAccent}15`,
-                        boxShadow: `0 0 40px ${modeGlow}`
-                    }}>
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="text-sm">✨</span>
-                            <span className="text-[10px] font-black tracking-widest uppercase" style={{ color: modeAccent }}>Golden Insight</span>
+            {/* ===== PHOTO + STATS ROW ===== */}
+            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                <div className="grid grid-cols-5 gap-3">
+                    {/* Photo - Takes 3 columns */}
+                    <div className="col-span-3 relative">
+                        {isLegendary && (
+                            <div
+                                className="absolute -inset-1 rounded-2xl opacity-50"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+                                    filter: 'blur(8px)',
+                                    animation: 'pulse-glow 2s ease-in-out infinite'
+                                }}
+                            />
+                        )}
+                        <div
+                            className={`relative aspect-[3/4] rounded-2xl overflow-hidden ${isLegendary ? 'card-golden' : ''}`}
+                            style={{
+                                border: `2px solid ${theme.accent}33`,
+                                boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 30px ${theme.glow}`
+                            }}
+                        >
+                            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+                            <div className="absolute top-2 left-2 opacity-40">
+                                <span className="text-[8px] font-black text-white tracking-widest uppercase drop-shadow">FITRATE.APP</span>
+                            </div>
                         </div>
-                        <div className="space-y-4 text-left">
+                    </div>
+
+                    {/* Stats - Takes 2 columns */}
+                    <div className="col-span-2 flex flex-col gap-2">
+                        <StatPill label="Color" value={scores.color} icon="🎨" delay={0.1} color="#ff6b9d" />
+                        <StatPill label="Fit" value={scores.fit} icon="📐" delay={0.2} color="#00d4ff" />
+                        <StatPill label="Style" value={scores.style} icon="✨" delay={0.3} color="#ffd700" />
+                    </div>
+                </div>
+            </div>
+
+            {/* ===== PRO TIP CARD ===== */}
+            {isPro && scores.proTip && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div
+                        className="p-4 rounded-2xl border backdrop-blur-xl"
+                        style={{
+                            background: `linear-gradient(135deg, ${theme.accent}15 0%, ${theme.end}10 100%)`,
+                            borderColor: `${theme.accent}33`
+                        }}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">💡</span>
+                            <span className="text-xs font-black uppercase tracking-widest" style={{ color: theme.accent }}>Pro Tip</span>
+                        </div>
+                        <p className="text-sm text-white/90 leading-relaxed">"{scores.proTip}"</p>
+                    </div>
+                </div>
+            )}
+
+            {/* ===== GOLDEN INSIGHTS (PRO) ===== */}
+            {isPro && (scores.identityReflection || scores.socialPerception) && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div
+                        className="p-5 rounded-2xl border backdrop-blur-xl"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.04) 100%)',
+                            borderColor: 'rgba(255,215,0,0.2)',
+                            boxShadow: '0 0 40px rgba(255,215,0,0.1)'
+                        }}
+                    >
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="text-xl">✨</span>
+                            <span className="text-sm font-black uppercase tracking-widest text-yellow-500">Golden Insights</span>
+                        </div>
+                        <div className="space-y-4">
                             {scores.identityReflection && (
                                 <div>
-                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Identity Reflection</span>
-                                    <p className="text-sm text-white font-medium leading-relaxed">{scores.identityReflection}</p>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Identity</span>
+                                    <p className="text-sm text-white/90 leading-relaxed">{scores.identityReflection}</p>
                                 </div>
                             )}
                             {scores.socialPerception && (
                                 <div>
-                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Social Perception</span>
-                                    <p className="text-sm text-white font-medium leading-relaxed">{scores.socialPerception}</p>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Perception</span>
+                                    <p className="text-sm text-white/90 leading-relaxed">{scores.socialPerception}</p>
                                 </div>
                             )}
                         </div>
                     </div>
-                )}
-            </div>
-
-            {/* SUB-RATINGS & ROASTS */}
-            <div className={`w-full max-w-xs mb-8 transition-all duration-700 delay-700 ${revealStage >= 5 ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                    {[{ l: 'Color', s: scores.color }, { l: 'Fit', s: scores.fit }, { l: 'Style', s: scores.style }].map(x => (
-                        <div key={x.l} className="text-center p-2 rounded-xl bg-white/5">
-                            <p className="text-[9px] text-white/30 uppercase font-black mb-1">{x.l}</p>
-                            <p className="text-lg font-bold" style={{ color: getScoreColor(x.s) }}>{x.s}</p>
-                        </div>
-                    ))}
                 </div>
+            )}
 
-                {scores.savageLevel && (
-                    <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 mb-4 text-left">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-[10px] font-black text-red-500 uppercase tracking-widest">Savage Level</span>
-                            <span className="text-lg font-black text-red-500">{scores.savageLevel}/10 🔥</span>
+            {/* ===== SAVAGE ROASTS ===== */}
+            {scores.savageLevel && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,68,68,0.08)', borderColor: 'rgba(255,68,68,0.25)' }}>
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Savage Level</span>
+                            <span className="text-2xl font-black text-red-500">{scores.savageLevel}/10</span>
                         </div>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-red-500" style={{ width: `${scores.savageLevel * 10}%` }} />
+                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+                            <div
+                                className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full stat-bar-fill"
+                                style={{ '--fill-width': `${scores.savageLevel * 10}%`, '--delay': '0.2s' }}
+                            />
                         </div>
                         {scores.itemRoasts && (
-                            <div className="mt-4 space-y-2">
+                            <div className="space-y-2">
                                 {Object.entries(scores.itemRoasts).filter(([_, r]) => r && r !== 'N/A').map(([k, v]) => (
-                                    <div key={k} className="text-xs text-white/80 leading-snug">
-                                        <span className="font-black text-red-500/70 uppercase text-[9px] mr-2">{k}:</span>
-                                        {v}
+                                    <div key={k}>
+                                        <span className="text-[9px] font-black text-red-500/70 uppercase">{k}:</span>
+                                        <p className="text-xs text-white/80">{v}</p>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
-            {/* CTAs */}
-            <div className={`w-full max-w-xs transition-all duration-700 delay-1000 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+            {/* ===== CTAs ===== */}
+            <div className={`w-full max-w-sm px-4 pt-2 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+                {/* Share Button - Big and Bold */}
                 <button
                     onClick={onGenerateShareCard}
-                    aria-label="Share your outfit rating to social media"
-                    className="btn-physical animate-pulse-glow w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 overflow-hidden group mb-4"
+                    aria-label="Share your outfit rating"
+                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 mb-3 relative overflow-hidden"
                     style={{
-                        background: `linear-gradient(135deg, ${modeGradientEnd} 0%, ${modeAccent} 100%)`,
-                        boxShadow: `0 10px 40px ${modeGlow}, var(--shadow-physical)`,
-                        color: (scores.mode === 'roast' || scores.mode === 'savage') ? 'white' : 'black'
+                        background: `linear-gradient(135deg, ${theme.end} 0%, ${theme.accent} 100%)`,
+                        boxShadow: `0 8px 0 rgba(0,0,0,0.25), 0 20px 40px ${theme.glow}`,
+                        color: (scores.mode === 'roast' || scores.mode === 'savage') ? '#fff' : '#000'
                     }}
                 >
-                    <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" aria-hidden="true" />
-                    <span className="text-2xl" aria-hidden="true">📤</span> SHARE THIS FIT
+                    <span className="text-2xl">📤</span> SHARE THIS FIT
                 </button>
 
+                {/* Try Again */}
                 <button
                     onClick={onReset}
-                    aria-label="Rate another outfit"
-                    className="btn-physical w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black uppercase tracking-widest active:bg-white/10 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2"
                 >
-                    <span aria-hidden="true">🔄</span>
-                    {scores.overall >= 85 ? "Can you beat this? Scan again" :
-                        scores.overall < 50 ? "Redeem yourself? Try again" :
-                            "Rate Another Fit"}
+                    🔄 {scores.overall >= 85 ? "Beat this? Scan again" : scores.overall < 50 ? "Redeem yourself" : "Rate Another"}
                 </button>
 
-                {/* Daily Limit Tracker */}
+                {/* Scans remaining */}
                 {!isPro && (
-                    <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 transition-opacity duration-300" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                        {scansRemaining > 0 ? `⚡ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left today` : 'Daily limit reached • Reset in 12h'}
+                    <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 text-white/25">
+                        {scansRemaining > 0 ? `⚡ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left` : '⏰ Daily limit reached'}
                     </p>
                 )}
 
-                {/* Mode Switch Teaser (Nice -> Roast) */}
+                {/* Mode switch */}
                 {!isPro && scores.mode === 'nice' && (
-                    <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 delay-1000">
-                        <p className="text-[10px] text-white/40 mb-1.5 font-medium">Too nice? Try the viral Roast Mode</p>
+                    <div className="mt-5 text-center">
+                        <p className="text-[10px] text-white/30 mb-1">Too nice?</p>
                         <button
                             onClick={() => { onSetMode('roast'); onReset(); }}
-                            aria-label="Try Roast Mode for more honest feedback"
-                            className="text-xs text-red-400 font-black uppercase tracking-wider border-b border-red-400/30 pb-0.5 hover:text-red-300 transition-colors"
+                            className="text-xs text-red-400 font-black uppercase tracking-wider hover:text-red-300"
                         >
-                            See what AI really thinks <span aria-hidden="true">😈</span>
+                            Try Roast Mode 😈
                         </button>
                     </div>
                 )}
             </div>
 
-            {/* Confetti */}
-            {scores.overall >= 90 && (
-                <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                    {[...Array(20)].map((_, i) => (
-                        <div key={i} className="absolute animate-bounce" style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${-20 - Math.random() * 50}px`,
-                            width: '8px',
-                            height: '8px',
-                            background: ['#ffd700', modeGradientEnd, modeAccent][i % 3],
-                            borderRadius: '50%',
-                            animation: `fall ${2 + Math.random() * 3}s linear infinite`,
-                            animationDelay: `${Math.random() * 3}s`
-                        }} />
-                    ))}
-                </div>
+            {/* Confetti for high scores */}
+            {scores.overall >= 90 && revealStage >= 6 && (
+                <Confetti count={35} colors={['#ffd700', theme.accent, theme.end, '#fff']} />
             )}
 
-            <Footer className="opacity-50 pb-8" />
-
-            <style>{`
-                @keyframes fall {
-                    to { transform: translateY(100vh) rotate(360deg); }
-                }
-            `}</style>
+            <Footer className="opacity-30 pt-6 pb-4" />
         </div>
     )
 }

@@ -75,13 +75,23 @@ export default function AnalyzingScreen({
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative" style={{
-            background: '#0a0a0f',
+            background: 'radial-gradient(ellipse at center, #12121f 0%, #0a0a0f 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
         }}>
+            {/* Background Glow Effect */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-[600px] h-[600px] rounded-full opacity-20" style={{
+                    background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
+                    top: '30%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: 'pulse 3s ease-in-out infinite'
+                }} />
+            </div>
+
             {/* Full Screen Scanning Container */}
-            <div className="relative w-full max-w-sm aspect-[3/4] mb-8 rounded-2xl overflow-hidden" style={{
-                border: `2px solid ${accent}40`,
-                boxShadow: `0 0 40px ${accentGlow}, inset 0 0 60px rgba(0,0,0,0.5)`
+            <div className="relative w-full max-w-sm aspect-[3/4] mb-8 rounded-3xl overflow-hidden" style={{
+                border: `2px solid ${accent}50`,
+                boxShadow: `0 0 60px ${accentGlow}, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(0,0,0,0.5)`
             }}>
                 {/* Full Image */}
                 {uploadedImage && (
@@ -109,55 +119,61 @@ export default function AnalyzingScreen({
                 <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2" style={{ borderColor: accent }} />
 
                 {/* Progress Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
                     {/* Progress Bar */}
-                    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mb-2">
+                    <div className="w-full h-2.5 rounded-full bg-white/10 overflow-hidden mb-3" style={{
+                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
+                    }}>
                         <div
                             className="h-full rounded-full transition-all duration-200"
                             style={{
                                 width: `${analysisProgress}%`,
                                 background: `linear-gradient(90deg, ${accent}, ${accent}cc)`,
-                                boxShadow: `0 0 10px ${accent}`
+                                boxShadow: `0 0 15px ${accent}, 0 0 30px ${accentGlow}`
                             }}
                         />
                     </div>
                     <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold" style={{ color: accent }}>
+                        <span className="text-sm font-black" style={{ color: accent, textShadow: `0 0 10px ${accentGlow}` }}>
                             {Math.round(analysisProgress)}%
                         </span>
-                        <span className="text-xs text-white/50">ANALYZING</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Analyzing</span>
                     </div>
                 </div>
             </div>
 
             {/* Rotating analysis text */}
-            <p className="text-lg font-semibold text-white text-center h-7 transition-opacity duration-300" style={{
-                textShadow: `0 0 20px ${accentGlow}`
+            <p className="text-lg font-bold text-white text-center h-7 transition-opacity duration-300 relative z-10" style={{
+                textShadow: `0 0 30px ${accentGlow}`
             }}>
                 {analysisMessages[analysisText]}
             </p>
 
             {/* Pro Features Checklist - Primes users before results */}
             {!isPro && (
-                <div className="mt-6 space-y-1.5 text-left">
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        <span className="text-green-400">✓</span><span>Score + sub-ratings</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        <span className="text-green-400">✓</span><span>Celeb style match</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        <span className="text-green-400">✓</span><span>Styling tip</span>
-                    </div>
-                    <div className="h-px my-2" style={{ background: 'rgba(255,255,255,0.1)' }} />
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-                        <span>🔒</span><span>Savage Level (Pro)</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-                        <span>🔒</span><span>Item-by-item roasts (Pro)</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(255,215,0,0.6)' }}>
-                        <span>🔒</span><span>Advanced AI analysis (Pro)</span>
+                <div className="mt-6 p-4 rounded-2xl glass-card relative z-10" style={{
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}>
+                    <div className="space-y-2 text-left">
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Score + sub-ratings</span>
+                        </div>
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Celeb style match</span>
+                        </div>
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Styling tip</span>
+                        </div>
+                        <div className="h-px my-2" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
+                            <span className="text-sm">🔒</span><span className="font-medium">Savage Level (Pro)</span>
+                        </div>
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
+                            <span className="text-sm">🔒</span><span className="font-medium">Item-by-item roasts (Pro)</span>
+                        </div>
+                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
+                            <span className="text-sm">🔒</span><span className="font-medium">Advanced AI analysis (Pro)</span>
+                        </div>
                     </div>
                 </div>
             )}

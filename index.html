@@ -95,6 +95,210 @@
         opacity: 0;
       }
     }
+
+    /* Rating bar fill animation */
+    @keyframes barFill {
+      0% {
+        transform: scaleX(0);
+      }
+
+      100% {
+        transform: scaleX(1);
+      }
+    }
+
+    /* Card slide up animation */
+    @keyframes cardSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Score glow pulse animation */
+    @keyframes scoreGlowPulse {
+      0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+      }
+    }
+
+    /* Score number pop animation */
+    @keyframes scoreNumberPop {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Pulse glow for legendary */
+    @keyframes pulse-glow {
+      0%, 100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    /* Floating animation */
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Confetti animation */
+    .confetti-piece {
+      position: absolute;
+      top: -20px;
+      animation: confettiFall 3s ease-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Legendary text shimmer */
+    .legendary-text {
+      background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    /* Stat bar fill animation */
+    .stat-bar-fill {
+      animation: statBarFill 1s ease-out forwards;
+      width: 0;
+    }
+
+    @keyframes statBarFill {
+      to {
+        width: var(--fill-width, 100%);
+      }
+    }
+
+    /* Button physical press effect */
+    .btn-physical {
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .btn-physical:active {
+      transform: translateY(4px) scale(0.98);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Button shine effect */
+    .btn-shine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: btnShine 3s ease-in-out infinite;
+    }
+
+    @keyframes btnShine {
+      0%, 100% {
+        left: -100%;
+      }
+
+      50% {
+        left: 100%;
+      }
+    }
+
+    /* Golden card effect */
+    .card-golden {
+      position: relative;
+    }
+
+    .card-golden::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+      border-radius: inherit;
+      z-index: -1;
+      animation: goldenBorder 2s ease-in-out infinite;
+    }
+
+    @keyframes goldenBorder {
+      0%, 100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    /* Glassmorphism card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Gradient border */
+    .gradient-border {
+      position: relative;
+      background: linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+        linear-gradient(135deg, rgba(0, 212, 255, 0.5), rgba(0, 255, 136, 0.5)) border-box;
+      border: 1px solid transparent;
+    }
   </style>
 </head>
 
