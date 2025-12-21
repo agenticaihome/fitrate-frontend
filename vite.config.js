@@ -8,6 +8,24 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
+      workbox: {
+        // Import push notification handler into generated service worker
+        importScripts: ['push-handler.js'],
+        // Runtime caching for API requests
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fitrate-production\.up\.railway\.app\/api\//,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 5 // 5 minutes
+              }
+            }
+          }
+        ]
+      },
       manifest: {
         name: 'FitRate - Your AI Style Coach',
         short_name: 'FitRate',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { vibrate } from '../utils/soundEffects'
+import NotificationOptIn from '../components/common/NotificationOptIn'
 
 // Mini Confetti component
 const MiniConfetti = () => {
@@ -113,6 +114,11 @@ export default function ShareSuccessScreen({
                     </button>
                 </div>
             )}
+
+            {/* Push Notification Opt-in */}
+            <div className="w-full max-w-xs mt-4">
+                <NotificationOptIn userId={userId} />
+            </div>
 
             {/* Back to home */}
             <button
