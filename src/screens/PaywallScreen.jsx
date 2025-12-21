@@ -33,6 +33,13 @@ export default function PaywallScreen({
                 }} />
             </div>
 
+            {/* Logo */}
+            <img
+                src="/logo.svg"
+                alt="FitRate"
+                className="h-10 mb-6 opacity-70"
+            />
+
             {/* Content Card */}
             <div className="glass-card p-8 rounded-3xl text-center relative z-10 max-w-sm w-full" style={{
                 boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',

@@ -253,6 +253,13 @@ export default function ResultsScreen({
             {/* ===== HERO SECTION: GIANT SCORE ===== */}
             <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
 
+                {/* Small Logo */}
+                <img
+                    src="/logo.svg"
+                    alt="FitRate"
+                    className="h-8 mb-4 opacity-60"
+                />
+
                 {/* MASSIVE Score Ring */}
                 <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
                     {/* Outer glow */}
