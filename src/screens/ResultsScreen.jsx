@@ -177,7 +177,8 @@ export default function ResultsScreen({
         // Score counting animation with lock
         const duration = 1200
         const startTime = Date.now() + 400
-        const endScore = scores.overall
+        // FREE USERS: Whole numbers only. PRO USERS: Decimal precision
+        const endScore = isPro ? scores.overall : Math.round(scores.overall)
         let animationFrameId
 
         const animateScore = () => {
