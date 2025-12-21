@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ModalHeader from '../common/ModalHeader'
 import { vibrate } from '../../utils/soundEffects'
+import EventCountdown from '../common/EventCountdown'
+import WinnerShareCard from './WinnerShareCard'
 
 export default function LeaderboardModal({
     showLeaderboard,
@@ -11,6 +13,8 @@ export default function LeaderboardModal({
     isPro,
     upcomingEvent
 }) {
+    const [showWinnerCard, setShowWinnerCard] = useState(false)
+
     if (!showLeaderboard) return null
 
     // Medal colors for top 3
