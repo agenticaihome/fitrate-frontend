@@ -572,25 +572,53 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Scans Remaining + Pro Badge (moved from top) */}
-            <div className="mb-6 flex items-center justify-center gap-3">
-                {!isPro && (
-                    <span className="text-xs text-white/40">
-                        {scansRemaining} scan{scansRemaining !== 1 ? 's' : ''} left today
-                    </span>
-                )}
-                {isPro && (
-                    <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
-                        background: 'rgba(0,255,136,0.15)',
-                        color: '#00ff88',
-                        border: '1px solid rgba(0,255,136,0.3)'
-                    }}>⚡ PRO</span>
-                )}
+            {/* Scans Remaining + Pro Badge + Streak */}
+            <div className="mb-6 flex flex-col items-center gap-3">
+                <div className="flex items-center justify-center gap-3">
+                    {!isPro && (
+                        <span className="text-xs text-white/40">
+                            {scansRemaining} scan{scansRemaining !== 1 ? 's' : ''} left today
+                        </span>
+                    )}
+                    {isPro && (
+                        <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
+                            background: 'rgba(0,255,136,0.15)',
+                            color: '#00ff88',
+                            border: '1px solid rgba(0,255,136,0.3)'
+                        }}>⚡ PRO</span>
+                    )}
+                </div>
+
+                {/* Streak with 7-day reward progress */}
                 {dailyStreak > 0 && (
-                    <span className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 border border-orange-500/20">
-                        <span>🔥</span>
-                        <span className="text-orange-400">{dailyStreak} day{dailyStreak !== 1 ? 's' : ''}</span>
-                    </span>
+                    <div className="flex flex-col items-center gap-1.5 px-4 py-2 rounded-xl" style={{
+                        background: dailyStreak >= 7
+                            ? 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.1) 100%)'
+                            : 'rgba(255,136,0,0.08)',
+                        border: dailyStreak >= 7
+                            ? '1px solid rgba(255,215,0,0.4)'
+                            : '1px solid rgba(255,136,0,0.2)'
+                    }}>
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">🔥</span>
+                            <span className={`font-black ${dailyStreak >= 7 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                                {dailyStreak} day streak{dailyStreak >= 7 ? '!' : ''}
+                            </span>
+                        </div>
+                        {dailyStreak < 7 ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full transition-all"
+                                        style={{ width: `${(dailyStreak / 7) * 100}%` }}
+                                    />
+                                </div>
+                                <span className="text-[10px] text-white/40">{7 - dailyStreak} to go</span>
+                            </div>
+                        ) : (
+                            <span className="text-[10px] text-yellow-400/80 font-bold">🎁 +1 FREE Pro Scan!</span>
+                        )}
+                    </div>
                 )}
             </div>
 

@@ -529,18 +529,37 @@ export default function ResultsScreen({
 
             {/* ===== CTAs ===== */}
             <div className={`w-full max-w-sm px-4 pt-2 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-                {/* Share Button - Big and Bold */}
+                {/* Challenge a Friend - PRIMARY CTA per Founders Council */}
+                <button
+                    onClick={() => {
+                        playSound('click')
+                        vibrate(30)
+                        // Generate share card with challenge link
+                        onGenerateShareCard('challenge')
+                    }}
+                    aria-label="Challenge a friend to beat your score"
+                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 mb-3 relative overflow-hidden"
+                    style={{
+                        background: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)',
+                        boxShadow: '0 8px 0 rgba(0,0,0,0.25), 0 20px 40px rgba(255,107,53,0.4)',
+                        color: '#fff'
+                    }}
+                >
+                    <span className="text-2xl">👊</span> CHALLENGE A FRIEND
+                </button>
+
+                {/* Share Button - Secondary */}
                 <button
                     onClick={onGenerateShareCard}
                     aria-label="Share your outfit rating"
-                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 mb-3 relative overflow-hidden"
+                    className="w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.97]"
                     style={{
-                        background: `linear-gradient(135deg, ${theme.end} 0%, ${theme.accent} 100%)`,
-                        boxShadow: `0 8px 0 rgba(0,0,0,0.25), 0 20px 40px ${theme.glow}`,
-                        color: (scores.mode === 'roast' || scores.mode === 'savage') ? '#fff' : '#000'
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        color: 'rgba(255,255,255,0.8)'
                     }}
                 >
-                    <span className="text-2xl">📤</span> SHARE THIS FIT
+                    <span className="text-lg">📤</span> Share This Fit
                 </button>
 
                 {/* Try Again */}

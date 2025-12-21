@@ -27,73 +27,7 @@ export default function PaywallModal({
                 paddingBottom: 'env(safe-area-inset-bottom)'
             }}
         >
-            {/* Decline Offer Popup - higher z-index to overlay main paywall */}
-            {showDeclineOffer && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{
-                    background: 'rgba(0,0,0,0.95)'
-                }}>
-                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-sm w-full border border-yellow-500/30 relative" style={{
-                        boxShadow: '0 0 60px rgba(255,215,0,0.2)'
-                    }}>
-                        {/* Close X for decline offer */}
-                        <button
-                            onClick={() => {
-                                setShowDeclineOffer(false)
-                                setShowPaywall(false)
-                            }}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-white text-xl p-1"
-                            aria-label="Close"
-                        >
-                            ×
-                        </button>
-                        <p className="text-yellow-400 font-bold text-lg mb-2">⏰ Wait!</p>
-                        <h2 className="text-white text-2xl font-black mb-4">First week on us...</h2>
-
-                        <p className="text-gray-400 mb-2">
-                            Get Pro for just <span className="text-yellow-400 font-bold">$1.99/week</span> for your first month
-                            <br />
-                            <span className="text-xs">(then ${PRICES.PRO_WEEKLY}/week, cancel anytime)</span>
-                        </p>
-
-                        {/* Softer urgency message instead of aggressive countdown */}
-                        <p className="text-center mb-4 text-yellow-400/60 text-xs">
-                            ✨ Limited time introductory offer
-                        </p>
-
-
-                        <button
-                            onClick={() => startCheckout('proWeeklyDiscount')}
-                            disabled={checkoutLoading}
-                            className="btn-stable-width w-full py-4 rounded-2xl text-black font-bold text-lg mb-3 transition-all duration-100 active:scale-[0.97] disabled:opacity-70"
-                            style={{
-                                background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 100%)',
-                                boxShadow: '0 8px 30px rgba(255,215,0,0.35)'
-                            }}
-                        >
-                            {checkoutLoading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                                    Loading...
-                                </span>
-                            ) : '🔥 Claim This Deal'}
-                        </button>
-
-                        <p className="text-center text-[10px] text-gray-500 mb-3">
-                            🔐 Secure checkout · Cancel anytime
-                        </p>
-
-                        <button
-                            onClick={() => {
-                                setShowDeclineOffer(false)
-                                setShowPaywall(false)
-                            }}
-                            className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-                        >
-                            No thanks
-                        </button>
-                    </div>
-                </div>
-            )}
+            {/* Decline offer popup removed - damages trust per Founders Council */}
 
             {/* Main Paywall */}
             <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-500/20 relative max-h-[90vh] overflow-y-auto" style={{
@@ -165,10 +99,10 @@ export default function PaywallModal({
                             {/* Benefits - Precision Focus */}
                             <div className="space-y-1.5 pl-1">
                                 {[
-                                    'GPT-4o High-Fidelity Analysis',
-                                    'Expert Style Critique',
+                                    'Expert-Level Style Analysis',
+                                    'Deep Critique & Insights',
                                     'Unlock Honest & Savage Modes',
-                                    'Precision Scoring (e.g. 87.4)'
+                                    'Precision Scoring (87.4)'
                                 ].map((benefit, i) => (
                                     <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
                                         <span className="text-black text-sm flex-shrink-0">✓</span>
@@ -274,8 +208,8 @@ export default function PaywallModal({
 
                         {/* Rows */}
                         {[
-                            { label: 'AI Model', free: 'Gemini Flash', pro: 'GPT-4o (Elite)' },
-                            { label: 'Style IQ', free: 'Standard', pro: 'High-Fidelity' },
+                            { label: 'AI Engine', free: 'Standard', pro: 'Elite Pro' },
+                            { label: 'Style IQ', free: 'Basic', pro: 'Expert-Level' },
                             { label: 'Critique', free: 'Basic', pro: 'Expert Level' },
                             { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' }
                         ].map((row, i) => (
