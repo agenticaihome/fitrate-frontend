@@ -17,6 +17,7 @@ import ProWelcomeScreen from './screens/ProWelcomeScreen'
 import SharePreviewScreen from './screens/SharePreviewScreen'
 import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
+import RulesScreen from './screens/RulesScreen'
 
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
