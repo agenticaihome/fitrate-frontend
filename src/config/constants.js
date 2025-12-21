@@ -5,7 +5,7 @@
 
 export const LIMITS = {
     // Scans
-    FREE_SCANS_DAILY: 2,
+    FREE_SCANS_DAILY: 5,
     PRO_SCANS_DAILY: 25, // Soft cap to prevent abuse, effectively unlimited for humans
 
     // Weekly Event
