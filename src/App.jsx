@@ -1011,6 +1011,42 @@ export default function App() {
     playSound('share')
     vibrate(30)
 
+    // Helper: Download share card and copy caption (desktop fallback)
+    const downloadAndCopy = (imageBlob, text) => {
+      // Download the image
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(imageBlob)
+      link.download = 'fitrate-score.png'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(link.href)
+
+      // Copy caption to clipboard
+      navigator.clipboard.writeText(text).then(() => {
+        setToastMessage('Image saved! Caption copied ✅')
+        setShowToast(true)
+        playSound('pop')
+        vibrate(20)
+
+        // GA4 tracking
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'share', {
+            method: 'download',
+            content_type: 'outfit_rating',
+            item_id: scores?.overall
+          })
+        }
+
+        // Go to share success after a short delay
+        setTimeout(() => setScreen('share-success'), 1500)
+      }).catch(() => {
+        setToastMessage('Image saved! Paste caption manually.')
+        setShowToast(true)
+        setTimeout(() => setScreen('share-success'), 1500)
+      })
+    }
+
     try {
       const { file, text, url, imageBlob } = await generateShareCardUtil({
         scores,
@@ -1052,13 +1088,13 @@ export default function App() {
         } catch (err) {
           if (err.name !== 'AbortError') {
             // Share failed but not cancelled - fallback to download
-            downloadShareCard(imageBlob, text)
+            downloadAndCopy(imageBlob, text)
           }
           // If AbortError (user cancelled), stay on results screen
         }
       } else {
         // Desktop fallback: download + copy caption
-        downloadShareCard(imageBlob, text)
+        downloadAndCopy(imageBlob, text)
       }
 
     } catch (error) {
@@ -1067,38 +1103,6 @@ export default function App() {
       setShowToast(true)
     }
   }, [uploadedImage, scores, userId, shareFormat, isPro])
-
-  // Helper: Download share card and copy caption (desktop fallback)
-  const downloadShareCard = useCallback((imageBlob, text) => {
-    // Download the image
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(imageBlob)
-    link.download = 'fitrate-score.png'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(link.href)
-
-    // Copy caption to clipboard
-    navigator.clipboard.writeText(text).then(() => {
-      displayToast('Image saved! Caption copied ✅')
-
-      // GA4 tracking
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'share', {
-          method: 'download',
-          content_type: 'outfit_rating',
-          item_id: scores?.overall
-        })
-      }
-
-      // Go to share success after a short delay
-      setTimeout(() => setScreen('share-success'), 1500)
-    }).catch(() => {
-      displayToast('Image saved! Paste caption manually.')
-      setTimeout(() => setScreen('share-success'), 1500)
-    })
-  }, [scores, displayToast])
 
   // Helpers wrapText and downloadImage moved to utils/shareUtils and utils/imageUtils
 
