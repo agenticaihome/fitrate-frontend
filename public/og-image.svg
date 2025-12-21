@@ -7,6 +7,13 @@
       <stop offset="100%" style="stop-color:#0a0a15"/>
     </linearGradient>
     
+    <!-- Brand gradient - Purple to Blue -->
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A855F7"/>
+      <stop offset="50%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#3B82F6"/>
+    </linearGradient>
+    
     <!-- Neon glow -->
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="6" result="blur"/>
@@ -16,30 +23,59 @@
       </feMerge>
     </filter>
     
-    <!-- Score gradient -->
+    <!-- Score gradient (cyan accent) -->
     <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#00d4ff"/>
       <stop offset="100%" style="stop-color:#00ff88"/>
-    </linearGradient>
-
-    <!-- Gold gradient -->
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="100%" style="stop-color:#ff8c00"/>
     </linearGradient>
   </defs>
   
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bgGrad)"/>
   
-  <!-- Decorative glows -->
-  <circle cx="150" cy="150" r="250" fill="rgba(0,212,255,0.06)"/>
-  <circle cx="1050" cy="480" r="200" fill="rgba(0,255,136,0.04)"/>
+  <!-- Decorative glows with brand colors -->
+  <circle cx="150" cy="150" r="250" fill="rgba(168,85,247,0.08)"/>
+  <circle cx="1050" cy="480" r="200" fill="rgba(59,130,246,0.06)"/>
+  
+  <!-- Hanger Icon on left side -->
+  <g transform="translate(180, 180)">
+    <!-- Hanger hook -->
+    <path d="M 0 45 
+             C 0 20, 10 8, 25 8
+             C 40 8, 50 20, 50 40
+             C 50 55, 38 62, 28 68"
+          stroke="url(#brandGrad)"
+          stroke-width="10"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <!-- Cyan dot -->
+    <circle cx="58" cy="15" r="8" fill="#00D4FF"/>
+    
+    <!-- Shoulders -->
+    <path d="M 28 68 L -35 115"
+          stroke="url(#brandGrad)"
+          stroke-width="10"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <path d="M 28 68 L 90 115"
+          stroke="url(#brandGrad)"
+          stroke-width="10"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <!-- Bottom bar -->
+    <line x1="-35" y1="115" x2="90" y2="115"
+          stroke="url(#brandGrad)"
+          stroke-width="10"
+          stroke-linecap="round"/>
+  </g>
   
   <!-- Main title - FitRate -->
-  <text x="600" y="200" 
+  <text x="600" y="220" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="72" 
+        font-size="90" 
         font-weight="900" 
         fill="white" 
         text-anchor="middle"
@@ -47,23 +83,32 @@
     FitRate
   </text>
   
-  <!-- Tagline -->
-  <text x="600" y="260" 
+  <!-- .app -->
+  <text x="780" y="220" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
-        font-size="28" 
+        font-size="40" 
+        font-weight="500" 
+        fill="#9CA3AF" 
+        text-anchor="start">
+  </text>
+  
+  <!-- Tagline with brand gradient -->
+  <text x="600" y="290" 
+        font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
+        font-size="32" 
         font-weight="600" 
-        fill="url(#scoreGrad)" 
+        fill="url(#brandGrad)" 
         text-anchor="middle"
         filter="url(#glow)">
     Your AI Style Coach
   </text>
   
   <!-- Score circle -->
-  <circle cx="600" cy="400" r="90" fill="none" stroke="url(#scoreGrad)" stroke-width="8" filter="url(#glow)"/>
-  <circle cx="600" cy="400" r="75" fill="rgba(0,212,255,0.1)"/>
+  <circle cx="600" cy="430" r="90" fill="none" stroke="url(#brandGrad)" stroke-width="8" filter="url(#glow)"/>
+  <circle cx="600" cy="430" r="75" fill="rgba(168,85,247,0.1)"/>
   
   <!-- Score number -->
-  <text x="600" y="420" 
+  <text x="600" y="450" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
         font-size="64" 
         font-weight="900" 
@@ -71,7 +116,7 @@
         text-anchor="middle">
     92
   </text>
-  <text x="600" y="448" 
+  <text x="600" y="478" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
         font-size="14" 
         fill="rgba(255,255,255,0.4)" 
@@ -81,7 +126,7 @@
   </text>
   
   <!-- CTA text -->
-  <text x="600" y="545" 
+  <text x="600" y="565" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
         font-size="22" 
         font-weight="600" 
@@ -91,7 +136,7 @@
   </text>
   
   <!-- URL -->
-  <text x="600" y="590" 
+  <text x="600" y="605" 
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" 
         font-size="18" 
         font-weight="700" 
@@ -101,7 +146,7 @@
     FITRATE.APP
   </text>
   
-  <!-- Accent lines -->
-  <line x1="250" y1="300" x2="420" y2="300" stroke="url(#scoreGrad)" stroke-width="2" opacity="0.3"/>
-  <line x1="780" y1="300" x2="950" y2="300" stroke="url(#scoreGrad)" stroke-width="2" opacity="0.3"/>
+  <!-- Accent lines with brand colors -->
+  <line x1="300" y1="330" x2="450" y2="330" stroke="url(#brandGrad)" stroke-width="2" opacity="0.3"/>
+  <line x1="750" y1="330" x2="900" y2="330" stroke="url(#brandGrad)" stroke-width="2" opacity="0.3"/>
 </svg>

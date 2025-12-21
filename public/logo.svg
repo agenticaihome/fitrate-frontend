@@ -1,47 +1,59 @@
 <svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Hanger Icon -->
-  <g transform="translate(100, 50)">
-    <!-- Hanger hook (curved) -->
-    <path d="M 80 20 Q 80 5, 90 5 Q 100 5, 100 20"
+  <g transform="translate(50, 30)">
+    <!-- Hanger hook (curved S-shape) -->
+    <path d="M 85 45 
+             C 85 25, 95 15, 110 15
+             C 125 15, 135 25, 135 40
+             C 135 55, 120 60, 110 65"
           stroke="url(#gradient1)"
-          stroke-width="8"
+          stroke-width="12"
           fill="none"
-          stroke-linecap="round"/>
-
-    <!-- Hanger circle (top) -->
-    <circle cx="100" cy="15" r="8" fill="url(#gradient1)"/>
-
-    <!-- Hanger bar (main part) -->
-    <path d="M 100 20 L 50 80 L 150 80 L 100 20 Z"
-          stroke="url(#gradient1)"
-          stroke-width="8"
-          fill="none"
-          stroke-linejoin="round"
-          stroke-linecap="round"/>
-
-    <!-- Bottom bar of hanger -->
-    <line x1="50" y1="80" x2="150" y2="80"
-          stroke="url(#gradient1)"
-          stroke-width="8"
           stroke-linecap="round"/>
     
-    <!-- Notification dot (near hook - brand signature) -->
-    <circle cx="115" cy="8" r="8" fill="#00d4ff"/>
+    <!-- Cyan notification dot (brand signature) -->
+    <circle cx="142" cy="22" r="10" fill="#00D4FF"/>
+    
+    <!-- Hanger shoulders (angled lines from center) -->
+    <path d="M 110 65 L 30 120"
+          stroke="url(#gradient1)"
+          stroke-width="12"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <path d="M 110 65 L 190 120"
+          stroke="url(#gradient1)"
+          stroke-width="12"
+          fill="none"
+          stroke-linecap="round"/>
+    
+    <!-- Bottom bar of hanger -->
+    <line x1="30" y1="120" x2="190" y2="120"
+          stroke="url(#gradient1)"
+          stroke-width="12"
+          stroke-linecap="round"/>
   </g>
 
-  <!-- FitRate.app Text -->
-  <text x="280" y="125"
+  <!-- FitRate Text -->
+  <text x="290" y="110"
         font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        font-size="80"
-        font-weight="700"
-        fill="white">FitRate.app</text>
+        font-size="85"
+        font-weight="800"
+        fill="white">FitRate</text>
+  
+  <!-- .app Text (smaller, gray, below) -->
+  <text x="580" y="155"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="45"
+        font-weight="500"
+        fill="#9CA3AF">.app</text>
 
-  <!-- Gradient Definition -->
+  <!-- Gradient Definition - Purple to Blue -->
   <defs>
     <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#0088ff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8b00ff;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#A855F7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
     </linearGradient>
   </defs>
 </svg>

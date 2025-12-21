@@ -19,6 +19,13 @@
   --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
   --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
   
+  /* Brand Colors - Purple to Blue gradient */
+  --brand-purple: #A855F7;
+  --brand-purple-mid: #8B5CF6;
+  --brand-blue: #3B82F6;
+  --brand-accent: #00D4FF;  /* Cyan dot accent */
+  --brand-gradient: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-purple-mid) 50%, var(--brand-blue) 100%);
+  
   /* Accessibility: Focus ring colors */
   --focus-color: #00d4ff;
   --focus-color-alt: #00ff88;

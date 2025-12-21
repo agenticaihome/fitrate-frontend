@@ -2,42 +2,47 @@
   <!-- Background -->
   <rect width="192" height="192" rx="40" fill="#0a0a0f"/>
   
-  <!-- Hanger Icon - centered and scaled for 192x192 -->
-  <g transform="translate(96, 60)">
-    <!-- Hanger hook (curved) -->
-    <path d="M 0 8 Q 0 -4, 10 -4 Q 20 -4, 20 8"
+  <!-- Hanger Icon - centered for 192x192 -->
+  <g transform="translate(96, 55)">
+    <!-- Hanger hook (curved S-shape) -->
+    <path d="M 0 25 
+             C 0 10, 8 2, 18 2
+             C 28 2, 36 10, 36 22
+             C 36 34, 24 38, 16 42"
           stroke="url(#hangerGrad)"
-          stroke-width="6"
+          stroke-width="8"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Hanger circle (top) -->
-    <circle cx="20" cy="4" r="6" fill="url(#hangerGrad)"/>
-    
-    <!-- Hanger body (triangle shape) -->
-    <path d="M 20 8 L -30 55 L 70 55 L 20 8 Z"
+    <!-- Hanger shoulders -->
+    <path d="M 16 42 L -45 85"
           stroke="url(#hangerGrad)"
-          stroke-width="6"
+          stroke-width="8"
           fill="none"
-          stroke-linejoin="round"
+          stroke-linecap="round"/>
+    
+    <path d="M 16 42 L 77 85"
+          stroke="url(#hangerGrad)"
+          stroke-width="8"
+          fill="none"
           stroke-linecap="round"/>
     
     <!-- Bottom bar -->
-    <line x1="-30" y1="55" x2="70" y2="55"
+    <line x1="-45" y1="85" x2="77" y2="85"
           stroke="url(#hangerGrad)"
-          stroke-width="6"
+          stroke-width="8"
           stroke-linecap="round"/>
   </g>
   
-  <!-- Notification dot (near hook) -->
-  <circle cx="130" cy="58" r="10" fill="#00d4ff"/>
+  <!-- Cyan notification dot -->
+  <circle cx="144" cy="50" r="10" fill="#00D4FF"/>
   
-  <!-- Gradients -->
+  <!-- Gradients - Purple to Blue -->
   <defs>
     <linearGradient id="hangerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#0088ff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#8b00ff;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#A855F7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
     </linearGradient>
   </defs>
 </svg>
