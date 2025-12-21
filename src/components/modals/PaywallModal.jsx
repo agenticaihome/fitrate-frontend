@@ -55,12 +55,11 @@ export default function PaywallModal({
                             <span className="text-xs">(then ${PRICES.PRO_WEEKLY}/week, cancel anytime)</span>
                         </p>
 
-                        {/* Countdown Timer */}
-                        {declineCountdown && (
-                            <p className="text-center mb-4 text-yellow-400/80 font-bold">
-                                ⏳ Offer expires in {Math.floor(declineCountdown / 60)}:{String(declineCountdown % 60).padStart(2, '0')}
-                            </p>
-                        )}
+                        {/* Softer urgency message instead of aggressive countdown */}
+                        <p className="text-center mb-4 text-yellow-400/60 text-xs">
+                            ✨ Limited time introductory offer
+                        </p>
+
 
                         <button
                             onClick={() => startCheckout('proWeeklyDiscount')}
@@ -239,12 +238,12 @@ export default function PaywallModal({
                     </button>
                 </div>
 
-                {/* ☠️ SAVAGE ONE-OFF - "Curiosity" Framing */}
+                {/* 💀 PRO SAVAGE ROAST - Premium One-Time */}
                 <div className="relative w-full mb-5">
                     <button
                         onClick={() => startCheckout('proRoast')}
                         disabled={checkoutLoading}
-                        aria-label="Try Savage Mode once for $0.99"
+                        aria-label="Try Pro Savage Roast once for $0.99"
                         className="btn-physical w-full p-5 rounded-2xl text-center transition-all group"
                         style={{
                             background: 'linear-gradient(135deg, #1a0000 0%, #330000 100%)',
@@ -253,9 +252,9 @@ export default function PaywallModal({
                         }}
                     >
                         <div className="flex flex-col items-center">
-                            <span className="text-4xl mb-2">☠️</span>
-                            <h3 className="text-red-400 text-xl font-black mb-1">Curious? Savage Mode</h3>
-                            <p className="text-red-300/60 text-sm font-bold mb-2">Try the brutal truth once</p>
+                            <span className="text-4xl mb-2">💀</span>
+                            <h3 className="text-red-400 text-xl font-black mb-1">Pro Savage Roast</h3>
+                            <p className="text-red-300/60 text-sm font-bold mb-2">The brutal AI truth — 1 scan</p>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-400 line-through">${PRICES.PRO_WEEKLY}</span>
                                 <span className="text-2xl font-black text-white">$0.99</span>

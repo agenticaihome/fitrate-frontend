@@ -14,7 +14,7 @@ import HomeScreen from './screens/HomeScreen'
 import ErrorScreen from './screens/ErrorScreen'
 import ProEmailPromptScreen from './screens/ProEmailPromptScreen'
 import ProWelcomeScreen from './screens/ProWelcomeScreen'
-import SharePreviewScreen from './screens/SharePreviewScreen'
+// SharePreviewScreen removed - share now triggers directly from Results
 import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
 import RulesScreen from './screens/RulesScreen'
@@ -184,7 +184,7 @@ export default function App() {
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [scores, setScores] = useState(null)
   const [uploadedImage, setUploadedImage] = useState(null)
-  const [mode, setMode] = useState('nice') // 'nice', 'roast', 'honest', 'savage'
+  const [mode, setMode] = useState('roast') // Default to roast - funnier, more shareable
   const [timeUntilReset, setTimeUntilReset] = useState(null)
   const [shareData, setShareData] = useState(null)
   const [emailInput, setEmailInput] = useState('')
@@ -1005,8 +1005,7 @@ export default function App() {
 
 
 
-  // Generate viral share card
-  // Generate viral share card
+  // Generate viral share card AND trigger native share directly (1-tap share)
   const generateShareCard = useCallback(async () => {
     // Satisfying feedback when generating
     playSound('share')
@@ -1021,19 +1020,85 @@ export default function App() {
         isPro: isPro || false
       })
 
-      setShareData({
-        file,
-        text,
-        url,
-        imageBlob
-      })
-      setScreen('share-preview')
+      // Store shareData for potential future use
+      setShareData({ file, text, url, imageBlob })
+
+      // Try native share directly (no intermediate screen!)
+      if (navigator.share) {
+        try {
+          const sharePayload = {
+            title: 'My FitRate Score',
+            text: text,
+          }
+
+          // Check if we can share files (most mobile browsers)
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            sharePayload.files = [file]
+          }
+
+          await navigator.share(sharePayload)
+
+          // GA4 tracking
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'share', {
+              method: 'native_share',
+              content_type: 'outfit_rating',
+              item_id: scores?.overall
+            })
+          }
+
+          // Success! Go to share-success screen
+          setScreen('share-success')
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            // Share failed but not cancelled - fallback to download
+            downloadShareCard(imageBlob, text)
+          }
+          // If AbortError (user cancelled), stay on results screen
+        }
+      } else {
+        // Desktop fallback: download + copy caption
+        downloadShareCard(imageBlob, text)
+      }
+
     } catch (error) {
       console.error("Share card generation failed", error)
       setToastMessage("Failed to generate card. Please try again.")
       setShowToast(true)
     }
   }, [uploadedImage, scores, userId, shareFormat, isPro])
+
+  // Helper: Download share card and copy caption (desktop fallback)
+  const downloadShareCard = useCallback((imageBlob, text) => {
+    // Download the image
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(imageBlob)
+    link.download = 'fitrate-score.png'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(link.href)
+
+    // Copy caption to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      displayToast('Image saved! Caption copied ✅')
+
+      // GA4 tracking
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'share', {
+          method: 'download',
+          content_type: 'outfit_rating',
+          item_id: scores?.overall
+        })
+      }
+
+      // Go to share success after a short delay
+      setTimeout(() => setScreen('share-success'), 1500)
+    }).catch(() => {
+      displayToast('Image saved! Paste caption manually.')
+      setTimeout(() => setScreen('share-success'), 1500)
+    })
+  }, [scores, displayToast])
 
   // Helpers wrapText and downloadImage moved to utils/shareUtils and utils/imageUtils
 
@@ -1298,26 +1363,8 @@ export default function App() {
     )
   }
 
-  // ============================================
-  // SHARE PREVIEW SCREEN - Ultimate Share Experience
-  // ============================================
-  // ============================================
-  // SHARE PREVIEW SCREEN
-  // ============================================
-  if (screen === 'share-preview' && shareData) {
-    return (
-      <SharePreviewScreen
-        shareData={shareData}
-        scores={scores}
-        onShareSuccess={() => setScreen('share-success')}
-        onClose={() => setScreen('results')}
-        showToast={showToast}
-        toastMessage={toastMessage}
-        setToastMessage={setToastMessage}
-        setShowToast={setShowToast}
-      />
-    )
-  }
+  // SharePreviewScreen REMOVED - share now happens directly from Results
+  // (1-tap share flow per founder audit recommendations)
 
 
   // ============================================
@@ -1332,6 +1379,8 @@ export default function App() {
         mode={mode}
         setMode={setMode}
         setScreen={setScreen}
+        userId={userId}
+        score={scores?.overall}
       />
     )
   }

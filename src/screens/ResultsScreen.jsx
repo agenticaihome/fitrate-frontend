@@ -460,6 +460,45 @@ export default function ResultsScreen({
                 </div>
             )}
 
+            {/* ===== PRO TEASER (FREE USERS) ===== */}
+            {!isPro && revealStage >= 5 && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div
+                        className="p-5 rounded-2xl border backdrop-blur-xl relative overflow-hidden cursor-pointer group"
+                        onClick={onShowPaywall}
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,140,0,0.02) 100%)',
+                            borderColor: 'rgba(255,215,0,0.15)',
+                        }}
+                    >
+                        {/* Blurred content preview */}
+                        <div className="blur-[6px] select-none pointer-events-none">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-xl">✨</span>
+                                <span className="text-sm font-black uppercase tracking-widest text-yellow-500/50">Golden Insights</span>
+                            </div>
+                            <div className="space-y-3">
+                                <div>
+                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Identity</span>
+                                    <p className="text-sm text-white/30 leading-relaxed">This outfit projects a confident, creative energy that blends...</p>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Perception</span>
+                                    <p className="text-sm text-white/30 leading-relaxed">Others see someone who takes style seriously without...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Unlock overlay */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 group-hover:bg-black/50 transition-colors">
+                            <span className="text-2xl mb-2">🔒</span>
+                            <span className="text-sm font-black text-yellow-400 uppercase tracking-wide">Unlock Deep Analysis</span>
+                            <span className="text-xs text-white/50 mt-1">See what your fit really says about you</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* ===== SAVAGE ROASTS ===== */}
             {scores.savageLevel && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>

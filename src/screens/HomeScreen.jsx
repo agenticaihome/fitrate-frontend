@@ -37,6 +37,7 @@ export default function HomeScreen({
     const [countdown, setCountdown] = useState(null)
     const [cameraError, setCameraError] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [showProModes, setShowProModes] = useState(false) // For Pro mode expansion
 
     // Refs
     const videoRef = useRef(null)
@@ -373,15 +374,7 @@ export default function HomeScreen({
             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Pro Badge */}
-            {isPro && (
-                <div className="absolute top-6 right-6 px-3 py-1.5 rounded-full" style={{
-                    background: 'rgba(0,255,136,0.15)',
-                    border: '1px solid rgba(0,255,136,0.3)'
-                }}>
-                    <span className="text-xs font-bold" style={{ color: '#00ff88' }}>⚡ PRO</span>
-                </div>
-            )}
+            {/* Pro Badge - Moved to bottom/footer area for cleaner above-fold */}
 
             {/* Logo */}
             <img
@@ -392,44 +385,11 @@ export default function HomeScreen({
                     filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
                 }}
             />
-            <p className="text-sm mb-2 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                Your AI style coach
-            </p>
-            <p className="text-xs mb-6 tracking-wide" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                Snap a photo • Get instant feedback • Have fun
+            <p className="text-sm mb-6 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                How hard is your fit?
             </p>
 
-            {/* Install Banner */}
-            {showInstallBanner && (
-                <div className="mb-6 w-full max-w-sm px-4 py-3 rounded-2xl relative" style={{
-                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
-                    border: '1px solid rgba(139, 92, 246, 0.3)'
-                }}>
-                    <button
-                        onClick={() => {
-                            if (onShowInstallBanner) onShowInstallBanner(false)
-                            localStorage.setItem('fitrate_install_dismissed', 'true')
-                            vibrate(10)
-                        }}
-                        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10"
-                    >
-                        <span className="text-white/50 text-xs">✕</span>
-                    </button>
-                    <div className="flex items-center gap-3">
-                        <span className="text-2xl">📲</span>
-                        <div>
-                            <p className="text-sm font-bold text-white mb-0.5">Install FitRate</p>
-                            <p className="text-[10px] text-gray-400">
-                                {/iPhone|iPad/.test(navigator.userAgent)
-                                    ? 'Tap Share ↗ then "Add to Home Screen"'
-                                    : /Android/.test(navigator.userAgent)
-                                        ? 'Tap ⋮ menu then "Install app"'
-                                        : 'Add to your home screen for quick access'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Install Banner moved to footer - not above-fold */}
 
             {/* Challenge Banner */}
             {challengeScore && (
@@ -444,15 +404,7 @@ export default function HomeScreen({
                 </div>
             )}
 
-            {/* Streak */}
-            {dailyStreak > 0 && (
-                <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 shadow-[0_0_20px_rgba(255,165,0,0.1)]">
-                        <span className="text-sm">🔥</span>
-                        <span className="text-xs font-black text-orange-400 uppercase tracking-widest">{dailyStreak} DAY STREAK</span>
-                    </div>
-                </div>
-            )}
+            {/* Streak moved to bottom area - cleaner above-fold */}
 
             {/* MAIN ACTION CTA */}
             <div className="flex-1 flex flex-col items-center justify-center">
@@ -470,21 +422,21 @@ export default function HomeScreen({
                             Out of Scans
                         </span>
                         <span className="text-white/40 text-sm mt-2 text-center px-8">
-                            Try again tomorrow or upgrade
+                            {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Resets at midnight'}
                         </span>
                         <button
                             onClick={() => { playSound('click'); vibrate(15); onShowPaywall(); }}
-                            className="mt-4 px-6 py-2 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95"
+                            className="mt-4 px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95 active:brightness-90"
                             style={{
                                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                                 color: '#000'
                             }}
                         >
-                            Upgrade to Pro
+                            ⚡ Get Unlimited Scans
                         </button>
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                            <p className="text-[11px] font-medium text-white/40">
-                                ⏱️ Resets at midnight
+                            <p className="text-xs font-medium text-white/40">
+                                or wait for daily reset
                             </p>
                         </div>
                     </div>
@@ -526,80 +478,120 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Mode Selectors */}
-            <div className="mt-6 mb-10 grid grid-cols-2 gap-2 p-2 rounded-2xl" style={{
+            {/* Mode Selectors - Simplified: Nice/Roast visible, Pro modes collapsed */}
+            <div className="mt-6 mb-4 flex flex-col gap-2 p-2 rounded-2xl" style={{
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)'
             }}>
-                {/* Nice */}
+                {/* Primary modes: Nice & Roast */}
+                <div className="grid grid-cols-2 gap-2">
+                    {/* Nice */}
+                    <button
+                        onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
+                        aria-label="Nice mode - get encouraging feedback"
+                        aria-pressed={mode === 'nice'}
+                        className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
+                        style={{
+                            background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
+                            border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
+                        }}
+                    >
+                        <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😇</span>
+                        <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
+                    </button>
+
+                    {/* Roast */}
+                    <button
+                        onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
+                        aria-label="Roast mode - get humorous critiques"
+                        aria-pressed={mode === 'roast'}
+                        className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
+                        style={{
+                            background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
+                            border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
+                        }}
+                    >
+                        <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">🔥</span>
+                        <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
+                    </button>
+                </div>
+
+                {/* More Modes Toggle */}
                 <button
-                    onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
-                    aria-label="Nice mode - get encouraging feedback"
-                    aria-pressed={mode === 'nice'}
-                    className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
-                    style={{
-                        background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
-                        border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid transparent'
-                    }}
+                    onClick={() => { playSound('click'); vibrate(10); setShowProModes(!showProModes); }}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all text-xs"
+                    style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                    <span className={`text-base transition-opacity ${mode === 'nice' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😇</span>
-                    <span className={`text-sm font-medium transition-opacity ${mode === 'nice' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Nice</span>
+                    <span>{showProModes ? '▲ Less' : '▼ More Modes'}</span>
+                    {!isPro && <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-black text-[10px]">PRO</span>}
                 </button>
 
-                {/* Roast */}
-                <button
-                    onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
-                    aria-label="Roast mode - get humorous critiques"
-                    aria-pressed={mode === 'roast'}
-                    className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
-                    style={{
-                        background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
-                        border: mode === 'roast' ? '1px solid #ff4444' : '1px solid transparent'
-                    }}
-                >
-                    <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">😈</span>
-                    <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
-                </button>
+                {/* Pro Modes (Honest & Savage) - Collapsible */}
+                {showProModes && (
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                        {/* PRO: Honest */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('honest'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Honest mode - get balanced analysis" : "Honest mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'honest' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
+                                border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">📊</span>
+                            <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-500'}`}>Honest</span>
+                        </button>
 
-                {/* PRO: Honest */}
-                <button
-                    onClick={() => {
-                        playSound('click'); vibrate(15);
-                        if (isPro) { setMode('honest'); setEventMode(false); }
-                        else onShowPaywall();
-                    }}
-                    aria-label={isPro ? "Honest mode - get balanced analysis" : "Honest mode - Pro feature, tap to upgrade"}
-                    aria-pressed={mode === 'honest' && isPro}
-                    className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                    style={{
-                        background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
-                        border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
-                    }}
-                >
-                    <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">📊</span>
-                    <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-400'}`}>Honest</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
-                </button>
+                        {/* PRO: Savage */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('savage'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Savage mode - get brutally honest feedback" : "Savage mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'savage' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
+                                border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">💀</span>
+                            <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-500'}`}>Savage</span>
+                        </button>
+                    </div>
+                )}
+            </div>
 
-                {/* PRO: Savage */}
-                <button
-                    onClick={() => {
-                        playSound('click'); vibrate(15);
-                        if (isPro) { setMode('savage'); setEventMode(false); }
-                        else onShowPaywall();
-                    }}
-                    aria-label={isPro ? "Savage mode - get brutally honest feedback" : "Savage mode - Pro feature, tap to upgrade"}
-                    aria-pressed={mode === 'savage' && isPro}
-                    className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                    style={{
-                        background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
-                        border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
-                    }}
-                >
-                    <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">💀</span>
-                    <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-400'}`}>Savage</span>
-                    {!isPro && <span className="text-[8px] ml-1 text-yellow-400 font-bold" aria-hidden="true">PRO</span>}
-                </button>
+            {/* Scans Remaining + Pro Badge (moved from top) */}
+            <div className="mb-6 flex items-center justify-center gap-3">
+                {!isPro && (
+                    <span className="text-xs text-white/40">
+                        {scansRemaining} scan{scansRemaining !== 1 ? 's' : ''} left today
+                    </span>
+                )}
+                {isPro && (
+                    <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
+                        background: 'rgba(0,255,136,0.15)',
+                        color: '#00ff88',
+                        border: '1px solid rgba(0,255,136,0.3)'
+                    }}>⚡ PRO</span>
+                )}
+                {dailyStreak > 0 && (
+                    <span className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 border border-orange-500/20">
+                        <span>🔥</span>
+                        <span className="text-orange-400">{dailyStreak} day{dailyStreak !== 1 ? 's' : ''}</span>
+                    </span>
+                )}
             </div>
 
             {currentEvent && (
