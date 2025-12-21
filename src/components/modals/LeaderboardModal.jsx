@@ -30,6 +30,13 @@ export default function LeaderboardModal({
                     onClose={() => { setShowLeaderboard(false); vibrate(10); }}
                 />
 
+                {/* Prize Banner */}
+                <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center">
+                    <span className="text-sm" aria-hidden="true">👑</span>
+                    <span className="text-yellow-300 font-bold text-sm ml-1">1 YEAR FREE PRO</span>
+                    <span className="text-yellow-400/70 text-xs ml-2">for #1</span>
+                </div>
+
                 {/* Leaderboard List */}
                 <div className="space-y-2 mb-4">
                     {leaderboard.length === 0 ? (
@@ -50,7 +57,10 @@ export default function LeaderboardModal({
                                     {entry.rank === 1 ? '👑' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}`}
                                 </span>
                                 <span className="flex-1 font-medium text-white">{entry.displayName}</span>
-                                <span className="font-bold text-lg text-white mr-2">{entry.score?.toFixed(1)}</span>
+                                {/* Score: Show decimal for Pro entries, whole for free */}
+                                <span className="font-bold text-lg text-white mr-2">
+                                    {entry.isPro ? entry.score?.toFixed(1) : Math.round(entry.score)}
+                                </span>
                                 {entry.isPro && (
                                     <span className="text-[10px] bg-amber-500 text-black px-2 py-0.5 rounded-full font-bold">PRO</span>
                                 )}
@@ -59,21 +69,35 @@ export default function LeaderboardModal({
                     )}
                 </div>
 
-                {/* User's Rank (if not in Top 5) */}
-                {userEventStatus?.participating && (!userEventStatus.inTop5 || userEventStatus.rank > 5) && isPro && (
+                {/* User's Rank (if participating) */}
+                {userEventStatus?.participating && userEventStatus.rank > 5 && (
                     <div className="bg-cyan-900/20 border border-cyan-500/30 p-3 rounded-xl mb-4">
                         <div className="flex items-center justify-between">
                             <span className="text-cyan-400 text-sm">Your rank</span>
-                            <span className="font-bold text-xl text-white">#{userEventStatus.rank}</span>
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-xl text-white">#{userEventStatus.rank}</span>
+                                <span className="text-gray-400 text-sm">
+                                    ({isPro ? userEventStatus.bestScore?.toFixed(1) : Math.round(userEventStatus.bestScore || 0)})
+                                </span>
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* Free User Upsell */}
+                {/* Free User Call to Action */}
+                {!isPro && !userEventStatus?.participating && (
+                    <div className="bg-cyan-900/20 border border-cyan-500/30 p-3 rounded-xl mb-4 text-center">
+                        <span className="text-cyan-400 text-sm">
+                            🎮 You get 1 FREE entry this week!
+                        </span>
+                    </div>
+                )}
+
+                {/* Free User Who Already Entered */}
                 {!isPro && userEventStatus?.participating && (
                     <div className="bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl mb-4 text-center">
                         <span className="text-amber-400 text-xs">
-                            ⭐ Go Pro to see your exact rank
+                            ⭐ Go Pro for 5 tries/day + decimal precision
                         </span>
                     </div>
                 )}

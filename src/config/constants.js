@@ -8,6 +8,11 @@ export const LIMITS = {
     FREE_SCANS_DAILY: 2,
     PRO_SCANS_DAILY: 25, // Soft cap to prevent abuse, effectively unlimited for humans
 
+    // Weekly Event
+    FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
+    PRO_EVENT_ENTRIES_DAILY: 5,   // Pro users can submit up to 25/day
+    WINNER_COOLDOWN_WEEKS: 4,      // Previous winners sit out 4 weeks
+
     // Bonuses
     REFERRAL_BONUS_ROASTS: 1,
     REFERRAL_BONUS_CAP: 5,

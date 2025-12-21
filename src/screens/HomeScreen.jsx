@@ -20,6 +20,9 @@ export default function HomeScreen({
     toastMessage,
     showInstallBanner,
     onShowInstallBanner, // To set false
+    hasSeenEventExplainer,
+    onShowEventExplainer,
+    freeEventEntryUsed,  // Track if free user has used their weekly entry
     onImageSelected,
     onShowPaywall,
     onShowLeaderboard,
@@ -602,43 +605,71 @@ export default function HomeScreen({
                 <button
                     onClick={() => {
                         vibrate(15); playSound('click');
-                        if (isPro) setEventMode(!eventMode);
-                        else onShowPaywall();
+                        // First-time users: show explainer modal
+                        if (!hasSeenEventExplainer) {
+                            onShowEventExplainer();
+                            return;
+                        }
+                        // User has seen explainer - toggle event mode
+                        // Pro users: unlimited toggles
+                        // Free users: can join if they haven't used their weekly entry
+                        if (isPro) {
+                            setEventMode(!eventMode);
+                        } else if (!freeEventEntryUsed) {
+                            // Free user with available entry - let them join!
+                            setEventMode(!eventMode);
+                        } else {
+                            // Free user who already used their entry - show paywall
+                            onShowPaywall();
+                        }
                     }}
                     aria-label={isPro
                         ? `${currentEvent.theme} weekly event - ${eventMode ? 'currently active, tap to deactivate' : 'tap to join'}`
-                        : `${currentEvent.theme} weekly event - Pro feature, tap to upgrade`
+                        : freeEventEntryUsed
+                            ? `${currentEvent.theme} weekly event - free entry used, upgrade for more`
+                            : `${currentEvent.theme} weekly event - tap to use your free entry`
                     }
-                    aria-pressed={eventMode && isPro}
-                    className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode && isPro ? 'ring-2 ring-emerald-400' : ''}`}
+                    aria-pressed={eventMode}
+                    className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode ? 'ring-2 ring-emerald-400' : ''}`}
                     style={{
-                        background: eventMode && isPro
+                        background: eventMode
                             ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.25) 100%)'
                             : isPro
                                 ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
-                                : 'linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)',
-                        border: eventMode && isPro
+                                : !freeEventEntryUsed
+                                    ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
+                                    : 'linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)',
+                        border: eventMode
                             ? '1px solid rgba(16, 185, 129, 0.5)'
-                            : isPro
+                            : isPro || !freeEventEntryUsed
                                 ? '1px solid rgba(16, 185, 129, 0.25)'
                                 : '1px dashed rgba(251, 191, 36, 0.4)'
                     }}
                 >
                     <div className="flex items-center gap-2">
-                        <span className="text-sm" aria-hidden="true">{currentEvent.themeEmoji}</span>
-                        <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
+                        <span className="text-lg" aria-hidden="true">{currentEvent.themeEmoji}</span>
+                        <div className="flex flex-col items-start">
+                            <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
+                            <span className="text-[10px] text-gray-400">Weekly Challenge</span>
+                        </div>
                         {isPro ? (
-                            <span className={`text-[10px] font-bold uppercase ${eventMode ? 'text-emerald-300' : 'text-emerald-400'}`}>
-                                {eventMode ? '✓ ACTIVE' : 'Event'}
+                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                                {eventMode ? '✓ ACTIVE' : 'JOIN'}
+                            </span>
+                        ) : !freeEventEntryUsed ? (
+                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-400'}`}>
+                                {eventMode ? '✓ ACTIVE' : '1 FREE'}
                             </span>
                         ) : (
-                            <span className="text-[10px] text-amber-400 font-bold uppercase">PRO</span>
+                            <span className="text-[10px] bg-amber-500/20 text-amber-400 font-bold uppercase px-2 py-0.5 rounded-full">USED</span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
+                        <span className="text-[11px] text-gray-400 font-medium">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
                         {isPro ? (
-                            <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '+'}</span>
+                            <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '→'}</span>
+                        ) : !freeEventEntryUsed ? (
+                            <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '→'}</span>
                         ) : (
                             <span className="text-amber-400 text-sm">🔒</span>
                         )}

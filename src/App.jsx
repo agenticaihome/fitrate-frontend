@@ -21,6 +21,7 @@ import PaywallScreen from './screens/PaywallScreen'
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
+import EventExplainerModal from './components/modals/EventExplainerModal'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -49,6 +50,16 @@ const CELEBRITIES = [
 ]
 
 // Helper: Social proof percentile logic moved to utils/scoreUtils.js
+
+// Helper: Get the start of the current week (Monday) as ISO date string
+const getWeekStart = (date) => {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1) // Adjust when day is Sunday
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d.toISOString().split('T')[0]
+}
 
 // Helper: Random share tips for virality (universal appeal)
 const SHARE_TIPS = [
@@ -186,6 +197,26 @@ export default function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [leaderboard, setLeaderboard] = useState([])
   const [showEventRules, setShowEventRules] = useState(false)
+  const [showEventExplainer, setShowEventExplainer] = useState(false)
+
+  // Track if user has seen event explainer modal
+  const [hasSeenEventExplainer, setHasSeenEventExplainer] = useState(() => {
+    return localStorage.getItem('fitrate_seen_event_explainer') === 'true'
+  })
+
+  // Track free user's weekly event entry (1 per week)
+  const [freeEventEntryUsed, setFreeEventEntryUsed] = useState(() => {
+    const stored = localStorage.getItem('fitrate_free_event_entry')
+    if (stored) {
+      const { weekStart, used } = JSON.parse(stored)
+      // Check if we're still in the same week (weeks start Monday)
+      const currentWeekStart = getWeekStart(new Date())
+      if (weekStart === currentWeekStart) {
+        return used
+      }
+    }
+    return false
+  })
 
   // User ID for referrals
   // SECURITY: Use crypto.randomUUID for cryptographically secure IDs
@@ -1068,6 +1099,34 @@ export default function App() {
   }
 
   // ============================================
+  // EVENT EXPLAINER MODAL (First-time users)
+  // ============================================
+  if (showEventExplainer && currentEvent) {
+    return (
+      <EventExplainerModal
+        event={currentEvent}
+        isPro={isPro}
+        freeEventEntryUsed={freeEventEntryUsed}
+        onJoin={() => {
+          localStorage.setItem('fitrate_seen_event_explainer', 'true')
+          setHasSeenEventExplainer(true)
+          setShowEventExplainer(false)
+          setEventMode(true)
+        }}
+        onClose={() => {
+          localStorage.setItem('fitrate_seen_event_explainer', 'true')
+          setHasSeenEventExplainer(true)
+          setShowEventExplainer(false)
+        }}
+        onUpgrade={() => {
+          setShowEventExplainer(false)
+          setShowPaywall(true)
+        }}
+      />
+    )
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
@@ -1088,6 +1147,9 @@ export default function App() {
         toastMessage={toastMessage}
         showInstallBanner={showInstallBanner}
         onShowInstallBanner={setShowInstallBanner}
+        hasSeenEventExplainer={hasSeenEventExplainer}
+        onShowEventExplainer={() => setShowEventExplainer(true)}
+        freeEventEntryUsed={freeEventEntryUsed}
         onImageSelected={(img) => {
           setUploadedImage(img)
           setScreen('analyzing')

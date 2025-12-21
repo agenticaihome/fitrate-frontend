@@ -5,25 +5,28 @@ import { playSound, vibrate } from '../../utils/soundEffects'
  * EventExplainerModal
  * 
  * A "dummy and grandma-proof" modal that explains what the weekly event is
- * and how to participate. Triggered on first tap of the event bar.
+ * and how to participate. Shows tier differences for free vs pro users.
  * 
  * Accessibility: Full ARIA support, large touch targets, clear language
  */
 export default function EventExplainerModal({
     event,
     isPro,
+    freeEventEntryUsed,
     onJoin,          // Called when user wants to join event
     onClose,         // Called when user dismisses
-    onUpgrade        // Called if free user taps join (needs Pro)
+    onUpgrade        // Called if free user who used their entry taps join
 }) {
     if (!event) return null
 
     const handleJoin = () => {
         playSound('click')
         vibrate(30)
-        if (isPro) {
+        // Free users who haven't used their entry can join
+        if (isPro || !freeEventEntryUsed) {
             onJoin()
         } else {
+            // Free user already used their entry - upgrade
             onUpgrade()
         }
     }
@@ -33,6 +36,9 @@ export default function EventExplainerModal({
         vibrate(10)
         onClose()
     }
+
+    // Can the current user join?
+    const canJoin = isPro || !freeEventEntryUsed
 
     return (
         <div
@@ -62,11 +68,11 @@ export default function EventExplainerModal({
                 </button>
 
                 {/* Header with Theme Emoji */}
-                <div className="text-center mb-6">
-                    <span className="text-5xl block mb-3" aria-hidden="true">{event.themeEmoji}</span>
+                <div className="text-center mb-4">
+                    <span className="text-5xl block mb-2" aria-hidden="true">{event.themeEmoji}</span>
                     <h2
                         id="event-explainer-title"
-                        className="text-2xl font-black text-white mb-2"
+                        className="text-2xl font-black text-white mb-1"
                     >
                         Weekly Style Challenge
                     </h2>
@@ -74,72 +80,105 @@ export default function EventExplainerModal({
                         id="event-explainer-desc"
                         className="text-sm text-gray-400"
                     >
-                        This week's theme: <span className="text-emerald-400 font-bold">{event.theme}</span>
+                        This week: <span className="text-emerald-400 font-bold">{event.theme}</span>
                     </p>
                 </div>
 
-                {/* How It Works - Big, Clear Steps */}
-                <div className="bg-white/5 rounded-2xl p-4 mb-6">
-                    <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest mb-4 text-center">
+                {/* Prize Banner */}
+                <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-3 mb-4 text-center">
+                    <span className="text-2xl" aria-hidden="true">👑</span>
+                    <p className="text-yellow-300 font-black text-lg">WIN 1 YEAR FREE PRO</p>
+                    <p className="text-yellow-400/70 text-xs">Top 5 scores get featured!</p>
+                </div>
+
+                {/* How It Works */}
+                <div className="bg-white/5 rounded-2xl p-4 mb-4">
+                    <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest mb-3 text-center">
                         How It Works
                     </h3>
-                    <ol className="space-y-4" role="list">
+                    <ol className="space-y-3" role="list">
                         <li className="flex items-start gap-3">
-                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">1</span>
+                            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">1</span>
                             <div>
-                                <p className="text-white font-medium">Take a themed photo</p>
-                                <p className="text-sm text-gray-400">Wear your best {event.theme.toLowerCase()} outfit</p>
+                                <p className="text-white font-medium text-sm">Snap your themed outfit</p>
+                                <p className="text-xs text-gray-400">Show your best {event.theme.toLowerCase()} look</p>
                             </div>
                         </li>
                         <li className="flex items-start gap-3">
-                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">2</span>
+                            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">2</span>
                             <div>
-                                <p className="text-white font-medium">AI rates your fit</p>
-                                <p className="text-sm text-gray-400">Get your score automatically</p>
+                                <p className="text-white font-medium text-sm">AI rates your fit</p>
+                                <p className="text-xs text-gray-400">Score based on theme + style</p>
                             </div>
                         </li>
                         <li className="flex items-start gap-3">
-                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">3</span>
+                            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">3</span>
                             <div>
-                                <p className="text-white font-medium">Compete on leaderboard!</p>
-                                <p className="text-sm text-gray-400">Top fits win free Pro scans 🎁</p>
+                                <p className="text-white font-medium text-sm">Compete for #1!</p>
+                                <p className="text-xs text-gray-400">Only your best score counts</p>
                             </div>
                         </li>
                     </ol>
                 </div>
 
-                {/* Timer + Info */}
-                <div className="text-center mb-6">
-                    <p className="text-sm text-gray-500">
-                        <span aria-hidden="true">⏱️</span> Ends Sunday midnight • New theme every Monday
-                    </p>
+                {/* Tier Comparison */}
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                    {/* Free Tier */}
+                    <div className={`rounded-xl p-3 ${!isPro ? 'ring-2 ring-cyan-400' : ''}`} style={{
+                        background: 'rgba(0, 200, 255, 0.1)',
+                        border: '1px solid rgba(0, 200, 255, 0.2)'
+                    }}>
+                        <p className="text-cyan-400 font-bold text-xs uppercase mb-2">Free</p>
+                        <ul className="space-y-1 text-[11px] text-gray-300">
+                            <li>• 1 entry per week</li>
+                            <li>• Whole number score</li>
+                            <li className="text-gray-500">• (e.g., 87)</li>
+                        </ul>
+                    </div>
+                    {/* Pro Tier */}
+                    <div className={`rounded-xl p-3 ${isPro ? 'ring-2 ring-emerald-400' : ''}`} style={{
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%)',
+                        border: '1px solid rgba(251, 191, 36, 0.3)'
+                    }}>
+                        <p className="text-yellow-400 font-bold text-xs uppercase mb-2">⚡ Pro</p>
+                        <ul className="space-y-1 text-[11px] text-gray-300">
+                            <li>• 5 entries per day</li>
+                            <li>• Decimal precision</li>
+                            <li className="text-emerald-400">• (e.g., 87.4)</li>
+                        </ul>
+                    </div>
                 </div>
 
-                {/* CTA Button - Large and Clear */}
+                {/* Timer */}
+                <p className="text-center text-xs text-gray-500 mb-4">
+                    <span aria-hidden="true">⏱️</span> Ends Sunday midnight • New theme Monday
+                </p>
+
+                {/* CTA Button */}
                 <button
                     onClick={handleJoin}
-                    aria-label={isPro
+                    aria-label={canJoin
                         ? `Join the ${event.theme} challenge`
-                        : `Upgrade to Pro to join the ${event.theme} challenge`
+                        : `Upgrade to Pro to get more entries`
                     }
-                    className="w-full py-5 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-3"
+                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-2"
                     style={{
-                        background: isPro
+                        background: canJoin
                             ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
                             : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                        color: isPro ? 'white' : 'black',
-                        boxShadow: isPro
+                        color: canJoin ? 'white' : 'black',
+                        boxShadow: canJoin
                             ? '0 8px 30px rgba(16,185,129,0.4)'
                             : '0 8px 30px rgba(251,191,36,0.4)'
                     }}
                 >
-                    {isPro ? (
+                    {canJoin ? (
                         <>
-                            <span aria-hidden="true">🎉</span> Join This Week's Challenge
+                            <span aria-hidden="true">🎉</span> Join Challenge {!isPro && '(1 Free Entry)'}
                         </>
                     ) : (
                         <>
-                            <span aria-hidden="true">👑</span> Upgrade to Join
+                            <span aria-hidden="true">👑</span> Upgrade for More Tries
                         </>
                     )}
                 </button>
@@ -148,7 +187,7 @@ export default function EventExplainerModal({
                 <button
                     onClick={handleClose}
                     aria-label="Maybe later"
-                    className="w-full py-3 text-sm text-gray-500 font-medium transition-all active:opacity-60"
+                    className="w-full py-2 text-sm text-gray-500 font-medium transition-all active:opacity-60"
                 >
                     Maybe later
                 </button>
@@ -156,3 +195,4 @@ export default function EventExplainerModal({
         </div>
     )
 }
+
