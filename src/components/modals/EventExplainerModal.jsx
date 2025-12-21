@@ -121,6 +121,31 @@ export default function EventExplainerModal({
                     </ol>
                 </div>
 
+                {/* Judging Criteria - What AI Looks For */}
+                <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-4 mb-4 border border-purple-500/20">
+                    <h3 className="text-xs font-bold text-purple-300 uppercase tracking-widest mb-3 text-center">
+                        🎯 What AI Judges
+                    </h3>
+                    <p className="text-sm text-gray-300 text-center mb-3">
+                        <span className="font-bold text-white">"{event.theme}"</span>
+                        <span className="block text-xs text-gray-400 mt-1">{event.themeDescription}</span>
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex items-center gap-2 text-gray-300">
+                            <span className="text-purple-400">✓</span> Theme match
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                            <span className="text-purple-400">✓</span> Color harmony
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                            <span className="text-purple-400">✓</span> Fit & silhouette
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                            <span className="text-purple-400">✓</span> Styling details
+                        </div>
+                    </div>
+                </div>
+
                 {/* Tier Comparison */}
                 <div className="grid grid-cols-2 gap-2 mb-4">
                     {/* Free Tier */}
