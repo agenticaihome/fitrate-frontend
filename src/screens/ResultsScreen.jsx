@@ -1,6 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import Footer from '../components/common/Footer'
 import { getScoreColor, getPercentile } from '../utils/scoreUtils'
+
+// ============================================
+// LEGENDARY SCORE-TIER COLORS
+// Ring color reflects SCORE ACHIEVEMENT, not mode
+// ============================================
+const getScoreTierColors = (score) => {
+    if (score >= 95) return { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.6)' }   // LEGENDARY GOLD
+    if (score >= 85) return { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.5)' }  // FIRE ORANGE→PINK
+    if (score >= 75) return { accent: '#00d4ff', end: '#0066ff', glow: 'rgba(0,212,255,0.5)' }   // GREAT CYAN
+    if (score >= 60) return { accent: '#00ff88', end: '#00d4ff', glow: 'rgba(0,255,136,0.5)' }   // GOOD GREEN
+    if (score >= 40) return { accent: '#ffaa00', end: '#ff6b00', glow: 'rgba(255,170,0,0.5)' }   // MID AMBER
+    return { accent: '#ff4444', end: '#cc0000', glow: 'rgba(255,68,68,0.5)' }                    // LOW RED
+}
 
 // Tier Badge Component - Big and Bold
 const TierBadge = ({ tier, score }) => {
@@ -16,7 +29,7 @@ const TierBadge = ({ tier, score }) => {
 
     return (
         <div
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-black text-base tracking-wide shadow-2xl"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-lg tracking-wide shadow-2xl"
             style={{
                 background: config.bg,
                 color: config.text,
@@ -28,8 +41,8 @@ const TierBadge = ({ tier, score }) => {
     )
 }
 
-// Enhanced Confetti
-const Confetti = ({ count, colors }) => {
+// Enhanced Confetti with tier-appropriate colors
+const Confetti = ({ count, colors, scoreKey }) => {
     const pieces = useMemo(() =>
         Array.from({ length: count }, (_, i) => ({
             id: i,
@@ -46,7 +59,7 @@ const Confetti = ({ count, colors }) => {
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
             {pieces.map(p => (
                 <div
-                    key={p.id}
+                    key={`${scoreKey}-${p.id}`}
                     className="confetti-piece"
                     style={{
                         left: `${p.left}%`,
@@ -67,13 +80,13 @@ const Confetti = ({ count, colors }) => {
 const RatingBar = ({ value, color, delay }) => {
     const percentage = Math.min(100, Math.max(0, value))
     return (
-        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mt-2">
+        <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden mt-2">
             <div
-                className="h-full rounded-full transition-all duration-1000 ease-out"
+                className="h-full rounded-full"
                 style={{
                     width: `${percentage}%`,
                     background: `linear-gradient(90deg, ${color} 0%, ${color}cc 100%)`,
-                    boxShadow: `0 0 8px ${color}66`,
+                    boxShadow: `0 0 12px ${color}66`,
                     animation: `barFill 1s ease-out ${delay}s forwards`,
                     transform: 'scaleX(0)',
                     transformOrigin: 'left'
@@ -83,18 +96,23 @@ const RatingBar = ({ value, color, delay }) => {
     )
 }
 
-// Stat Pill Component with Rating Bar
-const StatPill = ({ label, value, icon, delay, color }) => (
+// Enhanced Stat Pill with contribution display
+const StatPill = ({ label, displayLabel, value, icon, delay, color, contribution }) => (
     <div
-        className="flex flex-col items-center p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm"
+        className="flex flex-col items-center p-3 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm"
         style={{
             animation: `cardSlideUp 0.5s ease-out ${delay}s forwards`,
             opacity: 0
         }}
     >
-        <div className="text-lg mb-1">{icon}</div>
-        <div className="text-2xl font-black" style={{ color: color || getScoreColor(value) }}>{value}</div>
-        <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-1">{label}</div>
+        <div className="text-lg mb-0.5">{icon}</div>
+        <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-black" style={{ color: color || getScoreColor(value) }}>{value}</span>
+            {contribution && (
+                <span className="text-[10px] font-bold text-white/40">+{contribution}</span>
+            )}
+        </div>
+        <div className="text-[9px] uppercase tracking-widest text-white/50 font-bold mt-0.5">{displayLabel || label}</div>
         <RatingBar value={value} color={color || getScoreColor(value)} delay={delay + 0.3} />
     </div>
 )
@@ -115,43 +133,55 @@ export default function ResultsScreen({
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
+    const [animationComplete, setAnimationComplete] = useState(false)
 
-    // Animation sequence
+    // Track if component is mounted to prevent state updates after unmount
+    const isMounted = useRef(true)
+    useEffect(() => {
+        return () => { isMounted.current = false }
+    }, [])
+
+    // Animation sequence with proper locking
     useEffect(() => {
         if (!scores) return
 
         setRevealStage(0)
         setDisplayedScore(0)
+        setAnimationComplete(false)
 
         const sound = scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
 
         const timers = [
             setTimeout(() => {
+                if (!isMounted.current) return
                 playSound(sound)
                 vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
                 setRevealStage(1)
             }, 100),
             setTimeout(() => {
+                if (!isMounted.current) return
                 setRevealStage(2)
                 playSound('pop')
                 vibrate(10)
             }, 400),
             setTimeout(() => {
+                if (!isMounted.current) return
                 setRevealStage(3)
                 playSound('pop')
             }, 800),
-            setTimeout(() => setRevealStage(4), 1100),
-            setTimeout(() => setRevealStage(5), 1400),
-            setTimeout(() => setRevealStage(6), 1700),
+            setTimeout(() => isMounted.current && setRevealStage(4), 1100),
+            setTimeout(() => isMounted.current && setRevealStage(5), 1400),
+            setTimeout(() => isMounted.current && setRevealStage(6), 1700),
         ]
 
-        // Score counting animation
+        // Score counting animation with lock
         const duration = 1200
         const startTime = Date.now() + 400
         const endScore = scores.overall
         let animationFrameId
 
         const animateScore = () => {
+            if (!isMounted.current) return
             const elapsed = Date.now() - startTime
             if (elapsed < 0) {
                 animationFrameId = requestAnimationFrame(animateScore)
@@ -159,8 +189,16 @@ export default function ResultsScreen({
             }
             const progress = Math.min(elapsed / duration, 1)
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
-            setDisplayedScore(Math.floor(easeProgress * endScore))
-            if (progress < 1) animationFrameId = requestAnimationFrame(animateScore)
+            const currentScore = Math.floor(easeProgress * endScore)
+            setDisplayedScore(currentScore)
+
+            if (progress >= 1) {
+                // LOCK: Animation complete - set exact final value
+                setDisplayedScore(endScore)
+                setAnimationComplete(true)
+            } else {
+                animationFrameId = requestAnimationFrame(animateScore)
+            }
         }
 
         const scoreTimer = setTimeout(() => requestAnimationFrame(animateScore), 400)
@@ -183,8 +221,14 @@ export default function ResultsScreen({
         return 'low'
     }, [scores?.overall, scores?.isLegendary])
 
-    // Theme colors based on mode
-    const theme = useMemo(() => {
+    // LEGENDARY: Score-tier based ring colors (not mode-based!)
+    const ringColors = useMemo(() => {
+        if (!scores) return getScoreTierColors(50)
+        return getScoreTierColors(scores.overall)
+    }, [scores?.overall])
+
+    // Mode colors for secondary elements (tagline, accents)
+    const modeColors = useMemo(() => {
         const themes = {
             savage: { accent: '#8b00ff', end: '#ff0044', glow: 'rgba(139,0,255,0.5)' },
             roast: { accent: '#ff4444', end: '#ff8800', glow: 'rgba(255,68,68,0.5)' },
@@ -193,6 +237,9 @@ export default function ResultsScreen({
         }
         return themes[scores?.mode] || themes.nice
     }, [scores?.mode])
+
+    // Keep theme for backward compatibility
+    const theme = ringColors
 
     // Background gradient based on tier
     const bgGradient = useMemo(() => {
@@ -333,9 +380,9 @@ export default function ResultsScreen({
                 <div
                     className="p-5 rounded-3xl border backdrop-blur-xl text-center"
                     style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        borderColor: `${theme.accent}22`,
-                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)`
+                        background: 'rgba(255,255,255,0.05)',
+                        borderColor: `${ringColors.accent}33`,
+                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 40px ${ringColors.glow}`
                     }}
                 >
                     <h1 className={`text-2xl md:text-3xl font-black mb-3 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
@@ -349,15 +396,15 @@ export default function ResultsScreen({
                         </div>
                     )}
 
-                    {/* Tagline */}
+                    {/* Tagline - Uses mode colors for secondary accent */}
                     <div
                         className="inline-block px-4 py-1.5 rounded-full border"
                         style={{
-                            borderColor: `${theme.accent}33`,
-                            background: `${theme.accent}11`
+                            borderColor: `${modeColors.accent}33`,
+                            background: `${modeColors.accent}11`
                         }}
                     >
-                        <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: theme.accent }}>
+                        <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: modeColors.accent }}>
                             {scores.tagline}
                         </span>
                     </div>
@@ -365,7 +412,7 @@ export default function ResultsScreen({
                     {/* Social Proof */}
                     <div className="mt-4 pt-4 border-t border-white/5">
                         <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
-                        <p className="text-xs text-white/40 mt-1">Better than {scores.percentile}% of fits today</p>
+                        <p className="text-xs text-white/40 mt-1">Top {Math.max(1, 100 - scores.percentile)}% of all fits today</p>
                     </div>
                 </div>
             </div>
@@ -388,8 +435,8 @@ export default function ResultsScreen({
                         <div
                             className={`relative aspect-[3/4] rounded-2xl overflow-hidden ${isLegendary ? 'card-golden' : ''}`}
                             style={{
-                                border: `2px solid ${theme.accent}33`,
-                                boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 30px ${theme.glow}`
+                                border: `2px solid ${ringColors.accent}44`,
+                                boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 30px ${ringColors.glow}`
                             }}
                         >
                             <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
@@ -399,11 +446,35 @@ export default function ResultsScreen({
                         </div>
                     </div>
 
-                    {/* Stats - Takes 2 columns */}
+                    {/* Stats - Takes 2 columns - Now with contribution weights */}
                     <div className="col-span-2 flex flex-col gap-2">
-                        <StatPill label="Color" value={scores.color} icon="🎨" delay={0.1} color="#ff6b9d" />
-                        <StatPill label="Fit" value={scores.fit} icon="📐" delay={0.2} color="#00d4ff" />
-                        <StatPill label="Style" value={scores.style} icon="✨" delay={0.3} color="#ffd700" />
+                        <StatPill
+                            label="Color"
+                            displayLabel="Color Pop"
+                            value={scores.color}
+                            icon="🎨"
+                            delay={0.1}
+                            color="#ff6b9d"
+                            contribution={Math.round(scores.color * 0.25)}
+                        />
+                        <StatPill
+                            label="Fit"
+                            displayLabel="Silhouette"
+                            value={scores.fit}
+                            icon="📐"
+                            delay={0.2}
+                            color="#00d4ff"
+                            contribution={Math.round(scores.fit * 0.35)}
+                        />
+                        <StatPill
+                            label="Style"
+                            displayLabel="Cohesion"
+                            value={scores.style}
+                            icon="✨"
+                            delay={0.3}
+                            color="#ffd700"
+                            contribution={Math.round(scores.style * 0.40)}
+                        />
                     </div>
                 </div>
             </div>
@@ -578,7 +649,7 @@ export default function ResultsScreen({
                         </p>
                     ) : (
                         <div
-                            className="mt-4 p-5 rounded-2xl border cursor-pointer group transition-all hover:scale-[1.02]"
+                            className="mt-4 p-5 rounded-2xl border cursor-pointer group transition-all hover:scale-[1.02] active:scale-[0.98]"
                             onClick={onShowPaywall}
                             style={{
                                 background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(0,212,255,0.05) 100%)',
@@ -619,7 +690,7 @@ export default function ResultsScreen({
                         <p className="text-[10px] text-white/30 mb-1">Too nice?</p>
                         <button
                             onClick={() => { onSetMode('roast'); onReset(); }}
-                            className="text-xs text-red-400 font-black uppercase tracking-wider hover:text-red-300"
+                            className="text-xs text-red-400 font-black uppercase tracking-wider hover:text-red-300 transition-colors"
                         >
                             Try Roast Mode 😈
                         </button>
@@ -627,10 +698,25 @@ export default function ResultsScreen({
                 )}
             </div>
 
-            {/* Confetti for high scores */}
-            {scores.overall >= 90 && revealStage >= 6 && (
-                <Confetti count={35} colors={['#ffd700', theme.accent, theme.end, '#fff']} />
+            {/* ===== LEGENDARY CONFETTI SYSTEM ===== */}
+            {/* Tier-based confetti with scoreKey to prevent re-trigger bugs */}
+            {animationComplete && revealStage >= 6 && scoreTier !== 'low' && scoreTier !== 'mid' && (
+                <Confetti
+                    key={`confetti-${scores.overall}-${scores.mode}`}
+                    scoreKey={scores.overall}
+                    count={scoreTier === 'legendary' ? 50 : scoreTier === 'fire' ? 40 : 25}
+                    colors={
+                        scoreTier === 'legendary'
+                            ? ['#ffd700', '#ff8c00', '#fff', '#ffe066']  // Golden celebration
+                            : scoreTier === 'fire'
+                                ? ['#ff6b35', '#ff0080', '#ffd700', '#fff']  // Fire party
+                                : ['#00d4ff', '#0066ff', '#00ff88', '#fff']  // Cool success
+                    }
+                />
             )}
+
+            {/* Extra bottom padding for sticky CTA visibility */}
+            <div className="h-4" />
 
             <Footer className="opacity-30 pt-6 pb-4" />
         </div>
