@@ -24,7 +24,8 @@ export const generateShareCard = async ({
     shareFormat,
     uploadedImage,
     userId,
-    isPro
+    isPro,
+    eventContext = null  // { theme, themeEmoji, rank, weekId }
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -180,14 +181,41 @@ export const generateShareCard = async ({
             ctx.stroke()
             ctx.shadowBlur = 0
 
-            // PREMIUM BRANDING - "FITRATE AI" Seal
+            // PREMIUM BRANDING - Dynamic header for regular vs event
             ctx.save()
-            ctx.fillStyle = '#fff'
-            ctx.font = 'black 28px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.letterSpacing = '12px'
-            ctx.globalAlpha = 0.8
-            ctx.fillText('FITRATE AI', 540, 80)
+
+            if (eventContext) {
+                // EVENT MODE: Show theme with emoji
+                ctx.fillStyle = '#10b981'  // Emerald for events
+                ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText(`${eventContext.themeEmoji} ${eventContext.theme.toUpperCase()}`, 540, 70)
+
+                // Weekly Challenge badge
+                ctx.fillStyle = 'rgba(16,185,129,0.2)'
+                ctx.beginPath()
+                const badgeWidth = 220
+                ctx.roundRect(540 - badgeWidth / 2, 82, badgeWidth, 32, 16)
+                ctx.fill()
+                ctx.fillStyle = '#10b981'
+                ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText('🏆 WEEKLY CHALLENGE', 540, 103)
+
+                // If ranked, show rank badge
+                if (eventContext.rank) {
+                    const rankY = 130
+                    ctx.fillStyle = eventContext.rank <= 5 ? '#fbbf24' : '#fff'
+                    ctx.font = 'black 24px -apple-system, BlinkMacSystemFont, sans-serif'
+                    ctx.fillText(`#${eventContext.rank} ON LEADERBOARD`, 540, rankY)
+                }
+            } else {
+                // REGULAR MODE: "FITRATE AI" seal
+                ctx.fillStyle = '#fff'
+                ctx.font = 'black 28px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.letterSpacing = '12px'
+                ctx.globalAlpha = 0.8
+                ctx.fillText('FITRATE AI', 540, 80)
+            }
             ctx.restore()
 
             // CONVERSATION STAMP

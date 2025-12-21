@@ -1090,12 +1090,21 @@ export default function App() {
     }
 
     try {
+      // Build event context for themed share card
+      const eventShareContext = (eventMode && currentEvent && scores?.eventStatus) ? {
+        theme: currentEvent.theme,
+        themeEmoji: currentEvent.themeEmoji,
+        rank: scores.eventStatus.rank,
+        weekId: currentEvent.weekId
+      } : null
+
       const { file, text, url, imageBlob } = await generateShareCardUtil({
         scores,
         shareFormat,
         uploadedImage,
         userId,
-        isPro: isPro || false
+        isPro: isPro || false,
+        eventContext: eventShareContext
       })
 
       // Store shareData for potential future use
@@ -1338,6 +1347,7 @@ export default function App() {
         onShowPaywall={() => setShowPaywall(true)}
         playSound={playSound}
         vibrate={vibrate}
+        currentEvent={eventMode ? currentEvent : null}
       />
     )
   }

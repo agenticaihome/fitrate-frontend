@@ -128,7 +128,8 @@ export default function ResultsScreen({
     onGenerateShareCard,
     onShowPaywall,
     playSound,
-    vibrate
+    vibrate,
+    currentEvent = null  // Weekly event context
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
@@ -413,6 +414,49 @@ export default function ResultsScreen({
                         <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
                         <p className="text-xs text-white/40 mt-1">Top {Math.max(1, 100 - scores.percentile)}% of all fits today</p>
                     </div>
+
+                    {/* ===== EVENT STATUS BANNER ===== */}
+                    {currentEvent && scores.eventStatus && (
+                        <div
+                            className="mt-4 pt-4 border-t border-emerald-500/20"
+                            style={{ animation: 'fadeIn 0.5s ease-out' }}
+                        >
+                            <div
+                                className="flex items-center justify-between p-3 rounded-xl"
+                                style={{
+                                    background: scores.eventStatus.rank <= 5
+                                        ? 'linear-gradient(135deg, rgba(251,191,36,0.15) 0%, rgba(16,185,129,0.15) 100%)'
+                                        : 'rgba(16,185,129,0.1)',
+                                    border: scores.eventStatus.rank <= 5
+                                        ? '1px solid rgba(251,191,36,0.3)'
+                                        : '1px solid rgba(16,185,129,0.2)'
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl">{currentEvent.themeEmoji}</span>
+                                    <div>
+                                        <p className="text-sm font-bold text-emerald-400">
+                                            {currentEvent.theme}
+                                        </p>
+                                        <p className="text-[10px] text-emerald-300/70 uppercase tracking-wider">
+                                            {scores.eventStatus.rank <= 5 ? '🏆 Top 5!' : 'Entry recorded'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p
+                                        className="text-2xl font-black"
+                                        style={{
+                                            color: scores.eventStatus.rank <= 5 ? '#fbbf24' : '#10b981'
+                                        }}
+                                    >
+                                        #{scores.eventStatus.rank || '—'}
+                                    </p>
+                                    <p className="text-[9px] text-white/40">on leaderboard</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
