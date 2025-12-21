@@ -102,32 +102,6 @@ export default function SharePreviewScreen({
         }
     }
 
-    const shareToTwitter = () => {
-        playSound('click')
-        vibrate(15)
-        const text = encodeURIComponent(getShareText())
-        const url = encodeURIComponent(getShareUrl())
-        trackShare('twitter', 'outfit_rating', scores?.overall)
-        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
-    }
-
-    const shareToFacebook = () => {
-        playSound('click')
-        vibrate(15)
-        const url = encodeURIComponent(getShareUrl())
-        trackShare('facebook', 'outfit_rating', scores?.overall)
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank')
-    }
-
-    const shareToReddit = () => {
-        playSound('click')
-        vibrate(15)
-        const title = encodeURIComponent(getShareText())
-        const url = encodeURIComponent(getShareUrl())
-        trackShare('reddit', 'outfit_rating', scores?.overall)
-        window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank')
-    }
-
     const shareToSMS = () => {
         playSound('click')
         vibrate(15)
@@ -270,37 +244,6 @@ export default function SharePreviewScreen({
                     >
                         <span className="text-xl mb-1" aria-hidden="true">🔗</span>
                         <span className="text-[10px] font-bold text-white/70">Copy Link</span>
-                    </button>
-                </div>
-                <div className="grid grid-cols-3 gap-2" role="group" aria-label="Social media sharing">
-                    {/* X (Twitter) */}
-                    <button
-                        onClick={shareToTwitter}
-                        aria-label="Share to X, formerly Twitter"
-                        className="glass-card flex flex-col items-center justify-center p-2.5 rounded-xl transition-all active:scale-95 hover:bg-white/[0.08]"
-                    >
-                        <span className="text-lg mb-0.5" aria-hidden="true">𝕏</span>
-                        <span className="text-[9px] font-bold text-white/50">X</span>
-                    </button>
-
-                    {/* Facebook */}
-                    <button
-                        onClick={shareToFacebook}
-                        aria-label="Share to Facebook"
-                        className="glass-card flex flex-col items-center justify-center p-2.5 rounded-xl transition-all active:scale-95 hover:bg-white/[0.08]"
-                    >
-                        <span className="text-lg mb-0.5" aria-hidden="true">📘</span>
-                        <span className="text-[9px] font-bold text-white/50">Facebook</span>
-                    </button>
-
-                    {/* Reddit */}
-                    <button
-                        onClick={shareToReddit}
-                        aria-label="Share to Reddit"
-                        className="glass-card flex flex-col items-center justify-center p-2.5 rounded-xl transition-all active:scale-95 hover:bg-white/[0.08]"
-                    >
-                        <span className="text-lg mb-0.5" aria-hidden="true">🤖</span>
-                        <span className="text-[9px] font-bold text-white/50">Reddit</span>
                     </button>
                 </div>
             </div>

@@ -551,11 +551,47 @@ export default function ResultsScreen({
                     🔄 {scores.overall >= 85 ? "Beat this? Scan again" : scores.overall < 50 ? "Redeem yourself" : "Rate Another"}
                 </button>
 
-                {/* Scans remaining */}
+                {/* Scans remaining or Inline Paywall */}
                 {!isPro && (
-                    <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 text-white/25">
-                        {scansRemaining > 0 ? `⚡ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left` : '⏰ Daily limit reached'}
-                    </p>
+                    scansRemaining > 0 ? (
+                        <p className="text-center text-[10px] uppercase font-bold tracking-widest mt-3 text-white/25">
+                            ⚡ {scansRemaining} free scan{scansRemaining !== 1 ? 's' : ''} left
+                        </p>
+                    ) : (
+                        <div
+                            className="mt-4 p-5 rounded-2xl border cursor-pointer group transition-all hover:scale-[1.02]"
+                            onClick={onShowPaywall}
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(0,212,255,0.05) 100%)',
+                                borderColor: 'rgba(255,215,0,0.25)',
+                                boxShadow: '0 0 40px rgba(255,215,0,0.15)'
+                            }}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-lg">⏰</span>
+                                <span className="text-xs font-black text-yellow-500 uppercase tracking-wider animate-pulse">
+                                    Daily Limit Reached
+                                </span>
+                                <span className="text-lg">🔒</span>
+                            </div>
+                            <h3 className="text-base font-black text-white text-center mb-2">
+                                Want more ratings?
+                            </h3>
+                            <p className="text-xs text-white/60 text-center mb-4">
+                                Unlock unlimited scans + Pro analysis
+                            </p>
+                            <div
+                                className="w-full py-3 rounded-xl font-bold text-sm text-center transition-all group-hover:brightness-110"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                    color: '#000',
+                                    boxShadow: '0 4px 0 rgba(0,0,0,0.2)'
+                                }}
+                            >
+                                Upgrade Now →
+                            </div>
+                        </div>
+                    )
                 )}
 
                 {/* Mode switch */}
