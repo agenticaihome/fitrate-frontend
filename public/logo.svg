@@ -1,56 +1,61 @@
 <svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Hanger Icon -->
-  <g transform="translate(40, 25)">
-    <!-- Hanger hook (curved) -->
-    <path d="M 90 50 
-             C 90 30, 100 20, 115 20
-             C 130 20, 140 30, 140 45
-             C 140 60, 125 68, 115 75"
+  <!-- Premium Wire Hanger Icon -->
+  <g transform="translate(30, 15)">
+    <!-- Hook (elegant curved hook like real wire hanger) -->
+    <path d="M 115 55 
+             C 115 25, 130 12, 145 12
+             C 162 12, 172 28, 172 45
+             C 172 62, 158 72, 145 78"
           stroke="url(#gradient1)"
-          stroke-width="14"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
     <!-- Cyan notification dot (brand signature) -->
-    <circle cx="148" cy="28" r="11" fill="#00D4FF"/>
+    <circle cx="180" cy="22" r="10" fill="#00D4FF"/>
     
-    <!-- Left shoulder (angled line) -->
-    <path d="M 115 75 L 25 130"
+    <!-- Left shoulder curve (elegant wire curve) -->
+    <path d="M 145 78 
+             C 130 85, 80 95, 30 125
+             C 15 135, 20 145, 35 145"
           stroke="url(#gradient1)"
-          stroke-width="14"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Right shoulder (angled line) -->
-    <path d="M 115 75 L 205 130"
+    <!-- Right shoulder curve (elegant wire curve) -->
+    <path d="M 145 78 
+             C 160 85, 210 95, 260 125
+             C 275 135, 270 145, 255 145"
           stroke="url(#gradient1)"
-          stroke-width="14"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Bottom curved bar (rounded hanger bottom) -->
-    <path d="M 25 130 Q 115 155, 205 130"
+    <!-- Bottom bar (slightly curved for premium feel) -->
+    <path d="M 35 145 
+             C 85 155, 205 155, 255 145"
           stroke="url(#gradient1)"
-          stroke-width="14"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
   </g>
 
   <!-- FitRate Text -->
-  <text x="290" y="110"
+  <text x="320" y="115"
         font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
         font-size="85"
         font-weight="800"
         fill="white">FitRate</text>
   
-  <!-- .app Text (smaller, gray, offset right) -->
-  <text x="580" y="155"
+  <!-- .app Text (smaller, subtle) -->
+  <text x="610" y="158"
         font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        font-size="45"
+        font-size="42"
         font-weight="500"
-        fill="#9CA3AF">.app</text>
+        fill="#6B7280">.app</text>
 
-  <!-- Gradient Definition - Purple to Blue -->
+  <!-- Gradient Definition - Premium Purple to Blue -->
   <defs>
     <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#A855F7;stop-opacity:1" />
