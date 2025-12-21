@@ -18,7 +18,7 @@ export default function RestoreProModal({ onClose }) {
         playSound('click')
         vibrate(20)
         // Open email client with pre-filled subject
-        window.location.href = 'mailto:support@fitrate.app?subject=Restore%20Pro%20Access&body=Hi%2C%0A%0AI%20need%20to%20restore%20my%20Pro%20access.%0A%0AEmail%20used%20for%20purchase%3A%20%0A%0AThank%20you!'
+        window.location.href = 'mailto:support@agenticaihome.com?subject=Restore%20Pro%20Access&body=Hi%2C%0A%0AI%20need%20to%20restore%20my%20Pro%20access.%0A%0AEmail%20used%20for%20purchase%3A%20%0A%0AThank%20you!'
     }
 
     return (
