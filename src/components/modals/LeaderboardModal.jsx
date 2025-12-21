@@ -75,6 +75,13 @@ export default function LeaderboardModal({
                     onClose={() => { setShowLeaderboard(false); vibrate(10); }}
                 />
 
+                {/* Live Countdown Timer */}
+                {currentEvent?.endDate && (
+                    <div className="flex justify-center mb-3">
+                        <EventCountdown endDate={currentEvent.endDate} />
+                    </div>
+                )}
+
                 {/* Prize Banner */}
                 <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center">
                     <span className="text-sm" aria-hidden="true">👑</span>
