@@ -81,6 +81,19 @@ const SHARE_TIPS = [
 
 const getRandomShareTip = () => SHARE_TIPS[Math.floor(Math.random() * SHARE_TIPS.length)]
 
+// Helper: Social proof percentile (used by both mock scores and real AI results)
+const getPercentile = (score) => {
+  if (score >= 95) return 99
+  if (score >= 90) return 96
+  if (score >= 85) return 91
+  if (score >= 80) return 84
+  if (score >= 75) return 73
+  if (score >= 70) return 61
+  if (score >= 65) return 48
+  if (score >= 60) return 35
+  return Math.floor(score * 0.4)
+}
+
 // ============================================
 // GA4 SHARE TRACKING
 // Track share events for virality analytics
