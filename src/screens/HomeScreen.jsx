@@ -27,6 +27,7 @@ export default function HomeScreen({
     onShowPaywall,
     onShowLeaderboard,
     onShowRules,
+    onShowRestore,      // Show restore Pro modal
     onError
 }) {
     // Local State
@@ -736,6 +737,28 @@ export default function HomeScreen({
                         }}
                     >
                         👑 Go Pro
+                    </button>
+                )}
+
+                {/* Restore Pro link for returning users */}
+                {!isPro && onShowRestore && (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.preventDefault(); e.stopPropagation();
+                            playSound('click'); vibrate(10);
+                            onShowRestore();
+                        }}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'rgba(255,255,255,0.4)',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            padding: '8px'
+                        }}
+                    >
+                        Already Pro? Restore purchase
                     </button>
                 )}
             </div>

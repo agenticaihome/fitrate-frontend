@@ -22,6 +22,7 @@ import PaywallScreen from './screens/PaywallScreen'
 import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
 import EventExplainerModal from './components/modals/EventExplainerModal'
+import RestoreProModal from './components/modals/RestoreProModal'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -198,6 +199,7 @@ export default function App() {
   const [leaderboard, setLeaderboard] = useState([])
   const [showEventRules, setShowEventRules] = useState(false)
   const [showEventExplainer, setShowEventExplainer] = useState(false)
+  const [showRestoreModal, setShowRestoreModal] = useState(false)
 
   // Track if user has seen event explainer modal
   const [hasSeenEventExplainer, setHasSeenEventExplainer] = useState(() => {
@@ -1375,6 +1377,24 @@ export default function App() {
 
   if (showRules) {
     return <RulesModal onClose={() => setShowRules(false)} />
+  }
+
+  // ============================================
+  // RESTORE PRO MODAL
+  // ============================================
+  if (showRestoreModal) {
+    return (
+      <RestoreProModal
+        userId={userId}
+        onClose={() => setShowRestoreModal(false)}
+        onRestoreSuccess={() => {
+          setIsPro(true)
+          localStorage.setItem('fitrate_pro', 'true')
+          setShowRestoreModal(false)
+          setScreen('home')
+        }}
+      />
+    )
   }
 
   return null
