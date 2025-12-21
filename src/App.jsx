@@ -18,6 +18,7 @@ import ProWelcomeScreen from './screens/ProWelcomeScreen'
 import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
 import RulesScreen from './screens/RulesScreen'
+import ChallengeResultScreen from './screens/ChallengeResultScreen'
 
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
@@ -945,7 +946,12 @@ export default function App() {
         setLastScore(data.scores.overall)
 
         setScores(scores)
-        setScreen('results')
+        // If user came from a challenge link, show comparison screen first
+        if (challengeScore) {
+          setScreen('challenge-result')
+        } else {
+          setScreen('results')
+        }
         return
       } catch (err) {
         console.error('Analysis error:', err)
@@ -1000,7 +1006,12 @@ export default function App() {
         fetchUserEventStatus()
       }
 
-      setScreen('results')
+      // If user came from a challenge link, show comparison screen first
+      if (challengeScore) {
+        setScreen('challenge-result')
+      } else {
+        setScreen('results')
+      }
     } catch (err) {
       console.error('Analysis error:', err)
       if (err.name === 'AbortError') {
@@ -1262,8 +1273,29 @@ export default function App() {
   }
 
   // ============================================
-  // RESULTS SCREEN - The Viral Engine
+  // CHALLENGE RESULT SCREEN - "Who Won?"
   // ============================================
+  if (screen === 'challenge-result' && scores && challengeScore) {
+    return (
+      <ChallengeResultScreen
+        userScore={scores.overall}
+        challengeScore={challengeScore}
+        onViewResults={() => setScreen('results')}
+        onChallengeBack={() => {
+          // Clear challenge score and trigger share for rematch
+          setChallengeScore(null)
+          setScreen('results')
+          // Auto-trigger share after a short delay
+          setTimeout(() => generateShareCard(), 500)
+        }}
+        onTryAgain={() => {
+          setChallengeScore(null) // Clear so next scan goes to results
+          resetApp()
+        }}
+      />
+    )
+  }
+
   // ============================================
   // RESULTS SCREEN - The Viral Engine
   // ============================================
