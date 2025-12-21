@@ -59,7 +59,8 @@ export const generateShareCard = async ({
 
             // Mode-specific colors
             const getModeAccent = () => {
-                if (scores.roastMode) return { mid: '#2a1a1a', glow: 'rgba(255,68,68,0.4)', accent: '#ff4444', light: '#ff6666' }
+                if (scores.mode === 'savage') return { mid: '#1a0a1a', glow: 'rgba(139,0,255,0.5)', accent: '#8b00ff', light: '#ff0044' }
+                if (scores.roastMode || scores.mode === 'roast') return { mid: '#2a1a1a', glow: 'rgba(255,68,68,0.4)', accent: '#ff4444', light: '#ff6666' }
                 if (scores.mode === 'honest') return { mid: '#1a1a2a', glow: 'rgba(74,144,217,0.4)', accent: '#4A90D9', light: '#6BA8E8' }
                 return { mid: '#1a1a2e', glow: 'rgba(0,212,255,0.4)', accent: '#00d4ff', light: '#00ff88' }
             }

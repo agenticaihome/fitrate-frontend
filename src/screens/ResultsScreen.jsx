@@ -127,7 +127,6 @@ export default function ResultsScreen({
     onSetMode,
     onGenerateShareCard,
     onShowPaywall,
-    onBack,
     playSound,
     vibrate
 }) {

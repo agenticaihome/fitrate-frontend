@@ -932,11 +932,16 @@ export default function App() {
         localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
         setDailyStreak(newStreak)
 
-        // Add virality features to real scores
+        // Add virality features to real scores + subscore fallbacks
+        const overall = data.scores.overall
         const scores = {
           ...data.scores,
-          percentile: getPercentile(data.scores.overall),
-          isLegendary: data.scores.overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
+          // Subscore fallbacks: if AI doesn't return, generate from overall ±5
+          color: data.scores.color ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+          fit: data.scores.fit ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+          style: data.scores.style ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+          percentile: data.scores.percentile ?? getPercentile(overall),
+          isLegendary: overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
           shareTip: getRandomShareTip(),
           previousScore: lastScore // For "you improved!" messaging
         }
@@ -999,7 +1004,20 @@ export default function App() {
       localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
       setDailyStreak(newStreak)
 
-      setScores({ ...data.scores, mode, roastMode: mode === 'roast' || mode === 'savage' })
+      // Add subscore fallbacks for Pro users (same as free tier for consistency)
+      const overall = data.scores.overall
+      setScores({
+        ...data.scores,
+        mode,
+        roastMode: mode === 'roast' || mode === 'savage',
+        // Subscore fallbacks: if AI doesn't return, generate from overall ±5
+        color: data.scores.color ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+        fit: data.scores.fit ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+        style: data.scores.style ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
+        percentile: data.scores.percentile ?? getPercentile(overall),
+        isLegendary: overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
+        shareTip: getRandomShareTip()
+      })
 
       // Refresh event status if user participated in event mode
       if (eventMode && currentEvent) {
@@ -1275,6 +1293,13 @@ export default function App() {
   // ============================================
   // CHALLENGE RESULT SCREEN - "Who Won?"
   // ============================================
+  // Safety fallback: if we have challengeScore but no scores (scan failed), redirect home
+  if (screen === 'challenge-result' && challengeScore && !scores) {
+    setChallengeScore(null)
+    setScreen('home')
+    return null
+  }
+
   if (screen === 'challenge-result' && scores && challengeScore) {
     return (
       <ChallengeResultScreen
@@ -1317,9 +1342,6 @@ export default function App() {
     )
   }
 
-  // ============================================
-  // ERROR SCREEN
-  // ============================================
   // ============================================
   // ERROR SCREEN
   // ============================================
