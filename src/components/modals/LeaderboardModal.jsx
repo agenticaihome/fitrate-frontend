@@ -157,12 +157,18 @@ export default function LeaderboardModal({
                     </div>
                 )}
 
-                {/* User in Top 5 - Celebration */}
+                {/* User in Top 5 - Celebration + Share */}
                 {userEventStatus?.participating && userEventStatus.rank <= 5 && (
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-emerald-500/20 border border-yellow-500/30 p-3 rounded-xl mb-4 text-center">
-                        <span className="text-2xl">🎉</span>
-                        <p className="text-yellow-300 font-bold">You're in the Top 5!</p>
-                        <p className="text-[10px] text-yellow-400/70">Keep your spot to win 1 Year FREE Pro!</p>
+                    <div className="bg-gradient-to-r from-yellow-500/20 to-emerald-500/20 border border-yellow-500/30 p-4 rounded-xl mb-4 text-center">
+                        <span className="text-3xl">🎉</span>
+                        <p className="text-yellow-300 font-bold text-lg">You're #{userEventStatus.rank}!</p>
+                        <p className="text-[10px] text-yellow-400/70 mb-3">Keep your spot to win 1 Year FREE Pro!</p>
+                        <button
+                            onClick={() => setShowWinnerCard(true)}
+                            className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-yellow-500 to-amber-500 text-black active:scale-[0.97] transition-transform"
+                        >
+                            📤 Share My Win
+                        </button>
                     </div>
                 )}
 
@@ -203,6 +209,19 @@ export default function LeaderboardModal({
                     </div>
                 )}
             </div>
+
+            {/* Winner Share Card Modal */}
+            {showWinnerCard && userEventStatus?.rank <= 5 && (
+                <WinnerShareCard
+                    rank={userEventStatus.rank}
+                    score={userEventStatus.bestScore}
+                    theme={currentEvent?.theme}
+                    themeEmoji={currentEvent?.themeEmoji}
+                    weekId={currentEvent?.weekId}
+                    isPro={isPro}
+                    onClose={() => setShowWinnerCard(false)}
+                />
+            )}
         </div>
     )
 }

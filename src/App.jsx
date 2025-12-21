@@ -1095,10 +1095,10 @@ export default function App() {
   // returning from home screen if showPaywall is true - instead show paywall inline.
 
   // ============================================
-  // EVENT RULES MODAL
+  // EVENT RULES SCREEN
   // ============================================
   if (showEventRules) {
-    return <RulesModal event={currentEvent} onClose={() => setShowEventRules(false)} />
+    return <RulesScreen currentEvent={currentEvent} onClose={() => setShowEventRules(false)} />
   }
 
   // ============================================
@@ -1160,7 +1160,7 @@ export default function App() {
         }}
         onShowPaywall={() => setShowPaywall(true)}
         onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
-        onShowRules={() => setShowRules(true)}
+        onShowRules={() => setShowEventRules(true)}
         onError={(msg) => { setError(msg); setScreen('error'); }}
       />
     )
