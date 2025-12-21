@@ -3,39 +3,41 @@
   <rect width="192" height="192" rx="40" fill="#0a0a0f"/>
   
   <!-- Hanger Icon - centered for 192x192 -->
-  <g transform="translate(96, 55)">
-    <!-- Hanger hook (curved S-shape) -->
-    <path d="M 0 25 
-             C 0 10, 8 2, 18 2
-             C 28 2, 36 10, 36 22
-             C 36 34, 24 38, 16 42"
+  <g transform="translate(96, 50)">
+    <!-- Hanger hook (curved) -->
+    <path d="M 0 30 
+             C 0 12, 10 2, 22 2
+             C 34 2, 44 12, 44 27
+             C 44 42, 30 48, 20 55"
           stroke="url(#hangerGrad)"
-          stroke-width="8"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Hanger shoulders -->
-    <path d="M 16 42 L -45 85"
+    <!-- Left shoulder -->
+    <path d="M 20 55 L -55 100"
           stroke="url(#hangerGrad)"
-          stroke-width="8"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
-    <path d="M 16 42 L 77 85"
+    <!-- Right shoulder -->
+    <path d="M 20 55 L 95 100"
           stroke="url(#hangerGrad)"
-          stroke-width="8"
+          stroke-width="10"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Bottom bar -->
-    <line x1="-45" y1="85" x2="77" y2="85"
+    <!-- Bottom curved bar -->
+    <path d="M -55 100 Q 20 118, 95 100"
           stroke="url(#hangerGrad)"
-          stroke-width="8"
+          stroke-width="10"
+          fill="none"
           stroke-linecap="round"/>
   </g>
   
   <!-- Cyan notification dot -->
-  <circle cx="144" cy="50" r="10" fill="#00D4FF"/>
+  <circle cx="152" cy="48" r="12" fill="#00D4FF"/>
   
   <!-- Gradients - Purple to Blue -->
   <defs>

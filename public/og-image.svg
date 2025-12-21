@@ -65,10 +65,11 @@
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Bottom bar -->
-    <line x1="-35" y1="115" x2="90" y2="115"
+    <!-- Bottom curved bar -->
+    <path d="M -35 115 Q 28 135, 90 115"
           stroke="url(#brandGrad)"
           stroke-width="10"
+          fill="none"
           stroke-linecap="round"/>
   </g>
   

@@ -1,36 +1,38 @@
 <svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Hanger Icon -->
-  <g transform="translate(50, 30)">
-    <!-- Hanger hook (curved S-shape) -->
-    <path d="M 85 45 
-             C 85 25, 95 15, 110 15
-             C 125 15, 135 25, 135 40
-             C 135 55, 120 60, 110 65"
+  <g transform="translate(40, 25)">
+    <!-- Hanger hook (curved) -->
+    <path d="M 90 50 
+             C 90 30, 100 20, 115 20
+             C 130 20, 140 30, 140 45
+             C 140 60, 125 68, 115 75"
           stroke="url(#gradient1)"
-          stroke-width="12"
+          stroke-width="14"
           fill="none"
           stroke-linecap="round"/>
     
     <!-- Cyan notification dot (brand signature) -->
-    <circle cx="142" cy="22" r="10" fill="#00D4FF"/>
+    <circle cx="148" cy="28" r="11" fill="#00D4FF"/>
     
-    <!-- Hanger shoulders (angled lines from center) -->
-    <path d="M 110 65 L 30 120"
+    <!-- Left shoulder (angled line) -->
+    <path d="M 115 75 L 25 130"
           stroke="url(#gradient1)"
-          stroke-width="12"
+          stroke-width="14"
           fill="none"
           stroke-linecap="round"/>
     
-    <path d="M 110 65 L 190 120"
+    <!-- Right shoulder (angled line) -->
+    <path d="M 115 75 L 205 130"
           stroke="url(#gradient1)"
-          stroke-width="12"
+          stroke-width="14"
           fill="none"
           stroke-linecap="round"/>
     
-    <!-- Bottom bar of hanger -->
-    <line x1="30" y1="120" x2="190" y2="120"
+    <!-- Bottom curved bar (rounded hanger bottom) -->
+    <path d="M 25 130 Q 115 155, 205 130"
           stroke="url(#gradient1)"
-          stroke-width="12"
+          stroke-width="14"
+          fill="none"
           stroke-linecap="round"/>
   </g>
 
@@ -41,7 +43,7 @@
         font-weight="800"
         fill="white">FitRate</text>
   
-  <!-- .app Text (smaller, gray, below) -->
+  <!-- .app Text (smaller, gray, offset right) -->
   <text x="580" y="155"
         font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
         font-size="45"
