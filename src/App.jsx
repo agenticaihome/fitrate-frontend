@@ -206,6 +206,7 @@ export default function App() {
   const [emailChecking, setEmailChecking] = useState(false)
   const [proEmail, setProEmail] = useState('')
   const [referralCount, setReferralCount] = useState(0)
+  const [totalReferrals, setTotalReferrals] = useState(() => parseInt(localStorage.getItem('fitrate_total_referrals') || '0'))
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [scores, setScores] = useState(null)
   const [uploadedImage, setUploadedImage] = useState(null)
@@ -350,6 +351,7 @@ export default function App() {
             }
             // Track referral progress for UI display
             if (data.totalReferrals !== undefined) {
+              setTotalReferrals(data.totalReferrals)
               localStorage.setItem('fitrate_total_referrals', data.totalReferrals.toString())
             }
           }
@@ -1491,6 +1493,7 @@ export default function App() {
         setScreen={setScreen}
         userId={userId}
         score={scores?.overall}
+        totalReferrals={totalReferrals}
       />
     )
   }
