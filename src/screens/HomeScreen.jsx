@@ -203,6 +203,14 @@ export default function HomeScreen({
     // ==========================================
     // Helpers
     // ==========================================
+
+    // Samsung Galaxy devices have issues with capture="environment" silently failing
+    // Detect Samsung devices to conditionally omit the capture attribute
+    const isSamsungDevice = () => {
+        const ua = navigator.userAgent.toLowerCase();
+        return ua.includes('samsung') || ua.includes('sm-') || ua.includes('galaxy');
+    }
+
     const getModeColor = () => {
         switch (mode) {
             case 'savage': return '#8b00ff'
@@ -380,8 +388,15 @@ export default function HomeScreen({
                 </div>
             )}
 
-            {/* Inputs */}
-            <input type="file" accept="image/*" capture="environment" id="mobileCameraInput" onChange={handleFileUpload} className="hidden" />
+            {/* Inputs - Samsung Galaxy devices need capture omitted to work properly */}
+            <input
+                type="file"
+                accept="image/*"
+                capture={isSamsungDevice() ? undefined : "environment"}
+                id="mobileCameraInput"
+                onChange={handleFileUpload}
+                className="hidden"
+            />
             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
             <canvas ref={canvasRef} className="hidden" />
 
