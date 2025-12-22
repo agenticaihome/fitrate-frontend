@@ -81,7 +81,7 @@ export default function EventExplainerModal({
                             id="event-explainer-title"
                             className="text-2xl font-black text-white mb-1"
                         >
-                            Weekly Style Challenge
+                            Weekly Challenge
                         </h2>
                         <p
                             id="event-explainer-desc"
@@ -115,7 +115,7 @@ export default function EventExplainerModal({
                                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">2</span>
                                 <div>
                                     <p className="text-white font-medium text-sm">AI rates your fit</p>
-                                    <p className="text-xs text-gray-400">Score based on theme + style</p>
+                                    <p className="text-xs text-gray-400">Theme = 50% of your score!</p>
                                 </div>
                             </li>
                             <li className="flex items-start gap-3">

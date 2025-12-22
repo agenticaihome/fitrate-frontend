@@ -91,7 +91,11 @@ export default function RulesScreen({ onClose, currentEvent }) {
                     <ul className="space-y-2 text-sm text-gray-300">
                         <li className="flex items-start gap-2">
                             <span className="text-emerald-400">•</span>
-                            <span>AI rates <strong className="text-white">0-100</strong> based on theme + style</span>
+                            <span><strong className="text-purple-400">Theme = 50%</strong> of your score!</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-emerald-400">•</span>
+                            <span>AI rates <strong className="text-white">0-100</strong> (theme + style)</span>
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="text-emerald-400">•</span>
