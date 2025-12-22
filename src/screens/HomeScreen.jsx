@@ -39,6 +39,11 @@ export default function HomeScreen({
     const [cameraError, setCameraError] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [showProModes, setShowProModes] = useState(false) // For Pro mode expansion
+    const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
+
+    // Platform Detection Helpers
+    const isAndroid = () => /Android/i.test(navigator.userAgent)
+    const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
 
     // Refs
     const videoRef = useRef(null)
@@ -249,23 +254,37 @@ export default function HomeScreen({
         playSound('click')
         vibrate(20)
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-            // ANDROID FIX: Chrome on Android 14/15 has a bug where file inputs
-            // don't show the camera option. Use live camera (getUserMedia) for 
-            // ALL mobile devices for consistent experience.
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-            if (isMobile) {
-                // Try to start live camera first (works on all devices)
-                startCamera().catch(err => {
-                    console.log('Camera failed, falling back to file picker:', err)
-                    // Only fallback to file picker if camera fails (permissions denied, etc.)
-                    document.getElementById('mobileCameraInput')?.click()
-                })
+            // PLATFORM-SPECIFIC CAMERA HANDLING:
+            // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
+            // - iOS: Native camera via getUserMedia works perfectly
+            // - Desktop: getUserMedia for live camera preview
+            if (isAndroid()) {
+                // Android: Show dual-button picker modal
+                setShowAndroidPhotoModal(true)
             } else {
+                // iOS and Desktop: Use getUserMedia for live camera
                 startCamera()
             }
         } else {
             onShowPaywall()
         }
+    }
+
+    // Android-specific handlers for dual-button modal
+    const handleAndroidTakePhoto = () => {
+        setShowAndroidPhotoModal(false)
+        playSound('click')
+        vibrate(15)
+        // Directly click camera input with capture attribute (forces native camera)
+        document.getElementById('androidCameraInput')?.click()
+    }
+
+    const handleAndroidUploadPhoto = () => {
+        setShowAndroidPhotoModal(false)
+        playSound('click')
+        vibrate(15)
+        // Click gallery input without capture attribute
+        document.getElementById('androidGalleryInput')?.click()
     }
 
     // ==========================================
@@ -397,16 +416,33 @@ export default function HomeScreen({
                 </div>
             )}
 
-            {/* Inputs - Samsung Galaxy devices need capture omitted to work properly */}
+            {/* Visually Hidden Inputs - Android needs separate camera vs gallery inputs
+                Using visibility technique instead of display:none for Android compatibility */}
+            {/* Android Camera Input - with capture attribute to force native camera */}
             <input
                 type="file"
                 accept="image/*"
-                capture={isSamsungDevice() ? undefined : "environment"}
-                id="mobileCameraInput"
+                capture="environment"
+                id="androidCameraInput"
                 onChange={handleFileUpload}
-                className="hidden"
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
             />
-            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+            {/* Android Gallery Input - no capture, opens gallery picker */}
+            <input
+                type="file"
+                accept="image/*"
+                id="androidGalleryInput"
+                onChange={handleFileUpload}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
+            {/* Fallback input for iOS/desktop when getUserMedia fails */}
+            <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Pro Badge - Moved to bottom/footer area for cleaner above-fold */}
@@ -930,6 +966,64 @@ export default function HomeScreen({
                     </button>
                 )}
             </div>
+
+            {/* Android Photo Picker Modal - dual buttons for camera vs gallery */}
+            {showAndroidPhotoModal && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-end justify-center"
+                    style={{ background: 'rgba(0,0,0,0.8)' }}
+                    onClick={() => setShowAndroidPhotoModal(false)}
+                >
+                    <div
+                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                        style={{
+                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
+                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-6" />
+                        <h3 className="text-white text-lg font-bold text-center mb-6">
+                            Choose Photo Source
+                        </h3>
+                        <div className="flex flex-col gap-3">
+                            {/* Take Photo Button */}
+                            <button
+                                onClick={handleAndroidTakePhoto}
+                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                                    color: '#000',
+                                    boxShadow: '0 4px 20px rgba(0,212,255,0.3)'
+                                }}
+                            >
+                                <span className="text-2xl">📷</span>
+                                Take Photo
+                            </button>
+                            {/* Upload Photo Button */}
+                            <button
+                                onClick={handleAndroidUploadPhoto}
+                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    border: '1px solid rgba(255,255,255,0.2)'
+                                }}
+                            >
+                                <span className="text-2xl">🖼️</span>
+                                Upload Photo
+                            </button>
+                            {/* Cancel Button */}
+                            <button
+                                onClick={() => setShowAndroidPhotoModal(false)}
+                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer className="opacity-50" />
         </div >
