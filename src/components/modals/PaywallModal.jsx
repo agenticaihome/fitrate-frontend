@@ -79,30 +79,47 @@ export default function PaywallModal({
                                 </div>
                             </div>
 
-                            {/* Visual Lock Tease - The Core "Non-Greedy" Hook */}
-                            <div className="flex items-center gap-2 mb-3 bg-black/10 p-2 rounded-lg">
+                            {/* Visual Lock Tease - All 8 modes (2 free + 6 Pro) */}
+                            <div className="flex items-center gap-1.5 mb-3 bg-black/10 p-2 rounded-lg flex-wrap">
                                 <span className="text-[10px] uppercase font-black text-black/60 mr-1">Modes:</span>
-                                <div className="flex gap-2 text-lg">
+                                <div className="flex gap-1.5 text-base">
                                     <span title="Nice">😌</span>
                                     <span title="Roast">🔥</span>
-                                    <div className="relative">
-                                        <span>🧠</span>
-                                        <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
+                                    <div className="relative" title="Honest">
+                                        <span>📊</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
                                     </div>
-                                    <div className="relative">
-                                        <span>😈</span>
-                                        <div className="absolute -top-1 -right-1 text-[8px] bg-black text-white px-1 rounded-full">🔒</div>
+                                    <div className="relative" title="Savage">
+                                        <span>💀</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
+                                    </div>
+                                    <div className="relative" title="Rizz">
+                                        <span>😏</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
+                                    </div>
+                                    <div className="relative" title="Celebrity">
+                                        <span>🎭</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
+                                    </div>
+                                    <div className="relative" title="Aura">
+                                        <span>🔮</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
+                                    </div>
+                                    <div className="relative" title="Chaos">
+                                        <span>🎪</span>
+                                        <div className="absolute -top-1 -right-1 text-[6px] bg-black text-white px-0.5 rounded-full">🔒</div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Benefits - Precision Focus */}
+                            {/* Benefits - Comprehensive Pro Value */}
                             <div className="space-y-1.5 pl-1">
                                 {[
-                                    'Expert-Level Style Analysis',
-                                    'Deep Critique & Insights',
-                                    'Unlock Honest & Savage Modes',
-                                    'Precision Scoring (87.4)'
+                                    '25 ratings/day (vs 5 free)',
+                                    '6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos',
+                                    'Precision Scoring (87.4 vs 87)',
+                                    '5 Weekly Challenge entries/day',
+                                    'Golden Insights + Pro Tips'
                                 ].map((benefit, i) => (
                                     <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
                                         <span className="text-black text-sm flex-shrink-0">✓</span>
@@ -208,10 +225,12 @@ export default function PaywallModal({
 
                         {/* Rows */}
                         {[
-                            { label: 'AI Engine', free: 'Standard', pro: 'Elite Pro' },
-                            { label: 'Style IQ', free: 'Basic', pro: 'Expert-Level' },
-                            { label: 'Critique', free: 'Basic', pro: 'Expert Level' },
-                            { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' }
+                            { label: 'Daily Ratings', free: '5/day', pro: '25/day' },
+                            { label: 'AI Modes', free: '2', pro: 'All 8' },
+                            { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' },
+                            { label: 'Challenge', free: '1/week', pro: '5/day' },
+                            { label: 'Golden Insights', free: '—', pro: '✓' },
+                            { label: 'Pro Tips', free: '—', pro: '✓' }
                         ].map((row, i) => (
                             <React.Fragment key={i}>
                                 <div className="col-span-3 h-px bg-white/5 my-1" />
