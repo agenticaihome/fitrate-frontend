@@ -964,7 +964,9 @@ export default function App() {
           // Include eventInfo if present in the response (for weekly challenge tracking)
           eventInfo: data.eventInfo,
           // Include eventStatus for share card rank display
-          eventStatus: data.eventStatus
+          eventStatus: data.eventStatus,
+          // PRO PREVIEW: Flag if this was a Pro taste scan (shows Pro features in results)
+          wasProPreview: data.scanInfo?.wasProPreview || false
         }
 
         // Save this score as the new lastScore

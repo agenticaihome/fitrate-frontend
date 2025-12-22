@@ -750,7 +750,7 @@ export default function ResultsScreen({
             </div>
 
             {/* ===== PRO TIP CARD ===== */}
-            {isPro && scores.proTip && (
+            {(isPro || scores.wasProPreview) && scores.proTip && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
                         className="p-4 rounded-2xl border backdrop-blur-xl"
@@ -768,8 +768,8 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== GOLDEN INSIGHTS (PRO) ===== */}
-            {isPro && (scores.identityReflection || scores.socialPerception) && (
+            {/* ===== GOLDEN INSIGHTS (PRO + PRO PREVIEW) ===== */}
+            {(isPro || scores.wasProPreview) && (scores.identityReflection || scores.socialPerception) && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
                         className="p-5 rounded-2xl border backdrop-blur-xl"
@@ -801,8 +801,8 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== PRO TEASER (FREE USERS) ===== */}
-            {!isPro && revealStage >= 5 && (
+            {/* ===== PRO TEASER (FREE USERS - Hide for Pro Preview) ===== */}
+            {!isPro && !scores.wasProPreview && revealStage >= 5 && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
                         className="p-5 rounded-2xl border backdrop-blur-xl relative overflow-hidden cursor-pointer group"
