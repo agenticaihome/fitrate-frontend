@@ -4,13 +4,15 @@
  */
 
 export const LIMITS = {
-    // Scans
-    FREE_SCANS_DAILY: 5,
-    PRO_SCANS_DAILY: 25, // Soft cap to prevent abuse, effectively unlimited for humans
+    // Scans - Hybrid Model: 1 Pro Preview (GPT-4o) + 1 Free (Gemini)
+    FREE_SCANS_DAILY: 1,           // Gemini-powered free scan
+    FREE_PRO_PREVIEW_DAILY: 1,     // GPT-4o "taste" scan (first scan of day)
+    TOTAL_FREE_DAILY: 2,           // Combined for user display
+    PRO_SCANS_DAILY: 25,           // Soft cap to prevent abuse
 
     // Weekly Event
     FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
-    PRO_EVENT_ENTRIES_DAILY: 5,   // Pro users can submit up to 25/day
+    PRO_EVENT_ENTRIES_DAILY: 5,    // Pro users can submit up to 5/day
     WINNER_COOLDOWN_WEEKS: 4,      // Previous winners sit out 4 weeks
 
     // Bonuses

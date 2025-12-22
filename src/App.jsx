@@ -173,9 +173,20 @@ export default function App() {
     const stored = localStorage.getItem('fitrate_scans')
     if (stored) {
       const { date, count } = JSON.parse(stored)
-      if (date === today) return Math.max(0, LIMITS.FREE_SCANS_DAILY - count)
+      if (date === today) return Math.max(0, LIMITS.TOTAL_FREE_DAILY - count)
     }
-    return LIMITS.FREE_SCANS_DAILY
+    return LIMITS.TOTAL_FREE_DAILY  // 2 total (1 Pro + 1 Free)
+  })
+
+  // Pro Preview tracking: First scan of day uses GPT-4o
+  const [proPreviewAvailable, setProPreviewAvailable] = useState(() => {
+    const today = new Date().toDateString()
+    const stored = localStorage.getItem('fitrate_pro_preview')
+    if (stored) {
+      const { date, used } = JSON.parse(stored)
+      if (date === today) return !used
+    }
+    return true // First scan of day = Pro Preview available
   })
 
   // Pro Roasts available (from referrals or $0.99 purchase)
@@ -918,6 +929,12 @@ export default function App() {
           setScansRemaining(data.scanInfo.scansRemaining + bonus)
           const used = data.scanInfo.scansUsed || 1
           localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
+
+          // Track Pro Preview usage - if this was a Pro Preview scan, mark it used
+          if (data.scanInfo.wasProPreview) {
+            setProPreviewAvailable(false)
+            localStorage.setItem('fitrate_pro_preview', JSON.stringify({ date: new Date().toDateString(), used: true }))
+          }
         }
 
         // Update Streak
@@ -1268,6 +1285,7 @@ export default function App() {
         setMode={setMode}
         isPro={isPro}
         scansRemaining={scansRemaining}
+        proPreviewAvailable={proPreviewAvailable}
         dailyStreak={dailyStreak}
         currentEvent={currentEvent}
         eventMode={eventMode}

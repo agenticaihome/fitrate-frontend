@@ -10,6 +10,7 @@ export default function HomeScreen({
     setMode,
     isPro,
     scansRemaining,
+    proPreviewAvailable = false,  // True = first scan uses GPT-4o
     dailyStreak,
     currentEvent,
     eventMode,
@@ -689,9 +690,26 @@ export default function HomeScreen({
             <div className="mb-6 flex flex-col items-center gap-3">
                 <div className="flex items-center justify-center gap-3">
                     {!isPro && (
-                        <span className="text-xs text-white/40">
-                            {scansRemaining} scan{scansRemaining !== 1 ? 's' : ''} left today
-                        </span>
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
+                            background: proPreviewAvailable
+                                ? 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(0,212,255,0.15) 100%)'
+                                : 'rgba(255,255,255,0.05)',
+                            border: proPreviewAvailable
+                                ? '1px solid rgba(255,215,0,0.3)'
+                                : '1px solid rgba(255,255,255,0.1)'
+                        }}>
+                            {proPreviewAvailable ? (
+                                <>
+                                    <span className="text-xs font-bold text-yellow-400">🌟 Pro</span>
+                                    <span className="text-xs text-white/40">+</span>
+                                    <span className="text-xs font-medium text-cyan-400">✨ Free</span>
+                                </>
+                            ) : scansRemaining > 0 ? (
+                                <span className="text-xs font-medium text-cyan-400">✨ {scansRemaining} Free left</span>
+                            ) : (
+                                <span className="text-xs font-medium text-white/40">No scans left</span>
+                            )}
+                        </div>
                     )}
                     {isPro && (
                         <span className="px-3 py-1 rounded-full text-xs font-bold" style={{

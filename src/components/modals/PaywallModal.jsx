@@ -115,7 +115,7 @@ export default function PaywallModal({
                             {/* Benefits - Comprehensive Pro Value */}
                             <div className="space-y-1.5 pl-1">
                                 {[
-                                    '25 ratings/day (vs 5 free)',
+                                    '25 ratings/day (vs 2 free)',
                                     '6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos',
                                     'Precision Scoring (87.4 vs 87)',
                                     '5 Weekly Challenge entries/day',
@@ -225,11 +225,11 @@ export default function PaywallModal({
 
                         {/* Rows */}
                         {[
-                            { label: 'Daily Ratings', free: '5/day', pro: '25/day' },
+                            { label: 'Daily Ratings', free: '2/day', pro: '25/day' },
+                            { label: 'Pro AI', free: '1/day taste', pro: 'Every scan' },
                             { label: 'AI Modes', free: '2', pro: 'All 8' },
                             { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' },
                             { label: 'Challenge', free: '1/week', pro: '5/day' },
-                            { label: 'Golden Insights', free: '—', pro: '✓' },
                             { label: 'Pro Tips', free: '—', pro: '✓' }
                         ].map((row, i) => (
                             <React.Fragment key={i}>
