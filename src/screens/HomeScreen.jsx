@@ -256,13 +256,16 @@ export default function HomeScreen({
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
             // PLATFORM-SPECIFIC CAMERA HANDLING:
             // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
-            // - iOS: Native camera via getUserMedia works perfectly
+            // - iOS: Use native camera app via file input with capture attribute
             // - Desktop: getUserMedia for live camera preview
             if (isAndroid()) {
                 // Android: Show dual-button picker modal
                 setShowAndroidPhotoModal(true)
+            } else if (isIOS()) {
+                // iOS: Open native Camera app directly (not our custom camera view)
+                document.getElementById('androidCameraInput')?.click()
             } else {
-                // iOS and Desktop: Use getUserMedia for live camera
+                // Desktop: Use getUserMedia for live camera preview
                 startCamera()
             }
         } else {
