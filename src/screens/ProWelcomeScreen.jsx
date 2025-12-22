@@ -14,16 +14,19 @@ export default function ProWelcomeScreen({ onStart }) {
                 You now have 25 ratings per day
             </p>
 
-            <div className="p-6 rounded-2xl mb-8 text-center" style={{
+            <div className="p-6 rounded-2xl mb-8 text-left" style={{
                 background: 'rgba(0,255,136,0.1)',
                 border: '1px solid rgba(0,255,136,0.3)',
                 backdropFilter: 'blur(10px)'
             }}>
-                <p className="text-base" style={{ color: '#00ff88' }}>
-                    ✨ 25 ratings per day<br />
-                    🤖 Advanced AI analysis<br />
-                    🔥 All modes unlocked
-                </p>
+                <div className="space-y-2" style={{ color: '#00ff88' }}>
+                    <p className="text-sm">⚡ 25 ratings per day</p>
+                    <p className="text-sm">🎭 6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos</p>
+                    <p className="text-sm">📊 Precision scoring (87.4 vs 87)</p>
+                    <p className="text-sm">🏆 5 Weekly Challenge entries/day</p>
+                    <p className="text-sm">✨ Golden Insights (Identity + Perception)</p>
+                    <p className="text-sm">💡 Pro Tips on every result</p>
+                </div>
             </div>
 
             <button
