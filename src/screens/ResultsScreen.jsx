@@ -43,6 +43,9 @@ const TierBadge = ({ tier, score }) => {
 
 // Challenge Card Component - Visually distinct card for weekly challenges
 const ChallengeCard = ({ eventInfo, eventStatus, delay }) => {
+    // Defensive checks: ensure eventInfo has required properties
+    if (!eventInfo || !eventInfo.theme) return null
+
     const isTopRank = eventStatus?.rank && eventStatus.rank <= 5
 
     return (
@@ -97,11 +100,11 @@ const ChallengeCard = ({ eventInfo, eventStatus, delay }) => {
 
                     {/* Theme Name & Emoji */}
                     <div className="text-center mb-4">
-                        <div className="text-5xl mb-3">{eventInfo.themeEmoji}</div>
+                        <div className="text-5xl mb-3">{eventInfo?.themeEmoji || '🎯'}</div>
                         <h2 className="text-2xl font-black text-white mb-2">
                             {eventInfo.theme}
                         </h2>
-                        {eventInfo.themeDescription && (
+                        {eventInfo?.themeDescription && (
                             <p className="text-sm text-white/60 italic">
                                 "{eventInfo.themeDescription}"
                             </p>
