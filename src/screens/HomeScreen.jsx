@@ -208,6 +208,10 @@ export default function HomeScreen({
             case 'savage': return '#8b00ff'
             case 'roast': return '#ff4444'
             case 'honest': return '#0077ff'
+            case 'rizz': return '#ff69b4'     // Hot pink
+            case 'celeb': return '#ffd700'    // Gold
+            case 'aura': return '#9b59b6'     // Purple
+            case 'chaos': return '#ff6b6b'    // Coral
             default: return '#00d4ff'
         }
     }
@@ -216,6 +220,10 @@ export default function HomeScreen({
             case 'savage': return 'rgba(139,0,255,0.4)'
             case 'roast': return 'rgba(255,68,68,0.4)'
             case 'honest': return 'rgba(0,119,255,0.4)'
+            case 'rizz': return 'rgba(255,105,180,0.4)'
+            case 'celeb': return 'rgba(255,215,0,0.4)'
+            case 'aura': return 'rgba(155,89,182,0.4)'
+            case 'chaos': return 'rgba(255,107,107,0.4)'
             default: return 'rgba(0,212,255,0.4)'
         }
     }
@@ -223,7 +231,10 @@ export default function HomeScreen({
     // Derived Styles
     const accent = getModeColor()
     const accentGlow = getModeGlow()
-    const accentEnd = mode === 'savage' ? '#ff0044' : mode === 'roast' ? '#ff8800' : mode === 'honest' ? '#00d4ff' : '#00ff88'
+    const accentEnd = {
+        savage: '#ff0044', roast: '#ff8800', honest: '#00d4ff',
+        rizz: '#ff1493', celeb: '#ff8c00', aura: '#8e44ad', chaos: '#ee5a24'
+    }[mode] || '#00ff88'
 
     const handleStart = () => {
         playSound('click')
@@ -463,13 +474,17 @@ export default function HomeScreen({
 
                         {/* Icon & Text */}
                         <span className="relative text-8xl mb-4 drop-shadow-2xl" aria-hidden="true">
-                            {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
+                            {eventMode && currentEvent ? currentEvent.themeEmoji :
+                                mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' :
+                                    mode === 'rizz' ? '😏' : mode === 'celeb' ? '🎭' : mode === 'aura' ? '🔮' : mode === 'chaos' ? '🎪' : '📸'}
                         </span>
                         <span className={`relative text-white font-black uppercase text-center px-4 leading-tight ${eventMode && currentEvent
                             ? 'text-base tracking-wide max-w-[200px]'  // Smaller for event themes
                             : 'text-2xl tracking-widest'  // Original size for mode names
                             }`}>
-                            {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
+                            {eventMode && currentEvent ? currentEvent.theme.toUpperCase() :
+                                mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' :
+                                    mode === 'rizz' ? 'CHECK MY RIZZ' : mode === 'celeb' ? 'JUDGE MY FIT' : mode === 'aura' ? 'READ MY AURA' : mode === 'chaos' ? 'CHAOS MODE' : 'RATE MY FIT'}
                         </span>
 
                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
@@ -529,7 +544,7 @@ export default function HomeScreen({
                     {!isPro && <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-black text-[10px]">PRO</span>}
                 </button>
 
-                {/* Pro Modes (Honest & Savage) - Collapsible */}
+                {/* Pro Modes - Collapsible (6 modes in 2x3 grid) */}
                 {showProModes && (
                     <div className="grid grid-cols-2 gap-2 pt-1">
                         {/* PRO: Honest */}
@@ -570,6 +585,86 @@ export default function HomeScreen({
                             {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
                             <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">💀</span>
                             <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-500'}`}>Savage</span>
+                        </button>
+
+                        {/* PRO: Rizz Rating */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('rizz'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Rizz mode - rate your dating potential" : "Rizz mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'rizz' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'rizz' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'rizz' && isPro ? 'rgba(255,105,180,0.25)' : 'rgba(255,105,180,0.1)',
+                                border: mode === 'rizz' && isPro ? '1px solid #ff69b4' : '1px dashed rgba(255,105,180,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'rizz' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">😏</span>
+                            <span className={`text-sm font-medium ${mode === 'rizz' && isPro ? 'text-white' : 'text-gray-500'}`}>Rizz</span>
+                        </button>
+
+                        {/* PRO: Celebrity Judge */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('celeb'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Celebrity mode - get judged by fashion icons" : "Celebrity mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'celeb' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'celeb' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'celeb' && isPro ? 'rgba(255,215,0,0.25)' : 'rgba(255,215,0,0.1)',
+                                border: mode === 'celeb' && isPro ? '1px solid #ffd700' : '1px dashed rgba(255,215,0,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'celeb' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🎭</span>
+                            <span className={`text-sm font-medium ${mode === 'celeb' && isPro ? 'text-white' : 'text-gray-500'}`}>Celeb</span>
+                        </button>
+
+                        {/* PRO: Aura / Vibe Check */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('aura'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Aura mode - read your vibe and energy" : "Aura mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'aura' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'aura' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'aura' && isPro ? 'rgba(155,89,182,0.25)' : 'rgba(155,89,182,0.1)',
+                                border: mode === 'aura' && isPro ? '1px solid #9b59b6' : '1px dashed rgba(155,89,182,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'aura' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🔮</span>
+                            <span className={`text-sm font-medium ${mode === 'aura' && isPro ? 'text-white' : 'text-gray-500'}`}>Aura</span>
+                        </button>
+
+                        {/* PRO: Chaos Mode */}
+                        <button
+                            onClick={() => {
+                                playSound('click'); vibrate(15);
+                                if (isPro) { setMode('chaos'); setEventMode(false); }
+                                else onShowPaywall();
+                            }}
+                            aria-label={isPro ? "Chaos mode - unhinged AI feedback" : "Chaos mode - Pro feature, tap to upgrade"}
+                            aria-pressed={mode === 'chaos' && isPro}
+                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'chaos' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
+                            style={{
+                                background: mode === 'chaos' && isPro ? 'rgba(255,107,107,0.25)' : 'rgba(255,107,107,0.1)',
+                                border: mode === 'chaos' && isPro ? '1px solid #ff6b6b' : '1px dashed rgba(255,107,107,0.4)'
+                            }}
+                        >
+                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
+                            <span className={`text-base ${mode === 'chaos' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🎪</span>
+                            <span className={`text-sm font-medium ${mode === 'chaos' && isPro ? 'text-white' : 'text-gray-500'}`}>Chaos</span>
                         </button>
                     </div>
                 )}

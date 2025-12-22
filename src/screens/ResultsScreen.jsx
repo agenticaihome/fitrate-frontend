@@ -419,7 +419,11 @@ export default function ResultsScreen({
             savage: { accent: '#8b00ff', end: '#ff0044', glow: 'rgba(139,0,255,0.5)' },
             roast: { accent: '#ff4444', end: '#ff8800', glow: 'rgba(255,68,68,0.5)' },
             honest: { accent: '#0077ff', end: '#00d4ff', glow: 'rgba(0,119,255,0.5)' },
-            nice: { accent: '#00d4ff', end: '#00ff88', glow: 'rgba(0,212,255,0.5)' }
+            nice: { accent: '#00d4ff', end: '#00ff88', glow: 'rgba(0,212,255,0.5)' },
+            rizz: { accent: '#ff69b4', end: '#ff1493', glow: 'rgba(255,105,180,0.5)' },
+            celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.5)' },
+            aura: { accent: '#9b59b6', end: '#8e44ad', glow: 'rgba(155,89,182,0.5)' },
+            chaos: { accent: '#ff6b6b', end: '#ee5a24', glow: 'rgba(255,107,107,0.5)' }
         }
         return themes[scores?.mode] || themes.nice
     }, [scores?.mode])
@@ -806,6 +810,112 @@ export default function ResultsScreen({
                                         <p className="text-xs text-white/80">{v}</p>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ===== RIZZ MODE CARD ===== */}
+            {scores.mode === 'rizz' && scores.rizzType && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,105,180,0.08)', borderColor: 'rgba(255,105,180,0.25)' }}>
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-black text-pink-400 uppercase tracking-widest">😏 Rizz Rating</span>
+                            <span className="text-2xl font-black text-pink-400">{scores.pullProbability || scores.overall}%</span>
+                        </div>
+                        <div className="text-center mb-3">
+                            <span className="text-3xl font-black text-white">{scores.rizzType}</span>
+                        </div>
+                        {scores.pickupLine && (
+                            <div className="bg-pink-500/10 rounded-xl p-3 mb-3">
+                                <span className="text-[10px] font-bold text-pink-300 uppercase">Pickup Line:</span>
+                                <p className="text-sm text-white/90 italic">"{scores.pickupLine}"</p>
+                            </div>
+                        )}
+                        {scores.datingApps && (
+                            <div className="flex justify-around text-center">
+                                <div><span className="text-lg">🔥</span><p className="text-xs text-white/60">Tinder</p><p className="text-lg font-black text-pink-400">{scores.datingApps.tinder}/10</p></div>
+                                <div><span className="text-lg">💜</span><p className="text-xs text-white/60">Hinge</p><p className="text-lg font-black text-pink-400">{scores.datingApps.hinge}/10</p></div>
+                                <div><span className="text-lg">🐝</span><p className="text-xs text-white/60">Bumble</p><p className="text-lg font-black text-pink-400">{scores.datingApps.bumble}/10</p></div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ===== CELEBRITY JUDGE CARD ===== */}
+            {scores.mode === 'celeb' && scores.celebrityJudge && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">🎭</span>
+                            <span className="text-lg font-black text-yellow-400">{scores.celebrityJudge}</span>
+                        </div>
+                        {scores.celebQuote && (
+                            <blockquote className="bg-yellow-500/10 rounded-xl p-4 mb-3 border-l-4 border-yellow-500">
+                                <p className="text-sm text-white/90 italic">"{scores.celebQuote}"</p>
+                                <cite className="text-[10px] text-yellow-400/70 mt-2 block">— {scores.celebrityJudge}</cite>
+                            </blockquote>
+                        )}
+                        <div className="text-center">
+                            <span className={`text-xl font-black ${scores.wouldTheyWear ? 'text-green-400' : 'text-red-400'}`}>
+                                {scores.wouldTheyWear ? '✅ Would Wear' : '❌ Would NOT Wear'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ===== AURA / VIBE CHECK CARD ===== */}
+            {scores.mode === 'aura' && scores.auraColor && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.25)' }}>
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-black text-purple-400 uppercase tracking-widest">🔮 Aura Reading</span>
+                            <span className="text-lg font-black text-purple-400">{scores.energyLevel || scores.overall}% Energy</span>
+                        </div>
+                        <div className="text-center mb-4">
+                            <div className="inline-block px-6 py-3 rounded-full" style={{ background: 'linear-gradient(135deg, rgba(155,89,182,0.3), rgba(155,89,182,0.1))', border: '2px solid rgba(155,89,182,0.5)' }}>
+                                <span className="text-3xl font-black text-purple-300">{scores.auraColor} Aura</span>
+                            </div>
+                        </div>
+                        {scores.vibeAssessment && (
+                            <div className="text-center mb-3">
+                                <span className="text-xs uppercase text-white/40">Vibe Assessment</span>
+                                <p className="text-xl font-black text-white">{scores.vibeAssessment}</p>
+                            </div>
+                        )}
+                        {scores.spiritualRoast && (
+                            <div className="bg-purple-500/10 rounded-xl p-3">
+                                <p className="text-sm text-white/80 italic text-center">"✨ {scores.spiritualRoast}"</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ===== CHAOS MODE CARD ===== */}
+            {scores.mode === 'chaos' && scores.chaosLevel && (
+                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,107,107,0.08)', borderColor: 'rgba(255,107,107,0.25)', animation: scores.chaosLevel >= 8 ? 'shake 0.5s infinite' : 'none' }}>
+                        <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-black text-red-400 uppercase tracking-widest">🎪 Chaos Level</span>
+                            <span className="text-2xl font-black text-red-400">{scores.chaosLevel}/10</span>
+                        </div>
+                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+                            <div className="h-full bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full" style={{ width: `${scores.chaosLevel * 10}%` }} />
+                        </div>
+                        {scores.absurdComparison && (
+                            <div className="bg-red-500/10 rounded-xl p-3 mb-3">
+                                <span className="text-[10px] font-bold text-red-300 uppercase">Chaos Take:</span>
+                                <p className="text-sm text-white/90">"{scores.absurdComparison}"</p>
+                            </div>
+                        )}
+                        {scores.alternateReality && (
+                            <div className="text-center">
+                                <span className="text-[10px] uppercase text-white/40">In Another Universe</span>
+                                <p className="text-sm text-white/70 italic">{scores.alternateReality}</p>
                             </div>
                         )}
                     </div>
