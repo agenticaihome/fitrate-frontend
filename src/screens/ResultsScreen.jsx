@@ -42,7 +42,7 @@ const TierBadge = ({ tier, score }) => {
 }
 
 // Challenge Card Component - Visually distinct card for weekly challenges
-const ChallengeCard = ({ eventInfo, eventStatus, delay }) => {
+const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay }) => {
     // Defensive checks: ensure eventInfo has required properties
     if (!eventInfo || !eventInfo.theme) return null
 
@@ -110,6 +110,40 @@ const ChallengeCard = ({ eventInfo, eventStatus, delay }) => {
                             </p>
                         )}
                     </div>
+
+                    {/* AI Theme Verdict - Show how AI judged theme compliance */}
+                    {themeVerdict && (
+                        <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] uppercase tracking-wider text-purple-300 font-bold">
+                                    🎯 Theme Alignment
+                                </span>
+                                {themeScore !== undefined && (
+                                    <span className="text-sm font-black text-purple-400">
+                                        {themeScore}/100
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-sm text-white/80 italic">
+                                "{themeVerdict}"
+                            </p>
+                            {themeScore !== undefined && (
+                                <div className="mt-2 h-1.5 bg-purple-900/50 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full rounded-full"
+                                        style={{
+                                            width: `${themeScore}%`,
+                                            background: themeScore >= 80
+                                                ? 'linear-gradient(90deg, #10b981, #34d399)'
+                                                : themeScore >= 50
+                                                    ? 'linear-gradient(90deg, #fbbf24, #f59e0b)'
+                                                    : 'linear-gradient(90deg, #ef4444, #f87171)'
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Divider */}
                     <div className="h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent mb-4" />
@@ -591,6 +625,8 @@ export default function ResultsScreen({
                 <ChallengeCard
                     eventInfo={scores.eventInfo || currentEvent}
                     eventStatus={scores.eventStatus || { rank: null, score: scores.overall, action: 'submitted' }}
+                    themeScore={scores.themeScore}
+                    themeVerdict={scores.themeVerdict}
                     delay={0.4}
                 />
             )}
