@@ -116,11 +116,11 @@ export default function RulesScreen({ onClose, currentEvent }) {
                     <ul className="space-y-2 text-sm text-gray-300">
                         <li className="flex items-start gap-2">
                             <span className="text-yellow-400">👑</span>
-                            <span><strong className="text-yellow-300">Top 5</strong> win 1 Year FREE Pro</span>
+                            <span><strong className="text-yellow-300">#1 Winner</strong> gets 1 Year FREE Pro!</span>
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="text-yellow-400">⏳</span>
-                            <span>Previous winners sit out 4 weeks</span>
+                            <span>Top 5 finishers sit out 4 weeks</span>
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="text-yellow-400">🎉</span>
