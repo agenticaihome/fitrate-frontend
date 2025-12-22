@@ -610,18 +610,41 @@ export default function ResultsScreen({
                             />
                         </svg>
 
-                        {/* Score Number - HUGE */}
+                        {/* Score Number - HUGE with Pro decimal precision */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span
-                                className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
-                                style={{
-                                    color: isLegendary ? undefined : theme.accent,
-                                    textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`,
+                            {(isPro || scores.wasProPreview) ? (
+                                // PRO: Show decimal precision with gold highlight
+                                <div className="flex items-baseline" style={{
                                     animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
-                                }}
-                            >
-                                {displayedScore}
-                            </span>
+                                }}>
+                                    <span
+                                        className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
+                                        style={{
+                                            color: isLegendary ? undefined : theme.accent,
+                                            textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`
+                                        }}
+                                    >
+                                        {Math.floor(scores.overall)}
+                                    </span>
+                                    <span className="text-4xl md:text-5xl font-black text-yellow-400" style={{
+                                        textShadow: '0 0 20px rgba(255,215,0,0.5)'
+                                    }}>
+                                        .{Math.round((scores.overall % 1) * 10)}
+                                    </span>
+                                </div>
+                            ) : (
+                                // FREE: Integer only
+                                <span
+                                    className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
+                                    style={{
+                                        color: isLegendary ? undefined : theme.accent,
+                                        textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`,
+                                        animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
+                                    }}
+                                >
+                                    {displayedScore}
+                                </span>
+                            )}
                             <span className="text-sm font-bold text-white/30 tracking-widest">/ 100</span>
                         </div>
                     </div>
@@ -631,6 +654,28 @@ export default function ResultsScreen({
                 <div className={`transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                     <TierBadge tier={scoreTier} score={scores.overall} />
                 </div>
+
+                {/* PRO ANALYSIS BADGE - Shows for Pro and Pro Preview */}
+                {(isPro || scores.wasProPreview) && (
+                    <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                        <div
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.1) 100%)',
+                                border: '1px solid rgba(255,215,0,0.4)',
+                                boxShadow: '0 0 20px rgba(255,215,0,0.2)'
+                            }}
+                        >
+                            <span className="text-sm">⚡</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400">
+                                Pro Analysis
+                            </span>
+                            <span className="text-[8px] font-bold text-yellow-400/60 uppercase">
+                                GPT-4o
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* ===== VERDICT CARD ===== */}
@@ -749,50 +794,65 @@ export default function ResultsScreen({
                 </div>
             </div>
 
-            {/* ===== PRO TIP CARD ===== */}
-            {(isPro || scores.wasProPreview) && scores.proTip && (
+            {/* ===== UNIFIED PRO INSIGHTS SECTION ===== */}
+            {(isPro || scores.wasProPreview) && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
-                        className="p-4 rounded-2xl border backdrop-blur-xl"
+                        className="p-5 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden"
                         style={{
-                            background: `linear-gradient(135deg, ${theme.accent}15 0%, ${theme.end}10 100%)`,
-                            borderColor: `${theme.accent}33`
+                            background: 'linear-gradient(145deg, rgba(255,215,0,0.08) 0%, rgba(255,180,0,0.04) 50%, rgba(255,140,0,0.02) 100%)',
+                            borderColor: 'rgba(255,215,0,0.35)',
+                            boxShadow: '0 0 40px rgba(255,215,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
                         }}
                     >
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-lg">💡</span>
-                            <span className="text-xs font-black uppercase tracking-widest" style={{ color: theme.accent }}>Pro Tip</span>
-                        </div>
-                        <p className="text-sm text-white/90 leading-relaxed">"{scores.proTip}"</p>
-                    </div>
-                </div>
-            )}
+                        {/* Premium glow effect */}
+                        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30"
+                            style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%)' }}
+                        />
 
-            {/* ===== GOLDEN INSIGHTS (PRO + PRO PREVIEW) ===== */}
-            {(isPro || scores.wasProPreview) && (scores.identityReflection || scores.socialPerception) && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    <div
-                        className="p-5 rounded-2xl border backdrop-blur-xl"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,140,0,0.04) 100%)',
-                            borderColor: 'rgba(255,215,0,0.2)',
-                            boxShadow: '0 0 40px rgba(255,215,0,0.1)'
-                        }}
-                    >
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="text-xl">✨</span>
-                            <span className="text-sm font-black uppercase tracking-widest text-yellow-500">Golden Insights</span>
+                        {/* Section Header */}
+                        <div className="relative z-10 flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl">✨</span>
+                                <span className="text-sm font-black uppercase tracking-widest text-yellow-400">
+                                    Pro Insights
+                                </span>
+                            </div>
+                            <div className="px-2 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30">
+                                <span className="text-[9px] font-bold text-yellow-400/80 uppercase">Premium</span>
+                            </div>
                         </div>
-                        <div className="space-y-4">
+
+                        <div className="relative z-10 space-y-4">
+                            {/* Pro Tip */}
+                            {scores.proTip && (
+                                <div className="p-3 rounded-xl bg-black/20">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-base">💡</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Style Upgrade</span>
+                                    </div>
+                                    <p className="text-sm text-white/90 leading-relaxed italic">"{scores.proTip}"</p>
+                                </div>
+                            )}
+
+                            {/* Identity Reflection */}
                             {scores.identityReflection && (
-                                <div>
-                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Identity</span>
+                                <div className="p-3 rounded-xl bg-black/20">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-base">🪞</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Identity</span>
+                                    </div>
                                     <p className="text-sm text-white/90 leading-relaxed">{scores.identityReflection}</p>
                                 </div>
                             )}
+
+                            {/* Social Perception */}
                             {scores.socialPerception && (
-                                <div>
-                                    <span className="text-[10px] font-bold text-white/40 uppercase block mb-1">Perception</span>
+                                <div className="p-3 rounded-xl bg-black/20">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-base">👥</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Perception</span>
+                                    </div>
                                     <p className="text-sm text-white/90 leading-relaxed">{scores.socialPerception}</p>
                                 </div>
                             )}
@@ -801,40 +861,59 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== PRO TEASER (FREE USERS - Hide for Pro Preview) ===== */}
+            {/* ===== ENHANCED PRO TEASER (FREE USERS - Hide for Pro Preview) ===== */}
             {!isPro && !scores.wasProPreview && revealStage >= 5 && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
-                        className="p-5 rounded-2xl border backdrop-blur-xl relative overflow-hidden cursor-pointer group"
+                        className="p-6 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden cursor-pointer group active:scale-[0.98] transition-transform"
                         onClick={onShowPaywall}
                         style={{
-                            background: 'linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,140,0,0.02) 100%)',
-                            borderColor: 'rgba(255,215,0,0.15)',
+                            background: 'linear-gradient(145deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.03) 100%)',
+                            borderColor: 'rgba(255,215,0,0.25)',
+                            boxShadow: '0 0 30px rgba(255,215,0,0.1)'
                         }}
                     >
+                        {/* Animated shimmer effect */}
+                        <div
+                            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+                            style={{
+                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.1) 50%, transparent 100%)',
+                            }}
+                        />
+
                         {/* Blurred content preview */}
-                        <div className="blur-[6px] select-none pointer-events-none">
+                        <div className="blur-[8px] select-none pointer-events-none opacity-60">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className="text-xl">✨</span>
-                                <span className="text-sm font-black uppercase tracking-widest text-yellow-500/50">Golden Insights</span>
+                                <span className="text-sm font-black uppercase tracking-widest text-yellow-500/50">Pro Insights</span>
                             </div>
                             <div className="space-y-3">
-                                <div>
-                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Identity</span>
-                                    <p className="text-sm text-white/30 leading-relaxed">This outfit projects a confident, creative energy that blends...</p>
+                                <div className="p-3 rounded-xl bg-black/20">
+                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">💡 Style Upgrade</span>
+                                    <p className="text-sm text-white/30 leading-relaxed">Consider adding a statement accessory to elevate...</p>
                                 </div>
-                                <div>
-                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">Perception</span>
-                                    <p className="text-sm text-white/30 leading-relaxed">Others see someone who takes style seriously without...</p>
+                                <div className="p-3 rounded-xl bg-black/20">
+                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">🪞 Identity</span>
+                                    <p className="text-sm text-white/30 leading-relaxed">This outfit projects a confident, creative energy...</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Unlock overlay */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 group-hover:bg-black/50 transition-colors">
-                            <span className="text-2xl mb-2">🔒</span>
-                            <span className="text-sm font-black text-yellow-400 uppercase tracking-wide">Unlock Deep Analysis</span>
-                            <span className="text-xs text-white/50 mt-1">See what your fit really says about you</span>
+                        {/* Unlock overlay - larger and more prominent */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black/30 via-black/50 to-black/30 group-hover:from-black/40 group-hover:via-black/60 group-hover:to-black/40 transition-colors">
+                            <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">🔒</div>
+                            <span className="text-lg font-black text-yellow-400 uppercase tracking-wide mb-1">Unlock Pro Insights</span>
+                            <span className="text-xs text-white/60 mb-4 text-center px-4">Style tips, identity reflection & social perception</span>
+                            <div
+                                className="px-6 py-2.5 rounded-full font-bold text-sm group-hover:scale-105 transition-transform"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                    color: '#000',
+                                    boxShadow: '0 4px 20px rgba(255,215,0,0.4)'
+                                }}
+                            >
+                                See What Your Fit Says →
+                            </div>
                         </div>
                     </div>
                 </div>
