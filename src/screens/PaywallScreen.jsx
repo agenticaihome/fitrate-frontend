@@ -69,12 +69,20 @@ export default function PaywallScreen({
                         <span className="text-sm text-white/80 font-medium">25 ratings per day</span>
                     </div>
                     <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
-                        <span className="text-lg">🎯</span>
-                        <span className="text-sm text-white/80 font-medium">All AI modes unlocked</span>
+                        <span className="text-lg">🎭</span>
+                        <span className="text-sm text-white/80 font-medium">6 Pro modes: Honest, Savage, Rizz & more</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
+                        <span className="text-lg">📊</span>
+                        <span className="text-sm text-white/80 font-medium">Precision scoring (87.4 vs 87)</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
+                        <span className="text-lg">🏆</span>
+                        <span className="text-sm text-white/80 font-medium">5 Weekly Challenge entries/day</span>
                     </div>
                     <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
                         <span className="text-lg">✨</span>
-                        <span className="text-sm text-white/80 font-medium">Advanced style insights</span>
+                        <span className="text-sm text-white/80 font-medium">Golden Insights + Pro Tips</span>
                     </div>
                 </div>
 
