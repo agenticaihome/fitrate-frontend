@@ -123,8 +123,8 @@ export default function RulesScreen({ onClose, currentEvent }) {
                             <span><strong className="text-yellow-300">#1 Winner</strong> gets 1 Year FREE Pro!</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">⏳</span>
-                            <span>Top 5 finishers sit out 4 weeks</span>
+                            <span className="text-yellow-400">🔄</span>
+                            <span>Win again? You keep your Pro status!</span>
                         </li>
                         <li className="flex items-start gap-2">
                             <span className="text-yellow-400">🎉</span>
