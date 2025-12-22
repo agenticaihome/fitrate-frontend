@@ -465,7 +465,10 @@ export default function HomeScreen({
                         <span className="relative text-8xl mb-4 drop-shadow-2xl" aria-hidden="true">
                             {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
                         </span>
-                        <span className="relative text-white text-2xl font-black tracking-widest uppercase">
+                        <span className={`relative text-white font-black uppercase text-center px-4 leading-tight ${eventMode && currentEvent
+                                ? 'text-base tracking-wide max-w-[200px]'  // Smaller for event themes
+                                : 'text-2xl tracking-widest'  // Original size for mode names
+                            }`}>
                             {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
                         </span>
 
