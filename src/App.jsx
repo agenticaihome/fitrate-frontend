@@ -899,7 +899,8 @@ export default function App() {
           body: JSON.stringify({
             image: imageData,
             mode,
-            userId
+            userId,
+            eventMode: eventMode && currentEvent ? true : false  // FIX: Send eventMode for free users too!
           }),
           signal: controller.signal
         })
