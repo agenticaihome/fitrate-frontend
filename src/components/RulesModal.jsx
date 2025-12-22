@@ -9,14 +9,16 @@ export default function RulesModal({ onClose, event }) {
             zIndex: 60 // Ensure it's above other modals if needed
         }}>
             <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-white/10 overflow-hidden shadow-2xl">
-                <ModalHeader
-                    title="Event Rules"
-                    subtitle={event ? event.theme : "Official Charter"}
-                    icon="📋"
-                    onClose={onClose}
-                />
+                <div className="p-6 pb-0">
+                    <ModalHeader
+                        title="Event Rules"
+                        subtitle={event ? event.theme : "Official Charter"}
+                        icon="📋"
+                        onClose={onClose}
+                    />
+                </div>
 
-                <div className="p-6 space-y-5 text-sm max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div className="p-6 pt-4 space-y-5 text-sm max-h-[60vh] overflow-y-auto custom-scrollbar">
 
                     {/* Dynamic Theme Context */}
                     {event && (
