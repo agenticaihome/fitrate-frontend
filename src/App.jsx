@@ -876,7 +876,7 @@ export default function App() {
     setScansRemaining(Math.max(0, LIMITS.FREE_SCANS_DAILY - count))
   }
 
-  const analyzeOutfit = useCallback(async (imageData) => {
+  const analyzeOutfit = useCallback(async (imageData, scanType = null) => {
     setScreen('analyzing')
     setError(null)
     setErrorCode(null) // Reset error code for fresh analysis
@@ -886,6 +886,10 @@ export default function App() {
       setScreen('limit-reached')
       return
     }
+
+    // Determine if user wants to use their Pro Preview scan
+    // scanType can be 'pro' (use GPT-4o), 'free' (use Gemini), or null (auto/default behavior)
+    const useProScan = scanType === 'pro' ? true : scanType === 'free' ? false : undefined
 
     // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
@@ -902,7 +906,8 @@ export default function App() {
             image: imageData,
             mode,
             userId,
-            eventMode: eventMode && currentEvent ? true : false  // FIX: Send eventMode for free users too!
+            eventMode: eventMode && currentEvent ? true : false,  // FIX: Send eventMode for free users too!
+            useProScan  // User's conscious choice: true = use Pro, false = use Free, undefined = auto
           }),
           signal: controller.signal
         })
@@ -1304,10 +1309,10 @@ export default function App() {
         hasSeenEventExplainer={hasSeenEventExplainer}
         onShowEventExplainer={() => setShowEventExplainer(true)}
         freeEventEntryUsed={freeEventEntryUsed}
-        onImageSelected={(img) => {
+        onImageSelected={(img, scanType) => {
           setUploadedImage(img)
           setScreen('analyzing')
-          analyzeOutfit(img)
+          analyzeOutfit(img, scanType)
         }}
         onShowPaywall={() => setShowPaywall(true)}
         onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}

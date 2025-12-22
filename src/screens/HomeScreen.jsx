@@ -40,6 +40,8 @@ export default function HomeScreen({
     const [isProcessing, setIsProcessing] = useState(false)
     const [showProModes, setShowProModes] = useState(false) // For Pro mode expansion
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
+    const [showScanTypeModal, setShowScanTypeModal] = useState(false) // Pro vs Free scan choice
+    const [pendingScanType, setPendingScanType] = useState(null) // Track user's scan type choice
 
     // Platform Detection Helpers
     const isAndroid = () => /Android/i.test(navigator.userAgent)
@@ -125,7 +127,9 @@ export default function HomeScreen({
 
         const imageData = canvas.toDataURL('image/jpeg', 0.8)
         stopCamera()
-        onImageSelected(imageData)
+        // Pass the scan type choice (if any) to the parent
+        onImageSelected(imageData, pendingScanType)
+        setPendingScanType(null) // Reset for next time
 
     }, [facingMode, stopCamera, onImageSelected])
 
@@ -195,7 +199,9 @@ export default function HomeScreen({
                     reader.readAsDataURL(file)
                 })
             }
-            onImageSelected(imageData)
+            // Pass the scan type choice (if any) to the parent
+            onImageSelected(imageData, pendingScanType)
+            setPendingScanType(null) // Reset for next time
         } catch (err) {
             console.error('Image processing error:', err)
             onError('Something went wrong — try again!')
@@ -203,7 +209,7 @@ export default function HomeScreen({
             setIsProcessing(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
         }
-    }, [isProcessing, onError, onImageSelected])
+    }, [isProcessing, onError, onImageSelected, pendingScanType])
 
 
     // ==========================================
@@ -254,23 +260,53 @@ export default function HomeScreen({
         playSound('click')
         vibrate(20)
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
+            // FREE USERS WITH PRO PREVIEW: Show scan type choice modal
+            // Let them consciously choose between Pro (GPT-4o) or Free (Gemini)
+            if (!isPro && proPreviewAvailable && scansRemaining > 0) {
+                setShowScanTypeModal(true)
+                return
+            }
+
             // PLATFORM-SPECIFIC CAMERA HANDLING:
             // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
             // - iOS: Use native camera app via file input with capture attribute
             // - Desktop: getUserMedia for live camera preview
-            if (isAndroid()) {
-                // Android: Show dual-button picker modal
-                setShowAndroidPhotoModal(true)
-            } else if (isIOS()) {
-                // iOS: Open native Camera app directly (not our custom camera view)
-                document.getElementById('androidCameraInput')?.click()
-            } else {
-                // Desktop: Use getUserMedia for live camera preview
-                startCamera()
-            }
+            proceedToCamera()
         } else {
             onShowPaywall()
         }
+    }
+
+    // Handle camera opening after scan type is chosen (or directly if no choice needed)
+    const proceedToCamera = () => {
+        if (isAndroid()) {
+            // Android: Show dual-button picker modal
+            setShowAndroidPhotoModal(true)
+        } else if (isIOS()) {
+            // iOS: Open native Camera app directly (not our custom camera view)
+            document.getElementById('androidCameraInput')?.click()
+        } else {
+            // Desktop: Use getUserMedia for live camera preview
+            startCamera()
+        }
+    }
+
+    // User chose Pro scan from modal
+    const handleChooseProScan = () => {
+        setShowScanTypeModal(false)
+        setPendingScanType('pro')
+        playSound('pop')
+        vibrate(30)
+        proceedToCamera()
+    }
+
+    // User chose Free scan from modal
+    const handleChooseFreeScan = () => {
+        setShowScanTypeModal(false)
+        setPendingScanType('free')
+        playSound('click')
+        vibrate(15)
+        proceedToCamera()
     }
 
     // Android-specific handlers for dual-button modal
@@ -1019,6 +1055,70 @@ export default function HomeScreen({
                             {/* Cancel Button */}
                             <button
                                 onClick={() => setShowAndroidPhotoModal(false)}
+                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Scan Type Choice Modal - Pro vs Free */}
+            {showScanTypeModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center p-4">
+                    <div className="w-full max-w-md rounded-3xl p-6" style={{
+                        background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-6" />
+                        <h3 className="text-white text-xl font-bold text-center mb-2">
+                            Choose Your Scan
+                        </h3>
+                        <p className="text-white/60 text-sm text-center mb-6">
+                            You have both available today!
+                        </p>
+                        <div className="flex flex-col gap-3">
+                            {/* Pro Scan Button */}
+                            <button
+                                onClick={handleChooseProScan}
+                                className="flex items-center justify-between w-full py-4 px-5 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                    color: '#000',
+                                    boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">🌟</span>
+                                    <div className="text-left">
+                                        <div>Pro Scan</div>
+                                        <div className="text-xs font-normal opacity-70">GPT-4o • Deep Analysis</div>
+                                    </div>
+                                </div>
+                                <span className="text-sm font-black px-2 py-1 rounded-full bg-black/20">PREMIUM</span>
+                            </button>
+                            {/* Free Scan Button */}
+                            <button
+                                onClick={handleChooseFreeScan}
+                                className="flex items-center justify-between w-full py-4 px-5 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                                    color: '#000'
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">✨</span>
+                                    <div className="text-left">
+                                        <div>Free Scan</div>
+                                        <div className="text-xs font-normal opacity-70">Gemini • Quick & Fun</div>
+                                    </div>
+                                </div>
+                                <span className="text-sm font-medium">Save Pro for later</span>
+                            </button>
+                            {/* Cancel Button */}
+                            <button
+                                onClick={() => setShowScanTypeModal(false)}
                                 className="w-full py-3 text-white/50 text-sm font-medium mt-2"
                             >
                                 Cancel
