@@ -159,9 +159,11 @@ export default function WinnerShareCard({
                             <p className="text-[10px] text-gray-500 mt-1">{weekId}</p>
                         </div>
 
-                        {/* Prize Banner */}
+                        {/* Prize Banner - Only #1 gets Pro */}
                         <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 text-center">
-                            <p className="text-yellow-300 text-sm font-bold">🎁 WON 1 YEAR FREE PRO</p>
+                            <p className="text-yellow-300 text-sm font-bold">
+                                {rank === 1 ? '🎁 WON 1 YEAR FREE PRO' : '🏅 TOP 5 FINISHER'}
+                            </p>
                         </div>
 
                         {/* Footer */}
