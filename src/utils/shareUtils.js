@@ -49,6 +49,20 @@ export const generateShareCard = async ({
                     if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊`
                     if (scores.overall >= 60) return `Honest score: ${scores.overall} — thoughts? 📊`
                     return `Got my honest rating 📊 Your turn?`
+                } else if (scores.mode === 'rizz') {
+                    if (scores.overall >= 90) return `${scores.overall}% Rizz — I'm dangerous 😏`
+                    if (scores.overall >= 75) return `W Rizz confirmed 💋`
+                    if (scores.overall >= 50) return `Rizz check: ${scores.overall}% — valid? 😏`
+                    return `L Rizz? Rate yours 💔`
+                } else if (scores.mode === 'celeb') {
+                    return `${scores.celebrityJudge || 'A fashion icon'} rated my fit 🎭`
+                } else if (scores.mode === 'aura') {
+                    if (scores.vibeAssessment === 'Main Character') return `Main Character Aura confirmed ✨`
+                    if (scores.vibeAssessment === 'NPC') return `Got called an NPC 💀 Your aura?`
+                    return `${scores.auraColor || 'My'} Aura 🔮 What's yours?`
+                } else if (scores.mode === 'chaos') {
+                    if (scores.chaosLevel >= 8) return `The AI went UNHINGED 🎪🌀`
+                    return `Chaos Mode activated 🎪`
                 } else {
                     if (scores.overall >= 95) return `${scores.overall}/100 — I'm literally perfect 💅`
                     if (scores.overall >= 90) return `${scores.overall}/100 — beat that 🏆`
@@ -63,10 +77,14 @@ export const generateShareCard = async ({
                 if (scores.mode === 'savage') return { mid: '#1a0a1a', glow: 'rgba(139,0,255,0.5)', accent: '#8b00ff', light: '#ff0044' }
                 if (scores.roastMode || scores.mode === 'roast') return { mid: '#2a1a1a', glow: 'rgba(255,68,68,0.4)', accent: '#ff4444', light: '#ff6666' }
                 if (scores.mode === 'honest') return { mid: '#1a1a2a', glow: 'rgba(74,144,217,0.4)', accent: '#4A90D9', light: '#6BA8E8' }
+                if (scores.mode === 'rizz') return { mid: '#2a1a2a', glow: 'rgba(255,105,180,0.5)', accent: '#ff69b4', light: '#ff1493' }
+                if (scores.mode === 'celeb') return { mid: '#2a2a1a', glow: 'rgba(255,215,0,0.5)', accent: '#ffd700', light: '#ff8c00' }
+                if (scores.mode === 'aura') return { mid: '#1a1a2a', glow: 'rgba(155,89,182,0.5)', accent: '#9b59b6', light: '#8e44ad' }
+                if (scores.mode === 'chaos') return { mid: '#2a1a1a', glow: 'rgba(255,107,107,0.5)', accent: '#ff6b6b', light: '#ee5a24' }
                 return { mid: '#1a1a2e', glow: 'rgba(0,212,255,0.4)', accent: '#00d4ff', light: '#00ff88' }
             }
             const modeColors = getModeAccent()
-            const isProCard = isPro || scores.savageLevel
+            const isProCard = isPro || scores.savageLevel || ['rizz', 'celeb', 'aura', 'chaos'].includes(scores.mode)
 
             // Load user image
             const img = new Image()
@@ -222,12 +240,24 @@ export const generateShareCard = async ({
             ctx.save()
             const stampX = isSquare ? 880 : 920
             const stampY = isSquare ? 120 : 240
-            // Dynamic Stamp Text & Color
+            // Dynamic Stamp Text & Color based on mode
             let stampText = "AGREE?"
             let stampColor = '#fff'
             if (scores.mode === 'roast' || scores.mode === 'savage') {
                 stampText = scores.overall < 50 ? "COOKED?" : "SURVIVED?"
                 stampColor = '#ff4444'
+            } else if (scores.mode === 'rizz') {
+                stampText = scores.overall >= 75 ? "W RIZZ?" : "L RIZZ?"
+                stampColor = '#ff69b4'
+            } else if (scores.mode === 'celeb') {
+                stampText = scores.wouldTheyWear ? "APPROVED" : "REJECTED"
+                stampColor = '#ffd700'
+            } else if (scores.mode === 'aura') {
+                stampText = scores.vibeAssessment === 'Main Character' ? "MAIN?" : "NPC?"
+                stampColor = '#9b59b6'
+            } else if (scores.mode === 'chaos') {
+                stampText = "CHAOS!"
+                stampColor = '#ff6b6b'
             } else {
                 stampText = scores.overall >= 90 ? "VALID?" : "ROBBED?"
                 stampColor = scores.overall >= 90 ? '#ffd700' : '#ff8800'
@@ -368,6 +398,115 @@ export const generateShareCard = async ({
                 }
             }
 
+            // RIZZ MODE: Dating stats showcase
+            if (scores.mode === 'rizz') {
+                const rizzY = pillY + (isSquare ? 70 : 100)
+                ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
+                ctx.fillStyle = '#ff69b4'
+                const rizzLabel = scores.rizzType || 'W Rizz'
+                ctx.fillText(`😏 ${rizzLabel.toUpperCase()}`, 540, rizzY - 5)
+
+                if (scores.pullProbability) {
+                    ctx.font = `bold ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = 'rgba(255,105,180,0.8)'
+                    ctx.fillText(`Pull Probability: ${scores.pullProbability}%`, 540, rizzY + 25)
+                }
+
+                if (scores.pickupLine) {
+                    ctx.font = `italic ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+                    const pickupLines = wrapText(ctx, `"${scores.pickupLine}"`, isSquare ? 600 : 800)
+                    pickupLines.forEach((line, i) => {
+                        ctx.fillText(line, 540, rizzY + 50 + (i * 24))
+                    })
+                }
+            }
+
+            // CELEB MODE: Celebrity quote showcase
+            if (scores.mode === 'celeb' && scores.celebrityJudge) {
+                const celebY = pillY + (isSquare ? 70 : 100)
+                ctx.font = `bold ${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
+                ctx.fillStyle = '#ffd700'
+                ctx.fillText(`🎭 ${scores.celebrityJudge}`, 540, celebY - 5)
+
+                if (scores.celebQuote) {
+                    ctx.font = `italic ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+                    const quoteLines = wrapText(ctx, `"${scores.celebQuote}"`, isSquare ? 600 : 800)
+                    quoteLines.slice(0, 2).forEach((line, i) => {
+                        ctx.fillText(line, 540, celebY + 25 + (i * 24))
+                    })
+                }
+
+                ctx.font = `bold ${isSquare ? 12 : 16}px -apple-system, BlinkMacSystemFont, sans-serif`
+                ctx.fillStyle = scores.wouldTheyWear ? '#10b981' : '#ff4444'
+                const wearText = scores.wouldTheyWear ? '✅ Would Wear' : '❌ Would NOT Wear'
+                ctx.fillText(wearText, 540, celebY + 80)
+            }
+
+            // AURA MODE: Aura orb/badge
+            if (scores.mode === 'aura' && scores.auraColor) {
+                const auraY = pillY + (isSquare ? 70 : 100)
+
+                // Aura glow effect
+                ctx.shadowColor = '#9b59b6'
+                ctx.shadowBlur = 30
+                ctx.font = `bold ${isSquare ? 20 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
+                ctx.fillStyle = '#9b59b6'
+                ctx.fillText(`🔮 ${scores.auraColor} AURA`, 540, auraY - 5)
+                ctx.shadowBlur = 0
+
+                if (scores.vibeAssessment) {
+                    ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = scores.vibeAssessment === 'Main Character' ? '#ffd700' :
+                        scores.vibeAssessment === 'NPC' ? '#ff4444' : '#fff'
+                    ctx.fillText(scores.vibeAssessment.toUpperCase(), 540, auraY + 30)
+                }
+
+                if (scores.spiritualRoast) {
+                    ctx.font = `italic ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+                    const roastLines = wrapText(ctx, `"✨ ${scores.spiritualRoast}"`, isSquare ? 600 : 800)
+                    roastLines.slice(0, 2).forEach((line, i) => {
+                        ctx.fillText(line, 540, auraY + 60 + (i * 22))
+                    })
+                }
+            }
+
+            // CHAOS MODE: Chaos level bar + absurd quote
+            if (scores.mode === 'chaos' && scores.chaosLevel) {
+                const chaosY = pillY + (isSquare ? 70 : 100)
+                ctx.font = `bold ${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
+                ctx.fillStyle = '#ff6b6b'
+                ctx.fillText(`🎪 CHAOS LEVEL: ${scores.chaosLevel}/10`, 540, chaosY - 5)
+
+                // Chaos bar
+                const barWidth = isSquare ? 300 : 400
+                const barX = (1080 - barWidth) / 2
+                ctx.fillStyle = 'rgba(255,255,255,0.1)'
+                ctx.beginPath()
+                ctx.roundRect(barX, chaosY + 15, barWidth, 12, 6)
+                ctx.fill()
+
+                const chaosGradient = ctx.createLinearGradient(barX, 0, barX + barWidth, 0)
+                chaosGradient.addColorStop(0, '#ff4444')
+                chaosGradient.addColorStop(0.5, '#ff8800')
+                chaosGradient.addColorStop(1, '#ffd700')
+                ctx.fillStyle = chaosGradient
+                ctx.beginPath()
+                ctx.roundRect(barX, chaosY + 15, barWidth * (scores.chaosLevel / 10), 12, 6)
+                ctx.fill()
+
+                if (scores.absurdComparison) {
+                    ctx.font = `italic ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+                    const absurdLines = wrapText(ctx, `"${scores.absurdComparison}"`, isSquare ? 600 : 800)
+                    absurdLines.slice(0, 2).forEach((line, i) => {
+                        ctx.fillText(line, 540, chaosY + 50 + (i * 22))
+                    })
+                }
+            }
+
             // PRO TIP (If applicable)
             if (isProCard && scores.proTip) {
                 const tipY = taglineY + (isSquare ? 80 : 120)
@@ -409,6 +548,30 @@ export const generateShareCard = async ({
                 if (scores.mode === 'honest') {
                     if (scores.overall < 70) return `Honest mode gave me ${scores.overall}. I feel robbed. Thoughts? 🤨 ${link}`
                     return `Got a ${scores.overall}/100 honestly. Accurate? 📊 ${link}`
+                }
+
+                // Rizz Mode Strategy: Flirty debate
+                if (scores.mode === 'rizz') {
+                    if (scores.overall >= 85) return `${scores.overall}% rizz. Dangerous levels detected 😏💋 ${link}`
+                    if (scores.overall >= 60) return `Got rated ${scores.overall}% rizz. Valid or nah? 🤔 ${link}`
+                    return `They said I have L rizz... be honest 💔 ${link}`
+                }
+
+                // Celeb Mode Strategy: Celebrity authority
+                if (scores.mode === 'celeb') {
+                    return `${scores.celebrityJudge || 'Anna Wintour'} rated my fit ${scores.overall}/100 🎭 ${link}`
+                }
+
+                // Aura Mode Strategy: Main Character debate
+                if (scores.mode === 'aura') {
+                    if (scores.vibeAssessment === 'Main Character') return `Got Main Character aura ✨ What's yours? ${link}`
+                    if (scores.vibeAssessment === 'NPC') return `The AI called me an NPC 💀 Am I cooked? ${link}`
+                    return `${scores.auraColor} aura 🔮 What color are you? ${link}`
+                }
+
+                // Chaos Mode Strategy: Absurdist hook
+                if (scores.mode === 'chaos') {
+                    return `"${scores.absurdComparison || 'The AI went feral'}" 🎪 Chaos Mode ${link}`
                 }
 
                 // High Scores Strategy: Humble Brag / Challenge
