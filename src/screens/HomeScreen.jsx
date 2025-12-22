@@ -249,9 +249,17 @@ export default function HomeScreen({
         playSound('click')
         vibrate(20)
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
+            // ANDROID FIX: Chrome on Android 14/15 has a bug where file inputs
+            // don't show the camera option. Use live camera (getUserMedia) for 
+            // ALL mobile devices for consistent experience.
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
             if (isMobile) {
-                document.getElementById('mobileCameraInput')?.click()
+                // Try to start live camera first (works on all devices)
+                startCamera().catch(err => {
+                    console.log('Camera failed, falling back to file picker:', err)
+                    // Only fallback to file picker if camera fails (permissions denied, etc.)
+                    document.getElementById('mobileCameraInput')?.click()
+                })
             } else {
                 startCamera()
             }
