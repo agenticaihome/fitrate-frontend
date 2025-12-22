@@ -12,10 +12,10 @@ export default function ModalHeader({ title, subtitle, icon, onClose }) {
             {/* Consistent Close Button */}
             <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90"
+                className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90"
                 aria-label="Close"
             >
-                <span className="text-white text-lg leading-none mt-[-2px]">✕</span>
+                <span className="text-white text-xl leading-none mt-[-2px]">✕</span>
             </button>
         </div>
     )

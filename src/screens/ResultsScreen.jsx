@@ -41,6 +41,157 @@ const TierBadge = ({ tier, score }) => {
     )
 }
 
+// Challenge Card Component - Visually distinct card for weekly challenges
+const ChallengeCard = ({ eventInfo, eventStatus, delay }) => {
+    // Defensive checks: ensure eventInfo has required properties
+    if (!eventInfo || !eventInfo.theme) return null
+
+    const isTopRank = eventStatus?.rank && eventStatus.rank <= 5
+
+    return (
+        <div
+            className="w-full max-w-sm px-4 mb-4 transition-all duration-700"
+            style={{
+                animation: `cardSlideUp 0.6s ease-out ${delay}s forwards`,
+                opacity: 0
+            }}
+        >
+            <div
+                className="p-6 rounded-3xl border backdrop-blur-xl relative overflow-hidden"
+                style={{
+                    background: isTopRank
+                        ? 'linear-gradient(135deg, rgba(251,191,36,0.15) 0%, rgba(16,185,129,0.15) 100%)'
+                        : 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.12) 100%)',
+                    borderColor: isTopRank ? 'rgba(251,191,36,0.4)' : 'rgba(16,185,129,0.3)',
+                    boxShadow: isTopRank
+                        ? '0 0 60px rgba(251,191,36,0.3), 0 20px 40px rgba(0,0,0,0.3)'
+                        : '0 0 40px rgba(16,185,129,0.2), 0 20px 40px rgba(0,0,0,0.3)'
+                }}
+            >
+                {/* Animated glow effect for top ranks */}
+                {isTopRank && (
+                    <div
+                        className="absolute inset-0 rounded-3xl"
+                        style={{
+                            background: 'radial-gradient(circle at 50% 50%, rgba(251,191,36,0.15) 0%, transparent 70%)',
+                            animation: 'pulse 3s ease-in-out infinite'
+                        }}
+                    />
+                )}
+
+                {/* Content */}
+                <div className="relative z-10">
+                    {/* Header: Challenge Badge */}
+                    <div className="flex items-center justify-center mb-4">
+                        <div
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border"
+                            style={{
+                                background: 'rgba(16,185,129,0.15)',
+                                borderColor: 'rgba(16,185,129,0.3)',
+                                boxShadow: '0 4px 20px rgba(16,185,129,0.2)'
+                            }}
+                        >
+                            <span className="text-lg">🏆</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-emerald-400">
+                                Weekly Challenge Entry
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Theme Name & Emoji */}
+                    <div className="text-center mb-4">
+                        <div className="text-5xl mb-3">{eventInfo?.themeEmoji || '🎯'}</div>
+                        <h2 className="text-2xl font-black text-white mb-2">
+                            {eventInfo.theme}
+                        </h2>
+                        {eventInfo?.themeDescription && (
+                            <p className="text-sm text-white/60 italic">
+                                "{eventInfo.themeDescription}"
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent mb-4" />
+
+                    {/* Score & Rank Display */}
+                    <div className="flex items-center justify-around">
+                        {/* Score */}
+                        <div className="flex flex-col items-center">
+                            <span className="text-xs uppercase tracking-wider text-white/50 mb-1">Your Score</span>
+                            <div
+                                className="text-4xl font-black"
+                                style={{
+                                    color: isTopRank ? '#fbbf24' : '#10b981',
+                                    textShadow: isTopRank
+                                        ? '0 0 20px rgba(251,191,36,0.6)'
+                                        : '0 0 20px rgba(16,185,129,0.6)'
+                                }}
+                            >
+                                {eventStatus?.score || '—'}
+                            </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="w-px h-16 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+
+                        {/* Rank */}
+                        <div className="flex flex-col items-center">
+                            <span className="text-xs uppercase tracking-wider text-white/50 mb-1">Rank</span>
+                            <div
+                                className="text-4xl font-black"
+                                style={{
+                                    color: isTopRank ? '#fbbf24' : '#10b981',
+                                    textShadow: isTopRank
+                                        ? '0 0 20px rgba(251,191,36,0.6)'
+                                        : '0 0 20px rgba(16,185,129,0.6)'
+                                }}
+                            >
+                                #{eventStatus?.rank || '—'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Status Message */}
+                    {eventStatus?.action && (
+                        <div className="mt-4 text-center">
+                            <span className="text-xs font-bold uppercase tracking-wider" style={{
+                                color: eventStatus.action === 'added'
+                                    ? '#10b981'
+                                    : eventStatus.action === 'improved'
+                                        ? '#fbbf24'
+                                        : '#60a5fa'
+                            }}>
+                                {eventStatus.action === 'added' && '✅ Entry Submitted!'}
+                                {eventStatus.action === 'improved' && '🎉 Score Improved!'}
+                                {eventStatus.action === 'unchanged' && '📊 Entry Recorded'}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Top 5 Special Message */}
+                    {isTopRank && (
+                        <div className="mt-4 text-center">
+                            <div
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%)',
+                                    border: '1px solid rgba(251,191,36,0.3)'
+                                }}
+                            >
+                                <span className="text-xl">👑</span>
+                                <span className="text-xs font-black uppercase tracking-wider text-yellow-400">
+                                    You're in the Top 5!
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // Enhanced Confetti with tier-appropriate colors
 const Confetti = ({ count, colors, scoreKey }) => {
     const pieces = useMemo(() =>
@@ -415,51 +566,17 @@ export default function ResultsScreen({
                         <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
                         <p className="text-xs text-white/40 mt-1">Top {Math.max(1, 100 - scores.percentile)}% of all fits today</p>
                     </div>
-
-                    {/* ===== EVENT STATUS BANNER ===== */}
-                    {currentEvent && scores.eventStatus && (
-                        <div
-                            className="mt-4 pt-4 border-t border-emerald-500/20"
-                            style={{ animation: 'fadeIn 0.5s ease-out' }}
-                        >
-                            <div
-                                className="flex items-center justify-between p-3 rounded-xl"
-                                style={{
-                                    background: scores.eventStatus.rank <= 5
-                                        ? 'linear-gradient(135deg, rgba(251,191,36,0.15) 0%, rgba(16,185,129,0.15) 100%)'
-                                        : 'rgba(16,185,129,0.1)',
-                                    border: scores.eventStatus.rank <= 5
-                                        ? '1px solid rgba(251,191,36,0.3)'
-                                        : '1px solid rgba(16,185,129,0.2)'
-                                }}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl">{currentEvent.themeEmoji}</span>
-                                    <div>
-                                        <p className="text-sm font-bold text-emerald-400">
-                                            {currentEvent.theme}
-                                        </p>
-                                        <p className="text-[10px] text-emerald-300/70 uppercase tracking-wider">
-                                            {scores.eventStatus.rank <= 5 ? '🏆 Top 5!' : 'Entry recorded'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p
-                                        className="text-2xl font-black"
-                                        style={{
-                                            color: scores.eventStatus.rank <= 5 ? '#fbbf24' : '#10b981'
-                                        }}
-                                    >
-                                        #{scores.eventStatus.rank || '—'}
-                                    </p>
-                                    <p className="text-[9px] text-white/40">on leaderboard</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
+
+            {/* ===== CHALLENGE CARD - Weekly Event Entry ===== */}
+            {scores.eventInfo && scores.eventStatus && (
+                <ChallengeCard
+                    eventInfo={scores.eventInfo}
+                    eventStatus={scores.eventStatus}
+                    delay={0.4}
+                />
+            )}
 
             {/* ===== PHOTO + STATS ROW ===== */}
             <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
