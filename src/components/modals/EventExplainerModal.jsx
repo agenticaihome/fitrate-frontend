@@ -43,6 +43,7 @@ export default function EventExplainerModal({
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={handleClose}
             role="dialog"
             aria-modal="true"
             aria-labelledby="event-explainer-title"
@@ -56,15 +57,16 @@ export default function EventExplainerModal({
         >
             <div
                 className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-emerald-500/30 relative"
+                onClick={(e) => e.stopPropagation()}
                 style={{ boxShadow: '0 0 60px rgba(16,185,129,0.2)' }}
             >
                 {/* Close Button */}
                 <button
                     onClick={handleClose}
                     aria-label="Close event explanation"
-                    className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    className="absolute top-4 right-4 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors active:scale-95"
                 >
-                    <span className="text-white text-xl" aria-hidden="true">×</span>
+                    <span className="text-white text-2xl" aria-hidden="true">×</span>
                 </button>
 
                 {/* Header with Theme Emoji */}
