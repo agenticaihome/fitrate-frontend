@@ -945,7 +945,9 @@ export default function App() {
           shareTip: getRandomShareTip(),
           previousScore: lastScore, // For "you improved!" messaging
           // Include eventInfo if present in the response (for weekly challenge tracking)
-          eventInfo: data.eventInfo
+          eventInfo: data.eventInfo,
+          // Include eventStatus for share card rank display
+          eventStatus: data.eventStatus
         }
 
         // Save this score as the new lastScore
@@ -1020,7 +1022,9 @@ export default function App() {
         isLegendary: overall >= 95 ? Math.random() < 0.3 : Math.random() < 0.01,
         shareTip: getRandomShareTip(),
         // Include eventInfo if present in the response (for weekly challenge tracking)
-        eventInfo: data.eventInfo
+        eventInfo: data.eventInfo,
+        // Include eventStatus for share card rank display
+        eventStatus: data.eventStatus
       })
 
       // Refresh event status if user participated in event mode

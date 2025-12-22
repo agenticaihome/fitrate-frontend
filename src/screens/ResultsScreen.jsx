@@ -513,6 +513,58 @@ export default function ResultsScreen({
                     </div>
                 )}
 
+                {/* 🏆 TOP 5 CELEBRATION BANNER - Show when user achieves top 5 */}
+                {scores?.eventStatus?.rank && scores.eventStatus.rank <= 5 && (
+                    <div
+                        className="w-full max-w-sm mb-4 p-4 rounded-2xl border relative overflow-hidden"
+                        style={{
+                            background: scores.eventStatus.rank === 1
+                                ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,165,0,0.2) 100%)'
+                                : scores.eventStatus.rank <= 3
+                                    ? 'linear-gradient(135deg, rgba(192,192,192,0.2) 0%, rgba(139,92,246,0.2) 100%)'
+                                    : 'linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(59,130,246,0.2) 100%)',
+                            borderColor: scores.eventStatus.rank === 1 ? 'rgba(255,215,0,0.6)' : 'rgba(139,92,246,0.4)',
+                            animation: 'pulse 2s ease-in-out infinite'
+                        }}
+                    >
+                        {/* Celebratory glow */}
+                        <div className="absolute inset-0 rounded-2xl" style={{
+                            background: 'radial-gradient(circle at 50% 0%, rgba(255,215,0,0.2) 0%, transparent 60%)',
+                            animation: 'pulse 3s ease-in-out infinite'
+                        }} />
+
+                        <div className="relative z-10 text-center">
+                            {/* Medal Icon */}
+                            <span className="text-5xl block mb-2">
+                                {scores.eventStatus.rank === 1 ? '👑' :
+                                    scores.eventStatus.rank === 2 ? '🥈' :
+                                        scores.eventStatus.rank === 3 ? '🥉' : '⭐'}
+                            </span>
+
+                            {/* Title */}
+                            <h3 className="text-xl font-black text-white mb-1">
+                                {scores.eventStatus.rank === 1 ? '🎉 YOU\'RE #1!' :
+                                    scores.eventStatus.rank <= 3 ? `You're #${scores.eventStatus.rank}!` :
+                                        `Top 5! (#${scores.eventStatus.rank})`}
+                            </h3>
+
+                            {/* Subtitle */}
+                            <p className="text-sm text-white/70">
+                                {scores.eventStatus.action === 'improved'
+                                    ? `New personal best! Climbed to #${scores.eventStatus.rank}`
+                                    : `You're in the Top 5 on the leaderboard!`}
+                            </p>
+
+                            {/* Theme context */}
+                            {currentEvent && (
+                                <p className="text-xs text-emerald-400/80 mt-2">
+                                    {currentEvent.themeEmoji} {currentEvent.theme} Challenge
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* MASSIVE Score Ring */}
                 <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
                     {/* Outer glow */}
