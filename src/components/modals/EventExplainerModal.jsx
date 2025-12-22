@@ -51,12 +51,12 @@ export default function EventExplainerModal({
             style={{
                 background: 'rgba(0,0,0,0.9)',
                 backdropFilter: 'blur(10px)',
-                paddingTop: 'env(safe-area-inset-top)',
-                paddingBottom: 'env(safe-area-inset-bottom)'
+                paddingTop: 'max(1rem, env(safe-area-inset-top))',
+                paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
             }}
         >
             <div
-                className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 max-w-sm w-full border border-emerald-500/30 relative"
+                className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl max-w-sm w-full border border-emerald-500/30 relative flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
                 style={{ boxShadow: '0 0 60px rgba(16,185,129,0.2)' }}
             >
@@ -64,29 +64,34 @@ export default function EventExplainerModal({
                 <button
                     onClick={handleClose}
                     aria-label="Close event explanation"
-                    className="absolute top-4 right-4 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors active:scale-95"
+                    className="absolute top-4 right-4 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors active:scale-95 z-10"
+                    style={{
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                    }}
                 >
-                    <span className="text-white text-2xl" aria-hidden="true">×</span>
+                    <span className="text-white text-3xl font-bold" aria-hidden="true">×</span>
                 </button>
 
-                {/* Header with Theme Emoji */}
-                <div className="text-center mb-4">
-                    <span className="text-5xl block mb-2" aria-hidden="true">{event.themeEmoji}</span>
-                    <h2
-                        id="event-explainer-title"
-                        className="text-2xl font-black text-white mb-1"
-                    >
-                        Weekly Style Challenge
-                    </h2>
-                    <p
-                        id="event-explainer-desc"
-                        className="text-sm text-gray-400"
-                    >
-                        This week: <span className="text-emerald-400 font-bold">{event.theme}</span>
-                    </p>
-                </div>
+                {/* Scrollable Content */}
+                <div className="overflow-y-auto flex-1 p-6 custom-scrollbar">
+                    {/* Header with Theme Emoji */}
+                    <div className="text-center mb-4">
+                        <span className="text-5xl block mb-2" aria-hidden="true">{event.themeEmoji}</span>
+                        <h2
+                            id="event-explainer-title"
+                            className="text-2xl font-black text-white mb-1"
+                        >
+                            Weekly Style Challenge
+                        </h2>
+                        <p
+                            id="event-explainer-desc"
+                            className="text-sm text-gray-400"
+                        >
+                            This week: <span className="text-emerald-400 font-bold">{event.theme}</span>
+                        </p>
+                    </div>
 
-                {/* Prize Banner */}
+                    {/* Prize Banner */}
                 <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-3 mb-4 text-center">
                     <span className="text-2xl" aria-hidden="true">👑</span>
                     <p className="text-yellow-300 font-black text-lg">WIN 1 YEAR FREE PRO</p>
@@ -176,12 +181,15 @@ export default function EventExplainerModal({
                     </div>
                 </div>
 
-                {/* Timer */}
-                <p className="text-center text-xs text-gray-500 mb-4">
-                    <span aria-hidden="true">⏱️</span> Ends Sunday midnight • New theme Monday
-                </p>
+                    {/* Timer */}
+                    <p className="text-center text-xs text-gray-500 mb-4">
+                        <span aria-hidden="true">⏱️</span> Ends Sunday midnight • New theme Monday
+                    </p>
+                </div>
 
-                {/* CTA Button */}
+                {/* Fixed Footer with Action Buttons */}
+                <div className="p-6 pt-0 flex-shrink-0">
+                    {/* CTA Button */}
                 <button
                     onClick={handleJoin}
                     aria-label={canJoin
@@ -210,14 +218,15 @@ export default function EventExplainerModal({
                     )}
                 </button>
 
-                {/* Secondary Action */}
-                <button
-                    onClick={handleClose}
-                    aria-label="Maybe later"
-                    className="w-full py-2 text-sm text-gray-500 font-medium transition-all active:opacity-60"
-                >
-                    Maybe later
-                </button>
+                    {/* Secondary Action */}
+                    <button
+                        onClick={handleClose}
+                        aria-label="Maybe later"
+                        className="w-full py-3 text-base text-white font-bold transition-all active:opacity-60 bg-white/10 rounded-xl hover:bg-white/20"
+                    >
+                        Maybe later
+                    </button>
+                </div>
             </div>
         </div>
     )
