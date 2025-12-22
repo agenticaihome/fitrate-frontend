@@ -86,7 +86,7 @@ export default function LeaderboardModal({
                 <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center">
                     <span className="text-sm" aria-hidden="true">👑</span>
                     <span className="text-yellow-300 font-bold text-sm ml-1">1 YEAR FREE PRO</span>
-                    <span className="text-yellow-400/70 text-xs ml-2">for Top 5</span>
+                    <span className="text-yellow-400/70 text-xs ml-2">for #1 Winner</span>
                 </div>
 
                 {/* Leaderboard List */}
@@ -100,11 +100,13 @@ export default function LeaderboardModal({
                             const medalStyle = getMedalStyle(entry.rank)
                             const isTopThree = entry.rank <= 3
                             const isTopFive = entry.rank <= 5
+                            // Check if this is the current user's entry
+                            const isCurrentUser = userEventStatus?.rank === entry.rank
 
                             return (
                                 <div
                                     key={entry.rank}
-                                    className={`flex items-center p-3 rounded-xl transition-all ${isTopFive ? 'transform hover:scale-[1.02]' : ''}`}
+                                    className={`flex items-center p-3 rounded-xl transition-all ${isTopFive ? 'transform hover:scale-[1.02]' : ''} ${isCurrentUser ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-[#0a0a0f]' : ''}`}
                                     style={medalStyle}
                                 >
                                     {/* Rank Badge */}
@@ -116,6 +118,7 @@ export default function LeaderboardModal({
                                     <div className="flex-1">
                                         <span className={`font-bold ${isTopThree ? 'text-lg' : ''}`} style={{ color: medalStyle.color }}>
                                             {entry.displayName}
+                                            {isCurrentUser && <span className="ml-2 text-cyan-400 text-xs font-bold">(You)</span>}
                                         </span>
                                         {isTopFive && (
                                             <span className="block text-[10px] opacity-70" style={{ color: medalStyle.color }}>
