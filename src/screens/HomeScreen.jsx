@@ -466,8 +466,8 @@ export default function HomeScreen({
                             {eventMode && currentEvent ? currentEvent.themeEmoji : mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' : '📸'}
                         </span>
                         <span className={`relative text-white font-black uppercase text-center px-4 leading-tight ${eventMode && currentEvent
-                                ? 'text-base tracking-wide max-w-[200px]'  // Smaller for event themes
-                                : 'text-2xl tracking-widest'  // Original size for mode names
+                            ? 'text-base tracking-wide max-w-[200px]'  // Smaller for event themes
+                            : 'text-2xl tracking-widest'  // Original size for mode names
                             }`}>
                             {eventMode && currentEvent ? currentEvent.theme.toUpperCase() : mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' : 'RATE MY FIT'}
                         </span>
@@ -702,15 +702,24 @@ export default function HomeScreen({
             )
             }
 
-            {/* Leaderboard Link */}
+            {/* Leaderboard & Rules Links */}
             {currentEvent && (
-                <button
-                    onClick={() => { onShowLeaderboard(); vibrate(10); }}
-                    aria-label="View weekly event leaderboard"
-                    className="mt-2 text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
-                >
-                    <span aria-hidden="true">🏆</span> See Leaderboard
-                </button>
+                <div className="flex items-center gap-4 mt-2">
+                    <button
+                        onClick={() => { onShowLeaderboard(); vibrate(10); }}
+                        aria-label="View weekly event leaderboard"
+                        className="text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                        <span aria-hidden="true">🏆</span> Leaderboard
+                    </button>
+                    <button
+                        onClick={() => { onShowRules(); vibrate(10); }}
+                        aria-label="View weekly event rules"
+                        className="text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                        <span aria-hidden="true">📖</span> Rules
+                    </button>
+                </div>
             )}
 
             {/* Trust Message */}

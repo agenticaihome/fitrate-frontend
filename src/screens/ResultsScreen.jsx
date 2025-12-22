@@ -456,8 +456,24 @@ export default function ResultsScreen({
                 <img
                     src="/logo.svg"
                     alt="FitRate"
-                    className="h-8 mb-4 opacity-60"
+                    className="h-8 mb-2 opacity-60"
                 />
+
+                {/* Event Theme Banner - Show when in event mode */}
+                {currentEvent && (
+                    <div
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-full mb-3"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(6,182,212,0.2) 100%)',
+                            border: '1px solid rgba(16,185,129,0.4)'
+                        }}
+                    >
+                        <span className="text-sm">{currentEvent.themeEmoji}</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                            {currentEvent.theme}
+                        </span>
+                    </div>
+                )}
 
                 {/* MASSIVE Score Ring */}
                 <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
@@ -570,10 +586,11 @@ export default function ResultsScreen({
             </div>
 
             {/* ===== CHALLENGE CARD - Weekly Event Entry ===== */}
-            {scores.eventInfo && scores.eventStatus && (
+            {/* Show if we have event data from backend OR if currentEvent prop is passed */}
+            {(scores.eventInfo || currentEvent) && (scores.eventStatus || currentEvent) && (
                 <ChallengeCard
-                    eventInfo={scores.eventInfo}
-                    eventStatus={scores.eventStatus}
+                    eventInfo={scores.eventInfo || currentEvent}
+                    eventStatus={scores.eventStatus || { rank: null, score: scores.overall, action: 'submitted' }}
                     delay={0.4}
                 />
             )}
