@@ -21,7 +21,6 @@ export const LIMITS = {
 
 export const PRICES = {
     PRO_WEEKLY: 2.99,
-    PRO_WEEKLY_DISCOUNT: 1.99,
     PRO_ROAST_ONE_OFF: 0.99,
     SCAN_PACK_5: 1.99,
     SCAN_PACK_15: 3.99,
@@ -36,7 +35,6 @@ export const RESETS = {
 // Stripe Checkout Links
 export const STRIPE_LINKS = {
     proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',
-    proWeeklyDiscount: 'https://buy.stripe.com/8x214p2SI8AX8PtfztfYY03',
     proRoast: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',
 
     // Scan Packs (one-time)

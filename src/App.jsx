@@ -561,7 +561,6 @@ export default function App() {
     // Product price mapping for GA4
     const PRODUCT_PRICES = {
       proWeekly: 2.99,
-      proWeeklyDiscount: 1.99,
       proRoast: 0.99,
       starterPack: 1.99,
       popularPack: 3.99,
