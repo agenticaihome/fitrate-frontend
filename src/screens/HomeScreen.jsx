@@ -44,7 +44,29 @@ export default function HomeScreen({
     const [isProcessing, setIsProcessing] = useState(false)
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
     const [showModeDrawer, setShowModeDrawer] = useState(false) // Pro mode drawer
-    // Scan type choice modal removed - now just 2 free Gemini scans/day
+
+    // One-time discoverability nudge for Nice/Roast toggle
+    const [hasSeenNudge] = useState(() => localStorage.getItem('fitrate_seen_mode_nudge') === 'true')
+    const [showNudge, setShowNudge] = useState(!hasSeenNudge)
+    const [nudgePhase, setNudgePhase] = useState(0) // 0=pulse, 1=crossfade to nice, 2=crossfade back
+
+    // Run one-time nudge animation on first load
+    useEffect(() => {
+        if (!showNudge) return
+
+        // Phase 1: Show Nice for 400ms
+        const t1 = setTimeout(() => setNudgePhase(1), 400)
+        // Phase 2: Back to Roast at 800ms
+        const t2 = setTimeout(() => setNudgePhase(2), 800)
+        // Phase 3: End nudge at 1200ms
+        const t3 = setTimeout(() => {
+            localStorage.setItem('fitrate_seen_mode_nudge', 'true')
+            setShowNudge(false)
+            setNudgePhase(0)
+        }, 1200)
+
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    }, [showNudge])
 
     // Platform Detection Helpers
     const isAndroid = () => /Android/i.test(navigator.userAgent)
@@ -602,131 +624,115 @@ export default function HomeScreen({
                         {/* Escape Hatch */}
                         <p className="text-white/30 text-xs">or wait for daily reset</p>
                     </div>
-                ) : (
-                    <button
-                        onClick={handleStart}
-                        aria-label={eventMode && currentEvent
-                            ? `Submit outfit for ${currentEvent.theme} event in ${mode} mode`
-                            : `Take a photo to rate your outfit in ${mode} mode`
-                        }
-                        className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
-                        style={{
-                            background: `radial-gradient(circle, ${getModeGlow()} 0%, transparent 70%)`,
-                            border: `3px solid ${accent}99`,
-                            boxShadow: `var(--shadow-physical), 0 0 100px ${accentGlow}, inset 0 0 80px rgba(255,255,255,0.03)`
-                        }}
-                    >
-                        {/* Inner pulse */}
-                        <div className="absolute inset-4 rounded-full transition-all duration-300 group-hover:scale-105 group-active:scale-95" style={{
-                            background: `linear-gradient(135deg, ${accent} 0%, ${accentEnd} 100%)`,
-                            boxShadow: `0 0 60px ${accentGlow}`,
-                            animation: 'pulse 2s ease-in-out infinite'
-                        }} aria-hidden="true" />
+                ) : (() => {
+                    // Compute visual mode based on nudge animation
+                    const visualMode = showNudge && nudgePhase === 1 ? 'nice' : mode
+                    const isRoast = visualMode === 'roast'
+                    const buttonAccent = isRoast ? '#ff6b35' : '#00d4ff'
+                    const buttonAccentEnd = isRoast ? '#ff4444' : '#00a8cc'
+                    const buttonGlow = isRoast ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
 
-                        {/* Icon & Text */}
-                        <span className="relative text-8xl mb-4 drop-shadow-2xl" aria-hidden="true">
-                            {eventMode && currentEvent ? currentEvent.themeEmoji :
-                                mode === 'roast' ? '🔥' : mode === 'savage' ? '💀' : mode === 'honest' ? '📊' :
-                                    mode === 'rizz' ? '😏' : mode === 'celeb' ? '🎭' : mode === 'aura' ? '🔮' : mode === 'chaos' ? '🎪' : '📸'}
-                        </span>
-                        <span className={`relative text-white font-black uppercase text-center px-4 leading-tight ${eventMode && currentEvent
-                            ? 'text-base tracking-wide max-w-[200px]'  // Smaller for event themes
-                            : 'text-2xl tracking-widest'  // Original size for mode names
-                            }`}>
-                            {eventMode && currentEvent ? currentEvent.theme.toUpperCase() :
-                                mode === 'roast' ? 'ROAST MY FIT' : mode === 'savage' ? 'DESTROY MY FIT' : mode === 'honest' ? 'ANALYZE FIT' :
-                                    mode === 'rizz' ? 'CHECK MY RIZZ' : mode === 'celeb' ? 'JUDGE MY FIT' : mode === 'aura' ? 'READ MY AURA' : mode === 'chaos' ? 'CHAOS MODE' : 'RATE MY FIT'}
-                        </span>
+                    return (
+                        <div className="flex flex-col items-center">
+                            {/* Main Circular Button */}
+                            <button
+                                onClick={handleStart}
+                                aria-label={`Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
+                                className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
+                                style={{
+                                    background: `radial-gradient(circle, ${isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.2)'} 0%, transparent 70%)`,
+                                    border: `3px solid ${buttonAccent}66`,
+                                    boxShadow: `var(--shadow-physical), 0 0 80px ${buttonGlow}, inset 0 0 60px rgba(255,255,255,0.03)`
+                                }}
+                            >
+                                {/* Inner gradient circle */}
+                                <div
+                                    className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
+                                    style={{
+                                        background: `linear-gradient(135deg, ${buttonAccent} 0%, ${buttonAccentEnd} 100%)`,
+                                        boxShadow: `0 0 50px ${buttonGlow}`,
+                                        animation: 'pulse 2s ease-in-out infinite'
+                                    }}
+                                    aria-hidden="true"
+                                />
 
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                            <p className="text-[12px] font-black text-white/50 uppercase tracking-[0.15em] animate-pulse">
-                                {eventMode ? 'Submit for Leaderboard' : 'Tap to Start'}
-                            </p>
+                                {/* Emoji */}
+                                <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
+                                    {isRoast ? '🔥' : '😇'}
+                                </span>
+
+                                {/* Main Text */}
+                                <span className="relative text-white font-black text-2xl tracking-wide uppercase text-center transition-all duration-300">
+                                    {isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
+                                </span>
+
+                                {/* Subtitle */}
+                                <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
+                                    {isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
+                                </span>
+
+                                {/* Nice/Roast Toggle Pill - Inside Button */}
+                                <div
+                                    className={`relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
+                                    style={{
+                                        background: 'rgba(0,0,0,0.4)',
+                                        backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(255,255,255,0.2)'
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        playSound('click')
+                                        vibrate(15)
+                                        setMode(mode === 'roast' ? 'nice' : 'roast')
+                                        setEventMode(false)
+                                        // Clear nudge on interaction
+                                        if (showNudge) {
+                                            localStorage.setItem('fitrate_seen_mode_nudge', 'true')
+                                            setShowNudge(false)
+                                        }
+                                    }}
+                                >
+                                    <span className="text-lg">{mode === 'roast' ? '😇' : '🔥'}</span>
+                                    <span className="text-lg">{mode === 'roast' ? '🔥' : '😇'}</span>
+                                    <span className="text-white font-semibold">{mode === 'roast' ? 'Roast' : 'Nice'}</span>
+                                </div>
+                            </button>
                         </div>
-                    </button>
-                )}
+                    )
+                })()}
             </div>
 
 
-            {/* Mode Selectors */}
-            <div className="mt-6 mb-2 w-full max-w-xs">
-                {/* Nice & Roast - Side by side */}
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                    {/* Nice */}
-                    <button
-                        onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
-                        aria-pressed={mode === 'nice'}
-                        className={`flex items-center justify-center gap-2 py-3 rounded-xl transition-all active:scale-[0.97] ${mode === 'nice' ? 'opacity-100' : 'opacity-60'}`}
-                        style={{
-                            background: mode === 'nice' ? 'rgba(0,212,255,0.25)' : 'rgba(255,255,255,0.05)',
-                            border: mode === 'nice' ? '1px solid #00d4ff' : '1px solid rgba(255,255,255,0.1)'
-                        }}
-                    >
-                        <span className="text-lg">😇</span>
-                        <span className={`text-sm font-medium ${mode === 'nice' ? 'text-white' : 'text-white/50'}`}>Nice</span>
-                    </button>
-
-                    {/* Roast */}
-                    <button
-                        onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); }}
-                        aria-pressed={mode === 'roast'}
-                        className={`flex items-center justify-center gap-2 py-3 rounded-xl transition-all active:scale-[0.97] ${mode === 'roast' ? 'opacity-100' : 'opacity-60'}`}
-                        style={{
-                            background: mode === 'roast' ? 'rgba(255,68,68,0.25)' : 'rgba(255,255,255,0.05)',
-                            border: mode === 'roast' ? '1px solid #ff4444' : '1px solid rgba(255,255,255,0.1)'
-                        }}
-                    >
-                        <span className="text-lg">🔥</span>
-                        <span className={`text-sm font-medium ${mode === 'roast' ? 'text-white' : 'text-white/50'}`}>Roast</span>
-                    </button>
-                </div>
-
-                {/* Pro Modes - Full width button below */}
-                <button
-                    onClick={() => {
-                        playSound('click'); vibrate(15);
-                        if (isPro) {
-                            setShowModeDrawer(true);
-                        } else {
-                            onShowPaywall();
-                        }
-                    }}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl transition-all active:scale-[0.97] ${isPro && !['nice', 'roast'].includes(mode) ? 'opacity-100' : 'opacity-70'}`}
-                    style={{
-                        background: isPro && !['nice', 'roast'].includes(mode) ? 'rgba(255,215,0,0.2)' : 'rgba(255,215,0,0.08)',
-                        border: isPro ? '1px solid rgba(255,215,0,0.4)' : '1px dashed rgba(255,215,0,0.3)'
-                    }}
-                >
-                    <span className="text-lg">⚡</span>
-                    <span className="text-sm font-medium text-yellow-400">
-                        {isPro && !['nice', 'roast'].includes(mode) ? mode.charAt(0).toUpperCase() + mode.slice(1) : 'Pro Modes'}
-                    </span>
-                    <span className="text-xs text-yellow-400/50">(6)</span>
-                    {!isPro && <span className="text-xs ml-1">🔒</span>}
-                </button>
+            {/* Status Pill - Directly below the main button */}
+            <div
+                className="mt-6 mb-6 px-5 py-2.5 rounded-full"
+                style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 0 20px rgba(255,255,255,0.03)'
+                }}
+            >
+                <p className="text-center text-white/60 text-sm">
+                    {isPro ? '⚡ Unlimited scans' : `✨ ${scansRemaining} scan${scansRemaining !== 1 ? 's' : ''} left today`}
+                    {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak}-day streak</span>}
+                </p>
             </div>
 
-            {/* Status Line */}
-            <p className="text-center text-white/50 text-xs mb-4">
-                {isPro ? '⚡ Unlimited scans' : `✨ ${scansRemaining} free scan${scansRemaining !== 1 ? 's' : ''} left`}
-                {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak} streak</span>}
-            </p>
-
-            {/* Feature Buttons - Side by side */}
-            <div className="grid grid-cols-2 gap-3 w-full max-w-xs mb-4">
+            {/* Event Destination Cards - Side by side */}
+            <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
                 {/* Fashion Show */}
                 {onStartFashionShow && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                        className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl transition-all active:scale-[0.98]"
+                        className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(59,130,246,0.15) 100%)',
                             border: '1px solid rgba(139,92,246,0.3)'
                         }}
                     >
-                        <span className="text-2xl">🎭</span>
-                        <span className="text-white text-xs font-medium">Compete</span>
-                        <span className="text-purple-300/50 text-[10px]">with friends</span>
+                        <span className="text-4xl block mb-2">🎭</span>
+                        <span className="text-white font-bold block">Fashion Show</span>
+                        <span className="text-white/50 text-xs">Get ranked with others</span>
                     </button>
                 )}
 
@@ -734,30 +740,58 @@ export default function HomeScreen({
                 {currentEvent && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
-                        className="flex flex-col items-center justify-center gap-1 py-4 rounded-2xl transition-all active:scale-[0.98]"
+                        className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(6,182,212,0.15) 100%)',
+                            background: 'linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(6,182,212,0.15) 100%)',
                             border: '1px solid rgba(16,185,129,0.3)'
                         }}
                     >
-                        <span className="text-2xl">{currentEvent.themeEmoji}</span>
-                        <span className="text-white text-xs font-medium truncate max-w-[80px]">{currentEvent.theme}</span>
+                        <span className="text-4xl block mb-2">🏆</span>
+                        <span className="text-white font-bold block">Weekly Challenge</span>
+                        <span className="text-white/50 text-xs">This week's competition</span>
                     </button>
                 )}
             </div>
 
-            {/* Go Pro - Only for free users */}
+            {/* Advanced AI Modes Section */}
+            <button
+                onClick={() => {
+                    playSound('click'); vibrate(15);
+                    if (isPro) {
+                        setShowModeDrawer(true);
+                    } else {
+                        onShowPaywall();
+                    }
+                }}
+                className="w-full max-w-sm p-4 rounded-2xl transition-all active:scale-[0.99] mb-4"
+                style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px dashed rgba(255,255,255,0.15)'
+                }}
+            >
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg">⚡</span>
+                    <span className="text-white/80 font-semibold">Advanced AI Modes</span>
+                    <span className="text-white/40">(6)</span>
+                    {!isPro && <span className="text-sm">🔒</span>}
+                </div>
+                <p className="text-white/40 text-xs text-center">
+                    Honest • Savage • Rizz • Celebrity • Aura • Chaos
+                </p>
+            </button>
+
+            {/* Pro CTA Button - Yellow, rounded, premium */}
             {!isPro && (
                 <button
                     onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
-                    className="px-8 py-3 rounded-full font-bold transition-all active:scale-95"
+                    className="px-10 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
                     style={{
                         background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
                         color: '#000',
-                        boxShadow: '0 4px 15px rgba(255,215,0,0.3)'
+                        boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
                     }}
                 >
-                    👑 Go Pro
+                    👑 Get More Scans
                 </button>
             )}
 
@@ -817,93 +851,96 @@ export default function HomeScreen({
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Pro Mode Drawer */}
-            {showModeDrawer && (
-                <div
-                    className="fixed inset-0 z-[60] flex items-end justify-center"
-                    style={{ background: 'rgba(0,0,0,0.8)' }}
-                    onClick={() => setShowModeDrawer(false)}
-                >
+            {
+                showModeDrawer && (
                     <div
-                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
-                        style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
-                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
-                        }}
-                        onClick={e => e.stopPropagation()}
+                        className="fixed inset-0 z-[60] flex items-end justify-center"
+                        style={{ background: 'rgba(0,0,0,0.8)' }}
+                        onClick={() => setShowModeDrawer(false)}
                     >
-                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4" />
-                        <h3 className="text-white text-lg font-bold text-center mb-4">
-                            Choose Your Mode
-                        </h3>
-                        <div className="grid grid-cols-3 gap-3">
-                            {/* Honest */}
+                        <div
+                            className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                            style={{
+                                background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
+                                boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                            }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4" />
+                            <h3 className="text-white text-lg font-bold text-center mb-4">
+                                Choose Your Mode
+                            </h3>
+                            <div className="grid grid-cols-3 gap-3">
+                                {/* Honest */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
+                                    style={{ background: 'rgba(74,144,217,0.2)' }}
+                                >
+                                    <span className="text-2xl">📊</span>
+                                    <span className="text-xs font-medium text-white/80">Honest</span>
+                                </button>
+                                {/* Savage */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
+                                    style={{ background: 'rgba(139,0,255,0.2)' }}
+                                >
+                                    <span className="text-2xl">💀</span>
+                                    <span className="text-xs font-medium text-white/80">Savage</span>
+                                </button>
+                                {/* Rizz */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
+                                    style={{ background: 'rgba(255,105,180,0.2)' }}
+                                >
+                                    <span className="text-2xl">😏</span>
+                                    <span className="text-xs font-medium text-white/80">Rizz</span>
+                                </button>
+                                {/* Celeb */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
+                                    style={{ background: 'rgba(255,215,0,0.2)' }}
+                                >
+                                    <span className="text-2xl">🎭</span>
+                                    <span className="text-xs font-medium text-white/80">Celeb</span>
+                                </button>
+                                {/* Aura */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-purple-400' : ''}`}
+                                    style={{ background: 'rgba(155,89,182,0.2)' }}
+                                >
+                                    <span className="text-2xl">🔮</span>
+                                    <span className="text-xs font-medium text-white/80">Aura</span>
+                                </button>
+                                {/* Chaos */}
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
+                                    style={{ background: 'rgba(255,107,107,0.2)' }}
+                                >
+                                    <span className="text-2xl">🎪</span>
+                                    <span className="text-xs font-medium text-white/80">Chaos</span>
+                                </button>
+                            </div>
+                            <p className="text-center text-white/40 text-xs mt-4">Nice & Roast always available above</p>
                             <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
-                                style={{ background: 'rgba(74,144,217,0.2)' }}
+                                onClick={() => setShowModeDrawer(false)}
+                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
                             >
-                                <span className="text-2xl">📊</span>
-                                <span className="text-xs font-medium text-white/80">Honest</span>
-                            </button>
-                            {/* Savage */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
-                                style={{ background: 'rgba(139,0,255,0.2)' }}
-                            >
-                                <span className="text-2xl">💀</span>
-                                <span className="text-xs font-medium text-white/80">Savage</span>
-                            </button>
-                            {/* Rizz */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
-                                style={{ background: 'rgba(255,105,180,0.2)' }}
-                            >
-                                <span className="text-2xl">😏</span>
-                                <span className="text-xs font-medium text-white/80">Rizz</span>
-                            </button>
-                            {/* Celeb */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
-                                style={{ background: 'rgba(255,215,0,0.2)' }}
-                            >
-                                <span className="text-2xl">🎭</span>
-                                <span className="text-xs font-medium text-white/80">Celeb</span>
-                            </button>
-                            {/* Aura */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-purple-400' : ''}`}
-                                style={{ background: 'rgba(155,89,182,0.2)' }}
-                            >
-                                <span className="text-2xl">🔮</span>
-                                <span className="text-xs font-medium text-white/80">Aura</span>
-                            </button>
-                            {/* Chaos */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
-                                style={{ background: 'rgba(255,107,107,0.2)' }}
-                            >
-                                <span className="text-2xl">🎪</span>
-                                <span className="text-xs font-medium text-white/80">Chaos</span>
+                                Cancel
                             </button>
                         </div>
-                        <p className="text-center text-white/40 text-xs mt-4">Nice & Roast always available above</p>
-                        <button
-                            onClick={() => setShowModeDrawer(false)}
-                            className="w-full py-3 text-white/50 text-sm font-medium mt-2"
-                        >
-                            Cancel
-                        </button>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     )
 }
