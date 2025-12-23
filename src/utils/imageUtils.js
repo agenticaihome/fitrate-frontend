@@ -134,3 +134,60 @@ export const hintGarbageCollection = () => {
         }
     }
 }
+
+/**
+ * Create a small thumbnail from a base64 data URL
+ * Used for Fashion Show leaderboard to display outfit previews
+ * 
+ * @param {string} imageDataUrl - Base64 data URL of the image
+ * @param {number} maxSize - Maximum dimension (width or height) in pixels
+ * @param {number} quality - JPEG quality (0-1)
+ * @returns {Promise<string>} Compressed base64 data URL (~20-40KB)
+ */
+export const createThumbnail = (imageDataUrl, maxSize = 150, quality = 0.6) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = () => {
+            try {
+                // Calculate dimensions maintaining aspect ratio
+                let width = img.width;
+                let height = img.height;
+
+                // Scale down to fit within maxSize
+                const scale = Math.min(maxSize / width, maxSize / height, 1);
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+
+                // Create canvas at thumbnail size
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to JPEG with compression
+                const thumbnailDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                // Clean up canvas
+                canvas.width = 0;
+                canvas.height = 0;
+
+                console.log(`[Thumbnail] Created ${width}x${height} (${Math.round(thumbnailDataUrl.length / 1024)}KB)`);
+
+                resolve(thumbnailDataUrl);
+            } catch (err) {
+                console.error('[Thumbnail] Creation failed:', err);
+                resolve(null); // Return null instead of rejecting to not break the flow
+            }
+        };
+
+        img.onerror = () => {
+            console.error('[Thumbnail] Failed to load image');
+            resolve(null); // Graceful fallback
+        };
+
+        img.src = imageDataUrl;
+    });
+}

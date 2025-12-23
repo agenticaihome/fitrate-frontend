@@ -255,6 +255,26 @@ export default function AnalyzingScreen({
                 </div>
             )}
 
+            {/* Cancel Button - Escape Route */}
+            {onBack && (
+                <button
+                    onClick={() => {
+                        vibrate(20)
+                        if (window.confirm('Cancel analysis? Your scan will be refunded.')) {
+                            onBack()
+                        }
+                    }}
+                    className="mt-6 px-6 py-3 rounded-full text-sm font-medium transition-all active:scale-95"
+                    style={{
+                        color: 'rgba(255,255,255,0.4)',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                >
+                    ✕ Cancel
+                </button>
+            )}
+
             <Footer className="opacity-50" />
 
             <style>{`

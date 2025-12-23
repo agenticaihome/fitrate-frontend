@@ -263,6 +263,16 @@ body {
   }
 }
 
+/* Golden CTA button pulsing glow */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,180,0,0.2);
+  }
+  50% {
+    box-shadow: 0 4px 40px rgba(255,215,0,0.6), 0 0 80px rgba(255,180,0,0.35);
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

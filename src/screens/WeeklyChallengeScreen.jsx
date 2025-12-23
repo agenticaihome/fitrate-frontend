@@ -99,7 +99,7 @@ export default function WeeklyChallengeScreen({
                 <div className="space-y-2">
                     {leaderboard.slice(0, 5).map((entry, i) => (
                         <div
-                            key={entry.odId || i}
+                            key={entry.userId || i}
                             className="flex items-center justify-between px-4 py-3 rounded-xl"
                             style={{
                                 background: i === 0 ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255,255,255,0.05)',
@@ -107,8 +107,35 @@ export default function WeeklyChallengeScreen({
                             }}
                         >
                             <div className="flex items-center gap-3">
-                                <span className="text-lg">{i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
-                                <span className="text-white/80 font-medium">{entry.nickname || 'Anonymous'}</span>
+                                <span className="text-lg w-6 text-center">{i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
+                                {/* Outfit thumbnail for top 5 */}
+                                {entry.imageThumb ? (
+                                    <img
+                                        src={entry.imageThumb}
+                                        alt="Outfit"
+                                        style={{
+                                            width: 44,
+                                            height: 44,
+                                            borderRadius: 8,
+                                            objectFit: 'cover',
+                                            border: '2px solid rgba(255,255,255,0.2)'
+                                        }}
+                                    />
+                                ) : (
+                                    <div style={{
+                                        width: 44,
+                                        height: 44,
+                                        borderRadius: 8,
+                                        background: 'rgba(255,255,255,0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '1.25rem'
+                                    }}>
+                                        👤
+                                    </div>
+                                )}
+                                <span className="text-white/80 font-medium">{entry.displayName || 'Anonymous'}</span>
                             </div>
                             <span className="text-white font-bold">{entry.score}</span>
                         </div>

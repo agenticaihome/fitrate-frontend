@@ -473,20 +473,37 @@ export default function HomeScreen({
     // ==========================================
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
-            background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
+            background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 25%, #12091f 60%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
             paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
         }}>
-            {/* Background Glow */}
+            {/* Background Glow - Main accent */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-[500px] h-[500px] rounded-full opacity-20" style={{
-                    background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
-                    top: '50%', left: '50%',
+                <div className="absolute w-[600px] h-[600px] rounded-full opacity-30" style={{
+                    background: `radial-gradient(circle, ${accentGlow} 0%, transparent 60%)`,
+                    top: '30%', left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    animation: 'pulse 4s ease-in-out infinite'
+                    animation: 'pulse 3s ease-in-out infinite'
+                }} />
+                {/* Secondary glow for depth */}
+                <div className="absolute w-[400px] h-[400px] rounded-full opacity-15" style={{
+                    background: 'radial-gradient(circle, rgba(139,92,246,0.6) 0%, transparent 70%)',
+                    bottom: '20%', left: '50%',
+                    transform: 'translateX(-50%)'
+                }} />
+                {/* Sparkle particles */}
+                <div className="absolute inset-0" style={{
+                    backgroundImage: `radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.4) 0%, transparent 100%),
+                                      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.3) 0%, transparent 100%),
+                                      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.5) 0%, transparent 100%),
+                                      radial-gradient(2px 2px at 130px 90px, rgba(255,255,255,0.2) 0%, transparent 100%),
+                                      radial-gradient(1px 1px at 160px 20px, rgba(255,255,255,0.4) 0%, transparent 100%)`,
+                    backgroundSize: '200px 150px',
+                    animation: 'sparkle 4s ease-in-out infinite'
                 }} />
             </div>
+
 
             {/* Toast */}
             {showToast && (
@@ -668,17 +685,24 @@ export default function HomeScreen({
                                 aria-label={`Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
                                 className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
                                 style={{
-                                    background: `radial-gradient(circle, ${isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.2)'} 0%, transparent 70%)`,
-                                    border: `3px solid ${buttonAccent}66`,
-                                    boxShadow: `var(--shadow-physical), 0 0 80px ${buttonGlow}, inset 0 0 60px rgba(255,255,255,0.03)`
+                                    background: `radial-gradient(circle, ${isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
+                                    border: `4px solid ${isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
+                                    boxShadow: `
+                                        var(--shadow-physical), 
+                                        0 0 60px ${buttonGlow}, 
+                                        0 0 120px ${isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}, 
+                                        inset 0 0 60px rgba(255,255,255,0.05)
+                                    `
                                 }}
                             >
-                                {/* Inner gradient circle */}
+                                {/* Inner gradient circle - more vibrant */}
                                 <div
                                     className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
                                     style={{
-                                        background: `linear-gradient(135deg, ${buttonAccent} 0%, ${buttonAccentEnd} 100%)`,
-                                        boxShadow: `0 0 50px ${buttonGlow}`,
+                                        background: isRoast
+                                            ? 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)'
+                                            : 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)',
+                                        boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,180,255,0.5)'}`,
                                         animation: 'pulse 2s ease-in-out infinite'
                                     }}
                                     aria-hidden="true"
@@ -787,35 +811,52 @@ export default function HomeScreen({
 
             {/* Event Destination Cards - Side by side */}
             <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
-                {/* Fashion Show */}
+                {/* Fashion Show - Purple gradient with sparkles */}
                 {onStartFashionShow && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(59,130,246,0.15) 100%)',
-                            border: '1px solid rgba(139,92,246,0.3)'
+                            background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #4c1d95 100%)',
+                            border: '1px solid rgba(167,139,250,0.4)',
+                            boxShadow: '0 4px 20px rgba(139,92,246,0.3)'
                         }}
                     >
-                        <span className="text-4xl block mb-2">🎭</span>
-                        <span className="text-white font-bold block">Fashion Show</span>
-                        <span className="text-white/50 text-xs">Get ranked with others</span>
+                        {/* Sparkle overlay */}
+                        <div className="absolute inset-0 opacity-30" style={{
+                            backgroundImage: `radial-gradient(1px 1px at 10px 10px, white 0%, transparent 100%),
+                                             radial-gradient(1px 1px at 30px 25px, white 0%, transparent 100%),
+                                             radial-gradient(1px 1px at 50px 15px, white 0%, transparent 100%)`,
+                            backgroundSize: '60px 40px'
+                        }} />
+                        <span className="relative text-4xl block mb-2">🎭</span>
+                        <span className="relative text-white font-bold block">Fashion Show</span>
+                        <span className="relative text-purple-200/70 text-xs">Get ranked with others</span>
                     </button>
                 )}
 
-                {/* Weekly Challenge */}
+                {/* Weekly Challenge - Teal gradient with stars */}
                 {currentEvent && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(6,182,212,0.15) 100%)',
-                            border: '1px solid rgba(16,185,129,0.3)'
+                            background: 'linear-gradient(135deg, #047857 0%, #0d9488 50%, #115e59 100%)',
+                            border: '1px solid rgba(45,212,191,0.4)',
+                            boxShadow: '0 4px 20px rgba(16,185,129,0.3)'
                         }}
                     >
-                        <span className="text-4xl block mb-2">🏆</span>
-                        <span className="text-white font-bold block">Weekly Challenge</span>
-                        <span className="text-white/50 text-xs">This week's competition</span>
+                        {/* Star/confetti overlay */}
+                        <div className="absolute inset-0 opacity-25" style={{
+                            backgroundImage: `radial-gradient(2px 2px at 15px 12px, #fbbf24 0%, transparent 100%),
+                                             radial-gradient(1px 1px at 35px 8px, white 0%, transparent 100%),
+                                             radial-gradient(2px 2px at 55px 20px, #fbbf24 0%, transparent 100%),
+                                             radial-gradient(1px 1px at 70px 5px, white 0%, transparent 100%)`,
+                            backgroundSize: '80px 35px'
+                        }} />
+                        <span className="relative text-4xl block mb-2">🏆</span>
+                        <span className="relative text-white font-bold block">Weekly Challenge</span>
+                        <span className="relative text-teal-200/70 text-xs">This week's competition</span>
                     </button>
                 )}
             </div>
@@ -847,15 +888,16 @@ export default function HomeScreen({
                 </p>
             </button>
 
-            {/* Pro CTA Button - Yellow, rounded, premium */}
+            {/* Pro CTA Button - Yellow, rounded, premium with pulsing glow */}
             {!isPro && (
                 <button
                     onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
                     className="px-10 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
                     style={{
-                        background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                        background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 50%, #ff9500 100%)',
                         color: '#000',
-                        boxShadow: '0 4px 20px rgba(255,215,0,0.3)'
+                        boxShadow: '0 4px 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,180,0,0.2)',
+                        animation: 'pulseGlow 2s ease-in-out infinite'
                     }}
                 >
                     👑 Get More Scans

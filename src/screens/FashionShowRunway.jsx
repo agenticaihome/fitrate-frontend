@@ -137,8 +137,8 @@ export default function FashionShowRunway({
                     }}
                     disabled={!canWalk}
                     className={`w-full py-6 rounded-3xl font-black text-xl flex flex-col items-center justify-center gap-1 transition-all ${canWalk
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
-                            : 'bg-white/10 text-white/30'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
+                        : 'bg-white/10 text-white/30'
                         }`}
                 >
                     {!canWalk && hasWalked ? (
@@ -199,14 +199,32 @@ export default function FashionShowRunway({
                                 <div
                                     key={`${entry.userId}-${entry.walkedAt}`}
                                     className={`flex items-center gap-3 p-3 rounded-xl ${isUser
-                                            ? 'bg-purple-500/20 border border-purple-500/30'
-                                            : 'bg-white/5'
+                                        ? 'bg-purple-500/20 border border-purple-500/30'
+                                        : 'bg-white/5'
                                         }`}
                                 >
-                                    <span className="text-lg w-8 text-center">
+                                    {/* Rank */}
+                                    <span className="text-lg w-8 text-center flex-shrink-0">
                                         {typeof rankEmoji === 'string' ? rankEmoji : rankEmoji}
                                     </span>
-                                    <span className="text-xl">{entry.emoji}</span>
+
+                                    {/* Outfit Thumbnail OR Emoji fallback */}
+                                    {entry.imageThumb ? (
+                                        <img
+                                            src={entry.imageThumb}
+                                            alt={`${entry.nickname}'s outfit`}
+                                            className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                                            style={{
+                                                border: isUser ? '2px solid #a855f7' : '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                        />
+                                    ) : (
+                                        <span className="text-2xl w-12 h-12 flex items-center justify-center bg-white/5 rounded-lg flex-shrink-0">
+                                            {entry.emoji}
+                                        </span>
+                                    )}
+
+                                    {/* Name & Verdict */}
                                     <div className="flex-1 min-w-0">
                                         <div className="text-white font-semibold truncate">
                                             {entry.nickname}
@@ -218,7 +236,9 @@ export default function FashionShowRunway({
                                             </div>
                                         )}
                                     </div>
-                                    <div className="text-xl font-black text-white">
+
+                                    {/* Score */}
+                                    <div className="text-xl font-black text-white flex-shrink-0">
                                         {entry.score?.toFixed(1)}
                                     </div>
                                 </div>

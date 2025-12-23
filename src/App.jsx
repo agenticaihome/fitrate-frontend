@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { playSound, vibrate } from './utils/soundEffects'
 import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
+import BottomNav from './components/common/BottomNav'
 import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
 import { getScoreColor } from './utils/scoreUtils'
-import { compressImage, cleanupBlobUrls, hintGarbageCollection } from './utils/imageUtils'
+import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
 
 // Screens
@@ -1041,6 +1042,17 @@ export default function App() {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 30000)
 
+        // Create thumbnail for event mode submissions (Weekly Challenge)
+        const isEventSubmission = eventMode && currentEvent && !fashionShowId;
+        let eventThumb = null;
+        if (isEventSubmission && uploadedImage) {
+          try {
+            eventThumb = await createThumbnail(uploadedImage, 150, 0.6);
+          } catch (e) {
+            console.warn('Failed to create event thumbnail:', e);
+          }
+        }
+
         // Call real AI endpoint (backend routes free users to Gemini)
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -1049,7 +1061,8 @@ export default function App() {
             image: imageData,
             mode,
             userId,
-            eventMode: eventMode && currentEvent ? true : false
+            eventMode: isEventSubmission,
+            imageThumb: eventThumb  // Send thumbnail for Weekly Challenge top-5 display
           }),
           signal: controller.signal
         })
@@ -1130,6 +1143,9 @@ export default function App() {
         // ============================================
         if (fashionShowId && fashionShowNickname) {
           try {
+            // Create thumbnail for leaderboard display
+            const imageThumb = await createThumbnail(uploadedImage, 150, 0.6);
+
             await fetch(`${API_BASE}/show/${fashionShowId}/walk`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1138,11 +1154,12 @@ export default function App() {
                 nickname: fashionShowNickname,
                 emoji: fashionShowEmoji,
                 score: data.scores.overall,
-                verdict: data.scores.verdict || ''
+                verdict: data.scores.verdict || '',
+                imageThumb: imageThumb // Include outfit thumbnail
               })
             })
             setFashionShowWalks(prev => prev + 1)
-            console.log(`[FashionShow] Walk recorded: ${data.scores.overall}`)
+            console.log(`[FashionShow] Walk recorded: ${data.scores.overall} (thumb: ${imageThumb ? 'yes' : 'no'})`)
           } catch (err) {
             console.error('[FashionShow] Failed to record walk:', err)
           }
@@ -1174,10 +1191,27 @@ export default function App() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
+      // Create thumbnail for event mode submissions (Weekly Challenge)
+      const isProEventSubmission = eventMode && currentEvent && !fashionShowId;
+      let proEventThumb = null;
+      if (isProEventSubmission && uploadedImage) {
+        try {
+          proEventThumb = await createThumbnail(uploadedImage, 150, 0.6);
+        } catch (e) {
+          console.warn('Failed to create event thumbnail:', e);
+        }
+      }
+
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: getApiHeaders(),
-        body: JSON.stringify({ image: imageData, mode, userId, eventMode: eventMode && currentEvent ? true : false }),
+        body: JSON.stringify({
+          image: imageData,
+          mode,
+          userId,
+          eventMode: isProEventSubmission,
+          imageThumb: proEventThumb  // Send thumbnail for Weekly Challenge top-5 display
+        }),
         signal: controller.signal
       })
       clearTimeout(timeoutId)
@@ -1675,70 +1709,90 @@ export default function App() {
   // ============================================
   if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules) {
     return (
-      <HomeScreen
-        mode={mode}
-        setMode={setMode}
-        isPro={isPro}
-        scansRemaining={scansRemaining}
-        dailyStreak={dailyStreak}
-        currentEvent={currentEvent}
-        eventMode={eventMode}
-        setEventMode={setEventMode}
-        purchasedScans={purchasedScans}
-        challengeScore={challengeScore}
-        showToast={showToast}
-        toastMessage={toastMessage}
-        showInstallBanner={showInstallBanner}
-        onShowInstallBanner={setShowInstallBanner}
-        hasSeenEventExplainer={hasSeenEventExplainer}
-        onShowEventExplainer={() => setShowEventExplainer(true)}
-        freeEventEntryUsed={freeEventEntryUsed}
-        onImageSelected={(img, scanType) => {
-          setUploadedImage(img)
-          setScreen('analyzing')
-          analyzeOutfit(img, scanType)
-        }}
-        onShowPaywall={() => setShowPaywall(true)}
-        onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
-        onShowRules={() => setShowEventRules(true)}
-        onShowRestore={() => setShowRestoreModal(true)}
-        onError={(msg) => { setError(msg); setScreen('error'); }}
-        onStartFashionShow={() => setFashionShowScreen('create')}
-        onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
-        pendingFashionShowWalk={pendingFashionShowWalk}
-        onClearPendingWalk={() => setPendingFashionShowWalk(false)}
-        fashionShowName={fashionShowData?.name}
-        activeShows={activeShows}
-        onNavigateToShow={(showId) => {
-          // Navigate directly to a specific Fashion Show
-          setFashionShowId(showId)
-          setFashionShowScreen('runway')
-          window.history.pushState({}, '', `/f/${showId}`)
-          // Fetch show data
-          fetch(`${API_BASE}/show/${showId}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.showId) {
-                setFashionShowData(data)
-                // Restore nickname/emoji from localStorage
-                const savedNick = localStorage.getItem(`fashionshow_${showId}_nickname`)
-                const savedEmoji = localStorage.getItem(`fashionshow_${showId}_emoji`)
-                setFashionShowNickname(savedNick || 'Guest')
-                setFashionShowEmoji(savedEmoji || '😎')
-              } else {
-                // Show expired/not found - remove from active shows
+      <>
+        <HomeScreen
+          mode={mode}
+          setMode={setMode}
+          isPro={isPro}
+          scansRemaining={scansRemaining}
+          dailyStreak={dailyStreak}
+          currentEvent={currentEvent}
+          eventMode={eventMode}
+          setEventMode={setEventMode}
+          purchasedScans={purchasedScans}
+          challengeScore={challengeScore}
+          showToast={showToast}
+          toastMessage={toastMessage}
+          showInstallBanner={showInstallBanner}
+          onShowInstallBanner={setShowInstallBanner}
+          hasSeenEventExplainer={hasSeenEventExplainer}
+          onShowEventExplainer={() => setShowEventExplainer(true)}
+          freeEventEntryUsed={freeEventEntryUsed}
+          onImageSelected={(img, scanType) => {
+            setUploadedImage(img)
+            setScreen('analyzing')
+            analyzeOutfit(img, scanType)
+          }}
+          onShowPaywall={() => setShowPaywall(true)}
+          onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
+          onShowRules={() => setShowEventRules(true)}
+          onShowRestore={() => setShowRestoreModal(true)}
+          onError={(msg) => { setError(msg); setScreen('error'); }}
+          onStartFashionShow={() => setFashionShowScreen('create')}
+          onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
+          pendingFashionShowWalk={pendingFashionShowWalk}
+          onClearPendingWalk={() => setPendingFashionShowWalk(false)}
+          fashionShowName={fashionShowData?.name}
+          activeShows={activeShows}
+          onNavigateToShow={(showId) => {
+            // Navigate directly to a specific Fashion Show
+            setFashionShowId(showId)
+            setFashionShowScreen('runway')
+            window.history.pushState({}, '', `/f/${showId}`)
+            // Fetch show data
+            fetch(`${API_BASE}/show/${showId}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.showId) {
+                  setFashionShowData(data)
+                  // Restore nickname/emoji from localStorage
+                  const savedNick = localStorage.getItem(`fashionshow_${showId}_nickname`)
+                  const savedEmoji = localStorage.getItem(`fashionshow_${showId}_emoji`)
+                  setFashionShowNickname(savedNick || 'Guest')
+                  setFashionShowEmoji(savedEmoji || '😎')
+                } else {
+                  // Show expired/not found - remove from active shows
+                  removeFromActiveShows(showId)
+                  setFashionShowScreen(null)
+                  window.history.pushState({}, '', '/')
+                }
+              })
+              .catch(() => {
                 removeFromActiveShows(showId)
                 setFashionShowScreen(null)
                 window.history.pushState({}, '', '/')
-              }
-            })
-            .catch(() => {
-              removeFromActiveShows(showId)
-              setFashionShowScreen(null)
-              window.history.pushState({}, '', '/')
-            })
-        }}
-      />
+              })
+          }}
+        />
+        <BottomNav
+          activeTab="home"
+          eventMode={eventMode}
+          onNavigate={(tab) => {
+            if (tab === 'gala') {
+              fetchLeaderboard();
+              setScreen('weekly-challenge');
+            }
+            // 'home' tab is already current, no action needed
+          }}
+          onScan={() => {
+            // Trigger camera/scan action - scroll to camera section
+            const cameraSection = document.querySelector('.camera-section');
+            if (cameraSection) {
+              cameraSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
+      </>
     )
   }
 
@@ -1751,6 +1805,11 @@ export default function App() {
         uploadedImage={uploadedImage}
         mode={mode}
         isPro={isPro}
+        onBack={() => {
+          setIsAnalyzing(false)
+          setScreen('home')
+          displayToast('Analysis cancelled')
+        }}
       />
     )
   }
@@ -1791,29 +1850,47 @@ export default function App() {
   // ============================================
   if (screen === 'results' && scores) {
     return (
-      <ResultsScreen
-        scores={scores}
-        mode={mode}
-        uploadedImage={uploadedImage}
-        isPro={isPro}
-        scansRemaining={scansRemaining}
-        onReset={resetApp}
-        onSetMode={setMode}
-        onGenerateShareCard={generateShareCard}
-        onShowPaywall={() => setShowPaywall(true)}
-        playSound={playSound}
-        vibrate={vibrate}
-        currentEvent={eventMode ? currentEvent : null}
-        onStartFashionShow={() => setScreen('fashion-create')}
-        totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
-        fashionShowId={fashionShowId}
-        fashionShowName={fashionShowData?.name}
-        onReturnToRunway={() => {
-          setFashionShowScreen('runway')
-          setScores(null)
-          setScreen('home')
-        }}
-      />
+      <>
+        <ResultsScreen
+          scores={scores}
+          mode={mode}
+          uploadedImage={uploadedImage}
+          isPro={isPro}
+          scansRemaining={scansRemaining}
+          onReset={resetApp}
+          onSetMode={setMode}
+          onGenerateShareCard={generateShareCard}
+          onShowPaywall={() => setShowPaywall(true)}
+          playSound={playSound}
+          vibrate={vibrate}
+          currentEvent={eventMode ? currentEvent : null}
+          onStartFashionShow={() => setScreen('fashion-create')}
+          totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
+          fashionShowId={fashionShowId}
+          fashionShowName={fashionShowData?.name}
+          onReturnToRunway={() => {
+            setFashionShowScreen('runway')
+            setScores(null)
+            setScreen('home')
+          }}
+        />
+        <BottomNav
+          activeTab={null}
+          eventMode={eventMode}
+          onNavigate={(tab) => {
+            if (tab === 'home') {
+              setScreen('home');
+            } else if (tab === 'gala') {
+              fetchLeaderboard();
+              setScreen('weekly-challenge');
+            }
+          }}
+          onScan={() => {
+            // Go home to scan again
+            resetApp();
+          }}
+        />
+      </>
     )
   }
 
@@ -1827,6 +1904,7 @@ export default function App() {
         errorCode={errorCode}
         onReset={resetApp}
         onUpgrade={() => setShowPaywall(true)}
+        onHome={() => setScreen('home')}
       />
     )
   }

@@ -75,7 +75,7 @@ function getErrorConfig(errorCode, errorMessage) {
     };
 }
 
-export default function ErrorScreen({ error, errorCode, onReset, onUpgrade }) {
+export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHome }) {
     // Get config for this error code or message
     const config = getErrorConfig(errorCode, error);
 
@@ -104,6 +104,17 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade }) {
                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg transition-all active:scale-95"
                     >
                         ⚡ Upgrade to Pro
+                    </button>
+                )}
+
+                {/* Home Button - Always Available Escape Route */}
+                {onHome && (
+                    <button
+                        onClick={onHome}
+                        className="w-full py-3 mt-2 text-sm font-medium transition-all active:opacity-60"
+                        style={{ color: 'rgba(255,255,255,0.4)' }}
+                    >
+                        ← Back to Home
                     </button>
                 )}
             </div>
