@@ -40,34 +40,34 @@ export const generateShareCard = async ({
             // Determine viral caption based on score and mode
             const getViralCaption = () => {
                 if (scores.roastMode) {
-                    if (scores.overall < 30) return "I got DESTROYED 💀💀💀"
-                    if (scores.overall < 45) return "AI showed no mercy 💀"
-                    if (scores.overall < 60) return "AI humbled me 💀 Your turn?"
-                    return "Survived Roast Mode 😏"
+                    if (scores.overall < 30) return "The AI chose violence 💀"
+                    if (scores.overall < 45) return "This was personal 💀"
+                    if (scores.overall < 60) return "Humbled. Your turn? 😈"
+                    return "Survived the roast 😏"
                 } else if (scores.mode === 'honest') {
-                    if (scores.overall >= 90) return `${scores.overall}/100 — Honest mode approved 📊`
-                    if (scores.overall >= 75) return `Real talk: ${scores.overall}/100 📊`
-                    if (scores.overall >= 60) return `Honest score: ${scores.overall} — thoughts? 📊`
-                    return `Got my honest rating 📊 Your turn?`
+                    if (scores.overall >= 90) return `${scores.overall}/100 — No notes 📊`
+                    if (scores.overall >= 75) return `Objectively solid 📊`
+                    if (scores.overall >= 60) return `The truth hurts 📊`
+                    return `Honest rating. Thoughts? 📊`
                 } else if (scores.mode === 'rizz') {
-                    if (scores.overall >= 90) return `${scores.overall}% Rizz — I'm dangerous 😏`
+                    if (scores.overall >= 90) return `Dangerously attractive 😏`
                     if (scores.overall >= 75) return `W Rizz confirmed 💋`
-                    if (scores.overall >= 50) return `Rizz check: ${scores.overall}% — valid? 😏`
-                    return `L Rizz? Rate yours 💔`
+                    if (scores.overall >= 50) return `Valid or delusional? 😏`
+                    return `The AI said touch grass 💔`
                 } else if (scores.mode === 'celeb') {
-                    return `${scores.celebrityJudge || 'A fashion icon'} rated my fit 🎭`
+                    return `${scores.celebrityJudge || 'A legend'} has spoken 🎭`
                 } else if (scores.mode === 'aura') {
-                    if (scores.vibeAssessment === 'Main Character') return `Main Character Aura confirmed ✨`
-                    if (scores.vibeAssessment === 'NPC') return `Got called an NPC 💀 Your aura?`
-                    return `${scores.auraColor || 'My'} Aura 🔮 What's yours?`
+                    if (scores.vibeAssessment === 'Main Character') return `Main character confirmed ✨`
+                    if (scores.vibeAssessment === 'NPC') return `NPC behavior detected 💀`
+                    return `${scores.auraColor || 'Your'} Aura revealed 🔮`
                 } else if (scores.mode === 'chaos') {
-                    if (scores.chaosLevel >= 8) return `The AI went UNHINGED 🎪🌀`
-                    return `Chaos Mode activated 🎪`
+                    if (scores.chaosLevel >= 8) return `The AI went feral 🎪`
+                    return `Chaos mode activated 🌀`
                 } else {
-                    if (scores.overall >= 95) return `${scores.overall}/100 — I'm literally perfect 💅`
-                    if (scores.overall >= 90) return `${scores.overall}/100 — beat that 🏆`
-                    if (scores.overall >= 80) return "AI approved ✨ What's yours?"
-                    if (scores.overall >= 70) return "Pretty good 👀 Can you beat it?"
+                    if (scores.overall >= 95) return `Literally perfect 💅`
+                    if (scores.overall >= 90) return `Main character energy 🏆`
+                    if (scores.overall >= 80) return "AI approved ✨"
+                    if (scores.overall >= 70) return "Solid. Can you beat it? 👀"
                     return "Your turn 👀"
                 }
             }
@@ -240,27 +240,27 @@ export const generateShareCard = async ({
             ctx.save()
             const stampX = isSquare ? 880 : 920
             const stampY = isSquare ? 120 : 240
-            // Dynamic Stamp Text & Color based on mode
-            let stampText = "AGREE?"
+            // Dynamic Stamp Text & Color based on mode - Conversation starters
+            let stampText = "VALID?"
             let stampColor = '#fff'
             if (scores.mode === 'roast' || scores.mode === 'savage') {
-                stampText = scores.overall < 50 ? "COOKED?" : "SURVIVED?"
+                stampText = scores.overall < 50 ? "COOKED?" : "FAIR?"
                 stampColor = '#ff4444'
             } else if (scores.mode === 'rizz') {
-                stampText = scores.overall >= 75 ? "W RIZZ?" : "L RIZZ?"
+                stampText = scores.overall >= 75 ? "SMOOTH?" : "DELUSIONAL?"
                 stampColor = '#ff69b4'
             } else if (scores.mode === 'celeb') {
-                stampText = scores.wouldTheyWear ? "APPROVED" : "REJECTED"
+                stampText = scores.wouldTheyWear ? "ICONIC" : "YIKES"
                 stampColor = '#ffd700'
             } else if (scores.mode === 'aura') {
                 stampText = scores.vibeAssessment === 'Main Character' ? "MAIN?" : "NPC?"
                 stampColor = '#9b59b6'
             } else if (scores.mode === 'chaos') {
-                stampText = "CHAOS!"
+                stampText = "UNHINGED"
                 stampColor = '#ff6b6b'
             } else {
-                stampText = scores.overall >= 90 ? "VALID?" : "ROBBED?"
-                stampColor = scores.overall >= 90 ? '#ffd700' : '#ff8800'
+                stampText = scores.overall >= 90 ? "VALID?" : scores.overall >= 70 ? "ROBBED?" : "THOUGHTS?"
+                stampColor = scores.overall >= 90 ? '#ffd700' : '#00d4ff'
             }
 
             ctx.translate(stampX, stampY)
@@ -527,59 +527,59 @@ export const generateShareCard = async ({
             const percent = Math.max(1, 100 - scores.percentile)
             ctx.fillText(`TOP ${percent}% OF ALL FITS TODAY`, 540, isSquare ? 1040 : 1700)
 
-            // Branding Footer - Strong CTA for Viral Re-scans
-            ctx.fillStyle = 'rgba(255,255,255,0.3)'
+            // Branding Footer - Clean, confident
+            ctx.fillStyle = 'rgba(255,255,255,0.25)'
             ctx.font = `bold ${isSquare ? 16 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText('TRY IT FREE @ FITRATE.APP', 540, isSquare ? 1070 : 1750)
+            ctx.fillText('FITRATE.APP', 540, isSquare ? 1070 : 1750)
 
             // Generate Conversation-Starter Share Text
             const getShareText = () => {
                 const baseUrl = 'https://fitrate.app'
                 const link = `${baseUrl}?ref=${userId}`
 
-                // Roast / Savage Strategy: Disagreement & Shock
+                // Roast / Savage Strategy: Sharp, conversation-starting
                 if (scores.roastMode || scores.mode === 'savage') {
-                    if (scores.overall < 35) return `FitRate gave me a ${scores.overall}/100. Is it really that bad? 💀 ${link}`
-                    if (scores.overall < 60) return `They said I have NPC energy. Agree or disagree? 👇 ${link}`
-                    return `Rated ${scores.overall}/100. Be honest... am I cooked? 🍳 ${link}`
+                    if (scores.overall < 35) return `AI gave me a ${scores.overall}. Valid or personal? 💀 ${link}`
+                    if (scores.overall < 60) return `"${scores.verdict}" — agree? 👇 ${link}`
+                    return `Survived roast mode with ${scores.overall}/100. Fair? 😏 ${link}`
                 }
 
-                // Nice / Honest Strategy: Validation & "Robbed" Debate
+                // Nice / Honest Strategy: Debate-friendly
                 if (scores.mode === 'honest') {
-                    if (scores.overall < 70) return `Honest mode gave me ${scores.overall}. I feel robbed. Thoughts? 🤨 ${link}`
-                    return `Got a ${scores.overall}/100 honestly. Accurate? 📊 ${link}`
+                    if (scores.overall < 70) return `AI said ${scores.overall}. Robbed or accurate? 🤨 ${link}`
+                    return `Honest rating: ${scores.overall}/100. Thoughts? 📊 ${link}`
                 }
 
-                // Rizz Mode Strategy: Flirty debate
+                // Rizz Mode Strategy: Playful flex
                 if (scores.mode === 'rizz') {
-                    if (scores.overall >= 85) return `${scores.overall}% rizz. Dangerous levels detected 😏💋 ${link}`
-                    if (scores.overall >= 60) return `Got rated ${scores.overall}% rizz. Valid or nah? 🤔 ${link}`
-                    return `They said I have L rizz... be honest 💔 ${link}`
+                    if (scores.overall >= 85) return `${scores.overall}% rizz confirmed 😏 What's yours? ${link}`
+                    if (scores.overall >= 60) return `Rizz check: ${scores.overall}%. Valid? 🤔 ${link}`
+                    return `The AI humbled me 💔 Your turn? ${link}`
                 }
 
-                // Celeb Mode Strategy: Celebrity authority
+                // Celeb Mode Strategy: Authority quote
                 if (scores.mode === 'celeb') {
-                    return `${scores.celebrityJudge || 'Anna Wintour'} rated my fit ${scores.overall}/100 🎭 ${link}`
+                    return `${scores.celebrityJudge || 'Anna Wintour'} rated my fit. Agree? 🎭 ${link}`
                 }
 
-                // Aura Mode Strategy: Main Character debate
+                // Aura Mode Strategy: Identity hook
                 if (scores.mode === 'aura') {
-                    if (scores.vibeAssessment === 'Main Character') return `Got Main Character aura ✨ What's yours? ${link}`
-                    if (scores.vibeAssessment === 'NPC') return `The AI called me an NPC 💀 Am I cooked? ${link}`
-                    return `${scores.auraColor} aura 🔮 What color are you? ${link}`
+                    if (scores.vibeAssessment === 'Main Character') return `Main character aura ✨ Accurate? ${link}`
+                    if (scores.vibeAssessment === 'NPC') return `AI called me an NPC 💀 Valid? ${link}`
+                    return `${scores.auraColor} aura 🔮 What's yours? ${link}`
                 }
 
-                // Chaos Mode Strategy: Absurdist hook
+                // Chaos Mode Strategy: Absurdist share
                 if (scores.mode === 'chaos') {
-                    return `"${scores.absurdComparison || 'The AI went feral'}" 🎪 Chaos Mode ${link}`
+                    return `"${scores.absurdComparison || 'The AI went feral'}" 🎪 ${link}`
                 }
 
-                // High Scores Strategy: Humble Brag / Challenge
-                if (scores.overall >= 90) return `FitRate says ${scores.overall}/100. Can anyone beat this? 🏆 ${link}`
-                if (scores.overall >= 80) return `Rated ${scores.overall}/100. Valid or glazed? 👀 ${link}`
+                // High Scores Strategy: Flex + challenge
+                if (scores.overall >= 90) return `${scores.overall}/100. Beat that? 🏆 ${link}`
+                if (scores.overall >= 80) return `AI approved at ${scores.overall}/100 ✨ ${link}`
 
-                // Default / Low-Mid Nice
-                return `Got rated ${scores.overall}/100 on FitRate. Thoughts? 👇 ${link}`
+                // Default
+                return `Got ${scores.overall}/100. Thoughts? 👇 ${link}`
             }
 
             canvas.toBlob((blob) => {
