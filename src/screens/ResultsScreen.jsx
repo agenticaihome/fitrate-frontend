@@ -890,39 +890,6 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== COMPACT UPGRADE PROMPT (FREE USERS) ===== */}
-            {/* Replaced tall blurred teaser with compact, flow-friendly prompt */}
-            {!isPro && revealStage >= 5 && (
-                <div className={`w-full max-w-sm px-4 mb-3 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    <div
-                        className="p-4 rounded-2xl border cursor-pointer group active:scale-[0.98] transition-all hover:border-yellow-400/40"
-                        onClick={onShowPaywall}
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.03) 100%)',
-                            borderColor: 'rgba(255,215,0,0.2)',
-                        }}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <span className="text-2xl">✨</span>
-                                <div>
-                                    <p className="text-sm font-bold text-white">See what you're missing</p>
-                                    <p className="text-xs text-white/50">Understand how this actually reads</p>
-                                </div>
-                            </div>
-                            <div
-                                className="px-3 py-1.5 rounded-full text-xs font-bold group-hover:scale-105 transition-transform"
-                                style={{
-                                    background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                                    color: '#000'
-                                }}
-                            >
-                                Upgrade →
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* ===== SAVAGE ROASTS - Pro Mode Card ===== */}
             {scores.savageLevel && (
@@ -1115,34 +1082,33 @@ export default function ResultsScreen({
                     <span className="text-lg">📤</span> Share This Fit
                 </button>
 
-                {/* Try Again */}
-                <button
-                    onClick={onReset}
-                    className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2"
-                >
-                    🔄 {scores.overall >= 85 ? "Beat this? Scan again" : scores.overall < 50 ? "Redeem yourself" : "Rate Another"}
-                </button>
-
-                {/* Return to Runway - Fashion Show context */}
-                {fashionShowId && onReturnToRunway && (
+                {/* Try Again + Back to Runway (side-by-side when in Fashion Show) */}
+                <div className={`flex gap-2 ${fashionShowId && onReturnToRunway ? 'flex-row' : 'flex-col'}`}>
                     <button
-                        onClick={() => {
-                            playSound('click')
-                            vibrate(20)
-                            onReturnToRunway()
-                        }}
-                        className="w-full mt-3 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all active:scale-[0.97]"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(168,85,247,0.2) 100%)',
-                            border: '1px solid rgba(139,92,246,0.4)',
-                            boxShadow: '0 0 30px rgba(139,92,246,0.2)'
-                        }}
+                        onClick={onReset}
+                        className={`${fashionShowId && onReturnToRunway ? 'flex-1' : 'w-full'} py-3 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.97] transition-all`}
                     >
-                        <span className="text-xl">🎭</span>
-                        <span className="text-white">Back to {fashionShowName || 'Fashion Show'}</span>
-                        <span className="text-purple-300 text-sm">🏆</span>
+                        🔄 {scores.overall >= 85 ? "Scan Again" : scores.overall < 50 ? "Try Again" : "New Scan"}
                     </button>
-                )}
+
+                    {fashionShowId && onReturnToRunway && (
+                        <button
+                            onClick={() => {
+                                playSound('click')
+                                vibrate(20)
+                                onReturnToRunway()
+                            }}
+                            className="flex-1 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(168,85,247,0.15) 100%)',
+                                border: '1px solid rgba(139,92,246,0.35)',
+                            }}
+                        >
+                            <span>🎭</span>
+                            <span className="text-purple-300">Back to Show</span>
+                        </button>
+                    )}
+                </div>
 
                 {/* Scans remaining or Inline Paywall */}
                 {!isPro && (
@@ -1187,68 +1153,7 @@ export default function ResultsScreen({
                     )
                 )}
 
-                {/* Mode switch */}
-                {!isPro && scores.mode === 'nice' && (
-                    <div className="mt-5 text-center">
-                        <p className="text-[10px] text-white/30 mb-1">Too nice?</p>
-                        <button
-                            onClick={() => { onSetMode('roast'); onReset(); }}
-                            className="text-xs text-red-400 font-black uppercase tracking-wider hover:text-red-300 transition-colors"
-                        >
-                            Try Roast Mode 😈
-                        </button>
-                    </div>
-                )}
 
-                {/* ===== DISCOVERY CARDS ===== */}
-                {/* Show contextual suggestions after animation completes */}
-                {animationComplete && (
-                    <div className="mt-8 flex flex-col gap-3 w-full max-w-sm mx-auto px-4">
-                        <p className="text-center text-white/30 text-xs uppercase tracking-wide">Discover</p>
-
-                        {/* Fashion Show - show after 2+ scans */}
-                        {onStartFashionShow && totalScans >= 2 && (
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                                className="flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
-                                    border: '1px solid rgba(139,92,246,0.3)'
-                                }}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xl">🎭</span>
-                                    <div className="text-left">
-                                        <p className="text-white font-medium text-sm">Fashion Show</p>
-                                        <p className="text-white/50 text-[10px]">Compete with friends</p>
-                                    </div>
-                                </div>
-                                <span className="text-purple-400 text-sm">→</span>
-                            </button>
-                        )}
-
-                        {/* Pro Modes Tease - for free users */}
-                        {!isPro && (
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); onShowPaywall(); }}
-                                className="flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.1) 100%)',
-                                    border: '1px solid rgba(255,215,0,0.2)'
-                                }}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xl">⚡</span>
-                                    <div className="text-left">
-                                        <p className="text-white font-medium text-sm">Unlock Pro Modes</p>
-                                        <p className="text-white/50 text-[10px]">Savage, Rizz, Aura & more</p>
-                                    </div>
-                                </div>
-                                <span className="text-yellow-400 text-[10px] font-bold bg-yellow-500/20 px-2 py-1 rounded-full">PRO</span>
-                            </button>
-                        )}
-                    </div>
-                )}
             </div>
 
             {/* ===== LEGENDARY CONFETTI SYSTEM ===== */}
