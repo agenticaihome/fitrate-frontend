@@ -265,11 +265,59 @@ body {
 
 /* Golden CTA button pulsing glow */
 @keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 4px 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,180,0,0.2);
+
+  0%,
+  100% {
+    box-shadow: 0 4px 30px rgba(255, 215, 0, 0.4), 0 0 60px rgba(255, 180, 0, 0.2);
   }
+
   50% {
-    box-shadow: 0 4px 40px rgba(255,215,0,0.6), 0 0 80px rgba(255,180,0,0.35);
+    box-shadow: 0 4px 40px rgba(255, 215, 0, 0.6), 0 0 80px rgba(255, 180, 0, 0.35);
+  }
+}
+
+/* Sparkle twinkle animation for buttons */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(180deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) rotate(360deg);
+    opacity: 0.4;
+  }
+}
+
+/* Teal glow pulse for Weekly Challenge */
+@keyframes tealPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(45, 212, 191, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 4px 30px rgba(16, 185, 129, 0.5), 0 0 60px rgba(45, 212, 191, 0.3);
   }
 }
 

@@ -811,52 +811,60 @@ export default function HomeScreen({
 
             {/* Event Destination Cards - Side by side */}
             <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
-                {/* Fashion Show - Purple gradient with sparkles */}
+                {/* Fashion Show - Purple gradient with animated sparkles */}
                 {onStartFashionShow && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
                             background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #4c1d95 100%)',
-                            border: '1px solid rgba(167,139,250,0.4)',
-                            boxShadow: '0 4px 20px rgba(139,92,246,0.3)'
+                            border: '2px solid rgba(167,139,250,0.5)',
+                            boxShadow: '0 4px 20px rgba(139,92,246,0.4), 0 0 40px rgba(167,139,250,0.2)'
                         }}
                     >
-                        {/* Sparkle overlay */}
-                        <div className="absolute inset-0 opacity-30" style={{
-                            backgroundImage: `radial-gradient(1px 1px at 10px 10px, white 0%, transparent 100%),
-                                             radial-gradient(1px 1px at 30px 25px, white 0%, transparent 100%),
-                                             radial-gradient(1px 1px at 50px 15px, white 0%, transparent 100%)`,
-                            backgroundSize: '60px 40px'
-                        }} />
-                        <span className="relative text-4xl block mb-2">🎭</span>
+                        {/* Animated sparkle overlay */}
+                        <div className="absolute inset-0 overflow-hidden">
+                            <div className="absolute" style={{ top: '12%', left: '15%', animation: 'sparkle 1.8s ease-in-out infinite' }}>✨</div>
+                            <div className="absolute" style={{ top: '30%', right: '20%', animation: 'sparkle 2.2s ease-in-out infinite 0.4s' }}>💜</div>
+                            <div className="absolute" style={{ bottom: '25%', left: '25%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.2s' }}>✨</div>
+                        </div>
+                        <span className="relative text-4xl block mb-2 drop-shadow-lg">🎭</span>
                         <span className="relative text-white font-bold block">Fashion Show</span>
-                        <span className="relative text-purple-200/70 text-xs">Get ranked with others</span>
+                        <span className="relative text-purple-200/70 text-xs">Compete with friends</span>
                     </button>
                 )}
 
-                {/* Weekly Challenge - Teal gradient with stars */}
+                {/* Weekly Challenge - Large teal gradient with animated sparkles */}
                 {currentEvent && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, #047857 0%, #0d9488 50%, #115e59 100%)',
-                            border: '1px solid rgba(45,212,191,0.4)',
-                            boxShadow: '0 4px 20px rgba(16,185,129,0.3)'
+                            background: 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
+                            border: '2px solid rgba(45,212,191,0.5)',
+                            boxShadow: '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
+                            animation: 'tealPulse 2s ease-in-out infinite'
                         }}
                     >
-                        {/* Star/confetti overlay */}
-                        <div className="absolute inset-0 opacity-25" style={{
-                            backgroundImage: `radial-gradient(2px 2px at 15px 12px, #fbbf24 0%, transparent 100%),
-                                             radial-gradient(1px 1px at 35px 8px, white 0%, transparent 100%),
-                                             radial-gradient(2px 2px at 55px 20px, #fbbf24 0%, transparent 100%),
-                                             radial-gradient(1px 1px at 70px 5px, white 0%, transparent 100%)`,
-                            backgroundSize: '80px 35px'
-                        }} />
-                        <span className="relative text-4xl block mb-2">🏆</span>
-                        <span className="relative text-white font-bold block">Weekly Challenge</span>
-                        <span className="relative text-teal-200/70 text-xs">This week's competition</span>
+                        {/* Animated sparkle overlay */}
+                        <div className="absolute inset-0 overflow-hidden">
+                            {/* Sparkle dots */}
+                            <div className="absolute" style={{ top: '15%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite' }}>✨</div>
+                            <div className="absolute" style={{ top: '25%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s' }}>⭐</div>
+                            <div className="absolute" style={{ bottom: '20%', left: '30%', animation: 'sparkle 1.8s ease-in-out infinite 0.6s' }}>✨</div>
+                            <div className="absolute" style={{ top: '60%', right: '25%', animation: 'sparkleFloat 2.5s ease-in-out infinite' }}>⭐</div>
+                        </div>
+                        {/* Gold shimmer line */}
+                        <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                            <div className="absolute top-0 left-0 w-full h-full" style={{
+                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.3) 50%, transparent 100%)',
+                                transform: 'translateX(-100%)',
+                                animation: 'shimmer 3s infinite'
+                            }} />
+                        </div>
+                        <span className="relative text-4xl block mb-2 drop-shadow-lg">🏆</span>
+                        <span className="relative text-white font-bold block text-lg">{currentEvent.theme || 'Weekly Challenge'}</span>
+                        <span className="relative text-teal-100/80 text-xs">Tap to compete!</span>
                     </button>
                 )}
             </div>
