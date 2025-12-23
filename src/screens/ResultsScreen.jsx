@@ -943,9 +943,11 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== RIZZ MODE CARD ===== */}
+            {/* ===== RIZZ MODE CARD - Pro Mode ===== */}
             {scores.mode === 'rizz' && scores.rizzType && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    {/* Mode Context */}
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😏 Rizz Mode Active</p>
                     <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,105,180,0.08)', borderColor: 'rgba(255,105,180,0.25)' }}>
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-xs font-black text-pink-400 uppercase tracking-widest">😏 Rizz Rating</span>
@@ -971,9 +973,11 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== CELEBRITY JUDGE CARD ===== */}
+            {/* ===== CELEBRITY JUDGE CARD - Pro Mode ===== */}
             {scores.mode === 'celeb' && scores.celebrityJudge && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    {/* Mode Context */}
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
                     <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
                         <div className="flex items-center gap-2 mb-3">
                             <span className="text-2xl">🎭</span>
@@ -994,9 +998,11 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== AURA / VIBE CHECK CARD ===== */}
+            {/* ===== AURA / VIBE CHECK CARD - Pro Mode ===== */}
             {scores.mode === 'aura' && scores.auraColor && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    {/* Mode Context */}
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🔮 Aura Mode Active</p>
                     <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.25)' }}>
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-xs font-black text-purple-400 uppercase tracking-widest">🔮 Aura Reading</span>
@@ -1022,9 +1028,11 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== CHAOS MODE CARD ===== */}
+            {/* ===== CHAOS MODE CARD - Pro Mode ===== */}
             {scores.mode === 'chaos' && scores.chaosLevel && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    {/* Mode Context */}
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎪 Chaos Mode Active</p>
                     <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,107,107,0.08)', borderColor: 'rgba(255,107,107,0.25)', animation: scores.chaosLevel >= 8 ? 'shake 0.5s infinite' : 'none' }}>
                         <div className="flex justify-between items-center mb-3">
                             <span className="text-xs font-black text-red-400 uppercase tracking-widest">🎪 Chaos Level</span>
