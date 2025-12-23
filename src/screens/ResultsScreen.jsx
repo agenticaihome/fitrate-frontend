@@ -711,15 +711,16 @@ export default function ResultsScreen({
                         boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 40px ${ringColors.glow}`
                     }}
                 >
-                    <h1 className={`text-2xl md:text-3xl font-black mb-3 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
+                    {/* Bold Headline Roast */}
+                    <h1 className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
                         {scores.verdict}
                     </h1>
 
-                    {scores.lines && scores.lines.length >= 2 && (
-                        <div className="space-y-1 mb-4">
-                            <p className="text-sm text-white/60 italic">"{scores.lines[0]}"</p>
-                            <p className="text-sm text-white/60 italic">"{scores.lines[1]}"</p>
-                        </div>
+                    {/* Identity Line - Short, painfully accurate */}
+                    {scores.lines && scores.lines[0] && (
+                        <p className="text-base text-white/50 italic mb-4">
+                            "{scores.lines[0]}"
+                        </p>
                     )}
 
                     {/* Tagline - Uses mode colors for secondary accent */}
@@ -900,8 +901,8 @@ export default function ResultsScreen({
                             <div className="flex items-center gap-3">
                                 <span className="text-2xl">✨</span>
                                 <div>
-                                    <p className="text-sm font-bold text-white">Want Deeper Insights?</p>
-                                    <p className="text-xs text-white/50">Style tips • Identity • Perception</p>
+                                    <p className="text-sm font-bold text-white">See what you're missing</p>
+                                    <p className="text-xs text-white/50">Understand how this actually reads</p>
                                 </div>
                             </div>
                             <div
@@ -1062,11 +1063,14 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== FLOW DIVIDER — Smooth transition to actions ===== */}
+            {/* ===== VIRAL SHARE PRIMING ===== */}
             <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
+                <p className="text-center text-sm text-white/40 mb-2">
+                    Your friends will be honest. Probably.
+                </p>
                 <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-[10px] uppercase tracking-widest text-white/30">Ready to share?</span>
+                    <span className="text-[10px] uppercase tracking-widest text-white/30">Share the verdict</span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
             </div>
