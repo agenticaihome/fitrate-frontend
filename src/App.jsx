@@ -24,6 +24,8 @@ import FashionShowCreate from './screens/FashionShowCreate'
 import FashionShowJoin from './screens/FashionShowJoin'
 import FashionShowRunway from './screens/FashionShowRunway'
 import FashionShowInvite from './screens/FashionShowInvite'
+// Weekly Challenge screen
+import WeeklyChallengeScreen from './screens/WeeklyChallengeScreen'
 
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
@@ -1477,6 +1479,27 @@ export default function App() {
   }
 
   // ============================================
+  // WEEKLY CHALLENGE SCREEN
+  // ============================================
+  if (screen === 'weekly-challenge') {
+    return (
+      <WeeklyChallengeScreen
+        currentEvent={currentEvent}
+        leaderboard={leaderboard}
+        userEventStatus={userEventStatus}
+        isPro={isPro}
+        freeEventEntryUsed={freeEventEntryUsed}
+        onCompete={() => {
+          setEventMode(true)
+          setScreen('home')
+        }}
+        onShowPaywall={() => setShowPaywall(true)}
+        onBack={() => setScreen('home')}
+      />
+    )
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
@@ -1510,6 +1533,7 @@ export default function App() {
         onShowRules={() => setShowEventRules(true)}
         onError={(msg) => { setError(msg); setScreen('error'); }}
         onStartFashionShow={() => setFashionShowScreen('create')}
+        onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
       />
     )
   }

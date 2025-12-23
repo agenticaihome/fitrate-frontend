@@ -27,9 +27,10 @@ export default function HomeScreen({
     onShowPaywall,
     onShowLeaderboard,
     onShowRules,
-    onShowRestore,      // Show restore Pro modal
+    onShowRestore,          // Show restore Pro modal
     onError,
-    onStartFashionShow  // Start Fashion Show flow
+    onStartFashionShow,     // Start Fashion Show flow
+    onShowWeeklyChallenge   // Navigate to Weekly Challenge page
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -649,25 +650,48 @@ export default function HomeScreen({
                         <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
                     </button>
 
-                    {/* More (Pro only) */}
-                    {isPro && (
-                        <button
-                            onClick={() => { playSound('click'); vibrate(15); setShowModeDrawer(true); }}
-                            aria-label="Open more Pro modes"
-                            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${!['nice', 'roast'].includes(mode) ? 'opacity-100' : 'opacity-60'}`}
-                            style={{
-                                background: !['nice', 'roast'].includes(mode) ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.05)',
-                                border: !['nice', 'roast'].includes(mode) ? '1px solid #ffd700' : '1px solid transparent'
-                            }}
-                        >
-                            <span className="text-base" aria-hidden="true">⚡</span>
-                            <span className={`text-sm font-medium ${!['nice', 'roast'].includes(mode) ? 'text-yellow-400' : 'text-gray-400'}`}>
-                                {!['nice', 'roast'].includes(mode) ? mode.charAt(0).toUpperCase() + mode.slice(1) : 'More'}
-                            </span>
-                        </button>
-                    )}
+                    {/* Pro Modes - visible to everyone, paywall for free users */}
+                    <button
+                        onClick={() => {
+                            playSound('click'); vibrate(15);
+                            if (isPro) {
+                                setShowModeDrawer(true);
+                            } else {
+                                onShowPaywall();
+                            }
+                        }}
+                        aria-label={isPro ? "Open more Pro modes" : "Unlock Pro modes"}
+                        className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${isPro && !['nice', 'roast'].includes(mode) ? 'opacity-100' : 'opacity-60'}`}
+                        style={{
+                            background: isPro && !['nice', 'roast'].includes(mode) ? 'rgba(255,215,0,0.25)' : 'rgba(255,215,0,0.1)',
+                            border: isPro && !['nice', 'roast'].includes(mode) ? '1px solid #ffd700' : '1px dashed rgba(255,215,0,0.4)'
+                        }}
+                    >
+                        {!isPro && <span className="absolute -top-1 -right-1 text-[10px]">🔒</span>}
+                        <span className="text-base" aria-hidden="true">⚡</span>
+                        <span className={`text-sm font-medium ${isPro && !['nice', 'roast'].includes(mode) ? 'text-yellow-400' : 'text-yellow-400/60'}`}>
+                            {isPro && !['nice', 'roast'].includes(mode) ? mode.charAt(0).toUpperCase() + mode.slice(1) : 'Pro'}
+                        </span>
+                    </button>
                 </div>
             </div>
+
+            {/* Fashion Show — The Social Viral Loop */}
+            {onStartFashionShow && (
+                <button
+                    onClick={() => { playSound('click'); vibrate(20); onStartFashionShow(); }}
+                    aria-label="Start a Fashion Show with friends"
+                    className="mb-4 w-full max-w-xs flex items-center justify-center gap-3 px-5 py-3 rounded-2xl transition-all active:scale-[0.98]"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
+                        border: '1px solid rgba(139,92,246,0.3)'
+                    }}
+                >
+                    <span className="text-xl">🎭</span>
+                    <span className="text-white font-semibold">Fashion Show</span>
+                    <span className="text-purple-300/60 text-sm">with friends</span>
+                </button>
+            )}
 
             {/* Scans Remaining + Pro Badge + Streak */}
             <div className="mb-6 flex flex-col items-center gap-3">
@@ -705,33 +729,25 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Weekly Challenge - simplified to minimal pill */}
+
+            {/* Weekly Challenge Button - Goes to dedicated page */}
             {currentEvent && (
                 <button
                     onClick={() => {
                         vibrate(15); playSound('click');
-                        if (!hasSeenEventExplainer) {
-                            onShowEventExplainer();
-                            return;
-                        }
-                        if (isPro || !freeEventEntryUsed) {
-                            setEventMode(!eventMode);
-                        } else {
-                            onShowPaywall();
-                        }
+                        onShowWeeklyChallenge?.();
                     }}
                     aria-label={`${currentEvent.theme} weekly challenge`}
-                    className={`mt-4 px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-[0.98] ${eventMode ? 'ring-2 ring-emerald-400' : ''}`}
+                    className={`mt-4 w-full max-w-xs flex items-center justify-center gap-3 px-5 py-3 rounded-2xl transition-all active:scale-[0.98] ${eventMode ? 'ring-2 ring-emerald-400' : ''}`}
                     style={{
-                        background: eventMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
-                        border: eventMode ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(255,255,255,0.1)'
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)'
                     }}
                 >
-                    <span className="text-base">{currentEvent.themeEmoji}</span>
-                    <span className="text-sm font-medium text-white/80">{currentEvent.theme}</span>
-                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/30 text-emerald-300' : 'bg-white/10 text-white/50'}`}>
-                        {eventMode ? '✓' : isPro || !freeEventEntryUsed ? '→' : '🔒'}
-                    </span>
+                    <span className="text-xl">{currentEvent.themeEmoji}</span>
+                    <span className="text-white font-semibold">{currentEvent.theme}</span>
+                    <span className="text-emerald-300/60 text-sm">Challenge</span>
+                    {eventMode && <span className="text-emerald-400 text-xs">✓</span>}
                 </button>
             )}
 
