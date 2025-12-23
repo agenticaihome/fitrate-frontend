@@ -655,9 +655,10 @@ export default function ResultsScreen({
                     <TierBadge tier={scoreTier} score={scores.overall} />
                 </div>
 
-                {/* PRO ANALYSIS BADGE - Shows for Pro and Pro Preview */}
-                {(isPro || scores.wasProPreview) && (
-                    <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                {/* AI TIER BADGE - Shows for ALL users (eliminates dead space) */}
+                <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                    {isPro ? (
+                        // Pro users: Gold GPT-4o badge
                         <div
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
                             style={{
@@ -674,8 +675,25 @@ export default function ResultsScreen({
                                 GPT-4o
                             </span>
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        // Free users: Cyan Gemini badge (fast & fun!)
+                        <div
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(0,212,255,0.12) 0%, rgba(0,255,136,0.08) 100%)',
+                                border: '1px solid rgba(0,212,255,0.3)',
+                            }}
+                        >
+                            <span className="text-sm">⚡</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">
+                                Quick Scan
+                            </span>
+                            <span className="text-[8px] font-bold text-cyan-400/60 uppercase">
+                                Gemini
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* ===== VERDICT CARD ===== */}
@@ -861,70 +879,48 @@ export default function ResultsScreen({
                 </div>
             )}
 
-            {/* ===== ENHANCED PRO TEASER (FREE USERS - Hide for Pro Preview) ===== */}
-            {!isPro && !scores.wasProPreview && revealStage >= 5 && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {/* ===== COMPACT UPGRADE PROMPT (FREE USERS) ===== */}
+            {/* Replaced tall blurred teaser with compact, flow-friendly prompt */}
+            {!isPro && revealStage >= 5 && (
+                <div className={`w-full max-w-sm px-4 mb-3 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
-                        className="p-6 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden cursor-pointer group active:scale-[0.98] transition-transform"
+                        className="p-4 rounded-2xl border cursor-pointer group active:scale-[0.98] transition-all hover:border-yellow-400/40"
                         onClick={onShowPaywall}
                         style={{
-                            background: 'linear-gradient(145deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.03) 100%)',
-                            borderColor: 'rgba(255,215,0,0.25)',
-                            boxShadow: '0 0 30px rgba(255,215,0,0.1)'
+                            background: 'linear-gradient(135deg, rgba(255,215,0,0.06) 0%, rgba(255,140,0,0.03) 100%)',
+                            borderColor: 'rgba(255,215,0,0.2)',
                         }}
                     >
-                        {/* Animated shimmer effect */}
-                        <div
-                            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-                            style={{
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.1) 50%, transparent 100%)',
-                            }}
-                        />
-
-                        {/* Blurred content preview */}
-                        <div className="blur-[8px] select-none pointer-events-none opacity-60">
-                            <div className="flex items-center gap-2 mb-4">
-                                <span className="text-xl">✨</span>
-                                <span className="text-sm font-black uppercase tracking-widest text-yellow-500/50">Pro Insights</span>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="p-3 rounded-xl bg-black/20">
-                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">💡 Style Upgrade</span>
-                                    <p className="text-sm text-white/30 leading-relaxed">Consider adding a statement accessory to elevate...</p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-black/20">
-                                    <span className="text-[10px] font-bold text-white/20 uppercase block mb-1">🪞 Identity</span>
-                                    <p className="text-sm text-white/30 leading-relaxed">This outfit projects a confident, creative energy...</p>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">✨</span>
+                                <div>
+                                    <p className="text-sm font-bold text-white">Want Deeper Insights?</p>
+                                    <p className="text-xs text-white/50">Style tips • Identity • Perception</p>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Unlock overlay - larger and more prominent */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-black/30 via-black/50 to-black/30 group-hover:from-black/40 group-hover:via-black/60 group-hover:to-black/40 transition-colors">
-                            <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">🔒</div>
-                            <span className="text-lg font-black text-yellow-400 uppercase tracking-wide mb-1">Unlock Pro Insights</span>
-                            <span className="text-xs text-white/60 mb-4 text-center px-4">Style tips, identity reflection & social perception</span>
                             <div
-                                className="px-6 py-2.5 rounded-full font-bold text-sm group-hover:scale-105 transition-transform"
+                                className="px-3 py-1.5 rounded-full text-xs font-bold group-hover:scale-105 transition-transform"
                                 style={{
                                     background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                                    color: '#000',
-                                    boxShadow: '0 4px 20px rgba(255,215,0,0.4)'
+                                    color: '#000'
                                 }}
                             >
-                                See What Your Fit Says →
+                                Upgrade →
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* ===== SAVAGE ROASTS ===== */}
+            {/* ===== SAVAGE ROASTS - Pro Mode Card ===== */}
             {scores.savageLevel && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                    {/* Mode Context - Users know why they see this */}
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😈 Savage Mode Active</p>
                     <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,68,68,0.08)', borderColor: 'rgba(255,68,68,0.25)' }}>
                         <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Savage Level</span>
+                            <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Brutality Level</span>
                             <span className="text-2xl font-black text-red-500">{scores.savageLevel}/10</span>
                         </div>
                         <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
@@ -1053,8 +1049,17 @@ export default function ResultsScreen({
                 </div>
             )}
 
+            {/* ===== FLOW DIVIDER — Smooth transition to actions ===== */}
+            <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <span className="text-[10px] uppercase tracking-widest text-white/30">Ready to share?</span>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
+            </div>
+
             {/* ===== CTAs ===== */}
-            <div className={`w-full max-w-sm px-4 pt-2 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+            <div className={`w-full max-w-sm px-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                 {/* Challenge a Friend - PRIMARY CTA per Founders Council */}
                 <button
                     onClick={() => {
