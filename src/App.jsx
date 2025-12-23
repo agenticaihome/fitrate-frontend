@@ -1352,6 +1352,85 @@ export default function App() {
   }
 
   // ============================================
+  // SETTINGS / RESTORE MODAL
+  // ============================================
+  if (showRestoreModal) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0f] text-white">
+        <div className="w-full max-w-sm">
+          <h2 className="text-2xl font-bold text-center mb-6">⚙️ Settings</h2>
+
+          {/* Pro Status */}
+          <div className="mb-6 p-4 rounded-2xl text-center" style={{
+            background: isPro ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.05)',
+            border: isPro ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.1)'
+          }}>
+            {isPro ? (
+              <>
+                <span className="text-3xl block mb-2">⚡</span>
+                <p className="text-emerald-400 font-bold">You're a Pro!</p>
+                <p className="text-white/50 text-xs mt-1">Unlimited scans • All modes</p>
+              </>
+            ) : (
+              <>
+                <span className="text-3xl block mb-2">🔓</span>
+                <p className="text-white/70 font-medium">Free Account</p>
+                <p className="text-white/40 text-xs mt-1">{scansRemaining} scans/day</p>
+              </>
+            )}
+          </div>
+
+          {/* Restore Purchase */}
+          {!isPro && (
+            <div className="mb-6">
+              <p className="text-white/50 text-sm text-center mb-3">Already purchased Pro?</p>
+              <input
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="Enter purchase email"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-500/50 mb-3"
+              />
+              <button
+                onClick={async () => {
+                  if (!emailInput) return;
+                  displayToast('Checking...');
+                  try {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pro-status?email=${encodeURIComponent(emailInput)}`);
+                    const data = await res.json();
+                    if (data.isPro) {
+                      localStorage.setItem('fitrate_pro', 'true');
+                      localStorage.setItem('fitrate_email', emailInput);
+                      setIsPro(true);
+                      displayToast('⚡ Pro restored!');
+                    } else {
+                      displayToast('No Pro found for this email');
+                    }
+                  } catch (err) {
+                    displayToast('Error checking status');
+                  }
+                }}
+                className="w-full py-3 rounded-xl font-bold text-white transition-all active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, #00d4ff, #0099ff)' }}
+              >
+                Restore Purchase
+              </button>
+            </div>
+          )}
+
+          {/* Close */}
+          <button
+            onClick={() => setShowRestoreModal(false)}
+            className="w-full py-3 text-white/50 font-medium"
+          >
+            ← Back
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ============================================
   // EVENT EXPLAINER MODAL (First-time users)
   // ============================================
   if (showEventExplainer && currentEvent) {
@@ -1531,6 +1610,7 @@ export default function App() {
         onShowPaywall={() => setShowPaywall(true)}
         onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
         onShowRules={() => setShowEventRules(true)}
+        onShowRestore={() => setShowRestoreModal(true)}
         onError={(msg) => { setError(msg); setScreen('error'); }}
         onStartFashionShow={() => setFashionShowScreen('create')}
         onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
