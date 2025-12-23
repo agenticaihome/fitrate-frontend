@@ -145,16 +145,30 @@ export const hintGarbageCollection = () => {
  * @returns {Promise<string>} Compressed base64 data URL (~20-40KB)
  */
 export const createThumbnail = (imageDataUrl, maxSize = 150, quality = 0.6) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+        // Validate input
+        if (!imageDataUrl || typeof imageDataUrl !== 'string') {
+            console.error('[Thumbnail] Invalid image data:', typeof imageDataUrl);
+            return resolve(null);
+        }
+
         const img = new Image();
 
-        img.onload = () => {
+        // CORS-friendly (for data URLs this shouldn't matter but doesn't hurt)
+        img.crossOrigin = 'anonymous';
+
+        const createThumb = () => {
             try {
+                // Validate image loaded correctly
+                if (img.width === 0 || img.height === 0) {
+                    console.error('[Thumbnail] Image has zero dimensions');
+                    return resolve(null);
+                }
+
                 // Calculate dimensions maintaining aspect ratio
                 let width = img.width;
                 let height = img.height;
 
-                // Scale down to fit within maxSize
                 const scale = Math.min(maxSize / width, maxSize / height, 1);
                 width = Math.round(width * scale);
                 height = Math.round(height * scale);
@@ -165,27 +179,52 @@ export const createThumbnail = (imageDataUrl, maxSize = 150, quality = 0.6) => {
                 canvas.height = height;
 
                 const ctx = canvas.getContext('2d');
+
+                // Fill with white background first (prevents black on transparent PNGs)
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+
+                // Draw the image
                 ctx.drawImage(img, 0, 0, width, height);
 
                 // Convert to JPEG with compression
                 const thumbnailDataUrl = canvas.toDataURL('image/jpeg', quality);
 
+                // Validate output (black images are very small ~2KB)
+                const sizeKB = Math.round(thumbnailDataUrl.length / 1024);
+                if (sizeKB < 3) {
+                    console.warn(`[Thumbnail] Suspiciously small (${sizeKB}KB) - may be black`);
+                }
+
                 // Clean up canvas
                 canvas.width = 0;
                 canvas.height = 0;
 
-                console.log(`[Thumbnail] Created ${width}x${height} (${Math.round(thumbnailDataUrl.length / 1024)}KB)`);
-
+                console.log(`[Thumbnail] Created ${width}x${height} (${sizeKB}KB)`);
                 resolve(thumbnailDataUrl);
             } catch (err) {
                 console.error('[Thumbnail] Creation failed:', err);
-                resolve(null); // Return null instead of rejecting to not break the flow
+                resolve(null);
             }
         };
 
-        img.onerror = () => {
-            console.error('[Thumbnail] Failed to load image');
-            resolve(null); // Graceful fallback
+        img.onload = () => {
+            // Use decode() if available for more reliable rendering
+            if (img.decode) {
+                img.decode()
+                    .then(createThumb)
+                    .catch((err) => {
+                        console.warn('[Thumbnail] decode() failed, trying direct:', err);
+                        createThumb(); // Fallback to direct creation
+                    });
+            } else {
+                createThumb();
+            }
+        };
+
+        img.onerror = (e) => {
+            console.error('[Thumbnail] Failed to load image:', e);
+            resolve(null);
         };
 
         img.src = imageDataUrl;
