@@ -4,7 +4,7 @@ import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
 import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
 import { getScoreColor } from './utils/scoreUtils'
-import { compressImage } from './utils/imageUtils'
+import { compressImage, cleanupBlobUrls, hintGarbageCollection } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
 
 // Screens
@@ -277,6 +277,36 @@ export default function App() {
       checkProStatus(savedEmail)
     }
   }, [])
+
+  // PWA STABILITY: Handle visibility changes and memory pressure
+  // iOS Safari WebView can crash when backgrounding with large images in memory
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // App going to background - clean up memory
+        cleanupBlobUrls();
+        hintGarbageCollection();
+        console.log('[PWA] Visibility hidden - memory cleaned');
+      } else if (document.visibilityState === 'visible') {
+        // App returning to foreground
+        console.log('[PWA] Visibility restored');
+      }
+    };
+
+    // Also handle page hide (more reliable on iOS)
+    const handlePageHide = () => {
+      cleanupBlobUrls();
+      hintGarbageCollection();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, []);
 
   // Handle Referrals & Payment Success
   useEffect(() => {

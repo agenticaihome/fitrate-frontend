@@ -1,17 +1,49 @@
+/**
+ * Image Utilities with iOS PWA Memory Optimization
+ * 
+ * iOS Safari WebView has strict memory limits. When exceeded, the PWA crashes
+ * and shows a black screen. These utilities help prevent that by:
+ * - More aggressive compression on iOS devices
+ * - Proper cleanup of blob URLs to prevent memory leaks
+ * - Smaller image dimensions for mobile
+ */
 
+// Detect iOS devices
+const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
+
+// Track blob URLs for cleanup
+const activeBlobUrls = new Set();
+
+/**
+ * Compress image with iOS-optimized settings
+ * iOS gets more aggressive compression to prevent memory crashes
+ */
 export const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = (e) => {
             const img = new Image()
             img.onload = () => {
+                // iOS OPTIMIZATION: Use smaller dimensions and lower quality
+                // to prevent WebView memory pressure
+                const iosMode = isIOS();
+                const targetMaxWidth = iosMode ? Math.min(maxWidth, 800) : maxWidth;
+                const targetQuality = iosMode ? Math.min(quality, 0.5) : quality;
+
                 // Calculate new dimensions (maintain aspect ratio)
                 let width = img.width
                 let height = img.height
 
-                if (width > maxWidth) {
-                    height = (height * maxWidth) / width
-                    width = maxWidth
+                if (width > targetMaxWidth) {
+                    height = (height * targetMaxWidth) / width
+                    width = targetMaxWidth
+                }
+
+                // Also limit height for very tall images
+                const maxHeight = iosMode ? 1200 : 1600;
+                if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
                 }
 
                 // Create canvas and draw resized image
@@ -22,7 +54,16 @@ export const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
                 ctx.drawImage(img, 0, 0, width, height)
 
                 // Convert to JPEG with compression
-                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', targetQuality)
+
+                // Clean up to free memory
+                canvas.width = 0;
+                canvas.height = 0;
+
+                if (iosMode) {
+                    console.log(`[iOS] Image compressed: ${img.width}x${img.height} → ${width}x${height} @ ${targetQuality} quality`);
+                }
+
                 resolve(compressedDataUrl)
             }
             img.onerror = reject
@@ -33,20 +74,63 @@ export const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
     })
 }
 
+/**
+ * Download image with proper blob cleanup
+ */
 export const downloadImage = (blob, filename, shareText) => {
     const url = URL.createObjectURL(blob)
+    activeBlobUrls.add(url);
+
     const link = document.createElement('a')
     link.href = url
     link.download = filename || `fitrate-score-${Date.now()}.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+
+    // Revoke URL after a short delay to ensure download starts
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+        activeBlobUrls.delete(url);
+    }, 1000);
 
     // Copy caption to clipboard if provided
     if (shareText && navigator.clipboard) {
         navigator.clipboard.writeText(shareText).catch(err => {
             console.error('Failed to copy to clipboard', err)
         })
+    }
+}
+
+/**
+ * Clean up all tracked blob URLs
+ * Call this when navigating away from results or on memory pressure
+ */
+export const cleanupBlobUrls = () => {
+    activeBlobUrls.forEach(url => {
+        try {
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            // Ignore errors
+        }
+    });
+    activeBlobUrls.clear();
+    console.log('[Memory] Blob URLs cleaned up');
+}
+
+/**
+ * Force garbage collection hint for iOS
+ * Helps Safari know it can free memory
+ */
+export const hintGarbageCollection = () => {
+    if (isIOS()) {
+        // Force a small memory allocation and release to hint GC
+        try {
+            const temp = new ArrayBuffer(1024 * 1024); // 1MB
+            // Immediately nullify
+            void temp;
+        } catch (e) {
+            // Memory already tight, which is fine
+        }
     }
 }
