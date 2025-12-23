@@ -1118,6 +1118,27 @@ export default function ResultsScreen({
                     🔄 {scores.overall >= 85 ? "Beat this? Scan again" : scores.overall < 50 ? "Redeem yourself" : "Rate Another"}
                 </button>
 
+                {/* Return to Runway - Fashion Show context */}
+                {fashionShowId && onReturnToRunway && (
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(20)
+                            onReturnToRunway()
+                        }}
+                        className="w-full mt-3 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all active:scale-[0.97]"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(168,85,247,0.2) 100%)',
+                            border: '1px solid rgba(139,92,246,0.4)',
+                            boxShadow: '0 0 30px rgba(139,92,246,0.2)'
+                        }}
+                    >
+                        <span className="text-xl">🎭</span>
+                        <span className="text-white">Back to {fashionShowName || 'Fashion Show'}</span>
+                        <span className="text-purple-300 text-sm">🏆</span>
+                    </button>
+                )}
+
                 {/* Scans remaining or Inline Paywall */}
                 {!isPro && (
                     scansRemaining > 0 ? (

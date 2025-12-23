@@ -33,7 +33,9 @@ export default function HomeScreen({
     onShowWeeklyChallenge,  // Navigate to Weekly Challenge page
     pendingFashionShowWalk, // Auto-trigger camera for Fashion Show walk
     onClearPendingWalk,     // Clear the pending walk flag
-    fashionShowName         // Name of current Fashion Show (for display)
+    fashionShowName,        // Name of current Fashion Show (for display)
+    activeShows = [],       // User's active Fashion Shows
+    onNavigateToShow        // Navigate to a specific Fashion Show
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -717,6 +719,45 @@ export default function HomeScreen({
                     {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak}-day streak</span>}
                 </p>
             </div>
+
+            {/* My Shows Section - Active Fashion Shows */}
+            {activeShows.length > 0 && (
+                <div className="w-full max-w-sm mb-6">
+                    <div className="flex items-center justify-between mb-3 px-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">🎭</span>
+                            <span className="text-white/60 text-sm font-semibold">My Shows</span>
+                            <span className="text-white/30 text-xs">({activeShows.length})</span>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        {activeShows.map((show) => (
+                            <button
+                                key={show.showId}
+                                onClick={() => {
+                                    playSound('click')
+                                    vibrate(15)
+                                    onNavigateToShow?.(show.showId)
+                                }}
+                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.1) 100%)',
+                                    border: '1px solid rgba(139,92,246,0.25)'
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-2xl">🎭</span>
+                                    <div className="text-left">
+                                        <p className="text-white font-semibold text-sm">{show.name}</p>
+                                        <p className="text-purple-300/60 text-[10px]">Tap to rejoin</p>
+                                    </div>
+                                </div>
+                                <span className="text-purple-400 text-lg">→</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Event Destination Cards - Side by side */}
             <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">

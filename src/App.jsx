@@ -166,6 +166,43 @@ export default function App() {
   const [fashionShowLoading, setFashionShowLoading] = useState(false)
   const [pendingFashionShowWalk, setPendingFashionShowWalk] = useState(false) // Auto-trigger camera after walk
 
+  // Track user's active Fashion Shows (for "My Shows" section)
+  const [activeShows, setActiveShows] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fitrate_active_shows')
+      if (saved) {
+        const shows = JSON.parse(saved)
+        // Filter out expired shows (older than 7 days)
+        const now = Date.now()
+        const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
+        return shows.filter(s => (now - s.joinedAt) < maxAge)
+      }
+    } catch (e) {
+      console.error('[FashionShow] Failed to parse active shows:', e)
+    }
+    return []
+  })
+
+  // Helper to add a show to active shows list
+  const addToActiveShows = (showId, showName) => {
+    setActiveShows(prev => {
+      // Don't add duplicates
+      if (prev.some(s => s.showId === showId)) return prev
+      const updated = [...prev, { showId, name: showName, joinedAt: Date.now() }]
+      localStorage.setItem('fitrate_active_shows', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Helper to remove a show from active shows
+  const removeFromActiveShows = (showId) => {
+    setActiveShows(prev => {
+      const updated = prev.filter(s => s.showId !== showId)
+      localStorage.setItem('fitrate_active_shows', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Purchased scans (from scan packs)
   const [purchasedScans, setPurchasedScans] = useState(0)
 
@@ -1473,6 +1510,7 @@ export default function App() {
         onShowCreated={(showData) => {
           setFashionShowData(showData)
           setFashionShowId(showData.showId)
+          addToActiveShows(showData.showId, showData.name) // Track in My Shows
           setFashionShowScreen('invite')
         }}
         onBack={() => {
@@ -1510,6 +1548,7 @@ export default function App() {
         onJoined={(result) => {
           setFashionShowNickname(localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest')
           setFashionShowEmoji(localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎')
+          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show') // Track in My Shows
           setFashionShowScreen('runway')
         }}
         onShowNotFound={() => {
@@ -1623,6 +1662,36 @@ export default function App() {
         pendingFashionShowWalk={pendingFashionShowWalk}
         onClearPendingWalk={() => setPendingFashionShowWalk(false)}
         fashionShowName={fashionShowData?.name}
+        activeShows={activeShows}
+        onNavigateToShow={(showId) => {
+          // Navigate directly to a specific Fashion Show
+          setFashionShowId(showId)
+          setFashionShowScreen('runway')
+          window.history.pushState({}, '', `/f/${showId}`)
+          // Fetch show data
+          fetch(`${API_BASE}/show/${showId}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.showId) {
+                setFashionShowData(data)
+                // Restore nickname/emoji from localStorage
+                const savedNick = localStorage.getItem(`fashionshow_${showId}_nickname`)
+                const savedEmoji = localStorage.getItem(`fashionshow_${showId}_emoji`)
+                setFashionShowNickname(savedNick || 'Guest')
+                setFashionShowEmoji(savedEmoji || '😎')
+              } else {
+                // Show expired/not found - remove from active shows
+                removeFromActiveShows(showId)
+                setFashionShowScreen(null)
+                window.history.pushState({}, '', '/')
+              }
+            })
+            .catch(() => {
+              removeFromActiveShows(showId)
+              setFashionShowScreen(null)
+              window.history.pushState({}, '', '/')
+            })
+        }}
       />
     )
   }
