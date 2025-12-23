@@ -198,8 +198,7 @@ export default function HomeScreen({
                 })
             }
             // Pass the scan type choice (if any) to the parent
-            onImageSelected(imageData, pendingScanType)
-            setPendingScanType(null) // Reset for next time
+            onImageSelected(imageData, null) // scanType removed - always null now
         } catch (err) {
             console.error('Image processing error:', err)
             onError('Something went wrong — try again!')
@@ -207,7 +206,7 @@ export default function HomeScreen({
             setIsProcessing(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
         }
-    }, [isProcessing, onError, onImageSelected, pendingScanType])
+    }, [isProcessing, onError, onImageSelected])
 
 
     // ==========================================

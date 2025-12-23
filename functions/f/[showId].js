@@ -11,21 +11,22 @@ export async function onRequest(context) {
     const { request, next, params } = context;
     const showId = params.showId;
 
-    // Get the original response (the SPA HTML)
-    const response = await next();
+    try {
+        // Get the original response (the SPA HTML)
+        const response = await next();
 
-    // Only modify HTML responses
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('text/html')) {
-        return response;
-    }
+        // Only modify HTML responses
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('text/html')) {
+            return response;
+        }
 
-    // Read the HTML
-    let html = await response.text();
+        // Clone the response since we need to read it
+        const html = await response.text();
 
-    // Fashion Show OG meta tags - EXACT COPY from requirements
-    const fashionShowMeta = `
-    <!-- Fashion Show OG Tags - Injected by Cloudflare Pages Function -->
+        // Fashion Show OG meta tags - EXACT COPY from requirements
+        const fashionShowMeta = `
+    <!-- Fashion Show OG Tags -->
     <meta property="og:title" content="🎭 FitRate Fashion Show" />
     <meta property="og:description" content="Invite-only. Drop your fit. Crown the look 👑" />
     <meta property="og:type" content="website" />
@@ -37,25 +38,35 @@ export async function onRequest(context) {
     <meta name="twitter:title" content="🎭 FitRate Fashion Show" />
     <meta name="twitter:description" content="Invite-only. Drop your fit. Crown the look 👑" />
     <meta name="twitter:image" content="https://fitrate.app/og/fashion-show.png" />
-  `;
+`;
 
-    // Remove existing OG tags and inject Fashion Show ones
-    // Replace the existing Open Graph section
-    html = html.replace(
-        /<!-- Open Graph \/ Facebook -->[\s\S]*?<!-- Twitter\/X -->[\s\S]*?<meta name="twitter:image"[^>]*>/,
-        fashionShowMeta
-    );
+        // Safely inject meta tags - just replace the title and add meta after head
+        let modifiedHtml = html;
 
-    // Update the title tag as well
-    html = html.replace(
-        /<title>[^<]*<\/title>/,
-        '<title>🎭 FitRate Fashion Show — Invite Only</title>'
-    );
+        // Update title tag
+        modifiedHtml = modifiedHtml.replace(
+            /<title>[^<]*<\/title>/,
+            '<title>🎭 FitRate Fashion Show — Invite Only</title>'
+        );
 
-    // Return modified response
-    return new Response(html, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers
-    });
+        // Inject our OG tags right after the opening head tag
+        // This is safer than trying to replace existing OG tags with complex regex
+        modifiedHtml = modifiedHtml.replace(
+            /<head>/i,
+            '<head>' + fashionShowMeta
+        );
+
+        // Return modified response with new headers (can't reuse immutable headers)
+        return new Response(modifiedHtml, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: {
+                'content-type': 'text/html; charset=utf-8'
+            }
+        });
+    } catch (error) {
+        // If anything goes wrong, just pass through the original request
+        console.error('[FashionShow OG] Error:', error);
+        return await next();
+    }
 }
