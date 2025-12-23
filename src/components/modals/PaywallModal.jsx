@@ -148,7 +148,7 @@ export default function PaywallModal({
                     >
                         <span className="block text-4xl font-black text-cyan-400 mb-1">5</span>
                         <span className="block text-xs text-gray-400 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
+                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 8 modes</span>
                         <span className="block text-lg font-black text-white">$1.99</span>
                     </button>
 
@@ -167,7 +167,7 @@ export default function PaywallModal({
                         <div className="absolute top-0 left-0 w-full h-1.5 bg-cyan-400" />
                         <span className="block text-5xl font-black text-cyan-400 mb-1">15</span>
                         <span className="block text-xs text-cyan-400/80 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
+                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 8 modes</span>
                         <span className="block text-lg font-black text-white">$3.99</span>
                     </button>
 
@@ -184,7 +184,7 @@ export default function PaywallModal({
                     >
                         <span className="block text-5xl font-black text-purple-400 mb-1">50</span>
                         <span className="block text-xs text-purple-400/70 uppercase font-bold mb-2 tracking-wide">Pro Scans</span>
-                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 4 modes</span>
+                        <span className="block text-[10px] text-yellow-400/80 mb-2">⚡ GPT-4o • All 8 modes</span>
                         <span className="block text-lg font-black text-white">${PRICES.SCAN_PACK_50}</span>
                     </button>
                 </div>

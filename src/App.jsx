@@ -397,9 +397,7 @@ export default function App() {
             if (data.referralCount) {
               setReferralCount(data.referralCount)
             }
-            if (data.purchasedScans > 0) {
-              setPurchasedScans(data.purchasedScans)
-            }
+            const purchasedCount = data.purchasedScans || data.purchasedScansRemaining || 0; if (purchasedCount > 0) setPurchasedScans(purchasedCount)
             // Track referral progress for UI display
             if (data.totalReferrals !== undefined) {
               setTotalReferrals(data.totalReferrals)
