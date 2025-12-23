@@ -888,8 +888,12 @@ export default function HomeScreen({
                         onClick={() => {
                             playSound('click');
                             vibrate(15);
-                            // Set event mode so the hero button transforms for competition
-                            setEventMode(true);
+                            // First time: show explainer with rules. After that: toggle competition mode
+                            if (!hasSeenEventExplainer) {
+                                onShowEventExplainer?.();
+                            } else {
+                                setEventMode(!eventMode);
+                            }
                         }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
