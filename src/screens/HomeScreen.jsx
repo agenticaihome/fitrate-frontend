@@ -673,36 +673,65 @@ export default function HomeScreen({
                     // Compute visual mode based on nudge animation
                     const visualMode = showNudge && nudgePhase === 1 ? 'nice' : mode
                     const isRoast = visualMode === 'roast'
-                    const buttonAccent = isRoast ? '#ff6b35' : '#00d4ff'
-                    const buttonAccentEnd = isRoast ? '#ff4444' : '#00a8cc'
-                    const buttonGlow = isRoast ? 'rgba(255,68,68,0.4)' : 'rgba(0,212,255,0.4)'
+
+                    // EVENT MODE: Special styling when competing in Weekly Challenge
+                    const isCompeting = eventMode && currentEvent;
+
+                    // Choose colors based on mode
+                    let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
+                    if (isCompeting) {
+                        // Teal/emerald for competition mode
+                        buttonAccent = '#10b981';
+                        buttonAccentEnd = '#0d9488';
+                        buttonGlow = 'rgba(16,185,129,0.5)';
+                        innerGradient = 'linear-gradient(135deg, #10b981 0%, #0d9488 50%, #047857 100%)';
+                    } else if (isRoast) {
+                        buttonAccent = '#ff6b35';
+                        buttonAccentEnd = '#ff4444';
+                        buttonGlow = 'rgba(255,68,68,0.4)';
+                        innerGradient = 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)';
+                    } else {
+                        buttonAccent = '#00d4ff';
+                        buttonAccentEnd = '#00a8cc';
+                        buttonGlow = 'rgba(0,212,255,0.4)';
+                        innerGradient = 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)';
+                    }
 
                     return (
                         <div className="flex flex-col items-center">
                             {/* Main Circular Button */}
                             <button
                                 onClick={handleStart}
-                                aria-label={`Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
+                                aria-label={isCompeting ? `Submit to ${currentEvent.theme}` : `Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
                                 className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
                                 style={{
-                                    background: `radial-gradient(circle, ${isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
-                                    border: `4px solid ${isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
+                                    background: `radial-gradient(circle, ${isCompeting ? 'rgba(16,185,129,0.4)' : isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
+                                    border: `4px solid ${isCompeting ? 'rgba(45,212,191,0.6)' : isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
                                     boxShadow: `
                                         var(--shadow-physical), 
                                         0 0 60px ${buttonGlow}, 
-                                        0 0 120px ${isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}, 
+                                        0 0 120px ${isCompeting ? 'rgba(16,185,129,0.3)' : isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}, 
                                         inset 0 0 60px rgba(255,255,255,0.05)
-                                    `
+                                    `,
+                                    animation: isCompeting ? 'tealPulse 2s ease-in-out infinite' : undefined
                                 }}
                             >
+                                {/* Animated sparkles for competition mode */}
+                                {isCompeting && (
+                                    <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                                        <div className="absolute" style={{ top: '10%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite', fontSize: '1.5rem' }}>✨</div>
+                                        <div className="absolute" style={{ top: '15%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s', fontSize: '1.2rem' }}>⭐</div>
+                                        <div className="absolute" style={{ bottom: '15%', left: '15%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.5s', fontSize: '1.2rem' }}>⭐</div>
+                                        <div className="absolute" style={{ bottom: '20%', right: '20%', animation: 'sparkle 1.8s ease-in-out infinite 0.8s', fontSize: '1.5rem' }}>✨</div>
+                                    </div>
+                                )}
+
                                 {/* Inner gradient circle - more vibrant */}
                                 <div
                                     className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
                                     style={{
-                                        background: isRoast
-                                            ? 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)'
-                                            : 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)',
-                                        boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,180,255,0.5)'}`,
+                                        background: innerGradient,
+                                        boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${buttonGlow}`,
                                         animation: 'pulse 2s ease-in-out infinite'
                                     }}
                                     aria-hidden="true"
@@ -710,44 +739,63 @@ export default function HomeScreen({
 
                                 {/* Emoji */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {isRoast ? '🔥' : '😇'}
+                                    {isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
                                 {/* Main Text */}
                                 <span className="relative text-white font-black text-2xl tracking-wide uppercase text-center transition-all duration-300">
-                                    {isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
+                                    {isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
                                 </span>
 
                                 {/* Subtitle */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
+                                    {isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
                                 </span>
 
-                                {/* Nice/Roast Toggle Pill - Inside Button */}
-                                <div
-                                    className={`relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
-                                    style={{
-                                        background: 'rgba(0,0,0,0.4)',
-                                        backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255,255,255,0.2)'
-                                    }}
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        playSound('click')
-                                        vibrate(15)
-                                        setMode(mode === 'roast' ? 'nice' : 'roast')
-                                        setEventMode(false)
-                                        // Clear nudge on interaction
-                                        if (showNudge) {
-                                            localStorage.setItem('fitrate_seen_mode_nudge', 'true')
-                                            setShowNudge(false)
-                                        }
-                                    }}
-                                >
-                                    <span className="text-lg">{mode === 'roast' ? '😇' : '🔥'}</span>
-                                    <span className="text-lg">{mode === 'roast' ? '🔥' : '😇'}</span>
-                                    <span className="text-white font-semibold">{mode === 'roast' ? 'Roast' : 'Nice'}</span>
-                                </div>
+                                {/* Mode Toggle or Exit Competition */}
+                                {isCompeting ? (
+                                    <div
+                                        className="relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300"
+                                        style={{
+                                            background: 'rgba(0,0,0,0.5)',
+                                            backdropFilter: 'blur(10px)',
+                                            border: '1px solid rgba(45,212,191,0.4)'
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            playSound('click')
+                                            vibrate(15)
+                                            setEventMode(false)
+                                        }}
+                                    >
+                                        <span className="text-teal-400 font-semibold text-sm">Exit Competition Mode</span>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
+                                        style={{
+                                            background: 'rgba(0,0,0,0.4)',
+                                            backdropFilter: 'blur(10px)',
+                                            border: '1px solid rgba(255,255,255,0.2)'
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            playSound('click')
+                                            vibrate(15)
+                                            setMode(mode === 'roast' ? 'nice' : 'roast')
+                                            setEventMode(false)
+                                            // Clear nudge on interaction
+                                            if (showNudge) {
+                                                localStorage.setItem('fitrate_seen_mode_nudge', 'true')
+                                                setShowNudge(false)
+                                            }
+                                        }}
+                                    >
+                                        <span className="text-lg">{mode === 'roast' ? '😇' : '🔥'}</span>
+                                        <span className="text-lg">{mode === 'roast' ? '🔥' : '😇'}</span>
+                                        <span className="text-white font-semibold">{mode === 'roast' ? 'Roast' : 'Nice'}</span>
+                                    </div>
+                                )}
                             </button>
                         </div>
                     )
@@ -837,15 +885,30 @@ export default function HomeScreen({
                 {/* Weekly Challenge - Large teal gradient with animated sparkles */}
                 {currentEvent && (
                     <button
-                        onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
+                        onClick={() => {
+                            playSound('click');
+                            vibrate(15);
+                            // Set event mode so the hero button transforms for competition
+                            setEventMode(true);
+                        }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
-                            border: '2px solid rgba(45,212,191,0.5)',
-                            boxShadow: '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
+                            background: eventMode
+                                ? 'linear-gradient(135deg, #10b981 0%, #34d399 40%, #0d9488 70%, #047857 100%)'
+                                : 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
+                            border: eventMode ? '3px solid rgba(52,211,153,0.8)' : '2px solid rgba(45,212,191,0.5)',
+                            boxShadow: eventMode
+                                ? '0 4px 30px rgba(16,185,129,0.6), 0 0 60px rgba(45,212,191,0.4)'
+                                : '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
                             animation: 'tealPulse 2s ease-in-out infinite'
                         }}
                     >
+                        {/* Active indicator */}
+                        {eventMode && (
+                            <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold">
+                                ACTIVE
+                            </div>
+                        )}
                         {/* Animated sparkle overlay */}
                         <div className="absolute inset-0 overflow-hidden">
                             {/* Sparkle dots */}
@@ -864,7 +927,7 @@ export default function HomeScreen({
                         </div>
                         <span className="relative text-4xl block mb-2 drop-shadow-lg">🏆</span>
                         <span className="relative text-white font-bold block text-lg">{currentEvent.theme || 'Weekly Challenge'}</span>
-                        <span className="relative text-teal-100/80 text-xs">Tap to compete!</span>
+                        <span className="relative text-teal-100/80 text-xs">{eventMode ? 'Now competing!' : 'Tap to compete!'}</span>
                     </button>
                 )}
             </div>
