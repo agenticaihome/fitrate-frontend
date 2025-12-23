@@ -1303,7 +1303,6 @@ export default function App() {
         setMode={setMode}
         isPro={isPro}
         scansRemaining={scansRemaining}
-        proPreviewAvailable={proPreviewAvailable}
         dailyStreak={dailyStreak}
         currentEvent={currentEvent}
         eventMode={eventMode}
