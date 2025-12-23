@@ -1,17 +1,45 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Footer from '../components/common/Footer'
 import { playSound, vibrate } from '../utils/soundEffects'
+
+// === COPY POOLS (curious → clever → spicy progression) ===
+const COPY_CURIOUS = [
+    "Running vibe diagnostics…",
+    "Checking fit chemistry…",
+    "Assessing confidence signal…",
+    "Detecting fabric decisions…"
+]
+
+const COPY_CLEVER = [
+    "Consulting the fashion gods…",
+    "Measuring drip integrity…",
+    "Cross-checking with the internet's opinion…",
+    "Calculating style potential…"
+]
+
+const COPY_SPICY = [
+    "Synthesizing social risk…",
+    "Evaluating outfit bravery…",
+    "Detecting fabric failure…",
+    "Assessing the bold choices…"
+]
+
+// Shuffle array helper
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
 
 export default function AnalyzingScreen({
     uploadedImage,
     mode,
     isPro,
-    onBack, // If user cancels? Usually no back here.
+    onBack,
 }) {
-    const [analysisProgress, setAnalysisProgress] = useState(0)
-    const [analysisText, setAnalysisText] = useState(0)
+    const [progress, setProgress] = useState(0)
+    const [copyIndex, setCopyIndex] = useState(0)
+    const [copyPool, setCopyPool] = useState([])
+    const [checklistVisible, setChecklistVisible] = useState([false, false, false, false, false, false])
+    const pauseRef = useRef(false)
 
-    // Helpers locally scoped
+    // Mode colors
     const getModeColor = () => {
         if (mode === 'savage') return '#8b00ff'
         if (mode === 'roast') return '#ff4444'
@@ -29,56 +57,102 @@ export default function AnalyzingScreen({
     const accent = getModeColor()
     const accentGlow = getModeGlow()
 
-    // Analysis messages
-    const analysisMessages = mode === 'savage'
-        ? ['Preparing total destruction...', 'Loading maximum violence...', 'Calculating devastation...', 'Arming nuclear roasts...', 'Deploying fashion death....']
-        : mode === 'roast'
-            ? ['Synthesizing social suicide...', 'Detecting fabric failure...', 'Calculating ego damage...', 'Calibrating savagery...', 'Finalizing the damage...']
-            : mode === 'honest'
-                ? ['Analyzing social positioning...', 'Calculating wardrobe ROI...', 'Synthesizing aesthetic metrics...', 'Detecting style efficiency...', 'Finalizing objective data...']
-                : ['Detecting main character signal...', 'Optimizing social ROI...', 'Synthesizing aesthetic value...', 'Calculating aura level...', 'Finalizing the flex...']
-
+    // Initialize shuffled copy pool (curious → clever → spicy)
     useEffect(() => {
-        // Reset progress when mounting
-        setAnalysisProgress(0)
-        setAnalysisText(0)
+        const pool = [
+            ...shuffle(COPY_CURIOUS).slice(0, 2),
+            ...shuffle(COPY_CLEVER).slice(0, 2),
+            ...shuffle(COPY_SPICY).slice(0, 2)
+        ]
+        setCopyPool(pool)
+    }, [])
 
-        // Progress animation (0-90 over ~8-10s, caps at 90% until API responds)
+    // Progress animation with micro-pauses at 15%, 45%, 80%
+    useEffect(() => {
+        setProgress(0)
+        setCopyIndex(0)
+        setChecklistVisible([false, false, false, false, false, false])
+
         const progressInterval = setInterval(() => {
-            setAnalysisProgress(p => {
-                if (p >= 90) return 90  // Cap at 90%, API response will complete it
-                // Slow ramp: 0.5-2% per tick for realistic ~10s duration
-                const increment = Math.random() * 1.5 + 0.5
-                const next = p + increment
-                if (p < 50 && next >= 50) {
-                    vibrate(20)
+            if (pauseRef.current) return
+
+            setProgress(p => {
+                if (p >= 90) return 90
+
+                // Micro-pause logic
+                if (p >= 14 && p < 16) {
+                    pauseRef.current = true
+                    setTimeout(() => { pauseRef.current = false }, 400)
+                    return 16
                 }
-                if (p < 80 && next >= 80) {
+                if (p >= 44 && p < 46) {
+                    pauseRef.current = true
+                    setTimeout(() => { pauseRef.current = false }, 600)
+                    return 46
+                }
+                if (p >= 79 && p < 81) {
+                    pauseRef.current = true
                     vibrate(30)
                     playSound('tick')
+                    setTimeout(() => { pauseRef.current = false }, 800)
+                    return 81
                 }
-                return Math.min(90, next)
+
+                // Variable speed (irregular feel)
+                const increment = Math.random() * 1.8 + 0.4
+                return Math.min(90, p + increment)
             })
-        }, 200)
+        }, 180)
 
-        // Rotating text
-        const textInterval = setInterval(() => {
-            setAnalysisText(t => (t + 1) % 5)
-        }, 2000)
-
-        return () => {
-            clearInterval(progressInterval)
-            clearInterval(textInterval)
-        }
+        return () => clearInterval(progressInterval)
     }, [mode])
 
+    // Rotate copy every 2s
+    useEffect(() => {
+        if (copyPool.length === 0) return
+
+        const copyInterval = setInterval(() => {
+            setCopyIndex(i => (i + 1) % copyPool.length)
+        }, 2000)
+
+        return () => clearInterval(copyInterval)
+    }, [copyPool])
+
+    // Animate checklist items one by one
+    useEffect(() => {
+        const delays = [300, 800, 1300, 2200, 2800, 3400]
+        const timers = delays.map((delay, idx) =>
+            setTimeout(() => {
+                setChecklistVisible(prev => {
+                    const next = [...prev]
+                    next[idx] = true
+                    return next
+                })
+            }, delay)
+        )
+        return () => timers.forEach(clearTimeout)
+    }, [])
+
+    const currentCopy = copyPool[copyIndex] || "Analyzing your style…"
+
+    // Checklist items
+    const freeItems = [
+        "Overall score + breakdown",
+        "Celeb style match",
+        "Quick styling tip"
+    ]
+    const proItems = [
+        "Deep analysis (Pro)",
+        "Item-by-item feedback (Pro)",
+        "All AI modes (Pro)"
+    ]
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative" style={{
             background: 'radial-gradient(ellipse at center, #12121f 0%, #0a0a0f 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
         }}>
-            {/* Background Glow Effect */}
+            {/* Background Glow */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute w-[600px] h-[600px] rounded-full opacity-20" style={{
                     background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`,
@@ -88,12 +162,11 @@ export default function AnalyzingScreen({
                 }} />
             </div>
 
-            {/* Full Screen Scanning Container */}
+            {/* Scan Container */}
             <div className="relative w-full max-w-sm aspect-[3/4] mb-8 rounded-3xl overflow-hidden" style={{
                 border: `2px solid ${accent}50`,
                 boxShadow: `0 0 60px ${accentGlow}, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(0,0,0,0.5)`
             }}>
-                {/* Full Image */}
                 {uploadedImage && (
                     <img
                         src={uploadedImage}
@@ -102,7 +175,7 @@ export default function AnalyzingScreen({
                     />
                 )}
 
-                {/* Scanning Line Animation */}
+                {/* Scanning Line */}
                 <div
                     className="absolute left-0 right-0 h-1 pointer-events-none"
                     style={{
@@ -125,9 +198,9 @@ export default function AnalyzingScreen({
                         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
                     }}>
                         <div
-                            className="h-full rounded-full transition-all duration-200"
+                            className="h-full rounded-full transition-all duration-300 ease-out"
                             style={{
-                                width: `${analysisProgress}%`,
+                                width: `${progress}%`,
                                 background: `linear-gradient(90deg, ${accent}, ${accent}cc)`,
                                 boxShadow: `0 0 15px ${accent}, 0 0 30px ${accentGlow}`
                             }}
@@ -135,53 +208,52 @@ export default function AnalyzingScreen({
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-sm font-black" style={{ color: accent, textShadow: `0 0 10px ${accentGlow}` }}>
-                            {Math.round(analysisProgress)}%
+                            {Math.round(progress)}%
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Analyzing</span>
                     </div>
                 </div>
             </div>
 
-            {/* Rotating analysis text */}
-            <p className="text-lg font-bold text-white text-center h-7 transition-opacity duration-300 relative z-10" style={{
+            {/* Rotating Copy */}
+            <p className="text-lg font-bold text-white text-center h-7 transition-opacity duration-500 relative z-10" style={{
                 textShadow: `0 0 30px ${accentGlow}`
             }}>
-                {analysisMessages[analysisText]}
+                {currentCopy}
             </p>
 
-            {/* Pro Features Checklist - Primes users before results */}
+            {/* Animated Checklist */}
             {!isPro && (
                 <div className="mt-6 p-4 rounded-2xl glass-card relative z-10" style={{
                     boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
                 }}>
                     <div className="space-y-2 text-left">
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Score + sub-ratings</span>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Celeb style match</span>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                            <span className="text-green-400 text-sm">✓</span><span className="font-medium">Styling tip</span>
-                        </div>
+                        {freeItems.map((item, idx) => (
+                            <div
+                                key={item}
+                                className={`flex items-center gap-2.5 text-xs transition-all duration-300 ${checklistVisible[idx] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}
+                                style={{ color: 'rgba(255,255,255,0.7)' }}
+                            >
+                                <span className="text-green-400 text-sm">✓</span>
+                                <span className="font-medium">{item}</span>
+                            </div>
+                        ))}
+
                         <div className="h-px my-2" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
-                            <span className="text-sm">🔒</span><span className="font-medium">Savage Level (Pro)</span>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
-                            <span className="text-sm">🔒</span><span className="font-medium">Item-by-item roasts (Pro)</span>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,215,0,0.8)' }}>
-                            <span className="text-sm">🔒</span><span className="font-medium">Advanced AI analysis (Pro)</span>
-                        </div>
+
+                        {proItems.map((item, idx) => (
+                            <div
+                                key={item}
+                                className={`flex items-center gap-2.5 text-xs transition-all duration-300 ${checklistVisible[idx + 3] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}
+                                style={{ color: 'rgba(255,215,0,0.6)' }}
+                            >
+                                <span className="text-sm">🔒</span>
+                                <span className="font-medium">{item}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
-
-            {/* Subtle reassurance */}
-            <p className="text-xs mt-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                {mode === 'roast' ? 'Brutally honest AI incoming...' : mode === 'honest' ? 'Analyzing objectively...' : 'AI analyzing your style...'}
-            </p>
 
             <Footer className="opacity-50" />
 
@@ -195,4 +267,3 @@ export default function AnalyzingScreen({
         </div>
     )
 }
-
