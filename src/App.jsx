@@ -1045,9 +1045,10 @@ export default function App() {
         // Create thumbnail for event mode submissions (Weekly Challenge)
         const isEventSubmission = eventMode && currentEvent && !fashionShowId;
         let eventThumb = null;
-        if (isEventSubmission && uploadedImage) {
+        if (isEventSubmission && imageData) {
           try {
-            eventThumb = await createThumbnail(uploadedImage, 150, 0.6);
+            eventThumb = await createThumbnail(imageData, 150, 0.6);
+            console.log('[Event] Thumbnail created:', eventThumb ? `${Math.round(eventThumb.length / 1024)}KB` : 'failed');
           } catch (e) {
             console.warn('Failed to create event thumbnail:', e);
           }
@@ -1144,7 +1145,8 @@ export default function App() {
         if (fashionShowId && fashionShowNickname) {
           try {
             // Create thumbnail for leaderboard display
-            const imageThumb = await createThumbnail(uploadedImage, 150, 0.6);
+            const imageThumb = await createThumbnail(imageData, 150, 0.6);
+            console.log('[FashionShow] Thumbnail created:', imageThumb ? `${Math.round(imageThumb.length / 1024)}KB` : 'failed');
 
             await fetch(`${API_BASE}/show/${fashionShowId}/walk`, {
               method: 'POST',
@@ -1194,9 +1196,10 @@ export default function App() {
       // Create thumbnail for event mode submissions (Weekly Challenge)
       const isProEventSubmission = eventMode && currentEvent && !fashionShowId;
       let proEventThumb = null;
-      if (isProEventSubmission && uploadedImage) {
+      if (isProEventSubmission && imageData) {
         try {
-          proEventThumb = await createThumbnail(uploadedImage, 150, 0.6);
+          proEventThumb = await createThumbnail(imageData, 150, 0.6);
+          console.log('[Event Pro] Thumbnail created:', proEventThumb ? `${Math.round(proEventThumb.length / 1024)}KB` : 'failed');
         } catch (e) {
           console.warn('Failed to create event thumbnail:', e);
         }
