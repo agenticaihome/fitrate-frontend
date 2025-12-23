@@ -476,7 +476,8 @@ export default function HomeScreen({
             background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 25%, #12091f 60%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-            paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))'
+            // Account for fixed BottomNav (64px) + safe area + extra breathing room
+            paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'
         }}>
             {/* Background Glow - Main accent */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -701,6 +702,7 @@ export default function HomeScreen({
                         <div className="flex flex-col items-center">
                             {/* Main Circular Button */}
                             <button
+                                id="main-scan-cta"
                                 onClick={handleStart}
                                 aria-label={isCompeting ? `Submit to ${currentEvent.theme}` : `Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
                                 className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"

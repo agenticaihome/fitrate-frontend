@@ -1787,10 +1787,10 @@ export default function App() {
             // 'home' tab is already current, no action needed
           }}
           onScan={() => {
-            // Trigger camera/scan action - scroll to camera section
-            const cameraSection = document.querySelector('.camera-section');
-            if (cameraSection) {
-              cameraSection.scrollIntoView({ behavior: 'smooth' });
+            // Trigger the main scan button on HomeScreen
+            const mainCta = document.getElementById('main-scan-cta');
+            if (mainCta) {
+              mainCta.click();
             }
           }}
         />

@@ -4,7 +4,7 @@ import { playSound, vibrate } from '../../utils/soundEffects'
 const TABS = [
     { id: 'home', icon: '🏠', label: 'Home' },
     { id: 'scan', icon: '📸', label: 'Scan' },
-    { id: 'gala', icon: '🏆', label: 'Gala' },
+    { id: 'gala', icon: '🏆', label: 'Event' },
 ]
 
 /**
@@ -91,7 +91,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
                                 <span className="text-[10px] font-medium" style={{
                                     color: isEventHighlight ? '#ffd700' : undefined
                                 }}>
-                                    {isEventHighlight ? '⚡ Gala' : tab.label}
+                                    {isEventHighlight ? '⚡ Event' : tab.label}
                                 </span>
                             </>
                         )}
