@@ -1140,6 +1140,16 @@ export default function App() {
         setScores(scores)
 
         // ============================================
+        // Mark free user's weekly event entry as used
+        // ============================================
+        if (!isPro && data.eventStatus && (data.eventStatus.action === 'added' || data.eventStatus.action === 'improved')) {
+          const weekStart = getWeekStart(new Date())
+          localStorage.setItem('fitrate_free_event_entry', JSON.stringify({ weekStart, used: true }))
+          setFreeEventEntryUsed(true)
+          console.log('[Event] Free user weekly entry marked as used')
+        }
+
+        // ============================================
         // FASHION SHOW: Record walk to scoreboard
         // ============================================
         if (fashionShowId && fashionShowNickname) {
