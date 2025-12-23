@@ -1396,12 +1396,17 @@ export default function App() {
                   if (!emailInput) return;
                   displayToast('Checking...');
                   try {
-                    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pro-status?email=${encodeURIComponent(emailInput)}`);
+                    const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pro/check`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: emailInput, userId })
+                    });
                     const data = await res.json();
                     if (data.isPro) {
                       localStorage.setItem('fitrate_pro', 'true');
                       localStorage.setItem('fitrate_email', emailInput);
                       setIsPro(true);
+                      setShowRestoreModal(false);
                       displayToast('⚡ Pro restored!');
                     } else {
                       displayToast('No Pro found for this email');
