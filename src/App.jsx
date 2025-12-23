@@ -1749,8 +1749,8 @@ export default function App() {
             setFashionShowId(showId)
             setFashionShowScreen('runway')
             window.history.pushState({}, '', `/f/${showId}`)
-            // Fetch show data
-            fetch(`${API_BASE}/show/${showId}`)
+            // Fetch show data with userId to get walk count
+            fetch(`${API_BASE}/show/${showId}?userId=${encodeURIComponent(userId)}`)
               .then(res => res.json())
               .then(data => {
                 if (data.showId) {
@@ -1760,6 +1760,8 @@ export default function App() {
                   const savedEmoji = localStorage.getItem(`fashionshow_${showId}_emoji`)
                   setFashionShowNickname(savedNick || 'Guest')
                   setFashionShowEmoji(savedEmoji || '😎')
+                  // Restore walk count from backend
+                  setFashionShowWalks(data.userWalks || 0)
                 } else {
                   // Show expired/not found - remove from active shows
                   removeFromActiveShows(showId)
