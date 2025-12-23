@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import Footer from '../components/common/Footer'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
@@ -39,7 +38,6 @@ export default function HomeScreen({
     const [countdown, setCountdown] = useState(null)
     const [cameraError, setCameraError] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
-    const [showProModes, setShowProModes] = useState(false) // For Pro mode expansion
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
     // Scan type choice modal removed - now just 2 free Gemini scans/day
 
@@ -462,14 +460,11 @@ export default function HomeScreen({
             <img
                 src="/logo.svg"
                 alt="FitRate"
-                className="h-12 mb-1"
+                className="h-12 mb-6"
                 style={{
                     filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
                 }}
             />
-            <p className="text-sm mb-6 tracking-wide font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                How hard is your fit?
-            </p>
 
             {/* Install Banner moved to footer - not above-fold */}
 
@@ -604,141 +599,6 @@ export default function HomeScreen({
                         <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
                     </button>
                 </div>
-
-                {/* More Modes Toggle */}
-                <button
-                    onClick={() => { playSound('click'); vibrate(10); setShowProModes(!showProModes); }}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-all text-xs"
-                    style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                    <span>{showProModes ? '▲ Less' : '▼ More Modes'}</span>
-                    {!isPro && <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 font-black text-[10px]">PRO</span>}
-                </button>
-
-                {/* Pro Modes - Collapsible (6 modes in 2x3 grid) */}
-                {showProModes && (
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                        {/* PRO: Honest */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('honest'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Honest mode - get balanced analysis" : "Honest mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'honest' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'honest' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'honest' && isPro ? 'rgba(74,144,217,0.25)' : 'rgba(74,144,217,0.1)',
-                                border: mode === 'honest' && isPro ? '1px solid #4A90D9' : '1px dashed rgba(74,144,217,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'honest' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">📊</span>
-                            <span className={`text-sm font-medium ${mode === 'honest' && isPro ? 'text-white' : 'text-gray-500'}`}>Honest</span>
-                        </button>
-
-                        {/* PRO: Savage */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('savage'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Savage mode - get brutally honest feedback" : "Savage mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'savage' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'savage' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'savage' && isPro ? 'rgba(255,68,68,0.25)' : 'rgba(255,68,68,0.1)',
-                                border: mode === 'savage' && isPro ? '1px solid #ff4444' : '1px dashed rgba(255,68,68,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'savage' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">💀</span>
-                            <span className={`text-sm font-medium ${mode === 'savage' && isPro ? 'text-white' : 'text-gray-500'}`}>Savage</span>
-                        </button>
-
-                        {/* PRO: Rizz Rating */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('rizz'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Rizz mode - rate your dating potential" : "Rizz mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'rizz' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'rizz' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'rizz' && isPro ? 'rgba(255,105,180,0.25)' : 'rgba(255,105,180,0.1)',
-                                border: mode === 'rizz' && isPro ? '1px solid #ff69b4' : '1px dashed rgba(255,105,180,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'rizz' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">😏</span>
-                            <span className={`text-sm font-medium ${mode === 'rizz' && isPro ? 'text-white' : 'text-gray-500'}`}>Rizz</span>
-                        </button>
-
-                        {/* PRO: Celebrity Judge */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('celeb'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Celebrity mode - get judged by fashion icons" : "Celebrity mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'celeb' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'celeb' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'celeb' && isPro ? 'rgba(255,215,0,0.25)' : 'rgba(255,215,0,0.1)',
-                                border: mode === 'celeb' && isPro ? '1px solid #ffd700' : '1px dashed rgba(255,215,0,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'celeb' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🎭</span>
-                            <span className={`text-sm font-medium ${mode === 'celeb' && isPro ? 'text-white' : 'text-gray-500'}`}>Celeb</span>
-                        </button>
-
-                        {/* PRO: Aura / Vibe Check */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('aura'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Aura mode - read your vibe and energy" : "Aura mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'aura' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'aura' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'aura' && isPro ? 'rgba(155,89,182,0.25)' : 'rgba(155,89,182,0.1)',
-                                border: mode === 'aura' && isPro ? '1px solid #9b59b6' : '1px dashed rgba(155,89,182,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'aura' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🔮</span>
-                            <span className={`text-sm font-medium ${mode === 'aura' && isPro ? 'text-white' : 'text-gray-500'}`}>Aura</span>
-                        </button>
-
-                        {/* PRO: Chaos Mode */}
-                        <button
-                            onClick={() => {
-                                playSound('click'); vibrate(15);
-                                if (isPro) { setMode('chaos'); setEventMode(false); }
-                                else onShowPaywall();
-                            }}
-                            aria-label={isPro ? "Chaos mode - unhinged AI feedback" : "Chaos mode - Pro feature, tap to upgrade"}
-                            aria-pressed={mode === 'chaos' && isPro}
-                            className={`relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 ${isPro ? (mode === 'chaos' ? 'opacity-100' : 'opacity-60') : 'opacity-50'}`}
-                            style={{
-                                background: mode === 'chaos' && isPro ? 'rgba(255,107,107,0.25)' : 'rgba(255,107,107,0.1)',
-                                border: mode === 'chaos' && isPro ? '1px solid #ff6b6b' : '1px dashed rgba(255,107,107,0.4)'
-                            }}
-                        >
-                            {!isPro && <span className="absolute -top-1 -right-1 text-xs">🔒</span>}
-                            <span className={`text-base ${mode === 'chaos' && isPro ? 'opacity-100' : 'opacity-40'}`} aria-hidden="true">🎪</span>
-                            <span className={`text-sm font-medium ${mode === 'chaos' && isPro ? 'text-white' : 'text-gray-500'}`}>Chaos</span>
-                        </button>
-                    </div>
-                )}
             </div>
 
             {/* Scans Remaining + Pro Badge + Streak */}
@@ -765,153 +625,47 @@ export default function HomeScreen({
                     )}
                 </div>
 
-                {/* Streak with 7-day reward progress */}
+                {/* Streak - simplified to inline badge */}
                 {dailyStreak > 0 && (
-                    <div className="flex flex-col items-center gap-1.5 px-4 py-2 rounded-xl" style={{
-                        background: dailyStreak >= 7
-                            ? 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.1) 100%)'
-                            : 'rgba(255,136,0,0.08)',
-                        border: dailyStreak >= 7
-                            ? '1px solid rgba(255,215,0,0.4)'
-                            : '1px solid rgba(255,136,0,0.2)'
+                    <span className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1" style={{
+                        background: 'rgba(255,136,0,0.15)',
+                        color: '#ff8800',
+                        border: '1px solid rgba(255,136,0,0.3)'
                     }}>
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg">🔥</span>
-                            <span className={`font-black ${dailyStreak >= 7 ? 'text-yellow-400' : 'text-orange-400'}`}>
-                                {dailyStreak} day streak{dailyStreak >= 7 ? '!' : ''}
-                            </span>
-                        </div>
-                        {dailyStreak < 7 ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full transition-all"
-                                        style={{ width: `${(dailyStreak / 7) * 100}%` }}
-                                    />
-                                </div>
-                                <span className="text-[10px] text-white/40">{7 - dailyStreak} to go</span>
-                            </div>
-                        ) : (
-                            <span className="text-[10px] text-yellow-400/80 font-bold">🎁 +1 FREE Pro Scan!</span>
-                        )}
-                    </div>
+                        🔥 {dailyStreak}
+                    </span>
                 )}
             </div>
 
+            {/* Weekly Challenge - simplified to minimal pill */}
             {currentEvent && (
                 <button
                     onClick={() => {
                         vibrate(15); playSound('click');
-                        // First-time users: show explainer modal
                         if (!hasSeenEventExplainer) {
                             onShowEventExplainer();
                             return;
                         }
-                        // User has seen explainer - toggle event mode
-                        // Pro users: unlimited toggles
-                        // Free users: can join if they haven't used their weekly entry
-                        if (isPro) {
-                            setEventMode(!eventMode);
-                        } else if (!freeEventEntryUsed) {
-                            // Free user with available entry - let them join!
+                        if (isPro || !freeEventEntryUsed) {
                             setEventMode(!eventMode);
                         } else {
-                            // Free user who already used their entry - show paywall
                             onShowPaywall();
                         }
                     }}
-                    aria-label={isPro
-                        ? `${currentEvent.theme} weekly event - ${eventMode ? 'currently active, tap to deactivate' : 'tap to join'}`
-                        : freeEventEntryUsed
-                            ? `${currentEvent.theme} weekly event - free entry used, upgrade for more`
-                            : `${currentEvent.theme} weekly event - tap to use your free entry`
-                    }
-                    aria-pressed={eventMode}
-                    className={`w-full max-w-sm mt-4 px-4 py-3 rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-[0.98] ${eventMode ? 'ring-2 ring-emerald-400' : ''}`}
+                    aria-label={`${currentEvent.theme} weekly challenge`}
+                    className={`mt-4 px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-[0.98] ${eventMode ? 'ring-2 ring-emerald-400' : ''}`}
                     style={{
-                        background: eventMode
-                            ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.25) 100%)'
-                            : isPro
-                                ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
-                                : !freeEventEntryUsed
-                                    ? 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)'
-                                    : 'linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%)',
-                        border: eventMode
-                            ? '1px solid rgba(16, 185, 129, 0.5)'
-                            : isPro || !freeEventEntryUsed
-                                ? '1px solid rgba(16, 185, 129, 0.25)'
-                                : '1px dashed rgba(251, 191, 36, 0.4)'
+                        background: eventMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
+                        border: eventMode ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg" aria-hidden="true">{currentEvent.themeEmoji}</span>
-                        <div className="flex flex-col items-start">
-                            <span className="text-sm font-bold text-white">{currentEvent.theme}</span>
-                            <span className="text-[10px] text-gray-400">Weekly Challenge</span>
-                        </div>
-                        {isPro ? (
-                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                                {eventMode ? '✓ ACTIVE' : 'JOIN'}
-                            </span>
-                        ) : !freeEventEntryUsed ? (
-                            <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-400'}`}>
-                                {eventMode ? '✓ ACTIVE' : '1 FREE'}
-                            </span>
-                        ) : (
-                            <span className="text-[10px] bg-amber-500/20 text-amber-400 font-bold uppercase px-2 py-0.5 rounded-full">USED</span>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-gray-400 font-medium">⏱️ {formatTimeRemaining(currentEvent.endDate)}</span>
-                        {isPro ? (
-                            <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '→'}</span>
-                        ) : !freeEventEntryUsed ? (
-                            <span className={`text-sm ${eventMode ? 'text-emerald-400' : 'text-cyan-400'}`}>{eventMode ? '✓' : '→'}</span>
-                        ) : (
-                            <span className="text-amber-400 text-sm">🔒</span>
-                        )}
-                    </div>
-                </button>
-            )
-            }
-
-            {/* Leaderboard & Rules Links */}
-            {currentEvent && (
-                <div className="flex items-center gap-4 mt-2">
-                    <button
-                        onClick={() => { onShowLeaderboard(); vibrate(10); }}
-                        aria-label="View weekly event leaderboard"
-                        className="text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
-                    >
-                        <span aria-hidden="true">🏆</span> Leaderboard
-                    </button>
-                    <button
-                        onClick={() => { onShowRules(); vibrate(10); }}
-                        aria-label="View weekly event rules"
-                        className="text-xs font-medium text-gray-500 hover:text-white transition-colors flex items-center gap-1"
-                    >
-                        <span aria-hidden="true">📖</span> Rules
-                    </button>
-                </div>
-            )}
-
-            {/* Fashion Show Entry Point */}
-            {onStartFashionShow && (
-                <button
-                    onClick={() => { onStartFashionShow(); vibrate(20); playSound('click'); }}
-                    aria-label="Start a Fashion Show with friends"
-                    className="mt-4 px-4 py-2.5 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-colors flex items-center gap-2"
-                >
-                    <span className="text-lg">🎭</span>
-                    <span className="text-sm font-semibold text-purple-300">Fashion Show</span>
-                    <span className="text-[10px] text-purple-400/70 ml-1">with friends</span>
+                    <span className="text-base">{currentEvent.themeEmoji}</span>
+                    <span className="text-sm font-medium text-white/80">{currentEvent.theme}</span>
+                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${eventMode ? 'bg-emerald-500/30 text-emerald-300' : 'bg-white/10 text-white/50'}`}>
+                        {eventMode ? '✓' : isPro || !freeEventEntryUsed ? '→' : '🔒'}
+                    </span>
                 </button>
             )}
-
-            {/* Trust Message */}
-            <p className="mt-6 text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                <span>🔒</span> Photos analyzed instantly, never stored
-            </p>
 
             {/* Scans Remaining */}
             <div style={{
@@ -955,28 +709,6 @@ export default function HomeScreen({
                         }}
                     >
                         👑 Go Pro
-                    </button>
-                )}
-
-                {/* Restore Pro link for returning users */}
-                {!isPro && onShowRestore && (
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.preventDefault(); e.stopPropagation();
-                            playSound('click'); vibrate(10);
-                            onShowRestore();
-                        }}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'rgba(255,255,255,0.4)',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                            padding: '8px'
-                        }}
-                    >
-                        Already Pro? Restore purchase
                     </button>
                 )}
             </div>
@@ -1038,8 +770,6 @@ export default function HomeScreen({
                     </div>
                 </div>
             )}
-
-            <Footer className="opacity-50" />
         </div >
     )
 }
