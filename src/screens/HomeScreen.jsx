@@ -143,17 +143,39 @@ export default function HomeScreen({
         setCountdown(null)
     }, [cameraStream])
 
+    // iOS Safari: Restart camera when returning from background
+    // Camera stream can die silently when app is backgrounded
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && view === 'camera' && cameraStream) {
+                // Check if stream is still active
+                const tracks = cameraStream.getTracks()
+                const isActive = tracks.some(track => track.readyState === 'live')
+                if (!isActive) {
+                    console.log('[Camera] Stream died during background - restarting')
+                    startCamera(facingMode)
+                }
+            }
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }, [view, cameraStream, startCamera, facingMode])
+
     const flipCamera = useCallback(() => {
         const newFacing = facingMode === 'environment' ? 'user' : 'environment'
         startCamera(newFacing)
     }, [facingMode, startCamera])
 
     const capturePhoto = useCallback(() => {
+        // GUARD: Prevent double-capture from rapid taps
+        if (isProcessing) return
         if (!videoRef.current || !canvasRef.current) return
 
         const video = videoRef.current
         if (video.readyState < 2) return
 
+        setIsProcessing(true) // Lock to prevent double-tap
         playSound('shutter')
         vibrate(50)
 
@@ -173,8 +195,9 @@ export default function HomeScreen({
         const imageData = canvas.toDataURL('image/jpeg', 0.8)
         stopCamera()
         onImageSelected(imageData)
+        // Note: Don't reset isProcessing - screen navigation will unmount component
 
-    }, [facingMode, stopCamera, onImageSelected])
+    }, [facingMode, stopCamera, onImageSelected, isProcessing])
 
     const timerCapture = useCallback(() => {
         if (countdown !== null) return
@@ -299,6 +322,9 @@ export default function HomeScreen({
     }[mode] || '#00ff88'
 
     const handleStart = () => {
+        // GUARD: Prevent rapid double-taps
+        if (isProcessing) return
+
         playSound('click')
         vibrate(20)
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {

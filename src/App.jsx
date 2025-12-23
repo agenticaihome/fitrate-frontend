@@ -268,12 +268,13 @@ export default function App() {
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [scores, setScores] = useState(null)
   const [uploadedImage, setUploadedImage] = useState(null)
-  const [mode, setMode] = useState('roast') // Default to roast - funnier, more shareable
+  const [mode, setMode] = useState(() => localStorage.getItem('fitrate_mode') || 'roast') // Persist mode preference
   const [timeUntilReset, setTimeUntilReset] = useState(null)
   const [shareData, setShareData] = useState(null)
   const [emailInput, setEmailInput] = useState('')
   const [error, setError] = useState(null)
   const [errorCode, setErrorCode] = useState(null) // Track API error codes for better UX
+  const [isAnalyzing, setIsAnalyzing] = useState(false) // Guard against double-execution of analyzeOutfit
 
   // Weekly Event Mode state
   const [currentEvent, setCurrentEvent] = useState(null)
@@ -457,6 +458,24 @@ export default function App() {
       window.removeEventListener('online', handleOnline)
     }
   }, [])
+
+  // Persist mode preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('fitrate_mode', mode)
+  }, [mode])
+
+  // Warn user before leaving during active analysis (prevents scan loss)
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isAnalyzing) {
+        e.preventDefault()
+        e.returnValue = 'Analysis in progress. Your scan may be lost if you leave.'
+        return e.returnValue
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isAnalyzing])
 
   // Decline offer countdown timer (5 minutes = 300 seconds)
   useEffect(() => {
@@ -997,12 +1016,20 @@ export default function App() {
   }
 
   const analyzeOutfit = useCallback(async (imageData) => {
+    // GUARD: Prevent double-execution from rapid taps
+    if (isAnalyzing) {
+      console.log('[Analyze] Already analyzing - ignoring duplicate call')
+      return
+    }
+    setIsAnalyzing(true)
+
     setScreen('analyzing')
     setError(null)
     setErrorCode(null) // Reset error code for fresh analysis
 
     // Optimistic check
     if (!isPro && scansRemaining <= 0) {
+      setIsAnalyzing(false)
       setScreen('limit-reached')
       return
     }
@@ -1038,7 +1065,15 @@ export default function App() {
         }
 
         if (!data.success) {
-          // Extract error code for better UX in ErrorScreen (was missing for free tier!)
+          // Sync scans from server response (even on failure) to prevent client desync
+          if (data.scanInfo) {
+            setScansRemaining(data.scanInfo.scansRemaining || 0)
+            localStorage.setItem('fitrate_scans', JSON.stringify({
+              date: new Date().toDateString(),
+              count: data.scanInfo.scansUsed || 0
+            }))
+          }
+          // Extract error code for better UX in ErrorScreen
           const code = data.code || 'SERVER_ERROR'
           setErrorCode(code)
           setError(data.error || 'Analysis failed')
@@ -1128,6 +1163,7 @@ export default function App() {
           setError("Something went wrong — try again!")
         }
         setScreen('error')
+        setIsAnalyzing(false)
         return
       }
     }
@@ -1148,6 +1184,14 @@ export default function App() {
       const data = await response.json()
 
       if (!response.ok || !data.success) {
+        // Sync scans from server response (even on failure) to prevent client desync
+        if (data.scanInfo) {
+          setScansRemaining(data.scanInfo.scansRemaining || 0)
+          localStorage.setItem('fitrate_scans', JSON.stringify({
+            date: new Date().toDateString(),
+            count: data.scanInfo.scansUsed || 0
+          }))
+        }
         // Extract error code for better UX in ErrorScreen
         const code = data.code || (response.status === 429 ? 'LIMIT_REACHED' : 'SERVER_ERROR')
         setErrorCode(code)
@@ -1206,8 +1250,10 @@ export default function App() {
         // errorCode may have been set above from API response
       }
       setScreen('error')
+    } finally {
+      setIsAnalyzing(false)
     }
-  }, [mode, isPro, eventMode, currentEvent, userId])
+  }, [mode, isPro, eventMode, currentEvent, userId, isAnalyzing, scansRemaining])
 
 
 

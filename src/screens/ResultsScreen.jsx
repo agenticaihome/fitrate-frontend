@@ -331,6 +331,11 @@ export default function ResultsScreen({
         return () => { isMounted.current = false }
     }, [])
 
+    // Scroll to top when results appear (fixes scroll position bugs)
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [scores])
+
     // Animation sequence with proper locking
     useEffect(() => {
         if (!scores) return
