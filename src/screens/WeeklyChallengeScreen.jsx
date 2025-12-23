@@ -176,7 +176,7 @@ export default function WeeklyChallengeScreen({
             }}>
                 <p className="text-white/50 text-xs text-center">
                     <strong className="text-purple-400">Theme = 50%</strong> of your score • Top 5 win 🏆 •
-                    {isPro ? ' Unlimited entries' : ' 1 free entry/week'}
+                    {isPro ? ' 1 entry/day' : ' 1 free entry/week'}
                 </p>
             </div>
 
@@ -206,7 +206,7 @@ export default function WeeklyChallengeScreen({
                             boxShadow: '0 4px 20px rgba(255, 215, 0, 0.4)'
                         }}
                     >
-                        👑 Go Pro — Unlimited Entries
+                        👑 Go Pro — 1 Entry Daily
                     </button>
                 </div>
             )}

@@ -769,7 +769,7 @@ export default function HomeScreen({
 
                                 {/* Subtitle */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {entryBlocked ? 'Upgrade for unlimited entries!' : isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
+                                    {entryBlocked ? 'Go Pro for daily entries!' : isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
                                 </span>
 
                                 {/* Mode Toggle or Exit Competition */}
