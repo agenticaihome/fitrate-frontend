@@ -612,7 +612,7 @@ export default function ResultsScreen({
 
                         {/* Score Number - HUGE with Pro decimal precision */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            {(isPro || scores.wasProPreview) ? (
+                            {isPro ? (
                                 // PRO: Show decimal precision with gold highlight
                                 <div className="flex items-baseline" style={{
                                     animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
@@ -813,7 +813,7 @@ export default function ResultsScreen({
             </div>
 
             {/* ===== UNIFIED PRO INSIGHTS SECTION ===== */}
-            {(isPro || scores.wasProPreview) && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
+            {isPro && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
                 <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div
                         className="p-5 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden"

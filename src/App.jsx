@@ -954,12 +954,6 @@ export default function App() {
           setScansRemaining(data.scanInfo.scansRemaining + bonus)
           const used = data.scanInfo.scansUsed || 1
           localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
-
-          // Track Pro Preview usage - if this was a Pro Preview scan, mark it used
-          if (data.scanInfo.wasProPreview) {
-            setProPreviewAvailable(false)
-            localStorage.setItem('fitrate_pro_preview', JSON.stringify({ date: new Date().toDateString(), used: true }))
-          }
         }
 
         // Update Streak
@@ -989,9 +983,7 @@ export default function App() {
           // Include eventInfo if present in the response (for weekly challenge tracking)
           eventInfo: data.eventInfo,
           // Include eventStatus for share card rank display
-          eventStatus: data.eventStatus,
-          // PRO PREVIEW: Flag if this was a Pro taste scan (shows Pro features in results)
-          wasProPreview: data.scanInfo?.wasProPreview || false
+          eventStatus: data.eventStatus
         }
 
         // Save this score as the new lastScore
