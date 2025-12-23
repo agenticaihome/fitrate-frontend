@@ -4,11 +4,11 @@
  */
 
 export const LIMITS = {
-    // Scans - Hybrid Model: 1 Pro Preview (GPT-4o) + 1 Free (Gemini)
-    FREE_SCANS_DAILY: 1,           // Gemini-powered free scan
-    FREE_PRO_PREVIEW_DAILY: 1,     // GPT-4o "taste" scan (first scan of day)
-    TOTAL_FREE_DAILY: 2,           // Combined for user display
-    PRO_SCANS_DAILY: 25,           // Soft cap to prevent abuse
+    // Scans - Simplified Model: 2 Free Gemini scans/day
+    // Pro scans (GPT-4o) earned via referrals or subscription
+    FREE_SCANS_DAILY: 2,            // Gemini-powered free scans
+    TOTAL_FREE_DAILY: 2,            // For user display
+    PRO_SCANS_DAILY: 25,            // Soft cap to prevent abuse
 
     // Weekly Event
     FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
