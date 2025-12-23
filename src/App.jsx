@@ -164,6 +164,7 @@ export default function App() {
   const [fashionShowEmoji, setFashionShowEmoji] = useState('😎')
   const [fashionShowWalks, setFashionShowWalks] = useState(0)
   const [fashionShowLoading, setFashionShowLoading] = useState(false)
+  const [pendingFashionShowWalk, setPendingFashionShowWalk] = useState(false) // Auto-trigger camera after walk
 
   // Purchased scans (from scan packs)
   const [purchasedScans, setPurchasedScans] = useState(0)
@@ -1533,10 +1534,12 @@ export default function App() {
         walksUsed={fashionShowWalks}
         walksAllowed={isPro ? 3 : 1}
         onWalkRunway={() => {
-          // Keep show context but go to camera
+          // Keep show context and trigger camera flow
           // fashionShowId and nickname stay set, so after analyze 
           // the score will be recorded to the show
+          console.log('[FashionShow] Walk initiated - showId:', fashionShowId, 'nickname:', fashionShowNickname)
           setFashionShowScreen(null) // Exit show UI for camera
+          setPendingFashionShowWalk(true) // Flag to auto-trigger camera
           setScreen('home')
           // Note: fashionShowId, fashionShowNickname, fashionShowEmoji stay set
         }}
@@ -1619,6 +1622,9 @@ export default function App() {
         onError={(msg) => { setError(msg); setScreen('error'); }}
         onStartFashionShow={() => setFashionShowScreen('create')}
         onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
+        pendingFashionShowWalk={pendingFashionShowWalk}
+        onClearPendingWalk={() => setPendingFashionShowWalk(false)}
+        fashionShowName={fashionShowData?.name}
       />
     )
   }
@@ -1687,6 +1693,13 @@ export default function App() {
         currentEvent={eventMode ? currentEvent : null}
         onStartFashionShow={() => setScreen('fashion-create')}
         totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
+        fashionShowId={fashionShowId}
+        fashionShowName={fashionShowData?.name}
+        onReturnToRunway={() => {
+          setFashionShowScreen('runway')
+          setScores(null)
+          setScreen('home')
+        }}
       />
     )
   }

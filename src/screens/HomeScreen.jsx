@@ -30,7 +30,10 @@ export default function HomeScreen({
     onShowRestore,          // Show restore Pro modal
     onError,
     onStartFashionShow,     // Start Fashion Show flow
-    onShowWeeklyChallenge   // Navigate to Weekly Challenge page
+    onShowWeeklyChallenge,  // Navigate to Weekly Challenge page
+    pendingFashionShowWalk, // Auto-trigger camera for Fashion Show walk
+    onClearPendingWalk,     // Clear the pending walk flag
+    fashionShowName         // Name of current Fashion Show (for display)
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -46,6 +49,24 @@ export default function HomeScreen({
     // Platform Detection Helpers
     const isAndroid = () => /Android/i.test(navigator.userAgent)
     const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
+
+    // Auto-trigger camera when walking Fashion Show runway
+    useEffect(() => {
+        if (pendingFashionShowWalk) {
+            console.log('[FashionShow] Auto-triggering camera for walk')
+            onClearPendingWalk?.()
+            // Small delay to let component mount
+            setTimeout(() => {
+                if (isAndroid()) {
+                    setShowAndroidPhotoModal(true)
+                } else if (isIOS()) {
+                    document.getElementById('androidCameraInput')?.click()
+                } else {
+                    startCamera()
+                }
+            }, 300)
+        }
+    }, [pendingFashionShowWalk])
 
     // Refs
     const videoRef = useRef(null)
@@ -500,6 +521,19 @@ export default function HomeScreen({
                 </div>
             )}
 
+            {/* Fashion Show Walk Context Banner */}
+            {fashionShowName && (
+                <div className="w-full max-w-sm p-4 rounded-2xl text-center mb-4" style={{
+                    background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
+                    border: '1px solid rgba(139,92,246,0.4)'
+                }}>
+                    <p className="text-lg font-bold text-white mb-1">🎭 Walking in "{fashionShowName}"</p>
+                    <p className="text-xs text-purple-300/70">
+                        Take a photo to submit your fit!
+                    </p>
+                </div>
+            )}
+
             {/* Streak moved to bottom area - cleaner above-fold */}
 
             {/* MAIN ACTION CTA */}
@@ -691,7 +725,8 @@ export default function HomeScreen({
                         }}
                     >
                         <span className="text-2xl">🎭</span>
-                        <span className="text-white text-xs font-medium">Fashion Show</span>
+                        <span className="text-white text-xs font-medium">Compete</span>
+                        <span className="text-purple-300/50 text-[10px]">with friends</span>
                     </button>
                 )}
 

@@ -74,7 +74,23 @@ export default function FashionShowInvite({
             {/* Invite Card */}
             <div className="w-full max-w-sm bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 mb-6">
                 <div className="text-center mb-6">
-                    <p className="text-white/60 text-sm mb-3">Invite friends with this link:</p>
+                    <p className="text-white/60 text-sm mb-4">Scan to join:</p>
+
+                    {/* QR Code */}
+                    <div className="flex justify-center mb-4">
+                        <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(inviteUrl)}&bgcolor=000000&color=00d4ff`}
+                            alt="QR Code to join"
+                            className="rounded-xl"
+                            style={{
+                                width: 150,
+                                height: 150,
+                                background: '#000'
+                            }}
+                        />
+                    </div>
+
+                    <p className="text-white/40 text-xs mb-3">or share this link:</p>
                     <div
                         onClick={copyLink}
                         className="bg-black/30 rounded-xl p-4 cursor-pointer active:bg-black/50 transition-colors"

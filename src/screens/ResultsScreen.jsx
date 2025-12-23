@@ -316,7 +316,10 @@ export default function ResultsScreen({
     vibrate,
     currentEvent = null,  // Weekly event context
     onStartFashionShow = null,  // Fashion Show entry
-    totalScans = 0  // Total scans user has done (for discovery timing)
+    totalScans = 0,  // Total scans user has done (for discovery timing)
+    fashionShowId = null,  // Fashion Show context for return button
+    fashionShowName = null,
+    onReturnToRunway = null
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
