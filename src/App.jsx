@@ -178,16 +178,8 @@ export default function App() {
     return LIMITS.TOTAL_FREE_DAILY  // 2 total (1 Pro + 1 Free)
   })
 
-  // Pro Preview tracking: First scan of day uses GPT-4o
-  const [proPreviewAvailable, setProPreviewAvailable] = useState(() => {
-    const today = new Date().toDateString()
-    const stored = localStorage.getItem('fitrate_pro_preview')
-    if (stored) {
-      const { date, used } = JSON.parse(stored)
-      if (date === today) return !used
-    }
-    return true // First scan of day = Pro Preview available
-  })
+  // Pro Preview removed - now 2 free Gemini scans/day
+  // Pro scans earned via referrals (proRoasts state below)
 
   // Pro Roasts available (from referrals or $0.99 purchase)
   const [proRoasts, setProRoasts] = useState(0)
@@ -906,7 +898,7 @@ export default function App() {
     setScansRemaining(Math.max(0, LIMITS.FREE_SCANS_DAILY - count))
   }
 
-  const analyzeOutfit = useCallback(async (imageData, scanType = null) => {
+  const analyzeOutfit = useCallback(async (imageData) => {
     setScreen('analyzing')
     setError(null)
     setErrorCode(null) // Reset error code for fresh analysis
@@ -916,10 +908,6 @@ export default function App() {
       setScreen('limit-reached')
       return
     }
-
-    // Determine if user wants to use their Pro Preview scan
-    // scanType can be 'pro' (use GPT-4o), 'free' (use Gemini), or null (auto/default behavior)
-    const useProScan = scanType === 'pro' ? true : scanType === 'free' ? false : undefined
 
     // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
@@ -936,8 +924,7 @@ export default function App() {
             image: imageData,
             mode,
             userId,
-            eventMode: eventMode && currentEvent ? true : false,  // FIX: Send eventMode for free users too!
-            useProScan  // User's conscious choice: true = use Pro, false = use Free, undefined = auto
+            eventMode: eventMode && currentEvent ? true : false
           }),
           signal: controller.signal
         })

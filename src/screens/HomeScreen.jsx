@@ -10,7 +10,7 @@ export default function HomeScreen({
     setMode,
     isPro,
     scansRemaining,
-    proPreviewAvailable = false,  // True = first scan uses GPT-4o
+    // proPreviewAvailable removed - now just 2 free Gemini scans/day
     dailyStreak,
     currentEvent,
     eventMode,
@@ -40,8 +40,7 @@ export default function HomeScreen({
     const [isProcessing, setIsProcessing] = useState(false)
     const [showProModes, setShowProModes] = useState(false) // For Pro mode expansion
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
-    const [showScanTypeModal, setShowScanTypeModal] = useState(false) // Pro vs Free scan choice
-    const [pendingScanType, setPendingScanType] = useState(null) // Track user's scan type choice
+    // Scan type choice modal removed - now just 2 free Gemini scans/day
 
     // Platform Detection Helpers
     const isAndroid = () => /Android/i.test(navigator.userAgent)
@@ -127,9 +126,7 @@ export default function HomeScreen({
 
         const imageData = canvas.toDataURL('image/jpeg', 0.8)
         stopCamera()
-        // Pass the scan type choice (if any) to the parent
-        onImageSelected(imageData, pendingScanType)
-        setPendingScanType(null) // Reset for next time
+        onImageSelected(imageData)
 
     }, [facingMode, stopCamera, onImageSelected])
 
@@ -260,13 +257,6 @@ export default function HomeScreen({
         playSound('click')
         vibrate(20)
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-            // FREE USERS WITH PRO PREVIEW: Show scan type choice modal
-            // Let them consciously choose between Pro (GPT-4o) or Free (Gemini)
-            if (!isPro && proPreviewAvailable && scansRemaining > 0) {
-                setShowScanTypeModal(true)
-                return
-            }
-
             // PLATFORM-SPECIFIC CAMERA HANDLING:
             // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
             // - iOS: Use native camera app via file input with capture attribute
@@ -289,24 +279,6 @@ export default function HomeScreen({
             // Desktop: Use getUserMedia for live camera preview
             startCamera()
         }
-    }
-
-    // User chose Pro scan from modal
-    const handleChooseProScan = () => {
-        setShowScanTypeModal(false)
-        setPendingScanType('pro')
-        playSound('pop')
-        vibrate(30)
-        proceedToCamera()
-    }
-
-    // User chose Free scan from modal
-    const handleChooseFreeScan = () => {
-        setShowScanTypeModal(false)
-        setPendingScanType('free')
-        playSound('click')
-        vibrate(15)
-        proceedToCamera()
     }
 
     // Android-specific handlers for dual-button modal
@@ -774,21 +746,11 @@ export default function HomeScreen({
                 <div className="flex items-center justify-center gap-3">
                     {!isPro && (
                         <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{
-                            background: proPreviewAvailable
-                                ? 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(0,212,255,0.15) 100%)'
-                                : 'rgba(255,255,255,0.05)',
-                            border: proPreviewAvailable
-                                ? '1px solid rgba(255,215,0,0.3)'
-                                : '1px solid rgba(255,255,255,0.1)'
+                            background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)'
                         }}>
-                            {proPreviewAvailable ? (
-                                <>
-                                    <span className="text-xs font-bold text-yellow-400">🌟 Pro</span>
-                                    <span className="text-xs text-white/40">+</span>
-                                    <span className="text-xs font-medium text-cyan-400">✨ Free</span>
-                                </>
-                            ) : scansRemaining > 0 ? (
-                                <span className="text-xs font-medium text-cyan-400">✨ {scansRemaining} Free left</span>
+                            {scansRemaining > 0 ? (
+                                <span className="text-xs font-medium text-cyan-400">✨ {scansRemaining} Free scan{scansRemaining > 1 ? 's' : ''} left</span>
                             ) : (
                                 <span className="text-xs font-medium text-white/40">No scans left</span>
                             )}
