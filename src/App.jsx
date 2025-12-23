@@ -1576,6 +1576,8 @@ export default function App() {
         playSound={playSound}
         vibrate={vibrate}
         currentEvent={eventMode ? currentEvent : null}
+        onStartFashionShow={() => setScreen('fashion-create')}
+        totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
       />
     )
   }

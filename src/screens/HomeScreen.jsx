@@ -39,6 +39,7 @@ export default function HomeScreen({
     const [cameraError, setCameraError] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
+    const [showModeDrawer, setShowModeDrawer] = useState(false) // Pro mode drawer
     // Scan type choice modal removed - now just 2 free Gemini scans/day
 
     // Platform Detection Helpers
@@ -454,17 +455,34 @@ export default function HomeScreen({
             />
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Pro Badge - Moved to bottom/footer area for cleaner above-fold */}
+            {/* Header with Logo and Profile */}
+            <div className="w-full flex items-center justify-between px-4 mb-6">
+                {/* Empty spacer for centering */}
+                <div className="w-10" />
 
-            {/* Logo */}
-            <img
-                src="/logo.svg"
-                alt="FitRate"
-                className="h-12 mb-6"
-                style={{
-                    filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
-                }}
-            />
+                {/* Logo - centered */}
+                <img
+                    src="/logo.svg"
+                    alt="FitRate"
+                    className="h-12"
+                    style={{
+                        filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
+                    }}
+                />
+
+                {/* Profile/Settings Icon */}
+                <button
+                    onClick={() => { playSound('click'); vibrate(10); onShowRestore?.(); }}
+                    aria-label="Settings and Restore Purchase"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90"
+                    style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                >
+                    <span className="text-white/60 text-lg">⚙️</span>
+                </button>
+            </div>
 
             {/* Install Banner moved to footer - not above-fold */}
 
@@ -487,35 +505,67 @@ export default function HomeScreen({
             <div className="flex-1 flex flex-col items-center justify-center">
                 {/* Out of scans state */}
                 {scansRemaining === 0 && !isPro && purchasedScans === 0 ? (
-                    <div className="relative w-72 h-72 rounded-full flex flex-col items-center justify-center"
-                        style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '3px dashed rgba(255,255,255,0.2)',
-                            cursor: 'not-allowed'
-                        }}
-                    >
-                        <span className="text-6xl mb-4 opacity-40">⏳</span>
-                        <span className="text-white/60 text-lg font-bold uppercase tracking-wide text-center px-8">
-                            Out of Scans
-                        </span>
-                        <span className="text-white/40 text-sm mt-2 text-center px-8">
-                            {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Resets at midnight'}
-                        </span>
-                        <button
-                            onClick={() => { playSound('click'); vibrate(15); onShowPaywall(); }}
-                            className="mt-4 px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95 active:brightness-90"
-                            style={{
-                                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                                color: '#000'
-                            }}
-                        >
-                            ⚡ Get Unlimited Scans
-                        </button>
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                            <p className="text-xs font-medium text-white/40">
-                                or wait for daily reset
+                    <div className="flex flex-col items-center justify-center gap-6 py-8">
+                        {/* Out of Scans Message */}
+                        <div className="text-center">
+                            <span className="text-5xl mb-3 block">⏳</span>
+                            <h2 className="text-white text-xl font-bold mb-1">Out of Scans</h2>
+                            <p className="text-white/50 text-sm">
+                                {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Resets at midnight'}
                             </p>
                         </div>
+
+                        {/* Primary CTA: Go Pro */}
+                        <button
+                            onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
+                            className="px-8 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
+                            style={{
+                                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                color: '#000',
+                                boxShadow: '0 4px 20px rgba(255,215,0,0.4)'
+                            }}
+                        >
+                            👑 Go Pro — Unlimited
+                        </button>
+
+                        {/* Alternative Actions */}
+                        <div className="flex flex-col items-center gap-3 w-full max-w-xs">
+                            <p className="text-white/40 text-xs uppercase tracking-wide">or keep playing</p>
+
+                            {/* Fashion Show - Free! */}
+                            {onStartFashionShow && (
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all active:scale-95"
+                                    style={{
+                                        background: 'rgba(139,92,246,0.2)',
+                                        border: '1px solid rgba(139,92,246,0.3)'
+                                    }}
+                                >
+                                    <span>🎭</span>
+                                    <span className="text-purple-300 font-medium">Fashion Show with Friends</span>
+                                    <span className="text-[10px] bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded-full">FREE</span>
+                                </button>
+                            )}
+
+                            {/* Leaderboard */}
+                            {currentEvent && (
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(10); onShowLeaderboard(); }}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all active:scale-95"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)'
+                                    }}
+                                >
+                                    <span>🏆</span>
+                                    <span className="text-white/70 font-medium">View Leaderboard</span>
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Escape Hatch */}
+                        <p className="text-white/30 text-xs">or wait for daily reset</p>
                     </div>
                 ) : (
                     <button
@@ -562,13 +612,13 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Mode Selectors - Simplified: Nice/Roast visible, Pro modes collapsed */}
+
+            {/* Mode Selectors - Nice/Roast + More for Pro */}
             <div className="mt-6 mb-4 flex flex-col gap-2 p-2 rounded-2xl" style={{
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)'
             }}>
-                {/* Primary modes: Nice & Roast */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className={`grid gap-2 ${isPro ? 'grid-cols-3' : 'grid-cols-2'}`}>
                     {/* Nice */}
                     <button
                         onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); }}
@@ -598,6 +648,24 @@ export default function HomeScreen({
                         <span className={`text-base transition-opacity ${mode === 'roast' ? 'opacity-100' : 'opacity-50'}`} aria-hidden="true">🔥</span>
                         <span className={`text-sm font-medium transition-opacity ${mode === 'roast' ? 'opacity-100 text-white' : 'opacity-50 text-gray-400'}`}>Roast</span>
                     </button>
+
+                    {/* More (Pro only) */}
+                    {isPro && (
+                        <button
+                            onClick={() => { playSound('click'); vibrate(15); setShowModeDrawer(true); }}
+                            aria-label="Open more Pro modes"
+                            className={`flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl transition-all duration-100 active:scale-[0.97] ${!['nice', 'roast'].includes(mode) ? 'opacity-100' : 'opacity-60'}`}
+                            style={{
+                                background: !['nice', 'roast'].includes(mode) ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.05)',
+                                border: !['nice', 'roast'].includes(mode) ? '1px solid #ffd700' : '1px solid transparent'
+                            }}
+                        >
+                            <span className="text-base" aria-hidden="true">⚡</span>
+                            <span className={`text-sm font-medium ${!['nice', 'roast'].includes(mode) ? 'text-yellow-400' : 'text-gray-400'}`}>
+                                {!['nice', 'roast'].includes(mode) ? mode.charAt(0).toUpperCase() + mode.slice(1) : 'More'}
+                            </span>
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -767,6 +835,92 @@ export default function HomeScreen({
                                 Cancel
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Pro Mode Drawer */}
+            {showModeDrawer && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-end justify-center"
+                    style={{ background: 'rgba(0,0,0,0.8)' }}
+                    onClick={() => setShowModeDrawer(false)}
+                >
+                    <div
+                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                        style={{
+                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
+                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4" />
+                        <h3 className="text-white text-lg font-bold text-center mb-4">
+                            Choose Your Mode
+                        </h3>
+                        <div className="grid grid-cols-3 gap-3">
+                            {/* Honest */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
+                                style={{ background: 'rgba(74,144,217,0.2)' }}
+                            >
+                                <span className="text-2xl">📊</span>
+                                <span className="text-xs font-medium text-white/80">Honest</span>
+                            </button>
+                            {/* Savage */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
+                                style={{ background: 'rgba(139,0,255,0.2)' }}
+                            >
+                                <span className="text-2xl">💀</span>
+                                <span className="text-xs font-medium text-white/80">Savage</span>
+                            </button>
+                            {/* Rizz */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
+                                style={{ background: 'rgba(255,105,180,0.2)' }}
+                            >
+                                <span className="text-2xl">😏</span>
+                                <span className="text-xs font-medium text-white/80">Rizz</span>
+                            </button>
+                            {/* Celeb */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
+                                style={{ background: 'rgba(255,215,0,0.2)' }}
+                            >
+                                <span className="text-2xl">🎭</span>
+                                <span className="text-xs font-medium text-white/80">Celeb</span>
+                            </button>
+                            {/* Aura */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-purple-400' : ''}`}
+                                style={{ background: 'rgba(155,89,182,0.2)' }}
+                            >
+                                <span className="text-2xl">🔮</span>
+                                <span className="text-xs font-medium text-white/80">Aura</span>
+                            </button>
+                            {/* Chaos */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
+                                style={{ background: 'rgba(255,107,107,0.2)' }}
+                            >
+                                <span className="text-2xl">🎪</span>
+                                <span className="text-xs font-medium text-white/80">Chaos</span>
+                            </button>
+                        </div>
+                        <p className="text-center text-white/40 text-xs mt-4">Nice & Roast always available above</p>
+                        <button
+                            onClick={() => setShowModeDrawer(false)}
+                            className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 </div>
             )}

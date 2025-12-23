@@ -314,7 +314,9 @@ export default function ResultsScreen({
     onShowPaywall,
     playSound,
     vibrate,
-    currentEvent = null  // Weekly event context
+    currentEvent = null,  // Weekly event context
+    onStartFashionShow = null,  // Fashion Show entry
+    totalScans = 0  // Total scans user has done (for discovery timing)
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
@@ -1162,6 +1164,56 @@ export default function ResultsScreen({
                         >
                             Try Roast Mode 😈
                         </button>
+                    </div>
+                )}
+
+                {/* ===== DISCOVERY CARDS ===== */}
+                {/* Show contextual suggestions after animation completes */}
+                {animationComplete && (
+                    <div className="mt-8 flex flex-col gap-3 w-full max-w-sm mx-auto px-4">
+                        <p className="text-center text-white/30 text-xs uppercase tracking-wide">Discover</p>
+
+                        {/* Fashion Show - show after 2+ scans */}
+                        {onStartFashionShow && totalScans >= 2 && (
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
+                                className="flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
+                                    border: '1px solid rgba(139,92,246,0.3)'
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">🎭</span>
+                                    <div className="text-left">
+                                        <p className="text-white font-medium text-sm">Fashion Show</p>
+                                        <p className="text-white/50 text-[10px]">Compete with friends</p>
+                                    </div>
+                                </div>
+                                <span className="text-purple-400 text-sm">→</span>
+                            </button>
+                        )}
+
+                        {/* Pro Modes Tease - for free users */}
+                        {!isPro && (
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); onShowPaywall(); }}
+                                className="flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,140,0,0.1) 100%)',
+                                    border: '1px solid rgba(255,215,0,0.2)'
+                                }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">⚡</span>
+                                    <div className="text-left">
+                                        <p className="text-white font-medium text-sm">Unlock Pro Modes</p>
+                                        <p className="text-white/50 text-[10px]">Savage, Rizz, Aura & more</p>
+                                    </div>
+                                </div>
+                                <span className="text-yellow-400 text-[10px] font-bold bg-yellow-500/20 px-2 py-1 rounded-full">PRO</span>
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
