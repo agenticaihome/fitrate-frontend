@@ -327,6 +327,15 @@ export default function HomeScreen({
 
         playSound('click')
         vibrate(20)
+
+        // GUARD: Block free users in event mode who've used their weekly entry
+        if (eventMode && !isPro && freeEventEntryUsed) {
+            // Exit event mode and show paywall with context
+            setEventMode(false)
+            onShowPaywall()
+            return
+        }
+
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
             // PLATFORM-SPECIFIC CAMERA HANDLING:
             // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
@@ -677,10 +686,18 @@ export default function HomeScreen({
 
                     // EVENT MODE: Special styling when competing in Weekly Challenge
                     const isCompeting = eventMode && currentEvent;
+                    // ENTRY BLOCKED: Free user has used their weekly entry
+                    const entryBlocked = isCompeting && !isPro && freeEventEntryUsed;
 
                     // Choose colors based on mode
                     let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
-                    if (isCompeting) {
+                    if (entryBlocked) {
+                        // Amber/gray for blocked state
+                        buttonAccent = '#f59e0b';
+                        buttonAccentEnd = '#b45309';
+                        buttonGlow = 'rgba(245,158,11,0.3)';
+                        innerGradient = 'linear-gradient(135deg, #78716c 0%, #57534e 50%, #44403c 100%)';
+                    } else if (isCompeting) {
                         // Teal/emerald for competition mode
                         buttonAccent = '#10b981';
                         buttonAccentEnd = '#0d9488';
@@ -741,17 +758,17 @@ export default function HomeScreen({
 
                                 {/* Emoji */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
+                                    {entryBlocked ? '🔒' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
                                 {/* Main Text */}
                                 <span className="relative text-white font-black text-2xl tracking-wide uppercase text-center transition-all duration-300">
-                                    {isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
+                                    {entryBlocked ? 'ENTRY USED' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
                                 </span>
 
                                 {/* Subtitle */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
+                                    {entryBlocked ? 'Upgrade for unlimited entries!' : isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
                                 </span>
 
                                 {/* Mode Toggle or Exit Competition */}
