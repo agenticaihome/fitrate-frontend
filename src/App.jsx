@@ -19,6 +19,11 @@ import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
 import RulesScreen from './screens/RulesScreen'
 import ChallengeResultScreen from './screens/ChallengeResultScreen'
+// Fashion Show screens
+import FashionShowCreate from './screens/FashionShowCreate'
+import FashionShowJoin from './screens/FashionShowJoin'
+import FashionShowRunway from './screens/FashionShowRunway'
+import FashionShowInvite from './screens/FashionShowInvite'
 
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
@@ -136,6 +141,27 @@ export default function App() {
     const params = new URLSearchParams(window.location.search)
     return parseInt(params.get('challenge')) || null
   })
+
+  // ============================================
+  // FASHION SHOW STATE
+  // ============================================
+  const [fashionShowId, setFashionShowId] = useState(() => {
+    // Check URL for /f/:showId pattern
+    const path = window.location.pathname
+    const match = path.match(/^\/f\/([a-z0-9]{6})$/i)
+    return match ? match[1].toLowerCase() : null
+  })
+  const [fashionShowData, setFashionShowData] = useState(null)
+  const [fashionShowScreen, setFashionShowScreen] = useState(() => {
+    // If we have a show ID in URL, start in join mode
+    const path = window.location.pathname
+    const match = path.match(/^\/f\/([a-z0-9]{6})$/i)
+    return match ? 'join' : null  // null = not in fashion show mode
+  })
+  const [fashionShowNickname, setFashionShowNickname] = useState('')
+  const [fashionShowEmoji, setFashionShowEmoji] = useState('😎')
+  const [fashionShowWalks, setFashionShowWalks] = useState(0)
+  const [fashionShowLoading, setFashionShowLoading] = useState(false)
 
   // Purchased scans (from scan packs)
   const [purchasedScans, setPurchasedScans] = useState(0)
@@ -481,6 +507,41 @@ export default function App() {
       fetchUserEventStatus()
     }
   }, [currentEvent, userId])
+
+  // ============================================
+  // FASHION SHOW - Fetch show data when ID detected
+  // ============================================
+  useEffect(() => {
+    if (!fashionShowId) return
+
+    const fetchShowData = async () => {
+      setFashionShowLoading(true)
+      try {
+        const res = await fetch(`${API_BASE}/show/${fashionShowId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setFashionShowData(data)
+          // Check if user already joined (has nickname saved)
+          const savedNick = localStorage.getItem(`fashionshow_${fashionShowId}_nickname`)
+          const savedEmoji = localStorage.getItem(`fashionshow_${fashionShowId}_emoji`)
+          if (savedNick) {
+            setFashionShowNickname(savedNick)
+            setFashionShowEmoji(savedEmoji || '😎')
+            setFashionShowScreen('runway') // Go straight to runway
+          }
+        } else {
+          setFashionShowData(null) // Show not found
+        }
+      } catch (err) {
+        console.error('[FashionShow] Fetch error:', err)
+        setFashionShowData(null)
+      } finally {
+        setFashionShowLoading(false)
+      }
+    }
+
+    fetchShowData()
+  }, [fashionShowId])
 
   // Helper: Format time remaining moved to utils/dateUtils
 
@@ -990,6 +1051,30 @@ export default function App() {
         setLastScore(data.scores.overall)
 
         setScores(scores)
+
+        // ============================================
+        // FASHION SHOW: Record walk to scoreboard
+        // ============================================
+        if (fashionShowId && fashionShowNickname) {
+          try {
+            await fetch(`${API_BASE}/show/${fashionShowId}/walk`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId,
+                nickname: fashionShowNickname,
+                emoji: fashionShowEmoji,
+                score: data.scores.overall,
+                verdict: data.scores.verdict || ''
+              })
+            })
+            setFashionShowWalks(prev => prev + 1)
+            console.log(`[FashionShow] Walk recorded: ${data.scores.overall}`)
+          } catch (err) {
+            console.error('[FashionShow] Failed to record walk:', err)
+          }
+        }
+
         // If user came from a challenge link, show comparison screen first
         if (challengeScore) {
           setScreen('challenge-result')
@@ -1293,6 +1378,105 @@ export default function App() {
   }
 
   // ============================================
+  // FASHION SHOW SCREENS
+  // ============================================
+  if (fashionShowScreen === 'create') {
+    return (
+      <FashionShowCreate
+        isPro={isPro}
+        userId={userId}
+        onShowCreated={(showData) => {
+          setFashionShowData(showData)
+          setFashionShowId(showData.showId)
+          setFashionShowScreen('invite')
+        }}
+        onBack={() => {
+          setFashionShowScreen(null)
+          window.history.pushState({}, '', '/')
+        }}
+      />
+    )
+  }
+
+  if (fashionShowScreen === 'invite') {
+    return (
+      <FashionShowInvite
+        showData={fashionShowData}
+        onGoToRunway={() => {
+          setFashionShowNickname('Host')
+          setFashionShowScreen('runway')
+          window.history.pushState({}, '', `/f/${fashionShowId}`)
+        }}
+        onBack={() => {
+          setFashionShowScreen(null)
+          window.history.pushState({}, '', '/')
+        }}
+      />
+    )
+  }
+
+  if (fashionShowScreen === 'join') {
+    return (
+      <FashionShowJoin
+        showId={fashionShowId}
+        showData={fashionShowData}
+        userId={userId}
+        loading={fashionShowLoading}
+        onJoined={(result) => {
+          setFashionShowNickname(localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest')
+          setFashionShowEmoji(localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎')
+          setFashionShowScreen('runway')
+        }}
+        onShowNotFound={() => {
+          setFashionShowScreen(null)
+          window.history.pushState({}, '', '/')
+        }}
+      />
+    )
+  }
+
+  if (fashionShowScreen === 'runway') {
+    return (
+      <FashionShowRunway
+        showId={fashionShowId}
+        showData={fashionShowData}
+        userId={userId}
+        nickname={fashionShowNickname}
+        emoji={fashionShowEmoji}
+        isPro={isPro}
+        walksUsed={fashionShowWalks}
+        walksAllowed={isPro ? 3 : 1}
+        onWalkRunway={() => {
+          // Keep show context but go to camera
+          // fashionShowId and nickname stay set, so after analyze 
+          // the score will be recorded to the show
+          setFashionShowScreen(null) // Exit show UI for camera
+          setScreen('home')
+          // Note: fashionShowId, fashionShowNickname, fashionShowEmoji stay set
+        }}
+        onShare={() => {
+          const url = `https://fitrate.app/f/${fashionShowId}`
+          if (navigator.share) {
+            navigator.share({
+              title: `Join ${fashionShowData?.name}`,
+              text: `🎭 Join my Fashion Show on FitRate!`,
+              url
+            })
+          } else {
+            navigator.clipboard.writeText(url)
+          }
+        }}
+        onBack={() => {
+          setFashionShowScreen(null)
+          setFashionShowId(null)
+          setFashionShowData(null)
+          window.history.pushState({}, '', '/')
+        }}
+      />
+    )
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
@@ -1325,6 +1509,7 @@ export default function App() {
         onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
         onShowRules={() => setShowEventRules(true)}
         onError={(msg) => { setError(msg); setScreen('error'); }}
+        onStartFashionShow={() => setFashionShowScreen('create')}
       />
     )
   }

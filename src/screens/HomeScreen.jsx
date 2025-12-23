@@ -29,7 +29,8 @@ export default function HomeScreen({
     onShowLeaderboard,
     onShowRules,
     onShowRestore,      // Show restore Pro modal
-    onError
+    onError,
+    onStartFashionShow  // Start Fashion Show flow
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -893,6 +894,19 @@ export default function HomeScreen({
                         <span aria-hidden="true">📖</span> Rules
                     </button>
                 </div>
+            )}
+
+            {/* Fashion Show Entry Point */}
+            {onStartFashionShow && (
+                <button
+                    onClick={() => { onStartFashionShow(); vibrate(20); playSound('click'); }}
+                    aria-label="Start a Fashion Show with friends"
+                    className="mt-4 px-4 py-2.5 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-colors flex items-center gap-2"
+                >
+                    <span className="text-lg">🎭</span>
+                    <span className="text-sm font-semibold text-purple-300">Fashion Show</span>
+                    <span className="text-[10px] text-purple-400/70 ml-1">with friends</span>
+                </button>
             )}
 
             {/* Trust Message */}
