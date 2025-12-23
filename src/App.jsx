@@ -1691,6 +1691,7 @@ export default function App() {
         currentEvent={currentEvent}
         leaderboard={leaderboard}
         userEventStatus={userEventStatus}
+        userId={userId}
         isPro={isPro}
         freeEventEntryUsed={freeEventEntryUsed}
         onCompete={() => {
@@ -1739,7 +1740,7 @@ export default function App() {
           onShowRestore={() => setShowRestoreModal(true)}
           onError={(msg) => { setError(msg); setScreen('error'); }}
           onStartFashionShow={() => setFashionShowScreen('create')}
-          onShowWeeklyChallenge={() => { fetchLeaderboard(); setScreen('weekly-challenge'); }}
+          onShowWeeklyChallenge={() => { fetchLeaderboard(); fetchUserEventStatus(); setScreen('weekly-challenge'); }}
           pendingFashionShowWalk={pendingFashionShowWalk}
           onClearPendingWalk={() => setPendingFashionShowWalk(false)}
           fashionShowName={fashionShowData?.name}
@@ -1782,6 +1783,7 @@ export default function App() {
           onNavigate={(tab) => {
             if (tab === 'gala') {
               fetchLeaderboard();
+              fetchUserEventStatus();
               setScreen('weekly-challenge');
             }
             // 'home' tab is already current, no action needed
@@ -1884,6 +1886,7 @@ export default function App() {
               setScreen('home');
             } else if (tab === 'gala') {
               fetchLeaderboard();
+              fetchUserEventStatus();
               setScreen('weekly-challenge');
             }
           }}
