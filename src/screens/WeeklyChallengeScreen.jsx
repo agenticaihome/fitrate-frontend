@@ -43,10 +43,9 @@ export default function WeeklyChallengeScreen({
     const hasSubmitted = userEventStatus?.participating
 
     return (
-        <div className="min-h-screen flex flex-col p-6 bg-[#0a0a0f] text-white" style={{
+        <div className="min-h-screen flex flex-col p-6 pb-28 bg-[#0a0a0f] text-white" style={{
             background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-            paddingTop: 'max(24px, env(safe-area-inset-top))',
-            paddingBottom: 'max(24px, env(safe-area-inset-bottom))'
+            paddingTop: 'max(24px, env(safe-area-inset-top))'
         }}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -61,21 +60,21 @@ export default function WeeklyChallengeScreen({
             </div>
 
             {/* Theme Showcase */}
-            <div className="text-center mb-8">
-                <span className="text-7xl mb-4 block">{currentEvent.themeEmoji}</span>
-                <h1 className="text-3xl font-black text-white mb-2">{currentEvent.theme}</h1>
-                <p className="text-white/50 text-sm">Dress to impress. Top 5 get crowned.</p>
+            <div className="text-center mb-6">
+                <span className="text-5xl md:text-6xl mb-3 block">{currentEvent.themeEmoji}</span>
+                <h1 className="text-2xl md:text-3xl font-black text-white mb-1 leading-tight">{currentEvent.theme}</h1>
+                <p className="text-white/50 text-xs md:text-sm">Dress to impress. Top 5 get crowned.</p>
             </div>
 
             {/* Countdown Timer */}
-            <div className="flex items-center justify-center gap-2 mb-8 px-6 py-4 rounded-2xl mx-auto" style={{
+            <div className="flex items-center justify-center gap-2 mb-6 px-4 py-3 rounded-xl mx-auto" style={{
                 background: 'rgba(16, 185, 129, 0.1)',
                 border: '1px solid rgba(16, 185, 129, 0.3)'
             }}>
-                <span className="text-2xl">⏱️</span>
+                <span className="text-xl">⏱️</span>
                 <div className="text-center">
-                    <p className="text-emerald-400 font-bold text-lg">{formatTimeRemaining(currentEvent.endDate)}</p>
-                    <p className="text-white/40 text-xs">until challenge ends</p>
+                    <p className="text-emerald-400 font-bold text-base">{formatTimeRemaining(currentEvent.endDate)}</p>
+                    <p className="text-white/40 text-[10px]">until challenge ends</p>
                 </div>
             </div>
 

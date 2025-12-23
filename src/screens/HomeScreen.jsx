@@ -761,8 +761,9 @@ export default function HomeScreen({
                                     {entryBlocked ? '🔒' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
-                                {/* Main Text */}
-                                <span className="relative text-white font-black text-2xl tracking-wide uppercase text-center transition-all duration-300">
+                                {/* Main Text - size based on length for long theme names */}
+                                <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
+                                    }`}>
                                     {entryBlocked ? 'ENTRY USED' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
                                 </span>
 
