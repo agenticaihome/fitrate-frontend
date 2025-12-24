@@ -972,37 +972,6 @@ export default function ResultsScreen({
                             </div>
                         </div>
                     </div>
-
-                    {/* Stats - Takes 2 columns - Now with contribution weights */}
-                    <div className="col-span-2 flex flex-col gap-2">
-                        <StatPill
-                            label="Color"
-                            displayLabel="Color Pop"
-                            value={scores.color}
-                            icon="🎨"
-                            delay={0.1}
-                            color="#ff6b9d"
-                            contribution={Math.round(scores.color * 0.25)}
-                        />
-                        <StatPill
-                            label="Fit"
-                            displayLabel="Silhouette"
-                            value={scores.fit}
-                            icon="📐"
-                            delay={0.2}
-                            color="#00d4ff"
-                            contribution={Math.round(scores.fit * 0.35)}
-                        />
-                        <StatPill
-                            label="Style"
-                            displayLabel="Cohesion"
-                            value={scores.style}
-                            icon="✨"
-                            delay={0.3}
-                            color="#ffd700"
-                            contribution={Math.round(scores.style * 0.40)}
-                        />
-                    </div>
                 </div>
             </div>
 
