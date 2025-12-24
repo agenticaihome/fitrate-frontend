@@ -27,6 +27,56 @@
   /* Cyan dot accent */
   --brand-gradient: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-purple-mid) 50%, var(--brand-blue) 100%);
 
+  /* ================================================ */
+  /* AI MODE THEME COLORS                             */
+  /* Each mode has distinct accent for Results Page   */
+  /* ================================================ */
+  
+  /* Nice Mode - Supportive green */
+  --mode-nice-accent: #00ff88;
+  --mode-nice-accent2: #00d4ff;
+  --mode-nice-glow: rgba(0, 255, 136, 0.4);
+  
+  /* Roast Mode - Brutal orange */
+  --mode-roast-accent: #ff6b35;
+  --mode-roast-accent2: #ff0080;
+  --mode-roast-glow: rgba(255, 107, 53, 0.4);
+  
+  /* Honest Mode - Balanced blue */
+  --mode-honest-accent: #3b82f6;
+  --mode-honest-accent2: #06b6d4;
+  --mode-honest-glow: rgba(59, 130, 246, 0.4);
+  
+  /* Savage Mode - Maximum hot pink */
+  --mode-savage-accent: #ff1493;
+  --mode-savage-accent2: #ff0066;
+  --mode-savage-glow: rgba(255, 20, 147, 0.4);
+  
+  /* Rizz Mode - Dating pink */
+  --mode-rizz-accent: #ff69b4;
+  --mode-rizz-accent2: #ff1493;
+  --mode-rizz-glow: rgba(255, 105, 180, 0.4);
+  
+  /* Celeb Mode - Golden judgment */
+  --mode-celeb-accent: #ffd700;
+  --mode-celeb-accent2: #ff8c00;
+  --mode-celeb-glow: rgba(255, 215, 0, 0.4);
+  
+  /* Aura Mode - Spiritual purple */
+  --mode-aura-accent: #9b59b6;
+  --mode-aura-accent2: #8b5cf6;
+  --mode-aura-glow: rgba(155, 89, 182, 0.4);
+  
+  /* Chaos Mode - Absurdist red */
+  --mode-chaos-accent: #ff4444;
+  --mode-chaos-accent2: #ff6b6b;
+  --mode-chaos-glow: rgba(255, 68, 68, 0.4);
+  
+  /* Event Mode - Weekly challenge teal */
+  --mode-event-accent: #10b981;
+  --mode-event-accent2: #06b6d4;
+  --mode-event-glow: rgba(16, 185, 129, 0.4);
+
   /* Accessibility: Focus ring colors */
   --focus-color: #00d4ff;
   --focus-color-alt: #00ff88;
