@@ -1177,19 +1177,21 @@ export default function HomeScreen({
                                 <span className="text-2xl">📷</span>
                                 Take Photo
                             </button>
-                            {/* Upload Photo Button */}
-                            <button
-                                onClick={handleAndroidUploadPhoto}
-                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
-                                style={{
-                                    background: 'rgba(255,255,255,0.1)',
-                                    color: '#fff',
-                                    border: '1px solid rgba(255,255,255,0.2)'
-                                }}
-                            >
-                                <span className="text-2xl">🖼️</span>
-                                Upload Photo
-                            </button>
+                            {/* Upload Photo Button - HIDDEN for Events/Fashion Shows (camera only!) */}
+                            {!eventMode && !fashionShowId && (
+                                <button
+                                    onClick={handleAndroidUploadPhoto}
+                                    className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.1)',
+                                        color: '#fff',
+                                        border: '1px solid rgba(255,255,255,0.2)'
+                                    }}
+                                >
+                                    <span className="text-2xl">🖼️</span>
+                                    Upload Photo
+                                </button>
+                            )}
                             {/* Cancel Button */}
                             <button
                                 onClick={() => setShowAndroidPhotoModal(false)}
