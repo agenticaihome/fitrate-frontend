@@ -1,7 +1,7 @@
 {
-  "name": "FitRate - AI Outfit Rating",
+  "name": "FitRate - AI Fit Check",
   "short_name": "FitRate",
-  "description": "Get instant AI ratings on your outfits. The Umax for fashion.",
+  "description": "Get rated. Get roasted. Get sharing. Your AI fit check in seconds.",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#0a0a0f",
@@ -33,7 +33,11 @@
       "purpose": "maskable"
     }
   ],
-  "categories": ["lifestyle", "social", "fashion"],
+  "categories": [
+    "lifestyle",
+    "social",
+    "fashion"
+  ],
   "dir": "ltr",
   "lang": "en-US",
   "prefer_related_applications": false,
@@ -42,7 +46,12 @@
       "name": "Check Fit",
       "url": "/?source=shortcut",
       "description": "Rate your outfit with AI",
-      "icons": [{ "src": "/icon-192.svg", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

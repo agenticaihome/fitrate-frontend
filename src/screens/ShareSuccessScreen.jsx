@@ -59,6 +59,13 @@ export default function ShareSuccessScreen({
             setCopied(true)
             vibrate(20)
             setTimeout(() => setCopied(false), 2000)
+
+            // Track share for analytics
+            fetch(`${import.meta.env.VITE_API_URL || 'https://fitrate.app/api'}/referral/share`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            }).catch(() => { }) // Silent fail
         } catch (err) {
             console.error('Failed to copy:', err)
         }

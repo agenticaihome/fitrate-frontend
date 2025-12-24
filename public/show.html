@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a0a2e" />
+
+    <title>Fashion Show — Walk the Runway with Friends | FitRate</title>
+    <meta name="description"
+        content="Join the Fashion Show! Walk the runway with friends and let AI judge your fits. Who has the best style?" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fitrate.app/show" />
+    <meta property="og:title" content="🎭 Fashion Show — Walk the Runway" />
+    <meta property="og:description"
+        content="You're invited to the runway! Join the Fashion Show and let AI judge your fit." />
+    <meta property="og:image" content="https://fitrate.app/og/fashion-show.png?v=1" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="FitRate" />
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@AgenticAIHome" />
+    <meta name="twitter:url" content="https://fitrate.app/show" />
+    <meta name="twitter:title" content="🎭 Fashion Show — Walk the Runway" />
+    <meta name="twitter:description"
+        content="You're invited to the runway! Join the Fashion Show and let AI judge your fit." />
+    <meta name="twitter:image" content="https://fitrate.app/og/fashion-show.png?v=1" />
+
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0f;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .loading {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script>
+        // Redirect to main app with Fashion Show params preserved
+        const params = new URLSearchParams(window.location.search);
+        const showId = params.get('fs') || params.get('id');
+        if (showId) {
+            window.location.replace('/?fs=' + showId);
+        } else {
+            window.location.replace('/');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>Joining the runway...</p>
+    </div>
+</body>
+
+</html>

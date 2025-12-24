@@ -448,6 +448,52 @@ export default function App() {
     }
   }, [userId])
 
+  // Poll for referral notifications (when someone uses your link)
+  useEffect(() => {
+    if (!userId) return
+
+    // Check on focus (when user comes back to app)
+    const checkNotifications = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/referral/notifications?userId=${userId}`)
+        const data = await res.json()
+        if (data.success && data.notifications?.length > 0) {
+          data.notifications.forEach(n => {
+            if (n.type === 'referral_claimed') {
+              if (n.newRoastEarned) {
+                displayToast('🔥 Savage Roast unlocked! Someone used your link!')
+                playSound('legendary')
+                vibrate([100, 50, 100])
+              } else {
+                displayToast(`🎉 Someone used your link! (${n.sharesUntilNext} more for Savage Roast)`)
+                vibrate(30)
+              }
+              // Update local referral count
+              if (n.totalReferrals) {
+                setTotalReferrals(n.totalReferrals)
+                localStorage.setItem('fitrate_total_referrals', n.totalReferrals.toString())
+              }
+            }
+          })
+        }
+      } catch (err) {
+        console.warn('Notification check failed:', err)
+      }
+    }
+
+    // Check on focus
+    const handleFocus = () => checkNotifications()
+    window.addEventListener('focus', handleFocus)
+
+    // Also poll every 30 seconds
+    const pollInterval = setInterval(checkNotifications, 30000)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      clearInterval(pollInterval)
+    }
+  }, [userId])
+
   // Offline/Online detection
   useEffect(() => {
     const handleOffline = () => displayToast('No internet connection 📵')

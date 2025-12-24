@@ -558,7 +558,7 @@ export default function HomeScreen({
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Header with Logo and Profile */}
-            <div className="w-full flex items-center justify-between px-4 mb-6">
+            <div className="w-full flex items-center justify-between px-4 mb-2">
                 {/* Empty spacer for centering */}
                 <div className="w-10" />
 
@@ -568,7 +568,9 @@ export default function HomeScreen({
                     alt="FitRate"
                     className="h-12"
                     style={{
-                        filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
+                        filter: isPro || purchasedScans > 0
+                            ? 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.4))'
+                            : 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
                     }}
                 />
 
@@ -584,6 +586,36 @@ export default function HomeScreen({
                 >
                     <span className="text-white/60 text-lg">⚙️</span>
                 </button>
+            </div>
+
+            {/* Pro/Free Status Badge */}
+            <div className="flex justify-center mb-4">
+                {isPro || purchasedScans > 0 ? (
+                    <div
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,180,0,0.1) 100%)',
+                            border: '1px solid rgba(255,215,0,0.4)',
+                            boxShadow: '0 0 20px rgba(255,215,0,0.2)'
+                        }}
+                    >
+                        <span className="text-lg">👑</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-yellow-400">Pro Mode</span>
+                        <span className="text-[9px] font-bold text-yellow-400/60">GPT-4o</span>
+                    </div>
+                ) : (
+                    <div
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                        style={{
+                            background: 'rgba(0,212,255,0.08)',
+                            border: '1px solid rgba(0,212,255,0.25)',
+                        }}
+                    >
+                        <span className="text-sm">⚡</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">Free</span>
+                        <span className="text-[9px] font-bold text-cyan-400/60">Gemini Flash</span>
+                    </div>
+                )}
             </div>
 
             {/* Install Banner moved to footer - not above-fold */}
@@ -697,6 +729,9 @@ export default function HomeScreen({
                     // ENTRY BLOCKED: Free user has used their weekly entry
                     const entryBlocked = isCompeting && !isPro && freeEventEntryUsed;
 
+                    // Pro Flow: User has Pro subscription OR purchased scans
+                    const isProFlow = isPro || purchasedScans > 0;
+
                     // Choose colors based on mode
                     let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
                     if (entryBlocked) {
@@ -711,6 +746,14 @@ export default function HomeScreen({
                         buttonAccentEnd = '#0d9488';
                         buttonGlow = 'rgba(16,185,129,0.5)';
                         innerGradient = 'linear-gradient(135deg, #10b981 0%, #0d9488 50%, #047857 100%)';
+                    } else if (isProFlow) {
+                        // GOLD for Pro users - premium feel
+                        buttonAccent = '#ffd700';
+                        buttonAccentEnd = '#ff8c00';
+                        buttonGlow = 'rgba(255,215,0,0.5)';
+                        innerGradient = isRoast
+                            ? 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)'
+                            : 'linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #cc7000 100%)';
                     } else if (isRoast) {
                         buttonAccent = '#ff6b35';
                         buttonAccentEnd = '#ff4444';
@@ -823,8 +866,8 @@ export default function HomeScreen({
                                         {/* Nice option */}
                                         <div
                                             className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'nice'
-                                                    ? 'bg-cyan-500/30 border border-cyan-400/50'
-                                                    : 'opacity-50'
+                                                ? 'bg-cyan-500/30 border border-cyan-400/50'
+                                                : 'opacity-50'
                                                 }`}
                                         >
                                             <span className="text-base">😇</span>
@@ -834,8 +877,8 @@ export default function HomeScreen({
                                         {/* Roast option */}
                                         <div
                                             className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'roast'
-                                                    ? 'bg-orange-500/30 border border-orange-400/50'
-                                                    : 'opacity-50'
+                                                ? 'bg-orange-500/30 border border-orange-400/50'
+                                                : 'opacity-50'
                                                 }`}
                                         >
                                             <span className="text-base">🔥</span>
