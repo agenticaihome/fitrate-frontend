@@ -13,6 +13,7 @@ export default function HomeScreen({
     dailyStreak,
     currentEvent,
     eventMode,
+    dailyChallengeMode,  // Daily challenge mode flag
     setEventMode,
     purchasedScans,
     challengeScore,
@@ -691,6 +692,22 @@ export default function HomeScreen({
                     )}
                     <p className="text-xs text-purple-300/70">
                         Take a photo to submit your fit!
+                    </p>
+                </div>
+            )}
+
+            {/* Daily Challenge Context Banner */}
+            {dailyChallengeMode && !fashionShowName && (
+                <div className="w-full max-w-sm p-4 rounded-2xl text-center mb-4" style={{
+                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.15) 100%)',
+                    border: '1px solid rgba(59,130,246,0.4)'
+                }}>
+                    <p className="text-lg font-bold text-white mb-1">⚡ Daily Challenge</p>
+                    <p className="text-sm text-blue-400 font-semibold mb-1">
+                        Get the highest score today!
+                    </p>
+                    <p className="text-xs text-blue-300/70">
+                        #1 wins 5 free Pro scans 🎁
                     </p>
                 </div>
             )}

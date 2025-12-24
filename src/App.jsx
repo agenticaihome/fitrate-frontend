@@ -316,6 +316,7 @@ export default function App() {
   const [currentEvent, setCurrentEvent] = useState(null)
   const [upcomingEvent, setUpcomingEvent] = useState(null)
   const [eventMode, setEventMode] = useState(false) // Default: opt-out of event, show normal mode
+  const [dailyChallengeMode, setDailyChallengeMode] = useState(false) // Daily challenge mode
   const [userEventStatus, setUserEventStatus] = useState(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [leaderboard, setLeaderboard] = useState([]) // Weekly challenge leaderboard
@@ -1306,6 +1307,10 @@ export default function App() {
           }
         }
 
+        // Reset challenge modes after scan
+        setDailyChallengeMode(false)
+        setEventMode(false)
+
         // If user came from a challenge link, show comparison screen first
         if (challengeScore) {
           setScreen('challenge-result')
@@ -1874,9 +1879,12 @@ export default function App() {
         freeEventEntryUsed={freeEventEntryUsed}
         // Actions
         onCompeteDaily={() => {
+          setDailyChallengeMode(true)
+          setEventMode(false)
           setScreen('home')
         }}
         onCompeteWeekly={() => {
+          setDailyChallengeMode(false)
           setEventMode(true)
           setScreen('home')
         }}
@@ -1905,6 +1913,7 @@ export default function App() {
           dailyStreak={dailyStreak}
           currentEvent={currentEvent}
           eventMode={eventMode}
+          dailyChallengeMode={dailyChallengeMode}
           setEventMode={setEventMode}
           purchasedScans={purchasedScans}
           challengeScore={challengeScore}
