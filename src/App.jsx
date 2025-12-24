@@ -1934,9 +1934,20 @@ export default function App() {
       <ErrorScreen
         error={error}
         errorCode={errorCode}
-        onReset={resetApp}
+        onReset={() => {
+          // Clear error state and go home
+          setError(null)
+          setErrorCode(null)
+          setIsAnalyzing(false)
+          setScreen('home')
+        }}
         onUpgrade={() => setShowPaywall(true)}
-        onHome={() => setScreen('home')}
+        onHome={() => {
+          setError(null)
+          setErrorCode(null)
+          setIsAnalyzing(false)
+          setScreen('home')
+        }}
       />
     )
   }
