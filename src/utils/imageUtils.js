@@ -11,6 +11,9 @@
 // Detect iOS devices
 const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream;
 
+// Development mode check
+const isDev = import.meta.env.DEV;
+
 // Track blob URLs for cleanup
 const activeBlobUrls = new Set();
 
@@ -60,7 +63,7 @@ export const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
                 canvas.width = 0;
                 canvas.height = 0;
 
-                if (iosMode) {
+                if (iosMode && isDev) {
                     console.log(`[iOS] Image compressed: ${img.width}x${img.height} → ${width}x${height} @ ${targetQuality} quality`);
                 }
 
@@ -115,7 +118,7 @@ export const cleanupBlobUrls = () => {
         }
     });
     activeBlobUrls.clear();
-    console.log('[Memory] Blob URLs cleaned up');
+    if (isDev) console.log('[Memory] Blob URLs cleaned up');
 }
 
 /**
@@ -200,7 +203,7 @@ export const createThumbnail = (imageDataUrl, maxSize = 150, quality = 0.6) => {
                 canvas.width = 0;
                 canvas.height = 0;
 
-                console.log(`[Thumbnail] Created ${width}x${height} (${sizeKB}KB)`);
+                if (isDev) console.log(`[Thumbnail] Created ${width}x${height} (${sizeKB}KB)`);
                 resolve(thumbnailDataUrl);
             } catch (err) {
                 console.error('[Thumbnail] Creation failed:', err);

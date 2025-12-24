@@ -128,7 +128,6 @@ export default function FashionShowInvite({
             </div>
 
             {/* Show Info */}
-            {console.log('[FashionShowInvite] showData:', showData)}
             <div className="w-full max-w-sm flex items-center justify-center gap-3 text-white/50 text-sm mb-8">
                 <span className="px-3 py-1 rounded-full bg-white/10">
                     {showData?.vibeLabel || (showData?.vibe === 'roast' ? 'Roast 🔥' : showData?.vibe === 'nice' ? 'Nice 😇' : showData?.vibe) || 'Nice 😇'}
