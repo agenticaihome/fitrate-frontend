@@ -785,8 +785,20 @@ export default function ResultsScreen({
                         boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 40px ${ringColors.glow}`
                     }}
                 >
-                    {/* Bold Headline Roast */}
+                    {/* THE VERDICT Label */}
+                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">
+                        The Verdict
+                    </p>
+
+                    {/* Verdict Name + Tier Emoji */}
                     <h1 className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
+                        <span className="mr-2">
+                            {scoreTier === 'legendary' ? '👑' :
+                                scoreTier === 'fire' ? '🔥' :
+                                    scoreTier === 'great' ? '✨' :
+                                        scoreTier === 'good' ? '👍' :
+                                            scoreTier === 'mid' ? '😐' : '💀'}
+                        </span>
                         {scores.verdict}
                     </h1>
 
@@ -816,6 +828,21 @@ export default function ResultsScreen({
                         <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
                         <p className="text-xs text-white/40 mt-1">Top {Math.max(1, 100 - scores.percentile)}% of all fits today</p>
                     </div>
+
+                    {/* Pull-Quote Strip - Mode-Themed */}
+                    {scores.tagline && (
+                        <div
+                            className="mt-4 pt-3 border-t"
+                            style={{ borderColor: `${modeColors.accent}22` }}
+                        >
+                            <p
+                                className="text-sm italic"
+                                style={{ color: `${modeColors.accent}cc` }}
+                            >
+                                "{scores.tagline}"
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
 
