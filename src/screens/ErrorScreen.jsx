@@ -91,7 +91,18 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHo
 
             <div className="w-full max-w-xs space-y-3">
                 <button
-                    onClick={onReset}
+                    onClick={() => {
+                        // Haptic feedback to confirm click
+                        if (navigator.vibrate) navigator.vibrate(20);
+
+                        // Try the provided handler, or fall back to page reload
+                        if (onReset) {
+                            onReset();
+                        } else {
+                            // Nuclear option - full reload
+                            window.location.href = '/';
+                        }
+                    }}
                     className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg transition-all active:scale-95"
                     style={{ boxShadow: 'var(--shadow-physical)' }}
                 >
@@ -108,15 +119,20 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHo
                 )}
 
                 {/* Home Button - Always Available Escape Route */}
-                {onHome && (
-                    <button
-                        onClick={onHome}
-                        className="w-full py-3 mt-2 text-sm font-medium transition-all active:opacity-60"
-                        style={{ color: 'rgba(255,255,255,0.4)' }}
-                    >
-                        ← Back to Home
-                    </button>
-                )}
+                <button
+                    onClick={() => {
+                        if (navigator.vibrate) navigator.vibrate(20);
+                        if (onHome) {
+                            onHome();
+                        } else {
+                            window.location.href = '/';
+                        }
+                    }}
+                    className="w-full py-3 mt-2 text-sm font-medium transition-all active:opacity-60"
+                    style={{ color: 'rgba(255,255,255,0.4)' }}
+                >
+                    ← Back to Home
+                </button>
             </div>
         </div>
     )
