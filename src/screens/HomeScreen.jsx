@@ -877,13 +877,13 @@ export default function HomeScreen({
 
                                 {/* Emoji */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {entryBlocked ? '🔒' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
+                                    {entryBlocked ? '🔒' : dailyChallengeMode ? '⚡' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
                                 {/* Main Text - size based on length for long theme names */}
                                 <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
                                     }`}>
-                                    {entryBlocked ? 'ENTRY USED' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
+                                    {entryBlocked ? 'ENTRY USED' : dailyChallengeMode ? 'DAILY CHALLENGE' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
                                 </span>
 
                                 {/* Subtitle - changes based on mode */}
@@ -950,13 +950,14 @@ export default function HomeScreen({
                                 {/* Challenge Mode Banner - Shows when in challenge mode (from ChallengesScreen) */}
                                 {(dailyChallengeMode || (eventMode && currentEvent)) && (
                                     <div
-                                        className="mt-3 px-4 py-2 rounded-xl text-center"
+                                        className="mt-3 px-4 py-2 rounded-xl text-center relative"
                                         style={{
                                             background: dailyChallengeMode
                                                 ? 'rgba(59,130,246,0.2)'
                                                 : 'rgba(16,185,129,0.2)',
                                             border: `1px solid ${dailyChallengeMode ? 'rgba(59,130,246,0.4)' : 'rgba(16,185,129,0.4)'}`
                                         }}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         <p className="text-sm font-bold" style={{
                                             color: dailyChallengeMode ? '#3b82f6' : '#10b981'
@@ -966,6 +967,21 @@ export default function HomeScreen({
                                         <p className="text-[10px] text-white/50 mt-0.5">
                                             {dailyChallengeMode ? 'Highest score wins!' : 'Match the theme!'}
                                         </p>
+                                        {/* Exit Challenge Button */}
+                                        <button
+                                            onClick={() => {
+                                                playSound('click')
+                                                vibrate(15)
+                                                if (dailyChallengeMode) {
+                                                    setDailyChallengeMode?.(false)
+                                                } else {
+                                                    setEventMode(false)
+                                                }
+                                            }}
+                                            className="mt-2 text-xs text-white/40 hover:text-white/60 transition-colors"
+                                        >
+                                            ✕ Exit Challenge
+                                        </button>
                                     </div>
                                 )}
                             </button>
