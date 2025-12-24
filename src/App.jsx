@@ -1855,6 +1855,7 @@ export default function App() {
           setScreen('home')
         }}
         onShowPaywall={() => setShowPaywall(true)}
+        onShowFullLeaderboard={() => setShowLeaderboard(true)}
         onBack={() => setScreen('home')}
       />
     )
@@ -1891,7 +1892,6 @@ export default function App() {
             analyzeOutfit(img, scanType)
           }}
           onShowPaywall={() => setShowPaywall(true)}
-          onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
           onShowRules={() => setShowEventRules(true)}
           onShowRestore={() => setShowRestoreModal(true)}
           onError={(msg) => { setError(msg); setScreen('error'); }}
@@ -2211,10 +2211,7 @@ export default function App() {
   }
 
   // ============================================
-  // LEADERBOARD MODAL
-  // ============================================
-  // ============================================
-  // LEADERBOARD MODAL
+  // LEADERBOARD MODAL (Full view from Weekly Challenge)
   // ============================================
   if (showLeaderboard) {
     return (

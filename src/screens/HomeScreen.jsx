@@ -3,7 +3,6 @@ import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
-import LeaderboardCard from '../components/LeaderboardCard'
 
 export default function HomeScreen({
     mode,
@@ -26,7 +25,6 @@ export default function HomeScreen({
     freeEventEntryUsed,  // Track if free user has used their weekly entry
     onImageSelected,
     onShowPaywall,
-    onShowLeaderboard,
     onShowRules,
     onShowRestore,          // Show restore Pro modal
     onError,
@@ -699,17 +697,6 @@ export default function HomeScreen({
 
             {/* Streak moved to bottom area - cleaner above-fold */}
 
-            {/* Today's Top Fits Leaderboard - show when not in Fashion Show mode */}
-            {!fashionShowName && !eventMode && (
-                <div className="w-full max-w-sm px-4 mb-4">
-                    <LeaderboardCard
-                        playSound={playSound}
-                        vibrate={vibrate}
-                        onViewFull={onShowLeaderboard}
-                    />
-                </div>
-            )}
-
             {/* MAIN ACTION CTA */}
             <div className="flex-1 flex flex-col items-center justify-center">
                 {/* Out of scans state */}
@@ -757,18 +744,18 @@ export default function HomeScreen({
                                 </button>
                             )}
 
-                            {/* Leaderboard */}
-                            {currentEvent && (
+                            {/* Weekly Challenge */}
+                            {currentEvent && onShowWeeklyChallenge && (
                                 <button
-                                    onClick={() => { playSound('click'); vibrate(10); onShowLeaderboard(); }}
+                                    onClick={() => { playSound('click'); vibrate(10); onShowWeeklyChallenge(); }}
                                     className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all active:scale-95"
                                     style={{
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(255,255,255,0.1)'
+                                        background: 'rgba(16, 185, 129, 0.15)',
+                                        border: '1px solid rgba(16, 185, 129, 0.3)'
                                     }}
                                 >
                                     <span>🏆</span>
-                                    <span className="text-white/70 font-medium">View Leaderboard</span>
+                                    <span className="text-emerald-300 font-medium">Weekly Challenge</span>
                                 </button>
                             )}
                         </div>
