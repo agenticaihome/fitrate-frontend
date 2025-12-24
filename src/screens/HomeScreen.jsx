@@ -34,8 +34,11 @@ export default function HomeScreen({
     pendingFashionShowWalk, // Auto-trigger camera for Fashion Show walk
     onClearPendingWalk,     // Clear the pending walk flag
     fashionShowName,        // Name of current Fashion Show (for display)
+    fashionShowVibe,        // Vibe/mode of current Fashion Show
+    fashionShowVibeLabel,   // Human-readable vibe label
     activeShows = [],       // User's active Fashion Shows
-    onNavigateToShow        // Navigate to a specific Fashion Show
+    onNavigateToShow,       // Navigate to a specific Fashion Show
+    onRemoveShow            // Remove a show from the list
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -598,13 +601,18 @@ export default function HomeScreen({
                 </div>
             )}
 
-            {/* Fashion Show Walk Context Banner */}
+            {/* Fashion Show Walk Context Banner - shows active mode */}
             {fashionShowName && (
                 <div className="w-full max-w-sm p-4 rounded-2xl text-center mb-4" style={{
                     background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
                     border: '1px solid rgba(139,92,246,0.4)'
                 }}>
                     <p className="text-lg font-bold text-white mb-1">🎭 Walking in "{fashionShowName}"</p>
+                    {fashionShowVibe && (
+                        <p className="text-sm text-purple-400 font-semibold mb-1">
+                            ⚡ {fashionShowVibeLabel || fashionShowVibe.charAt(0).toUpperCase() + fashionShowVibe.slice(1)} Mode Active
+                        </p>
+                    )}
                     <p className="text-xs text-purple-300/70">
                         Take a photo to submit your fit!
                     </p>
@@ -792,11 +800,12 @@ export default function HomeScreen({
                                     </div>
                                 ) : (
                                     <div
-                                        className={`relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
+                                        className={`relative mt-4 rounded-full flex items-center cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
                                         style={{
-                                            background: 'rgba(0,0,0,0.4)',
+                                            background: 'rgba(0,0,0,0.5)',
                                             backdropFilter: 'blur(10px)',
-                                            border: '1px solid rgba(255,255,255,0.2)'
+                                            border: '2px solid rgba(255,255,255,0.25)',
+                                            padding: '4px'
                                         }}
                                         onClick={(e) => {
                                             e.stopPropagation()
@@ -811,9 +820,32 @@ export default function HomeScreen({
                                             }
                                         }}
                                     >
-                                        <span className="text-lg">{mode === 'roast' ? '😇' : '🔥'}</span>
-                                        <span className="text-lg">{mode === 'roast' ? '🔥' : '😇'}</span>
-                                        <span className="text-white font-semibold">{mode === 'roast' ? 'Roast' : 'Nice'}</span>
+                                        {/* Nice option */}
+                                        <div
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'nice'
+                                                    ? 'bg-cyan-500/30 border border-cyan-400/50'
+                                                    : 'opacity-50'
+                                                }`}
+                                        >
+                                            <span className="text-base">😇</span>
+                                            <span className={`font-bold text-sm ${mode === 'nice' ? 'text-cyan-300' : 'text-white/40'}`}>Nice</span>
+                                        </div>
+
+                                        {/* Roast option */}
+                                        <div
+                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'roast'
+                                                    ? 'bg-orange-500/30 border border-orange-400/50'
+                                                    : 'opacity-50'
+                                                }`}
+                                        >
+                                            <span className="text-base">🔥</span>
+                                            <span className={`font-bold text-sm ${mode === 'roast' ? 'text-orange-300' : 'text-white/40'}`}>Roast</span>
+                                        </div>
+
+                                        {/* Hint text for first-time users */}
+                                        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white/40 whitespace-nowrap">
+                                            tap to switch
+                                        </span>
                                     </div>
                                 )}
                             </button>
@@ -850,28 +882,48 @@ export default function HomeScreen({
                     </div>
                     <div className="space-y-2">
                         {activeShows.map((show) => (
-                            <button
+                            <div
                                 key={show.showId}
-                                onClick={() => {
-                                    playSound('click')
-                                    vibrate(15)
-                                    onNavigateToShow?.(show.showId)
-                                }}
-                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all active:scale-[0.98]"
+                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all"
                                 style={{
                                     background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.1) 100%)',
                                     border: '1px solid rgba(139,92,246,0.25)'
                                 }}
                             >
-                                <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(15)
+                                        onNavigateToShow?.(show.showId)
+                                    }}
+                                    className="flex items-center gap-3 flex-1 text-left"
+                                >
                                     <span className="text-2xl">🎭</span>
-                                    <div className="text-left">
+                                    <div>
                                         <p className="text-white font-semibold text-sm">{show.name}</p>
-                                        <p className="text-purple-300/60 text-[10px]">Tap to rejoin</p>
+                                        <p className="text-purple-300/60 text-[10px]">
+                                            {show.vibeLabel || 'Nice 😌'} • Tap to rejoin
+                                        </p>
                                     </div>
-                                </div>
-                                <span className="text-purple-400 text-lg">→</span>
-                            </button>
+                                </button>
+                                {/* Dismiss/Remove Button */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        playSound('click')
+                                        vibrate(10)
+                                        onRemoveShow?.(show.showId)
+                                    }}
+                                    className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.1)'
+                                    }}
+                                    aria-label="Remove show from list"
+                                >
+                                    <span className="text-white/40 text-sm">✕</span>
+                                </button>
+                            </div>
                         ))}
                     </div>
                 </div>

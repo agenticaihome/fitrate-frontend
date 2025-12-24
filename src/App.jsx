@@ -184,12 +184,12 @@ export default function App() {
     return []
   })
 
-  // Helper to add a show to active shows list
-  const addToActiveShows = (showId, showName) => {
+  // Helper to add a show to active shows list (with vibe info)
+  const addToActiveShows = (showId, showName, vibe = 'nice', vibeLabel = 'Nice 😌') => {
     setActiveShows(prev => {
       // Don't add duplicates
       if (prev.some(s => s.showId === showId)) return prev
-      const updated = [...prev, { showId, name: showName, joinedAt: Date.now() }]
+      const updated = [...prev, { showId, name: showName, vibe, vibeLabel, joinedAt: Date.now() }]
       localStorage.setItem('fitrate_active_shows', JSON.stringify(updated))
       return updated
     })
@@ -1035,6 +1035,15 @@ export default function App() {
       return
     }
 
+    // FASHION SHOW MODE ENFORCEMENT: Use show's vibe instead of user's selected mode
+    const effectiveMode = fashionShowId && fashionShowData?.vibe
+      ? fashionShowData.vibe  // Use the show's vibe setting
+      : mode                   // Use user's selected mode
+
+    if (fashionShowId && fashionShowData?.vibe && fashionShowData.vibe !== mode) {
+      console.log(`[FashionShow] Mode overridden: ${mode} → ${fashionShowData.vibe} (show vibe)`)
+    }
+
     // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
       try {
@@ -1060,7 +1069,7 @@ export default function App() {
           headers: getApiHeaders(),
           body: JSON.stringify({
             image: imageData,
-            mode,
+            mode: effectiveMode,  // Use show's vibe when in Fashion Show
             userId,
             eventMode: isEventSubmission,
             imageThumb: eventThumb  // Send thumbnail for Weekly Challenge top-5 display
@@ -1220,7 +1229,7 @@ export default function App() {
         headers: getApiHeaders(),
         body: JSON.stringify({
           image: imageData,
-          mode,
+          mode: effectiveMode,  // Use show's vibe when in Fashion Show
           userId,
           eventMode: isProEventSubmission,
           imageThumb: proEventThumb  // Send thumbnail for Weekly Challenge top-5 display
@@ -1603,7 +1612,7 @@ export default function App() {
         onShowCreated={(showData) => {
           setFashionShowData(showData)
           setFashionShowId(showData.showId)
-          addToActiveShows(showData.showId, showData.name) // Track in My Shows
+          addToActiveShows(showData.showId, showData.name, showData.vibe, showData.vibeLabel) // Track in My Shows with vibe
           setFashionShowScreen('invite')
         }}
         onBack={() => {
@@ -1641,7 +1650,7 @@ export default function App() {
         onJoined={(result) => {
           setFashionShowNickname(localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest')
           setFashionShowEmoji(localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎')
-          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show') // Track in My Shows
+          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show', fashionShowData?.vibe, fashionShowData?.vibeLabel) // Track in My Shows with vibe
           setFashionShowScreen('runway')
         }}
         onShowNotFound={() => {
@@ -1757,6 +1766,8 @@ export default function App() {
           pendingFashionShowWalk={pendingFashionShowWalk}
           onClearPendingWalk={() => setPendingFashionShowWalk(false)}
           fashionShowName={fashionShowData?.name}
+          fashionShowVibe={fashionShowData?.vibe}
+          fashionShowVibeLabel={fashionShowData?.vibeLabel}
           activeShows={activeShows}
           onNavigateToShow={(showId) => {
             // Navigate directly to a specific Fashion Show
@@ -1788,6 +1799,9 @@ export default function App() {
                 setFashionShowScreen(null)
                 window.history.pushState({}, '', '/')
               })
+          }}
+          onRemoveShow={(showId) => {
+            removeFromActiveShows(showId)
           }}
         />
         <BottomNav

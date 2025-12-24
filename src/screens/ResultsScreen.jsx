@@ -704,6 +704,42 @@ export default function ResultsScreen({
                         </div>
                     )}
                 </div>
+
+                {/* ===== AESTHETIC & CELEB MATCH BADGES ===== */}
+                <div className={`flex flex-wrap items-center justify-center gap-2 mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                    {/* Aesthetic Badge */}
+                    {scores.aesthetic && (
+                        <div
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                            style={{
+                                background: 'rgba(255,255,255,0.06)',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                            }}
+                        >
+                            <span className="text-sm">✨</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">
+                                {scores.aesthetic}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Celeb Match Badge */}
+                    {scores.celebMatch && (
+                        <div
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,0,128,0.08) 100%)',
+                                border: '1px solid rgba(255,107,53,0.2)',
+                            }}
+                        >
+                            <span className="text-sm">🌟</span>
+                            <span className="text-[10px] font-bold text-white/60">Vibes like</span>
+                            <span className="text-[10px] font-black text-orange-400">
+                                {scores.celebMatch}
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* ===== VERDICT CARD ===== */}
@@ -722,9 +758,10 @@ export default function ResultsScreen({
                     </h1>
 
                     {/* Identity Line - Short, painfully accurate */}
-                    {scores.lines && scores.lines[0] && (
+                    {/* Support both new 'line' field and legacy 'lines' array */}
+                    {(scores.line || (scores.lines && scores.lines[0])) && (
                         <p className="text-base text-white/50 italic mb-4">
-                            "{scores.lines[0]}"
+                            "{scores.line || scores.lines[0]}"
                         </p>
                     )}
 
