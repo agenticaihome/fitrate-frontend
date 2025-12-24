@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
+import { compressImage } from '../utils/imageUtils'
 
 const EMOJI_OPTIONS = ['😎', '🔥', '✨', '💅', '👑', '🎭']
 
@@ -36,17 +37,41 @@ export default function FashionShowHub({
 
     // Runway state
     const [scoreboard, setScoreboard] = useState(showData?.scoreboard || [])
-    const [timeRemaining, setTimeRemaining] = useState(showData?.timeRemaining || 0)
+    const [timeRemaining, setTimeRemaining] = useState(() => {
+        // Calculate from expiresAt for accuracy, fallback to timeRemaining
+        if (showData?.expiresAt) {
+            return Math.max(0, new Date(showData.expiresAt).getTime() - Date.now())
+        }
+        return showData?.timeRemaining || 0
+    })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
     // Camera state
     const [showCamera, setShowCamera] = useState(false)
+    const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false)
+    const [isProcessing, setIsProcessing] = useState(false)
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
     const streamRef = useRef(null)
+    const fileInputRef = useRef(null)
 
     const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/analyze', '/api') || 'https://fitrate-production.up.railway.app/api'
+
+    // Platform Detection Helpers
+    const isAndroid = () => /Android/i.test(navigator.userAgent)
+    const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
+
+    // Sync timeRemaining when showData changes (fixes initial load timing issue)
+    useEffect(() => {
+        if (showData?.expiresAt) {
+            // Calculate from expiresAt for accuracy
+            const remaining = Math.max(0, new Date(showData.expiresAt).getTime() - Date.now())
+            setTimeRemaining(remaining)
+        } else if (showData?.timeRemaining !== undefined) {
+            setTimeRemaining(showData.timeRemaining)
+        }
+    }, [showData?.expiresAt, showData?.timeRemaining])
 
     // Format time remaining
     const formatTime = (ms) => {
@@ -113,22 +138,86 @@ export default function FashionShowHub({
         }
     }
 
-    // Start camera
-    const startCamera = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 1080 }, height: { ideal: 1920 } }
-            })
-            streamRef.current = stream
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream
-            }
-            setShowCamera(true)
-            playSound('click')
-        } catch (err) {
-            setError('Camera access denied')
-            console.error('[FashionShow] Camera error:', err)
+    // Handle file upload from native camera or gallery
+    const handleFileUpload = async (e) => {
+        const file = e.target.files?.[0]
+        if (!file || isProcessing) return
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            setError('Image is too large. Please try a smaller photo.')
+            return
         }
+
+        setIsProcessing(true)
+        playSound('shutter')
+        vibrate(50)
+
+        try {
+            let imageData
+            if (file.size > 500 * 1024) {
+                imageData = await compressImage(file, 1200, 0.7)
+            } else {
+                imageData = await new Promise((resolve, reject) => {
+                    const reader = new FileReader()
+                    reader.onload = (e) => resolve(e.target.result)
+                    reader.onerror = reject
+                    reader.readAsDataURL(file)
+                })
+            }
+            onImageSelected?.(imageData, 'fashionshow')
+        } catch (err) {
+            console.error('Image processing error:', err)
+            setError('Something went wrong — try again!')
+        } finally {
+            setIsProcessing(false)
+            if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+    }
+
+    // Start camera - platform specific
+    const startCamera = async () => {
+        playSound('click')
+        vibrate(15)
+
+        if (isAndroid()) {
+            // Android: Show dual-button picker modal
+            setShowAndroidPhotoModal(true)
+        } else if (isIOS()) {
+            // iOS: Open native Camera app directly
+            document.getElementById('fashionShowCameraInput')?.click()
+        } else {
+            // Desktop: Use getUserMedia for live camera preview
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1080 }, height: { ideal: 1920 } }
+                })
+                streamRef.current = stream
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream
+                }
+                setShowCamera(true)
+            } catch (err) {
+                setError('Camera access denied')
+                console.error('[FashionShow] Camera error:', err)
+            }
+        }
+    }
+
+    // Android-specific handlers for dual-button modal
+    const handleAndroidTakePhoto = () => {
+        setShowAndroidPhotoModal(false)
+        playSound('click')
+        vibrate(15)
+        // Directly click camera input with capture attribute (forces native camera)
+        document.getElementById('fashionShowCameraInput')?.click()
+    }
+
+    const handleAndroidUploadPhoto = () => {
+        setShowAndroidPhotoModal(false)
+        playSound('click')
+        vibrate(15)
+        // Click gallery input without capture attribute
+        document.getElementById('fashionShowGalleryInput')?.click()
     }
 
     // Capture photo
@@ -159,7 +248,7 @@ export default function FashionShowHub({
         setShowCamera(false)
     }
 
-    const canWalk = walksUsed < walksAllowed && timeRemaining > 0
+    const canWalk = walksUsed < walksAllowed && timeRemaining > 0 && showData?.status !== 'ended'
     const userRank = scoreboard.findIndex(e => e.userId === userId) + 1
 
     // Show loading
@@ -171,22 +260,11 @@ export default function FashionShowHub({
         )
     }
 
-    // Show ended
-    if (showData?.status === 'ended') {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col items-center justify-center px-4">
-                <div className="text-6xl mb-4">🏁</div>
-                <h1 className="text-2xl font-black text-white mb-2">Show Ended</h1>
-                <p className="text-white/50 text-center mb-4">"{showData.name}" has finished</p>
-                <button
-                    onClick={() => { playSound('click'); window.location.href = '/'; }}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold"
-                >
-                    Start a New Show
-                </button>
-            </div>
-        )
-    }
+    // Check if show has ended - trust backend status OR local timer expired
+    // If status is 'ended', show is definitely over
+    // If timeRemaining <= 0 but status isn't 'ended', still allow viewing but disable walking
+    const showEnded = showData?.status === 'ended'
+    const canStillWalk = timeRemaining > 0 && !showEnded
 
     // Camera view
     if (showCamera) {
@@ -231,6 +309,33 @@ export default function FashionShowHub({
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col">
+            {/* Hidden File Inputs - Platform-specific camera/gallery access */}
+            {/* Fashion Show Camera Input - with capture attribute to force native camera */}
+            <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                id="fashionShowCameraInput"
+                onChange={handleFileUpload}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
+            {/* Fashion Show Gallery Input - no capture, opens gallery picker */}
+            <input
+                type="file"
+                accept="image/*"
+                id="fashionShowGalleryInput"
+                onChange={handleFileUpload}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
+            {/* Fallback input for desktop when getUserMedia fails */}
+            <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
+
             {/* Header */}
             <div className="pt-safe px-4 py-4 flex items-center justify-between">
                 <button onClick={() => { playSound('click'); onBack?.(); }} className="text-white/60 text-sm">
@@ -241,6 +346,14 @@ export default function FashionShowHub({
                 </button>
             </div>
 
+            {/* Show Ended Banner */}
+            {(showEnded || timeRemaining <= 0) && (
+                <div className="mx-4 mb-3 p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-center">
+                    <div className="text-lg font-bold text-amber-400">🏁 Show Ended</div>
+                    <p className="text-amber-200/70 text-sm mt-1">Check out the final scores below!</p>
+                </div>
+            )}
+
             {/* Show Header */}
             <div className="px-4 text-center mb-4">
                 <h1 className="text-2xl font-black text-white mb-1">🎭 {showData.name}</h1>
@@ -248,12 +361,15 @@ export default function FashionShowHub({
                     <span className="px-3 py-1 rounded-full bg-white/10 text-white/60">{showData.vibeLabel}</span>
                     {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
                 </div>
-                <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+                {canStillWalk && (
+                    <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+                )}
             </div>
 
             {/* Join Form OR Walk Button */}
             <div className="px-4 mb-4">
-                {!hasJoined ? (
+                {!hasJoined && canStillWalk ? (
+                    // Show join form only if show is still active AND has time remaining
                     <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
                         <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
                             Your Name
@@ -294,6 +410,14 @@ export default function FashionShowHub({
                             {loading ? '⏳ Joining...' : '📸 Walk the Runway'}
                         </button>
                     </div>
+                ) : !hasJoined && !canStillWalk ? (
+                    // Show ended or time expired - user never joined, just show "Start New Show" option
+                    <button
+                        onClick={() => { playSound('click'); window.location.href = '/'; }}
+                        className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]"
+                    >
+                        🎭 Start a New Show
+                    </button>
                 ) : (
                     <button
                         onClick={canWalk ? startCamera : undefined}
@@ -361,6 +485,64 @@ export default function FashionShowHub({
                     </div>
                 )}
             </div>
+
+            {/* Android Photo Picker Modal - dual buttons for camera vs gallery */}
+            {showAndroidPhotoModal && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-end justify-center"
+                    style={{ background: 'rgba(0,0,0,0.8)' }}
+                    onClick={() => setShowAndroidPhotoModal(false)}
+                >
+                    <div
+                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                        style={{
+                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
+                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-6" />
+                        <h3 className="text-white text-lg font-bold text-center mb-6">
+                            Choose Photo Source
+                        </h3>
+                        <div className="flex flex-col gap-3">
+                            {/* Take Photo Button */}
+                            <button
+                                onClick={handleAndroidTakePhoto}
+                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                                    color: '#fff',
+                                    boxShadow: '0 4px 20px rgba(139,92,246,0.3)'
+                                }}
+                            >
+                                <span className="text-2xl">📷</span>
+                                Take Photo
+                            </button>
+                            {/* Upload Photo Button */}
+                            <button
+                                onClick={handleAndroidUploadPhoto}
+                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: '#fff',
+                                    border: '1px solid rgba(255,255,255,0.2)'
+                                }}
+                            >
+                                <span className="text-2xl">🖼️</span>
+                                Upload Photo
+                            </button>
+                            {/* Cancel Button */}
+                            <button
+                                onClick={() => setShowAndroidPhotoModal(false)}
+                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
