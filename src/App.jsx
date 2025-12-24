@@ -245,26 +245,6 @@ export default function App() {
   // Purchased scans (from scan packs)
   const [purchasedScans, setPurchasedScans] = useState(0)
 
-  // Daily Streak Logic
-  const [dailyStreak, setDailyStreak] = useState(() => {
-    try {
-      const stored = localStorage.getItem('fitrate_streak')
-      if (stored) {
-        const { date, count } = JSON.parse(stored)
-        const lastDate = new Date(date)
-        const today = new Date()
-
-        // Check if yesterday (allow 48h window to be safe)
-        const diffTime = Math.abs(today - lastDate)
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-        if (diffDays <= 2) return count // Keep streak
-        return 0 // Streak broken
-      }
-    } catch (e) { return 0 }
-    return 0
-  })
-
   // Daily Theme Rotation
   const DAILY_THEMES = [
     "Y2K Revival", "Airport Looks", "Gym Baddie", "Date Night", "Coffee Run",
