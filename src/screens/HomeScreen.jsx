@@ -947,42 +947,27 @@ export default function HomeScreen({
                                     </div>
                                 )}
 
-                                {/* Challenge Mode Banner - Shows when in challenge mode (from ChallengesScreen) */}
+                                {/* Exit Challenge Button - Simple version without redundant text */}
                                 {(dailyChallengeMode || (eventMode && currentEvent)) && (
-                                    <div
-                                        className="mt-3 px-4 py-2 rounded-xl text-center relative"
+                                    <button
+                                        className="mt-3 px-4 py-2 rounded-lg transition-all active:scale-95"
                                         style={{
-                                            background: dailyChallengeMode
-                                                ? 'rgba(59,130,246,0.2)'
-                                                : 'rgba(16,185,129,0.2)',
-                                            border: `1px solid ${dailyChallengeMode ? 'rgba(59,130,246,0.4)' : 'rgba(16,185,129,0.4)'}`
+                                            background: 'rgba(255,255,255,0.08)',
+                                            border: '1px solid rgba(255,255,255,0.15)'
                                         }}
-                                        onClick={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            playSound('click')
+                                            vibrate(15)
+                                            if (dailyChallengeMode) {
+                                                setDailyChallengeMode?.(false)
+                                            } else {
+                                                setEventMode(false)
+                                            }
+                                        }}
                                     >
-                                        <p className="text-sm font-bold" style={{
-                                            color: dailyChallengeMode ? '#3b82f6' : '#10b981'
-                                        }}>
-                                            {dailyChallengeMode ? '⚡ Daily Challenge' : `🏆 ${currentEvent?.theme || 'Weekly Challenge'}`}
-                                        </p>
-                                        <p className="text-[10px] text-white/50 mt-0.5">
-                                            {dailyChallengeMode ? 'Highest score wins!' : 'Match the theme!'}
-                                        </p>
-                                        {/* Exit Challenge Button */}
-                                        <button
-                                            onClick={() => {
-                                                playSound('click')
-                                                vibrate(15)
-                                                if (dailyChallengeMode) {
-                                                    setDailyChallengeMode?.(false)
-                                                } else {
-                                                    setEventMode(false)
-                                                }
-                                            }}
-                                            className="mt-2 text-xs text-white/40 hover:text-white/60 transition-colors"
-                                        >
-                                            ✕ Exit Challenge
-                                        </button>
-                                    </div>
+                                        <span className="text-sm text-white/60">✕ Exit Challenge</span>
+                                    </button>
                                 )}
                             </button>
 
