@@ -1,0 +1,366 @@
+/**
+ * FashionShowHub Screen
+ * 
+ * Merged view: Join + Runway + Camera all in one
+ * - If not joined: Show name input + "Walk the Runway" button
+ * - If joined: Show scoreboard + "Walk the Runway" button
+ * - Camera opens inline when user taps Walk
+ */
+
+import React, { useState, useEffect, useRef } from 'react'
+import { playSound, vibrate } from '../utils/soundEffects'
+
+const EMOJI_OPTIONS = ['😎', '🔥', '✨', '💅', '👑', '🎭']
+
+export default function FashionShowHub({
+    showId,
+    showData,
+    userId,
+    isPro,
+    walksUsed = 0,
+    walksAllowed = 1,
+    onImageSelected,
+    onShare,
+    onBack
+}) {
+    // Join state
+    const [nickname, setNickname] = useState(() =>
+        localStorage.getItem(`fashionshow_${showId}_nickname`) || ''
+    )
+    const [emoji, setEmoji] = useState(() =>
+        localStorage.getItem(`fashionshow_${showId}_emoji`) || '😎'
+    )
+    const [hasJoined, setHasJoined] = useState(() =>
+        !!localStorage.getItem(`fashionshow_${showId}_nickname`)
+    )
+
+    // Runway state
+    const [scoreboard, setScoreboard] = useState(showData?.scoreboard || [])
+    const [timeRemaining, setTimeRemaining] = useState(showData?.timeRemaining || 0)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+
+    // Camera state
+    const [showCamera, setShowCamera] = useState(false)
+    const videoRef = useRef(null)
+    const canvasRef = useRef(null)
+    const streamRef = useRef(null)
+
+    const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/analyze', '/api') || 'https://fitrate-production.up.railway.app/api'
+
+    // Format time remaining
+    const formatTime = (ms) => {
+        if (ms <= 0) return 'Ended'
+        const hours = Math.floor(ms / (1000 * 60 * 60))
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
+        return `${hours}h ${minutes}m`
+    }
+
+    // Countdown timer
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeRemaining(prev => Math.max(0, prev - 1000))
+        }, 1000)
+        return () => clearInterval(interval)
+    }, [])
+
+    // Poll scoreboard
+    useEffect(() => {
+        const fetchScoreboard = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/show/${showId}/scoreboard`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setScoreboard(data.scoreboard || [])
+                }
+            } catch (err) {
+                console.error('[FashionShow] Scoreboard poll error:', err)
+            }
+        }
+        fetchScoreboard()
+        const interval = setInterval(fetchScoreboard, 10000)
+        return () => clearInterval(interval)
+    }, [showId])
+
+    // Join the show
+    const handleJoin = async () => {
+        if (!nickname.trim()) {
+            setError('Enter your name!')
+            return
+        }
+        setLoading(true)
+        setError('')
+
+        try {
+            const res = await fetch(`${API_BASE}/show/${showId}/join`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, nickname: nickname.trim(), emoji })
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to join')
+
+            localStorage.setItem(`fashionshow_${showId}_nickname`, nickname.trim())
+            localStorage.setItem(`fashionshow_${showId}_emoji`, emoji)
+            setHasJoined(true)
+            playSound('success')
+            vibrate([50, 30, 50])
+        } catch (err) {
+            setError(err.message)
+            playSound('error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Start camera
+    const startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1080 }, height: { ideal: 1920 } }
+            })
+            streamRef.current = stream
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream
+            }
+            setShowCamera(true)
+            playSound('click')
+        } catch (err) {
+            setError('Camera access denied')
+            console.error('[FashionShow] Camera error:', err)
+        }
+    }
+
+    // Capture photo
+    const capturePhoto = () => {
+        if (!videoRef.current || !canvasRef.current) return
+
+        const video = videoRef.current
+        const canvas = canvasRef.current
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        canvas.getContext('2d').drawImage(video, 0, 0)
+
+        canvas.toBlob((blob) => {
+            const file = new File([blob], 'fashion-show-walk.jpg', { type: 'image/jpeg' })
+            stopCamera()
+            playSound('success')
+            vibrate(50)
+            onImageSelected?.(file, 'fashionshow')
+        }, 'image/jpeg', 0.9)
+    }
+
+    // Stop camera
+    const stopCamera = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop())
+            streamRef.current = null
+        }
+        setShowCamera(false)
+    }
+
+    const canWalk = walksUsed < walksAllowed && timeRemaining > 0
+    const userRank = scoreboard.findIndex(e => e.userId === userId) + 1
+
+    // Show loading
+    if (!showData) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center">
+                <div className="text-5xl animate-pulse">🎭</div>
+            </div>
+        )
+    }
+
+    // Show ended
+    if (showData?.status === 'ended') {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col items-center justify-center px-4">
+                <div className="text-6xl mb-4">🏁</div>
+                <h1 className="text-2xl font-black text-white mb-2">Show Ended</h1>
+                <p className="text-white/50 text-center mb-4">"{showData.name}" has finished</p>
+                <button
+                    onClick={() => { playSound('click'); window.location.href = '/'; }}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold"
+                >
+                    Start a New Show
+                </button>
+            </div>
+        )
+    }
+
+    // Camera view
+    if (showCamera) {
+        return (
+            <div className="fixed inset-0 bg-black z-50 flex flex-col">
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="flex-1 object-cover"
+                />
+                <canvas ref={canvasRef} className="hidden" />
+
+                {/* Show vibe banner */}
+                <div className="absolute top-safe left-0 right-0 p-4 text-center">
+                    <div className="inline-block px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+                        <span className="text-white font-bold">🎭 {showData.name}</span>
+                        <span className="text-white/60 ml-2 text-sm">{showData.vibeLabel}</span>
+                    </div>
+                </div>
+
+                {/* Camera controls */}
+                <div className="absolute bottom-safe left-0 right-0 p-6 flex items-center justify-center gap-6">
+                    <button
+                        onClick={stopCamera}
+                        className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl"
+                    >
+                        ✕
+                    </button>
+                    <button
+                        onClick={capturePhoto}
+                        className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+                    >
+                        <div className="w-16 h-16 rounded-full border-4 border-purple-500" />
+                    </button>
+                    <div className="w-14 h-14" /> {/* Spacer */}
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col">
+            {/* Header */}
+            <div className="pt-safe px-4 py-4 flex items-center justify-between">
+                <button onClick={() => { playSound('click'); onBack?.(); }} className="text-white/60 text-sm">
+                    ← Exit
+                </button>
+                <button onClick={() => { playSound('click'); onShare?.(); }} className="text-white/60 text-sm">
+                    Share 📤
+                </button>
+            </div>
+
+            {/* Show Header */}
+            <div className="px-4 text-center mb-4">
+                <h1 className="text-2xl font-black text-white mb-1">🎭 {showData.name}</h1>
+                <div className="flex items-center justify-center gap-3 text-sm">
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-white/60">{showData.vibeLabel}</span>
+                    {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
+                </div>
+                <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+            </div>
+
+            {/* Join Form OR Walk Button */}
+            <div className="px-4 mb-4">
+                {!hasJoined ? (
+                    <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                        <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                            Your Name
+                        </label>
+                        <input
+                            type="text"
+                            value={nickname}
+                            onChange={(e) => setNickname(e.target.value)}
+                            placeholder="Enter your name"
+                            maxLength={20}
+                            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-white/30 focus:outline-none focus:border-purple-500 mb-4"
+                        />
+
+                        {/* Quick emoji picker */}
+                        <div className="flex gap-2 mb-4 justify-center">
+                            {EMOJI_OPTIONS.map((e) => (
+                                <button
+                                    key={e}
+                                    onClick={() => { setEmoji(e); playSound('click'); }}
+                                    className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all ${emoji === e ? 'bg-purple-500/30 border-2 border-purple-500' : 'bg-white/10'
+                                        }`}
+                                >
+                                    {e}
+                                </button>
+                            ))}
+                        </div>
+
+                        {error && <p className="text-red-400 text-sm text-center mb-3">{error}</p>}
+
+                        <button
+                            onClick={handleJoin}
+                            disabled={loading || !nickname.trim()}
+                            className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${loading || !nickname.trim()
+                                    ? 'bg-white/10 text-white/30'
+                                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]'
+                                }`}
+                        >
+                            {loading ? '⏳ Joining...' : '📸 Walk the Runway'}
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={canWalk ? startCamera : undefined}
+                        disabled={!canWalk}
+                        className={`w-full py-6 rounded-3xl font-black text-xl flex flex-col items-center justify-center gap-1 transition-all ${canWalk
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
+                                : 'bg-white/10 text-white/30'
+                            }`}
+                    >
+                        {walksUsed > 0 ? (
+                            <>
+                                <span className="text-3xl">✅</span>
+                                <span>You've Walked!</span>
+                                {userRank > 0 && <span className="text-sm font-normal text-white/60">You're #{userRank}</span>}
+                            </>
+                        ) : timeRemaining <= 0 ? (
+                            <>
+                                <span className="text-3xl">🏁</span>
+                                <span>Show Ended</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-3xl">📸</span>
+                                <span>Walk the Runway</span>
+                            </>
+                        )}
+                    </button>
+                )}
+            </div>
+
+            {/* Scoreboard */}
+            <div className="px-4 flex-1 overflow-y-auto pb-8">
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-sm font-black text-white/60 uppercase tracking-widest">📊 Scoreboard</h2>
+                    <span className="text-xs text-white/40">{scoreboard.length} entries</span>
+                </div>
+
+                {scoreboard.length === 0 ? (
+                    <div className="text-center py-8 text-white/30 text-sm">
+                        No walks yet — be the first! 🎭
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        {scoreboard.slice(0, 10).map((entry, idx) => {
+                            const isUser = entry.userId === userId
+                            const rankEmoji = idx === 0 ? '👑' : idx === 1 ? '🔥' : idx === 2 ? '⭐' : `#${idx + 1}`
+                            return (
+                                <div
+                                    key={`${entry.userId}-${idx}`}
+                                    className={`flex items-center gap-3 p-3 rounded-xl ${isUser ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-white/5'
+                                        }`}
+                                >
+                                    <span className="text-lg w-8 text-center">{rankEmoji}</span>
+                                    <span className="text-2xl">{entry.emoji}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-white font-semibold truncate">
+                                            {entry.nickname}
+                                            {isUser && <span className="text-purple-400 ml-1">(you)</span>}
+                                        </div>
+                                    </div>
+                                    <div className="text-xl font-black text-white">{entry.score?.toFixed(1)}</div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
