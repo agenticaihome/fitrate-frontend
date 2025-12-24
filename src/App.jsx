@@ -1350,7 +1350,8 @@ export default function App() {
 
         // Go to share success after a short delay
         setTimeout(() => setScreen('share-success'), 1500)
-      }).catch(() => {
+      }).catch((err) => {
+        console.warn('[Share] Clipboard copy failed:', err?.message || err)
         setToastMessage('Image saved! Paste caption manually.')
         setShowToast(true)
         setTimeout(() => setScreen('share-success'), 1500)
@@ -1794,7 +1795,8 @@ export default function App() {
                   window.history.pushState({}, '', '/')
                 }
               })
-              .catch(() => {
+              .catch((err) => {
+                console.warn('[FashionShow] Failed to load show:', err?.message || err)
                 removeFromActiveShows(showId)
                 setFashionShowScreen(null)
                 window.history.pushState({}, '', '/')

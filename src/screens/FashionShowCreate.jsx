@@ -20,6 +20,8 @@ const VIBES = [
 
 const DURATIONS = [
     { hours: 24, label: '24 Hours' },
+    { hours: 72, label: '3 Days' },
+    { hours: 120, label: '5 Days' },
     { hours: 168, label: '7 Days' }
 ]
 
@@ -160,10 +162,10 @@ export default function FashionShowCreate({
                                     }}
                                     disabled={isLocked}
                                     className={`p-4 rounded-2xl border-2 transition-all text-left relative ${isSelected
-                                            ? 'border-purple-500 bg-purple-500/20'
-                                            : isLocked
-                                                ? 'border-white/10 bg-white/5 opacity-50'
-                                                : 'border-white/20 bg-white/5 hover:border-white/30'
+                                        ? 'border-purple-500 bg-purple-500/20'
+                                        : isLocked
+                                            ? 'border-white/10 bg-white/5 opacity-50'
+                                            : 'border-white/20 bg-white/5 hover:border-white/30'
                                         }`}
                                 >
                                     <div className="text-xl mb-1">{v.label}</div>
@@ -196,8 +198,8 @@ export default function FashionShowCreate({
                                         vibrate(15)
                                     }}
                                     className={`flex-1 py-3 px-4 rounded-xl border transition-all ${isSelected
-                                            ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
-                                            : 'border-white/20 bg-white/5 text-white/60'
+                                        ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
+                                        : 'border-white/20 bg-white/5 text-white/60'
                                         }`}
                                 >
                                     {d.label}
@@ -250,8 +252,8 @@ export default function FashionShowCreate({
                     onClick={handleCreate}
                     disabled={loading || !showName.trim()}
                     className={`w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 transition-all ${loading || !showName.trim()
-                            ? 'bg-white/10 text-white/30'
-                            : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
+                        ? 'bg-white/10 text-white/30'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
                         }`}
                 >
                     {loading ? (
