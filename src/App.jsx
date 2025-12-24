@@ -25,6 +25,7 @@ import FashionShowCreate from './screens/FashionShowCreate'
 import FashionShowJoin from './screens/FashionShowJoin'
 import FashionShowRunway from './screens/FashionShowRunway'
 import FashionShowInvite from './screens/FashionShowInvite'
+import FashionShowHub from './screens/FashionShowHub'
 // Weekly Challenge screen
 import WeeklyChallengeScreen from './screens/WeeklyChallengeScreen'
 // Combined Challenges screen (Daily + Weekly)
@@ -1797,47 +1798,30 @@ export default function App() {
     )
   }
 
-  if (fashionShowScreen === 'join') {
+  // ============================================
+  // FASHION SHOW HUB (Merged Join + Runway + Camera)
+  // ============================================
+  if (fashionShowScreen === 'join' || fashionShowScreen === 'runway') {
     return (
-      <FashionShowJoin
+      <FashionShowHub
         showId={fashionShowId}
         showData={fashionShowData}
         userId={userId}
-        loading={fashionShowLoading}
-        onJoined={(result) => {
-          setFashionShowNickname(localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest')
-          setFashionShowEmoji(localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎')
-          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show', fashionShowData?.vibe, fashionShowData?.vibeLabel) // Track in My Shows with vibe
-          setFashionShowScreen('runway')
-        }}
-        onShowNotFound={() => {
-          setFashionShowScreen(null)
-          window.history.pushState({}, '', '/')
-        }}
-      />
-    )
-  }
-
-  if (fashionShowScreen === 'runway') {
-    return (
-      <FashionShowRunway
-        showId={fashionShowId}
-        showData={fashionShowData}
-        userId={userId}
-        nickname={fashionShowNickname}
-        emoji={fashionShowEmoji}
         isPro={isPro}
         walksUsed={fashionShowWalks}
         walksAllowed={isPro ? 3 : 1}
-        onWalkRunway={() => {
-          // Keep show context and trigger camera flow
-          // fashionShowId and nickname stay set, so after analyze 
-          // the score will be recorded to the show
-          console.log('[FashionShow] Walk initiated - showId:', fashionShowId, 'nickname:', fashionShowNickname)
-          setFashionShowScreen(null) // Exit show UI for camera
-          setPendingFashionShowWalk(true) // Flag to auto-trigger camera
-          setScreen('home')
-          // Note: fashionShowId, fashionShowNickname, fashionShowEmoji stay set
+        onImageSelected={(file, scanType) => {
+          // Record nickname before analyzing
+          const nickname = localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest'
+          const emoji = localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎'
+          setFashionShowNickname(nickname)
+          setFashionShowEmoji(emoji)
+          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show', fashionShowData?.vibe, fashionShowData?.vibeLabel)
+
+          // Start analysis
+          setUploadedImage(file)
+          setScreen('analyzing')
+          analyzeOutfit(file, scanType)
         }}
         onShare={() => {
           const url = `https://fitrate.app/f/${fashionShowId}`
