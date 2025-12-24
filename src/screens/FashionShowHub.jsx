@@ -36,7 +36,13 @@ export default function FashionShowHub({
 
     // Runway state
     const [scoreboard, setScoreboard] = useState(showData?.scoreboard || [])
-    const [timeRemaining, setTimeRemaining] = useState(showData?.timeRemaining || 0)
+    const [timeRemaining, setTimeRemaining] = useState(() => {
+        // Calculate from expiresAt for accuracy, fallback to timeRemaining
+        if (showData?.expiresAt) {
+            return Math.max(0, new Date(showData.expiresAt).getTime() - Date.now())
+        }
+        return showData?.timeRemaining || 0
+    })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -47,6 +53,17 @@ export default function FashionShowHub({
     const streamRef = useRef(null)
 
     const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/analyze', '/api') || 'https://fitrate-production.up.railway.app/api'
+
+    // Sync timeRemaining when showData changes (fixes initial load timing issue)
+    useEffect(() => {
+        if (showData?.expiresAt) {
+            // Calculate from expiresAt for accuracy
+            const remaining = Math.max(0, new Date(showData.expiresAt).getTime() - Date.now())
+            setTimeRemaining(remaining)
+        } else if (showData?.timeRemaining !== undefined) {
+            setTimeRemaining(showData.timeRemaining)
+        }
+    }, [showData?.expiresAt, showData?.timeRemaining])
 
     // Format time remaining
     const formatTime = (ms) => {
