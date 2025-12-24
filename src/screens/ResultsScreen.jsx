@@ -846,6 +846,92 @@ export default function ResultsScreen({
                 </div>
             </div>
 
+            {/* ===== FIT BREAKDOWN SECTION ===== */}
+            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-white/20" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Fit Breakdown</span>
+                    <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/20 to-white/20" />
+                </div>
+                <p className="text-[10px] text-white/30 text-center mb-4">
+                    ({scores.overall >= 50 ? 'what went right' : 'what went wrong'})
+                </p>
+
+                {/* 2x2 Metric Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                    {/* Color Energy */}
+                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">🎨</span>
+                            <span className="text-xs font-bold text-white/80">Color Energy</span>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.colorEnergy || Math.round(scores.overall * 0.9)}</span>
+                            <span className="text-[10px] text-white/40">{(scores.colorEnergy || scores.overall) >= 60 ? 'Bold palette' : 'Safe palette'}</span>
+                        </div>
+                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${scores.colorEnergy || scores.overall}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
+                        </div>
+                    </div>
+
+                    {/* Silhouette Control */}
+                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">📐</span>
+                            <span className="text-xs font-bold text-white/80">Silhouette</span>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.silhouette || Math.round(scores.overall * 0.85)}</span>
+                            <span className="text-[10px] text-white/40">{(scores.silhouette || scores.overall) >= 60 ? 'Sharp lines' : 'Angles off'}</span>
+                        </div>
+                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${scores.silhouette || scores.overall * 0.85}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
+                        </div>
+                    </div>
+
+                    {/* Outfit Intent */}
+                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">✨</span>
+                            <span className="text-xs font-bold text-white/80">Outfit Intent</span>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.intent || Math.round(scores.overall * 0.95)}</span>
+                            <span className="text-[10px] text-white/40">{(scores.intent || scores.overall) >= 60 ? 'Clear vision' : 'No game plan'}</span>
+                        </div>
+                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${scores.intent || scores.overall}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
+                        </div>
+                    </div>
+
+                    {/* Risk Taken */}
+                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">🎲</span>
+                            <span className="text-xs font-bold text-white/80">Risk Taken</span>
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.riskTaken || Math.round(scores.overall * 0.7)}</span>
+                            <span className="text-[10px] text-white/40">{(scores.riskTaken || scores.overall * 0.7) >= 50 ? 'Bold moves' : 'Played safe'}</span>
+                        </div>
+                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${scores.riskTaken || scores.overall * 0.7}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* AI Summary Line */}
+                <div
+                    className="mt-4 py-3 px-4 rounded-xl text-center"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                >
+                    <p className="text-sm text-white/60 italic">
+                        {scores.summaryLine || scores.tagline || `${scores.overall >= 60 ? 'Strong presence.' : 'Low presence.'} ${scores.overall >= 70 ? 'High intention.' : 'Needs focus.'} ${scores.overall >= 50 ? 'Room to push.' : 'Time to experiment.'}`}
+                    </p>
+                </div>
+            </div>
+
             {/* ===== CHALLENGE CARD - Weekly Event Entry ===== */}
             {/* Show if we have event data from backend OR if currentEvent prop is passed */}
             {(scores.eventInfo || currentEvent) && (scores.eventStatus || currentEvent) && (
