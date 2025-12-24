@@ -1155,28 +1155,34 @@ export default function ResultsScreen({
                         onGenerateShareCard('challenge')
                     }}
                     aria-label="Challenge a friend to beat your score"
-                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 mb-3 relative overflow-hidden"
+                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex flex-col items-center justify-center gap-1 mb-3 relative overflow-hidden"
                     style={{
-                        background: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)',
-                        boxShadow: '0 8px 0 rgba(0,0,0,0.25), 0 20px 40px rgba(255,107,53,0.4)',
+                        background: `linear-gradient(135deg, ${modeColors.accent} 0%, ${modeColors.end} 100%)`,
+                        boxShadow: `0 8px 0 rgba(0,0,0,0.25), 0 20px 40px ${modeColors.glow}`,
                         color: '#fff'
                     }}
                 >
-                    <span className="text-2xl">👊</span> CHALLENGE A FRIEND
+                    <span className="flex items-center gap-2">
+                        <span className="text-2xl">🔥</span> CHALLENGE A FRIEND
+                    </span>
+                    <span className="text-xs font-medium opacity-80">Let them try to do better</span>
                 </button>
 
                 {/* Share Button - Secondary */}
                 <button
                     onClick={onGenerateShareCard}
                     aria-label="Share your outfit rating"
-                    className="w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.97]"
+                    className="w-full py-4 rounded-2xl font-bold text-base flex flex-col items-center justify-center gap-1 mb-3 transition-all active:scale-[0.97]"
                     style={{
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: `${modeColors.bg}`,
+                        border: `1px solid ${modeColors.border}`,
                         color: 'rgba(255,255,255,0.8)'
                     }}
                 >
-                    <span className="text-lg">📤</span> Share This Fit
+                    <span className="flex items-center gap-2">
+                        <span className="text-lg">📤</span> Share This Fit
+                    </span>
+                    <span className="text-[10px] opacity-60">Public shame builds character</span>
                 </button>
 
                 {/* Try Again + Back to Runway (side-by-side when in Fashion Show) */}
