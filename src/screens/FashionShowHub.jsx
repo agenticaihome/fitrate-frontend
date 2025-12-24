@@ -159,7 +159,7 @@ export default function FashionShowHub({
         setShowCamera(false)
     }
 
-    const canWalk = walksUsed < walksAllowed && timeRemaining > 0
+    const canWalk = walksUsed < walksAllowed && timeRemaining > 0 && showData?.status !== 'ended'
     const userRank = scoreboard.findIndex(e => e.userId === userId) + 1
 
     // Show loading
@@ -171,22 +171,11 @@ export default function FashionShowHub({
         )
     }
 
-    // Show ended
-    if (showData?.status === 'ended') {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col items-center justify-center px-4">
-                <div className="text-6xl mb-4">🏁</div>
-                <h1 className="text-2xl font-black text-white mb-2">Show Ended</h1>
-                <p className="text-white/50 text-center mb-4">"{showData.name}" has finished</p>
-                <button
-                    onClick={() => { playSound('click'); window.location.href = '/'; }}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold"
-                >
-                    Start a New Show
-                </button>
-            </div>
-        )
-    }
+    // Check if show has ended - trust backend status OR local timer expired
+    // If status is 'ended', show is definitely over
+    // If timeRemaining <= 0 but status isn't 'ended', still allow viewing but disable walking
+    const showEnded = showData?.status === 'ended'
+    const canStillWalk = timeRemaining > 0 && !showEnded
 
     // Camera view
     if (showCamera) {
@@ -241,6 +230,14 @@ export default function FashionShowHub({
                 </button>
             </div>
 
+            {/* Show Ended Banner */}
+            {(showEnded || timeRemaining <= 0) && (
+                <div className="mx-4 mb-3 p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-center">
+                    <div className="text-lg font-bold text-amber-400">🏁 Show Ended</div>
+                    <p className="text-amber-200/70 text-sm mt-1">Check out the final scores below!</p>
+                </div>
+            )}
+
             {/* Show Header */}
             <div className="px-4 text-center mb-4">
                 <h1 className="text-2xl font-black text-white mb-1">🎭 {showData.name}</h1>
@@ -248,12 +245,15 @@ export default function FashionShowHub({
                     <span className="px-3 py-1 rounded-full bg-white/10 text-white/60">{showData.vibeLabel}</span>
                     {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
                 </div>
-                <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+                {canStillWalk && (
+                    <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+                )}
             </div>
 
             {/* Join Form OR Walk Button */}
             <div className="px-4 mb-4">
-                {!hasJoined ? (
+                {!hasJoined && canStillWalk ? (
+                    // Show join form only if show is still active AND has time remaining
                     <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
                         <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
                             Your Name
@@ -294,6 +294,14 @@ export default function FashionShowHub({
                             {loading ? '⏳ Joining...' : '📸 Walk the Runway'}
                         </button>
                     </div>
+                ) : !hasJoined && !canStillWalk ? (
+                    // Show ended or time expired - user never joined, just show "Start New Show" option
+                    <button
+                        onClick={() => { playSound('click'); window.location.href = '/'; }}
+                        className="w-full py-4 rounded-2xl font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]"
+                    >
+                        🎭 Start a New Show
+                    </button>
                 ) : (
                     <button
                         onClick={canWalk ? startCamera : undefined}
