@@ -216,21 +216,22 @@ export default function PaywallModal({
 
                 {/* MODEL CAPABILITIES COMPARISON - The "Why Control" */}
                 <div className="mb-5 p-4 rounded-2xl bg-black/40 border border-white/10">
-                    <h4 className="text-xs font-black text-white/50 uppercase tracking-widest mb-4 text-center">Engine Comparison</h4>
+                    <h4 className="text-xs font-black text-white/50 uppercase tracking-widest mb-4 text-center">Free vs Pro</h4>
                     <div className="grid grid-cols-3 gap-y-3 text-[11px]">
                         {/* Headers */}
                         <div className="col-span-1 text-gray-500 font-bold">Feature</div>
-                        <div className="col-span-1 text-center text-gray-400 font-bold">Free</div>
+                        <div className="col-span-1 text-center text-cyan-400 font-bold">Free</div>
                         <div className="col-span-1 text-center text-yellow-400 font-black">PRO</div>
 
                         {/* Rows */}
                         {[
-                            { label: 'Daily Ratings', free: '2/day', pro: '25/day' },
-                            { label: 'Pro AI', free: '1/day taste', pro: 'Every scan' },
-                            { label: 'AI Modes', free: '2', pro: 'All 8' },
-                            { label: 'Precision', free: 'Integer (87)', pro: 'Decimal (87.4)' },
-                            { label: 'Challenge', free: '1/week', pro: '5/day' },
-                            { label: 'Pro Tips', free: '—', pro: '✓' }
+                            { label: 'AI Engine', free: 'Gemini', pro: 'GPT-4o' },
+                            { label: 'Daily Ratings', free: '2', pro: '25' },
+                            { label: 'AI Modes', free: '2 (Nice/Roast)', pro: 'All 8' },
+                            { label: 'Score Detail', free: 'Whole (87)', pro: 'Precise (87.4)' },
+                            { label: 'Weekly Gala', free: '1/week', pro: '5/day' },
+                            { label: 'Fashion Show', free: '1 walk', pro: '3 walks' },
+                            { label: 'Golden Tips', free: '—', pro: '✓' }
                         ].map((row, i) => (
                             <React.Fragment key={i}>
                                 <div className="col-span-3 h-px bg-white/5 my-1" />

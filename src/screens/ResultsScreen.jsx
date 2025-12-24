@@ -699,7 +699,7 @@ export default function ResultsScreen({
                                 Quick Scan
                             </span>
                             <span className="text-[8px] font-bold text-cyan-400/60 uppercase">
-                                Gemini
+                                Gemini Flash
                             </span>
                         </div>
                     )}
