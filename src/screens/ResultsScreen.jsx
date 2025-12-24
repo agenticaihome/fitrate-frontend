@@ -441,19 +441,9 @@ export default function ResultsScreen({
         return getScoreTierColors(scores.overall)
     }, [scores?.overall])
 
-    // Mode colors for secondary elements (tagline, accents)
+    // Mode colors for secondary elements (tagline, accents) - uses new getModeColors helper
     const modeColors = useMemo(() => {
-        const themes = {
-            savage: { accent: '#8b00ff', end: '#ff0044', glow: 'rgba(139,0,255,0.5)' },
-            roast: { accent: '#ff4444', end: '#ff8800', glow: 'rgba(255,68,68,0.5)' },
-            honest: { accent: '#0077ff', end: '#00d4ff', glow: 'rgba(0,119,255,0.5)' },
-            nice: { accent: '#00d4ff', end: '#00ff88', glow: 'rgba(0,212,255,0.5)' },
-            rizz: { accent: '#ff69b4', end: '#ff1493', glow: 'rgba(255,105,180,0.5)' },
-            celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.5)' },
-            aura: { accent: '#9b59b6', end: '#8e44ad', glow: 'rgba(155,89,182,0.5)' },
-            chaos: { accent: '#ff6b6b', end: '#ee5a24', glow: 'rgba(255,107,107,0.5)' }
-        }
-        return themes[scores?.mode] || themes.nice
+        return getModeColors(scores?.mode || 'honest')
     }, [scores?.mode])
 
     // Keep theme for backward compatibility
@@ -518,12 +508,23 @@ export default function ResultsScreen({
             {/* ===== HERO SECTION: GIANT SCORE ===== */}
             <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
 
-                {/* Small Logo */}
-                <img
-                    src="/logo.svg"
-                    alt="FitRate"
-                    className="h-8 mb-2 opacity-60"
-                />
+                {/* TODAY'S FIT VERDICT Header with Mode-Themed Lines */}
+                <div className="flex items-center gap-3 mb-4">
+                    <div
+                        className="h-px w-12"
+                        style={{ background: `linear-gradient(90deg, transparent 0%, ${modeColors.accent} 100%)` }}
+                    />
+                    <span
+                        className="text-xs font-black uppercase tracking-[0.2em]"
+                        style={{ color: modeColors.accent }}
+                    >
+                        Today's Fit Verdict
+                    </span>
+                    <div
+                        className="h-px w-12"
+                        style={{ background: `linear-gradient(90deg, ${modeColors.accent} 0%, transparent 100%)` }}
+                    />
+                </div>
 
                 {/* Event Theme Banner - Show when in event mode */}
                 {currentEvent && (
