@@ -59,6 +59,47 @@ const TierBadge = ({ tier, score }) => {
     )
 }
 
+// Daily Challenge Rank Badge - Shows rank on daily leaderboard
+const DailyRankBadge = ({ leaderboard }) => {
+    if (!leaderboard?.rank) return null;
+
+    const { rank, title, description } = leaderboard;
+
+    // Rank-based styling
+    const getStyle = () => {
+        if (rank === 1) return { bg: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', text: '#000', glow: 'rgba(255,215,0,0.5)', icon: '👑' };
+        if (rank === 2) return { bg: 'linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%)', text: '#000', glow: 'rgba(192,192,192,0.4)', icon: '🥈' };
+        if (rank === 3) return { bg: 'linear-gradient(135deg, #cd7f32 0%, #b87333 100%)', text: '#fff', glow: 'rgba(205,127,50,0.4)', icon: '🥉' };
+        if (rank <= 10) return { bg: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)', text: '#fff', glow: 'rgba(255,107,53,0.4)', icon: '🔥' };
+        return { bg: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', text: '#fff', glow: 'rgba(59,130,246,0.4)', icon: '⚡' };
+    };
+
+    const style = getStyle();
+
+    return (
+        <div
+            className="w-full max-w-sm mb-4 p-3 rounded-2xl text-center relative overflow-hidden"
+            style={{
+                background: style.bg,
+                boxShadow: `0 4px 20px ${style.glow}`,
+                animation: rank <= 3 ? 'pulse 2s ease-in-out infinite' : 'none'
+            }}
+        >
+            <div className="flex items-center justify-center gap-3">
+                <span className="text-3xl">{style.icon}</span>
+                <div className="text-left">
+                    <p className="font-black text-lg" style={{ color: style.text }}>
+                        Today's Rank: #{rank}
+                    </p>
+                    <p className="text-xs" style={{ color: style.text, opacity: 0.8 }}>
+                        {title || description || 'Daily Challenge'}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // Challenge Card Component - Visually distinct card for weekly challenges
 const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay }) => {
     // Defensive checks: ensure eventInfo has required properties
@@ -594,6 +635,11 @@ export default function ResultsScreen({
                             )}
                         </div>
                     </div>
+                )}
+
+                {/* Daily Challenge Rank - Shows for non-event scans */}
+                {scores?.leaderboard?.rank && !scores?.eventStatus && (
+                    <DailyRankBadge leaderboard={scores.leaderboard} />
                 )}
 
                 {/* MASSIVE Score Ring */}

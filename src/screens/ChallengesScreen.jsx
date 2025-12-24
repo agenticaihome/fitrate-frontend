@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { formatTimeRemaining } from '../utils/dateUtils'
+import BottomNav from '../components/common/BottomNav'
 
 /**
  * ChallengesScreen
@@ -182,7 +183,7 @@ export default function ChallengesScreen({
                             </div>
                             <div className="mt-3 pt-3 border-t border-white/10">
                                 <p className="text-white/40 text-xs text-center">
-                                    🎮 FREE for everyone • 1 try per day • Resets at midnight
+                                    🎮 FREE for everyone • Your best score counts! • Resets at midnight
                                 </p>
                             </div>
                         </div>
@@ -205,7 +206,7 @@ export default function ChallengesScreen({
                                 <div className="space-y-2">
                                     {dailyLeaderboard.slice(0, 5).map((entry, i) => {
                                         const { icon, color, label } = getRankDisplay(entry.rank || i + 1)
-                                        const isCurrentUser = entry.isCurrentUser || (userId && entry.userId?.startsWith(userId?.slice(0, 8)))
+                                        const isCurrentUser = entry.isCurrentUser
 
                                         return (
                                             <div
@@ -462,6 +463,20 @@ export default function ChallengesScreen({
                     </div>
                 )}
             </div>
+
+            {/* Bottom Navigation */}
+            <BottomNav
+                activeTab="challenges"
+                eventMode={false}
+                onNavigate={(tab) => {
+                    if (tab === 'home') {
+                        onBack();
+                    }
+                }}
+                onScan={() => {
+                    onCompeteDaily?.();
+                }}
+            />
         </div>
     )
 }
