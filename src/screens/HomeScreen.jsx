@@ -1066,44 +1066,26 @@ export default function HomeScreen({
                     </button>
                 )}
 
-                {/* Weekly Challenge - Large teal gradient with animated sparkles */}
-                {currentEvent && (
+                {/* Challenges - Navigate to Challenges screen */}
+                {(currentEvent || true) && (
                     <button
                         onClick={() => {
                             playSound('click');
                             vibrate(15);
-                            // First time: show explainer with rules. After that: toggle competition mode
-                            if (!hasSeenEventExplainer) {
-                                onShowEventExplainer?.();
-                            } else {
-                                setEventMode(!eventMode);
-                            }
+                            onShowWeeklyChallenge?.();
                         }}
                         className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
                         style={{
-                            background: eventMode
-                                ? 'linear-gradient(135deg, #10b981 0%, #34d399 40%, #0d9488 70%, #047857 100%)'
-                                : 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
-                            border: eventMode ? '3px solid rgba(52,211,153,0.8)' : '2px solid rgba(45,212,191,0.5)',
-                            boxShadow: eventMode
-                                ? '0 4px 30px rgba(16,185,129,0.6), 0 0 60px rgba(45,212,191,0.4)'
-                                : '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
-                            animation: 'tealPulse 2s ease-in-out infinite'
+                            background: 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
+                            border: '2px solid rgba(45,212,191,0.5)',
+                            boxShadow: '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
                         }}
                     >
-                        {/* Active indicator */}
-                        {eventMode && (
-                            <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold">
-                                ACTIVE
-                            </div>
-                        )}
                         {/* Animated sparkle overlay */}
                         <div className="absolute inset-0 overflow-hidden">
-                            {/* Sparkle dots */}
                             <div className="absolute" style={{ top: '15%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite' }}>✨</div>
                             <div className="absolute" style={{ top: '25%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s' }}>⭐</div>
                             <div className="absolute" style={{ bottom: '20%', left: '30%', animation: 'sparkle 1.8s ease-in-out infinite 0.6s' }}>✨</div>
-                            <div className="absolute" style={{ top: '60%', right: '25%', animation: 'sparkleFloat 2.5s ease-in-out infinite' }}>⭐</div>
                         </div>
                         {/* Gold shimmer line */}
                         <div className="absolute inset-0 overflow-hidden rounded-2xl">
@@ -1114,8 +1096,8 @@ export default function HomeScreen({
                             }} />
                         </div>
                         <span className="relative text-4xl block mb-2 drop-shadow-lg">🏆</span>
-                        <span className="relative text-white font-bold block text-lg">{currentEvent.theme || 'Weekly Challenge'}</span>
-                        <span className="relative text-teal-100/80 text-xs">{eventMode ? 'Now competing!' : 'Tap to compete!'}</span>
+                        <span className="relative text-white font-bold block">Challenges</span>
+                        <span className="relative text-teal-100/80 text-xs">Daily & Weekly prizes</span>
                     </button>
                 )}
             </div>
