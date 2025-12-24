@@ -23,7 +23,7 @@ export default function ProWelcomeScreen({ onStart }) {
                     <p className="text-sm">⚡ 25 ratings per day</p>
                     <p className="text-sm">🎭 6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos</p>
                     <p className="text-sm">📊 Precision scoring (87.4 vs 87)</p>
-                    <p className="text-sm">🏆 5 Weekly Challenge entries/day</p>
+                    <p className="text-sm">🏆 1 Weekly Challenge entry/day</p>
                     <p className="text-sm">✨ Golden Insights (Identity + Perception)</p>
                     <p className="text-sm">💡 Pro Tips on every result</p>
                 </div>

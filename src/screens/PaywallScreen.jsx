@@ -78,7 +78,7 @@ export default function PaywallScreen({
                     </div>
                     <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
                         <span className="text-lg">🏆</span>
-                        <span className="text-sm text-white/80 font-medium">5 Weekly Challenge entries/day</span>
+                        <span className="text-sm text-white/80 font-medium">1 Weekly Challenge entry/day</span>
                     </div>
                     <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.03]">
                         <span className="text-lg">✨</span>

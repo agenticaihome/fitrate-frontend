@@ -89,7 +89,7 @@ export const PAYWALL = {
         '25 ratings/day (vs 5 free)',
         '6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos',
         'Precision scoring (87.4 vs 87)',
-        '5 Weekly Challenge entries/day',
+        '1 Weekly Challenge entry/day',
         'Golden Insights (Identity + Social Perception)',
         'Pro Tips on every result',
     ],

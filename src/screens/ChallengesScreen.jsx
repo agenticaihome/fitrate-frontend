@@ -59,7 +59,7 @@ export default function ChallengesScreen({
         } else if (activeTab === 'weekly' && fetchWeeklyLeaderboard) {
             fetchWeeklyLeaderboard()
         }
-    }, [activeTab])
+    }, [activeTab, fetchDailyLeaderboard, fetchWeeklyLeaderboard])
 
     const handleTabChange = (tab) => {
         playSound('click')
@@ -81,16 +81,9 @@ export default function ChallengesScreen({
             paddingTop: 'max(24px, env(safe-area-inset-top))',
             paddingBottom: 'calc(80px + env(safe-area-inset-bottom))'
         }}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 mb-4">
-                <button
-                    onClick={() => { playSound('click'); vibrate(10); onBack(); }}
-                    className="text-white/60 text-sm font-medium"
-                >
-                    ← Back
-                </button>
+            {/* Header - Centered title, no redundant back since BottomNav handles navigation */}
+            <div className="flex items-center justify-center px-6 mb-4">
                 <span className="text-white font-bold text-lg">🏆 Challenges</span>
-                <div className="w-12" />
             </div>
 
             {/* Tab Switcher */}
@@ -330,7 +323,7 @@ export default function ChallengesScreen({
                                     </div>
                                     <div className="mt-3 pt-3 border-t border-white/10">
                                         <p className="text-white/40 text-xs text-center">
-                                            {isPro ? '✨ Pro: 5 entries per week' : '🎮 Free: 1 entry per week'}
+                                            {isPro ? '✨ Pro: 1 entry/day' : '🎮 Free: 1 entry/week'}
                                         </p>
                                     </div>
                                 </div>
@@ -370,7 +363,7 @@ export default function ChallengesScreen({
                                         <div className="space-y-2">
                                             {weeklyLeaderboard.slice(0, 5).map((entry, i) => {
                                                 const { icon, color, label } = getRankDisplay(entry.rank || i + 1)
-                                                const isCurrentUser = userId && entry.userId?.startsWith(userId?.slice(0, 8))
+                                                const isCurrentUser = entry.isCurrentUser || (userId && entry.userId?.startsWith(userId?.slice(0, 8)))
 
                                                 return (
                                                     <div
@@ -389,7 +382,7 @@ export default function ChallengesScreen({
                                                             {entry.imageThumb ? (
                                                                 <img
                                                                     src={entry.imageThumb}
-                                                                    alt=""
+                                                                    alt="Outfit thumbnail"
                                                                     className="w-10 h-10 rounded-lg object-cover"
                                                                     style={{ border: '2px solid rgba(255,255,255,0.2)' }}
                                                                 />
@@ -454,7 +447,7 @@ export default function ChallengesScreen({
                                                 color: '#000'
                                             }}
                                         >
-                                            👑 Go Pro — 5 Tries/Week
+                                            👑 Go Pro — 1 Try/Day
                                         </button>
                                     </div>
                                 )}

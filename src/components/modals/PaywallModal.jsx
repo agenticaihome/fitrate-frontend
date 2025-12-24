@@ -118,7 +118,7 @@ export default function PaywallModal({
                                     '25 ratings/day (vs 2 free)',
                                     '6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos',
                                     'Precision Scoring (87.4 vs 87)',
-                                    '5 Weekly Challenge entries/day',
+                                    '1 Weekly Challenge entry/day',
                                     'Golden Insights + Pro Tips'
                                 ].map((benefit, i) => (
                                     <div key={i} className="flex items-center gap-2 text-sm font-bold text-black/90">
@@ -229,7 +229,7 @@ export default function PaywallModal({
                             { label: 'Daily Ratings', free: '2', pro: '25' },
                             { label: 'AI Modes', free: '2 (Nice/Roast)', pro: 'All 8' },
                             { label: 'Score Detail', free: 'Whole (87)', pro: 'Precise (87.4)' },
-                            { label: 'Weekly Gala', free: '1/week', pro: '5/day' },
+                            { label: 'Weekly Gala', free: '1/week', pro: '1/day' },
                             { label: 'Fashion Show', free: '1 walk', pro: '3 walks' },
                             { label: 'Golden Tips', free: '—', pro: '✓' }
                         ].map((row, i) => (

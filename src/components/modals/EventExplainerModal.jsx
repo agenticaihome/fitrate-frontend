@@ -174,7 +174,7 @@ export default function EventExplainerModal({
                         }}>
                             <p className="text-yellow-400 font-bold text-xs uppercase mb-2">⚡ Pro</p>
                             <ul className="space-y-1 text-[11px] text-gray-300">
-                                <li>• 5 entries per day</li>
+                                <li>• 1 entry per day</li>
                                 <li>• Decimal precision</li>
                                 <li className="text-emerald-400">• (e.g., 87.4)</li>
                             </ul>

@@ -26,8 +26,6 @@ import FashionShowJoin from './screens/FashionShowJoin'
 import FashionShowRunway from './screens/FashionShowRunway'
 import FashionShowInvite from './screens/FashionShowInvite'
 import FashionShowHub from './screens/FashionShowHub'
-// Weekly Challenge screen
-import WeeklyChallengeScreen from './screens/WeeklyChallengeScreen'
 // Combined Challenges screen (Daily + Weekly)
 import ChallengesScreen from './screens/ChallengesScreen'
 
