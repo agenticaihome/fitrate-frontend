@@ -27,6 +27,8 @@ import FashionShowRunway from './screens/FashionShowRunway'
 import FashionShowInvite from './screens/FashionShowInvite'
 // Weekly Challenge screen
 import WeeklyChallengeScreen from './screens/WeeklyChallengeScreen'
+// Combined Challenges screen (Daily + Weekly)
+import ChallengesScreen from './screens/ChallengesScreen'
 
 // Modals
 import PaywallModal from './components/modals/PaywallModal'
@@ -316,7 +318,9 @@ export default function App() {
   const [eventMode, setEventMode] = useState(false) // Default: opt-out of event, show normal mode
   const [userEventStatus, setUserEventStatus] = useState(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
-  const [leaderboard, setLeaderboard] = useState([])
+  const [leaderboard, setLeaderboard] = useState([]) // Weekly challenge leaderboard
+  const [dailyLeaderboard, setDailyLeaderboard] = useState([]) // Daily challenge leaderboard
+  const [userDailyRank, setUserDailyRank] = useState(null)
   const [showEventRules, setShowEventRules] = useState(false)
   const [showEventExplainer, setShowEventExplainer] = useState(false)
   const [showRestoreModal, setShowRestoreModal] = useState(false)
@@ -635,7 +639,7 @@ export default function App() {
     }
   }
 
-  // Fetch leaderboard
+  // Fetch weekly challenge leaderboard
   const fetchLeaderboard = async () => {
     try {
       const res = await fetch(`${API_BASE}/event/leaderboard`, { headers: getApiHeaders() })
@@ -646,6 +650,20 @@ export default function App() {
       }
     } catch (e) {
       console.error('Failed to fetch leaderboard:', e)
+    }
+  }
+
+  // Fetch daily challenge leaderboard
+  const fetchDailyLeaderboard = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/leaderboard/today?userId=${encodeURIComponent(userId)}`, { headers: getApiHeaders() })
+      const data = await res.json()
+      if (data.success) {
+        setDailyLeaderboard(data.leaderboard || [])
+        if (data.userRank) setUserDailyRank(data.userRank)
+      }
+    } catch (e) {
+      console.error('Failed to fetch daily leaderboard:', e)
     }
   }
 
@@ -1839,23 +1857,35 @@ export default function App() {
   }
 
   // ============================================
-  // WEEKLY CHALLENGE SCREEN
+  // CHALLENGES SCREEN (Daily + Weekly)
   // ============================================
-  if (screen === 'weekly-challenge') {
+  if (screen === 'challenges') {
     return (
-      <WeeklyChallengeScreen
+      <ChallengesScreen
+        // Daily challenge props
+        dailyLeaderboard={dailyLeaderboard}
+        userDailyRank={userDailyRank}
+        // Weekly challenge props
         currentEvent={currentEvent}
-        leaderboard={leaderboard}
+        weeklyLeaderboard={leaderboard}
         userEventStatus={userEventStatus}
         userId={userId}
         isPro={isPro}
         freeEventEntryUsed={freeEventEntryUsed}
-        onCompete={() => {
+        // Actions
+        onCompeteDaily={() => {
+          setScreen('home')
+        }}
+        onCompeteWeekly={() => {
           setEventMode(true)
           setScreen('home')
         }}
         onShowPaywall={() => setShowPaywall(true)}
+        onShowFullLeaderboard={() => setShowLeaderboard(true)}
         onBack={() => setScreen('home')}
+        // Data fetching
+        fetchDailyLeaderboard={fetchDailyLeaderboard}
+        fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
       />
     )
   }
@@ -1891,12 +1921,11 @@ export default function App() {
             analyzeOutfit(img, scanType)
           }}
           onShowPaywall={() => setShowPaywall(true)}
-          onShowLeaderboard={() => { setShowLeaderboard(true); fetchLeaderboard(); }}
           onShowRules={() => setShowEventRules(true)}
           onShowRestore={() => setShowRestoreModal(true)}
           onError={(msg) => { setError(msg); setScreen('error'); }}
           onStartFashionShow={() => setFashionShowScreen('create')}
-          onShowWeeklyChallenge={() => { fetchLeaderboard(); fetchUserEventStatus(); setScreen('weekly-challenge'); }}
+          onShowWeeklyChallenge={() => { fetchDailyLeaderboard(); fetchLeaderboard(); fetchUserEventStatus(); setScreen('challenges'); }}
           pendingFashionShowWalk={pendingFashionShowWalk}
           onClearPendingWalk={() => setPendingFashionShowWalk(false)}
           fashionShowName={fashionShowData?.name}
@@ -1943,10 +1972,11 @@ export default function App() {
           activeTab="home"
           eventMode={eventMode}
           onNavigate={(tab) => {
-            if (tab === 'gala') {
+            if (tab === 'challenges') {
+              fetchDailyLeaderboard();
               fetchLeaderboard();
               fetchUserEventStatus();
-              setScreen('weekly-challenge');
+              setScreen('challenges');
             }
             // 'home' tab is already current, no action needed
           }}
@@ -2048,10 +2078,11 @@ export default function App() {
           onNavigate={(tab) => {
             if (tab === 'home') {
               setScreen('home');
-            } else if (tab === 'gala') {
+            } else if (tab === 'challenges') {
+              fetchDailyLeaderboard();
               fetchLeaderboard();
               fetchUserEventStatus();
-              setScreen('weekly-challenge');
+              setScreen('challenges');
             }
           }}
           onScan={() => {
@@ -2211,10 +2242,7 @@ export default function App() {
   }
 
   // ============================================
-  // LEADERBOARD MODAL
-  // ============================================
-  // ============================================
-  // LEADERBOARD MODAL
+  // LEADERBOARD MODAL (Full view from Weekly Challenge)
   // ============================================
   if (showLeaderboard) {
     return (

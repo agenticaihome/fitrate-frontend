@@ -21,6 +21,7 @@ export default function WeeklyChallengeScreen({
     freeEventEntryUsed,
     onCompete,
     onShowPaywall,
+    onShowFullLeaderboard,
     onBack
 }) {
     if (!currentEvent) {
@@ -152,7 +153,7 @@ export default function WeeklyChallengeScreen({
                                             justifyContent: 'center',
                                             fontSize: '1.25rem'
                                         }}>
-                                            {isCurrentUser ? '�' : '�👤'}
+                                            {isCurrentUser ? '✨' : '👤'}
                                         </div>
                                     )}
                                     <span className={`font-medium ${isCurrentUser ? 'text-cyan-400' : 'text-white/80'}`}>
@@ -167,6 +168,16 @@ export default function WeeklyChallengeScreen({
                         <p className="text-center text-white/30 py-8">No entries yet. Be the first!</p>
                     )}
                 </div>
+
+                {/* View Full Leaderboard - subtle link */}
+                {leaderboard.length > 0 && onShowFullLeaderboard && (
+                    <button
+                        onClick={() => { playSound('click'); vibrate(10); onShowFullLeaderboard(); }}
+                        className="w-full text-center py-2 text-white/40 text-xs hover:text-white/60 transition-colors"
+                    >
+                        View all {currentEvent?.totalParticipants || leaderboard.length} participants →
+                    </button>
+                )}
             </div>
 
             {/* Quick Rules */}
@@ -176,7 +187,7 @@ export default function WeeklyChallengeScreen({
             }}>
                 <p className="text-white/50 text-xs text-center">
                     <strong className="text-purple-400">Theme = 50%</strong> of your score • Top 5 win 🏆 •
-                    {isPro ? ' 1 entry/day' : ' 1 free entry/week'}
+                    {isPro ? ' 5 entries/week' : ' 1 free entry/week'}
                 </p>
             </div>
 
