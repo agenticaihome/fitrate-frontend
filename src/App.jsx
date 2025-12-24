@@ -149,17 +149,30 @@ export default function App() {
   // FASHION SHOW STATE
   // ============================================
   const [fashionShowId, setFashionShowId] = useState(() => {
-    // Check URL for /f/:showId pattern
+    // Check URL for /f/:showId pattern OR ?fs= query param
     const path = window.location.pathname
-    const match = path.match(/^\/f\/([a-z0-9]{6})$/i)
-    return match ? match[1].toLowerCase() : null
+    const pathMatch = path.match(/^\/f\/([a-z0-9]{6})$/i)
+    if (pathMatch) return pathMatch[1].toLowerCase()
+
+    // Also check for ?fs= query param (from /show.html redirect)
+    const params = new URLSearchParams(window.location.search)
+    const fsParam = params.get('fs')
+    if (fsParam && /^[a-z0-9]{6}$/i.test(fsParam)) return fsParam.toLowerCase()
+
+    return null
   })
   const [fashionShowData, setFashionShowData] = useState(null)
   const [fashionShowScreen, setFashionShowScreen] = useState(() => {
-    // If we have a show ID in URL, start in join mode
+    // If we have a show ID in URL (path or query), start in join mode
     const path = window.location.pathname
-    const match = path.match(/^\/f\/([a-z0-9]{6})$/i)
-    return match ? 'join' : null  // null = not in fashion show mode
+    const pathMatch = path.match(/^\/f\/([a-z0-9]{6})$/i)
+    if (pathMatch) return 'join'
+
+    const params = new URLSearchParams(window.location.search)
+    const fsParam = params.get('fs')
+    if (fsParam && /^[a-z0-9]{6}$/i.test(fsParam)) return 'join'
+
+    return null  // null = not in fashion show mode
   })
   const [fashionShowNickname, setFashionShowNickname] = useState('')
   const [fashionShowEmoji, setFashionShowEmoji] = useState('😎')

@@ -892,6 +892,23 @@ export default function HomeScreen({
                                     </div>
                                 )}
                             </button>
+
+                            {/* Upload from Gallery option */}
+                            <button
+                                onClick={() => {
+                                    playSound('click')
+                                    vibrate(10)
+                                    document.getElementById('androidGalleryInput')?.click()
+                                }}
+                                className="mt-4 px-4 py-2 rounded-full text-sm font-medium transition-all active:scale-95"
+                                style={{
+                                    background: 'rgba(255,255,255,0.08)',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    color: 'rgba(255,255,255,0.6)'
+                                }}
+                            >
+                                📁 Or upload from gallery
+                            </button>
                         </div>
                     )
                 })()}
@@ -900,7 +917,7 @@ export default function HomeScreen({
 
             {/* Status Pill - Directly below the main button */}
             <div
-                className="mt-6 mb-6 px-5 py-2.5 rounded-full"
+                className="mt-6 mb-2 px-5 py-2.5 rounded-full"
                 style={{
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.1)',
@@ -912,6 +929,14 @@ export default function HomeScreen({
                     {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak}-day streak</span>}
                 </p>
             </div>
+
+            {/* Privacy Assurance */}
+            <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                {eventMode
+                    ? '🔒 Entry photo saved for leaderboard display'
+                    : '🔒 Analyzed instantly • Never stored'
+                }
+            </p>
 
             {/* My Shows Section - Active Fashion Shows */}
             {activeShows.length > 0 && (
