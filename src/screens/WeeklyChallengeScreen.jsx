@@ -187,7 +187,7 @@ export default function WeeklyChallengeScreen({
             }}>
                 <p className="text-white/50 text-xs text-center">
                     <strong className="text-purple-400">Theme = 50%</strong> of your score • Top 5 win 🏆 •
-                    {isPro ? ' 1 entry/day' : ' 1 free entry/week'}
+                    {isPro ? ' 5 entries/week' : ' 1 free entry/week'}
                 </p>
             </div>
 

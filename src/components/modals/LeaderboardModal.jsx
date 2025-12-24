@@ -190,7 +190,7 @@ export default function LeaderboardModal({
                 {!isPro && userEventStatus?.participating && userEventStatus.rank > 5 && (
                     <div className="bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl mb-4 text-center">
                         <span className="text-amber-400 text-xs">
-                            ⭐ Go Pro for 5 tries/day + decimal precision
+                            ⭐ Go Pro for 5 tries/week + decimal precision
                         </span>
                     </div>
                 )}

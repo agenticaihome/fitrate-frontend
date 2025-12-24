@@ -182,7 +182,7 @@ export default function ChallengesScreen({
                             </div>
                             <div className="mt-3 pt-3 border-t border-white/10">
                                 <p className="text-white/40 text-xs text-center">
-                                    ✨ Resets every day at midnight • Unlimited tries
+                                    🎮 FREE for everyone • 1 try per day • Resets at midnight
                                 </p>
                             </div>
                         </div>
@@ -329,7 +329,7 @@ export default function ChallengesScreen({
                                     </div>
                                     <div className="mt-3 pt-3 border-t border-white/10">
                                         <p className="text-white/40 text-xs text-center">
-                                            {isPro ? '✨ Pro: 1 entry per day' : '🎮 Free: 1 entry per week'}
+                                            {isPro ? '✨ Pro: 5 entries per week' : '🎮 Free: 1 entry per week'}
                                         </p>
                                     </div>
                                 </div>
@@ -453,7 +453,7 @@ export default function ChallengesScreen({
                                                 color: '#000'
                                             }}
                                         >
-                                            👑 Go Pro — Unlimited Tries
+                                            👑 Go Pro — 5 Tries/Week
                                         </button>
                                     </div>
                                 )}
