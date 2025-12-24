@@ -3,6 +3,7 @@ import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
+import LeaderboardCard from '../components/LeaderboardCard'
 
 export default function HomeScreen({
     mode,
@@ -697,6 +698,17 @@ export default function HomeScreen({
             )}
 
             {/* Streak moved to bottom area - cleaner above-fold */}
+
+            {/* Today's Top Fits Leaderboard - show when not in Fashion Show mode */}
+            {!fashionShowName && !eventMode && (
+                <div className="w-full max-w-sm px-4 mb-4">
+                    <LeaderboardCard
+                        playSound={playSound}
+                        vibrate={vibrate}
+                        onViewFull={onShowLeaderboard}
+                    />
+                </div>
+            )}
 
             {/* MAIN ACTION CTA */}
             <div className="flex-1 flex flex-col items-center justify-center">
