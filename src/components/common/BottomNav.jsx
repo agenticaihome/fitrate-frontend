@@ -4,15 +4,15 @@ import { playSound, vibrate } from '../../utils/soundEffects'
 const TABS = [
     { id: 'home', icon: '🏠', label: 'Home' },
     { id: 'scan', icon: '📸', label: 'Scan' },
-    { id: 'gala', icon: '🏆', label: 'Event' },
+    { id: 'challenges', icon: '🏆', label: 'Challenges' },
 ]
 
 /**
  * Persistent Bottom Navigation Bar
  * Shows on: home, results, share-success screens
  * Provides quick navigation between core features
- * 
- * @param {string} activeTab - Current active tab ('home', 'gala', or null)
+ *
+ * @param {string} activeTab - Current active tab ('home', 'challenges', or null)
  * @param {boolean} eventMode - Whether user is in competition/event mode
  * @param {function} onNavigate - Called with tab id when tab is tapped
  * @param {function} onScan - Called when scan button is tapped
@@ -46,10 +46,10 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
             {TABS.map(tab => {
                 const isActive = activeTab === tab.id
                 const isScan = tab.id === 'scan'
-                const isGala = tab.id === 'gala'
+                const isChallenges = tab.id === 'challenges'
 
-                // When in event mode, highlight Gala tab
-                const isEventHighlight = eventMode && isGala
+                // When in event mode, highlight Challenges tab
+                const isEventHighlight = eventMode && isChallenges
 
                 return (
                     <button
