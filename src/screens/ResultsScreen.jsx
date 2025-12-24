@@ -506,7 +506,7 @@ export default function ResultsScreen({
             }}
         >
             {/* ===== HERO SECTION: GIANT SCORE ===== */}
-            <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 overflow-visible ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
 
                 {/* TODAY'S FIT VERDICT Header with Mode-Themed Lines */}
                 <div className="flex items-center gap-3 mb-4">
