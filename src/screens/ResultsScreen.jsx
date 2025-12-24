@@ -15,7 +15,25 @@ const getScoreTierColors = (score) => {
     return { accent: '#ff4444', end: '#cc0000', glow: 'rgba(255,68,68,0.5)' }                    // LOW RED
 }
 
-// Tier Badge Component - Big and Bold
+// ============================================
+// MODE-THEMED ACCENT COLORS
+// Each AI mode has distinct accent for UI theming
+// ============================================
+const getModeColors = (mode) => {
+    const colors = {
+        nice: { accent: '#00ff88', end: '#00d4ff', glow: 'rgba(0,255,136,0.4)', border: 'rgba(0,255,136,0.3)', bg: 'rgba(0,255,136,0.08)' },
+        roast: { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.4)', border: 'rgba(255,107,53,0.3)', bg: 'rgba(255,107,53,0.08)' },
+        honest: { accent: '#3b82f6', end: '#06b6d4', glow: 'rgba(59,130,246,0.4)', border: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.08)' },
+        savage: { accent: '#ff1493', end: '#ff0066', glow: 'rgba(255,20,147,0.4)', border: 'rgba(255,20,147,0.3)', bg: 'rgba(255,20,147,0.08)' },
+        rizz: { accent: '#ff69b4', end: '#ff1493', glow: 'rgba(255,105,180,0.4)', border: 'rgba(255,105,180,0.3)', bg: 'rgba(255,105,180,0.08)' },
+        celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.4)', border: 'rgba(255,215,0,0.3)', bg: 'rgba(255,215,0,0.08)' },
+        aura: { accent: '#9b59b6', end: '#8b5cf6', glow: 'rgba(155,89,182,0.4)', border: 'rgba(155,89,182,0.3)', bg: 'rgba(155,89,182,0.08)' },
+        chaos: { accent: '#ff4444', end: '#ff6b6b', glow: 'rgba(255,68,68,0.4)', border: 'rgba(255,68,68,0.3)', bg: 'rgba(255,68,68,0.08)' },
+        event: { accent: '#10b981', end: '#06b6d4', glow: 'rgba(16,185,129,0.4)', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.08)' }
+    }
+    return colors[mode] || colors.honest
+}
+
 const TierBadge = ({ tier, score }) => {
     const tierConfig = {
         legendary: { label: '👑 LEGENDARY', bg: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', text: '#000', glow: '#ffd700' },
