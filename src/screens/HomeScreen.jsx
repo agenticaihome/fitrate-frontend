@@ -886,30 +886,17 @@ export default function HomeScreen({
                                     {entryBlocked ? 'ENTRY USED' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
                                 </span>
 
-                                {/* Subtitle */}
+                                {/* Subtitle - changes based on mode */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {entryBlocked ? 'Go Pro for daily entries!' : isCompeting ? 'Tap to enter competition!' : isRoast ? 'Brutally honest AI' : 'Supportive AI feedback'}
+                                    {dailyChallengeMode ? 'Highest score wins 5 Pro scans!'
+                                        : entryBlocked ? 'Go Pro for daily entries!'
+                                            : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
+                                                : isRoast ? 'Brutally honest AI'
+                                                    : 'Supportive AI feedback'}
                                 </span>
 
-                                {/* Mode Toggle or Exit Competition */}
-                                {isCompeting ? (
-                                    <div
-                                        className="relative mt-4 px-6 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300"
-                                        style={{
-                                            background: 'rgba(0,0,0,0.5)',
-                                            backdropFilter: 'blur(10px)',
-                                            border: '1px solid rgba(45,212,191,0.4)'
-                                        }}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            playSound('click')
-                                            vibrate(15)
-                                            setEventMode(false)
-                                        }}
-                                    >
-                                        <span className="text-teal-400 font-semibold text-sm">Exit Competition Mode</span>
-                                    </div>
-                                ) : (
+                                {/* Mode Toggle - HIDE when in challenge mode */}
+                                {!dailyChallengeMode && !isCompeting && (
                                     <div
                                         className={`relative mt-4 rounded-full flex items-center cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
                                         style={{
@@ -960,55 +947,27 @@ export default function HomeScreen({
                                     </div>
                                 )}
 
-                                {/* Challenge Mode Toggle - Daily/Weekly */}
-                                <div
-                                    className="mt-3 flex items-center gap-2"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    {/* Daily Challenge */}
-                                    <button
-                                        onClick={() => {
-                                            playSound('click')
-                                            vibrate(10)
-                                            if (dailyChallengeMode) {
-                                                setDailyChallengeMode?.(false)
-                                            } else {
-                                                setDailyChallengeMode?.(true)
-                                                setEventMode(false)
-                                            }
+                                {/* Challenge Mode Banner - Shows when in challenge mode (from ChallengesScreen) */}
+                                {(dailyChallengeMode || (eventMode && currentEvent)) && (
+                                    <div
+                                        className="mt-3 px-4 py-2 rounded-xl text-center"
+                                        style={{
+                                            background: dailyChallengeMode
+                                                ? 'rgba(59,130,246,0.2)'
+                                                : 'rgba(16,185,129,0.2)',
+                                            border: `1px solid ${dailyChallengeMode ? 'rgba(59,130,246,0.4)' : 'rgba(16,185,129,0.4)'}`
                                         }}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${dailyChallengeMode
-                                            ? 'bg-blue-500/30 border border-blue-400/60 text-blue-300'
-                                            : 'bg-white/5 border border-white/10 text-white/40'
-                                            }`}
                                     >
-                                        <span>⚡</span>
-                                        <span>Daily</span>
-                                    </button>
-
-                                    {/* Weekly Challenge - only show if event available */}
-                                    {currentEvent && (
-                                        <button
-                                            onClick={() => {
-                                                playSound('click')
-                                                vibrate(10)
-                                                if (eventMode) {
-                                                    setEventMode(false)
-                                                } else {
-                                                    setEventMode(true)
-                                                    setDailyChallengeMode?.(false)
-                                                }
-                                            }}
-                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${eventMode
-                                                ? 'bg-teal-500/30 border border-teal-400/60 text-teal-300'
-                                                : 'bg-white/5 border border-white/10 text-white/40'
-                                                }`}
-                                        >
-                                            <span>🏆</span>
-                                            <span>Weekly</span>
-                                        </button>
-                                    )}
-                                </div>
+                                        <p className="text-sm font-bold" style={{
+                                            color: dailyChallengeMode ? '#3b82f6' : '#10b981'
+                                        }}>
+                                            {dailyChallengeMode ? '⚡ Daily Challenge' : `🏆 ${currentEvent?.theme || 'Weekly Challenge'}`}
+                                        </p>
+                                        <p className="text-[10px] text-white/50 mt-0.5">
+                                            {dailyChallengeMode ? 'Highest score wins!' : 'Match the theme!'}
+                                        </p>
+                                    </div>
+                                )}
                             </button>
 
                             {/* Upload from Gallery option */}
