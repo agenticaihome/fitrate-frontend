@@ -65,7 +65,7 @@ export default function ShareSuccessScreen({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId })
-            }).catch(() => { }) // Silent fail
+            }).catch(err => console.warn('[Analytics] Share tracking failed:', err.message))
         } catch (err) {
             console.error('Failed to copy:', err)
         }

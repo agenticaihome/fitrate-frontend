@@ -100,7 +100,7 @@ export const downloadImage = (blob, filename, shareText) => {
     // Copy caption to clipboard if provided
     if (shareText && navigator.clipboard) {
         navigator.clipboard.writeText(shareText).catch(err => {
-            console.error('Failed to copy to clipboard', err)
+            console.warn('[Clipboard] Copy caption failed:', err.message)
         })
     }
 }
