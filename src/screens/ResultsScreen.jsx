@@ -684,6 +684,20 @@ export default function ResultsScreen({
                     <TierBadge tier={scoreTier} score={scores.overall} />
                 </div>
 
+                {/* Percentile Context Line */}
+                <p className={`text-sm text-white/50 mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                    {scores.overall >= 50
+                        ? `Better than ${getPercentile(scores.overall)}% of fits today`
+                        : `Worse than ${100 - getPercentile(scores.overall)}% of fits today`
+                    }
+                </p>
+
+                {/* Verdict Complete Divider */}
+                <div className={`flex items-center gap-4 mt-4 mb-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    <span className="text-[10px] text-white/30 uppercase tracking-widest">verdict complete</span>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                </div>
                 {/* AI TIER BADGE - Shows for ALL users (eliminates dead space) */}
                 <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                     {isPro ? (
