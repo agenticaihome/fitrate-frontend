@@ -297,6 +297,21 @@ export default function App() {
   const [showDeclineOffer, setShowDeclineOffer] = useState(false)
   const [declineCountdown, setDeclineCountdown] = useState(null) // Seconds remaining for decline offer
 
+  // Daily Streak state - object with current, max, emoji, message, tier
+  const [dailyStreak, setDailyStreak] = useState(() => {
+    // Initialize from localStorage until server syncs on first scan
+    const stored = localStorage.getItem('fitrate_streak')
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        // Support both old format {date, count} and new format
+        if (parsed.current !== undefined) return parsed
+        if (parsed.count !== undefined) return { current: parsed.count, message: `${parsed.count} day streak! 🔥` }
+      } catch (e) { /* ignore */ }
+    }
+    return { current: 0, message: 'Start your streak!' }
+  })
+
   const [screen, setScreen] = useState('home')
   const [showPaywall, setShowPaywall] = useState(false)
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
@@ -1207,17 +1222,29 @@ export default function App() {
           localStorage.setItem('fitrate_scans', JSON.stringify({ date: new Date().toDateString(), count: used }))
         }
 
-        // Update Streak
-        const storedStreak = localStorage.getItem('fitrate_streak')
-        let newStreak = 1
-        const today = new Date().toDateString()
-        if (storedStreak) {
-          const { date, count } = JSON.parse(storedStreak)
-          if (date !== today) newStreak = count + 1
-          else newStreak = count
+        // Update Streak from server response (more accurate than client-side)
+        if (data.streak) {
+          setDailyStreak(data.streak)
+          localStorage.setItem('fitrate_streak', JSON.stringify(data.streak))
+          console.log(`[Streak] Server: ${data.streak.current} days, tier: ${data.streak.tier}`)
+        } else {
+          // Fallback to client-side streak (when server doesn't return it)
+          const storedStreak = localStorage.getItem('fitrate_streak')
+          let newStreak = 1
+          const today = new Date().toDateString()
+          if (storedStreak) {
+            try {
+              const parsed = JSON.parse(storedStreak)
+              const date = parsed.date || parsed.lastScan
+              const count = parsed.count || parsed.current || 0
+              if (date !== today) newStreak = count + 1
+              else newStreak = count || 1
+            } catch (e) { /* ignore */ }
+          }
+          const newStreakObj = { current: newStreak, message: `${newStreak} day streak! 🔥` }
+          localStorage.setItem('fitrate_streak', JSON.stringify(newStreakObj))
+          setDailyStreak(newStreakObj)
         }
-        localStorage.setItem('fitrate_streak', JSON.stringify({ date: today, count: newStreak }))
-        setDailyStreak(newStreak)
 
         // Add virality features to real scores + subscore fallbacks
         const overall = data.scores.overall
@@ -2027,6 +2054,8 @@ export default function App() {
           totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
           fashionShowId={fashionShowId}
           fashionShowName={fashionShowData?.name}
+          dailyStreak={dailyStreak}
+          showToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
           onReturnToRunway={() => {
             setFashionShowScreen('runway')
             setScores(null)

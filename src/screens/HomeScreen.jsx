@@ -559,8 +559,53 @@ export default function HomeScreen({
 
             {/* Header with Logo and Profile */}
             <div className="w-full flex items-center justify-between px-4 mb-2">
-                {/* Empty spacer for centering */}
-                <div className="w-10" />
+                {/* Streak Badge - Left side */}
+                <div
+                    className="relative w-10 h-10 flex items-center justify-center rounded-full cursor-pointer transition-all active:scale-90"
+                    style={{
+                        background: dailyStreak?.current > 0
+                            ? 'rgba(255,107,0,0.15)'
+                            : 'rgba(255,255,255,0.05)',
+                        border: dailyStreak?.current > 0
+                            ? '1px solid rgba(255,107,0,0.3)'
+                            : '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: dailyStreak?.current >= 7
+                            ? '0 0 15px rgba(255,107,0,0.4)'
+                            : 'none'
+                    }}
+                    onClick={() => {
+                        vibrate(10);
+                        const msg = dailyStreak?.current > 0
+                            ? dailyStreak.message || `${dailyStreak.current} day streak! 🔥`
+                            : 'Start your streak today! 💪';
+                        showToast?.(msg);
+                    }}
+                    title={dailyStreak?.current > 0 ? `${dailyStreak.current} day streak` : 'No active streak'}
+                >
+                    <span className="text-lg" style={{
+                        filter: dailyStreak?.current >= 7 ? 'drop-shadow(0 0 4px rgba(255,107,0,0.8))' : 'none'
+                    }}>
+                        {dailyStreak?.current >= 30 ? '🏆' :
+                            dailyStreak?.current >= 14 ? '👑' :
+                                dailyStreak?.current >= 7 ? '✨' :
+                                    dailyStreak?.current >= 3 ? '🔥' :
+                                        dailyStreak?.current >= 1 ? '🔥' : '💤'}
+                    </span>
+                    {dailyStreak?.current > 0 && (
+                        <span
+                            className="absolute -bottom-1 -right-1 text-[10px] font-bold rounded-full px-1.5 py-0.5"
+                            style={{
+                                background: 'linear-gradient(135deg, #ff6b00, #ff9500)',
+                                color: '#fff',
+                                minWidth: '18px',
+                                textAlign: 'center',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                            }}
+                        >
+                            {dailyStreak.current}
+                        </span>
+                    )}
+                </div>
 
                 {/* Logo - centered */}
                 <img

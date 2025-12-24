@@ -337,7 +337,9 @@ export default function ResultsScreen({
     totalScans = 0,  // Total scans user has done (for discovery timing)
     fashionShowId = null,  // Fashion Show context for return button
     fashionShowName = null,
-    onReturnToRunway = null
+    onReturnToRunway = null,
+    dailyStreak = null,  // Daily streak data { current, max, emoji, message, tier, isMilestone, milestone }
+    showToast = null  // Toast function for streak celebration
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
