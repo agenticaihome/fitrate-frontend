@@ -778,71 +778,73 @@ export default function ResultsScreen({
             {/* ===== VERDICT CARD ===== */}
             <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 <div
-                    className="p-5 rounded-3xl border backdrop-blur-xl text-center"
+                    className="p-4 rounded-3xl border backdrop-blur-xl"
                     style={{
                         background: 'rgba(255,255,255,0.05)',
-                        borderColor: `${ringColors.accent}33`,
-                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 40px ${ringColors.glow}`
+                        borderColor: `${modeColors.accent}44`,
+                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), 0 0 30px ${modeColors.glow}`
                     }}
                 >
-                    {/* THE VERDICT Label */}
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">
-                        The Verdict
-                    </p>
-
-                    {/* Verdict Name + Tier Emoji */}
-                    <h1 className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
-                        <span className="mr-2">
-                            {scoreTier === 'legendary' ? '👑' :
-                                scoreTier === 'fire' ? '🔥' :
-                                    scoreTier === 'great' ? '✨' :
-                                        scoreTier === 'good' ? '👍' :
-                                            scoreTier === 'mid' ? '😐' : '💀'}
-                        </span>
-                        {scores.verdict}
-                    </h1>
-
-                    {/* Identity Line - Short, painfully accurate */}
-                    {/* Support both new 'line' field and legacy 'lines' array */}
-                    {(scores.line || (scores.lines && scores.lines[0])) && (
-                        <p className="text-base text-white/50 italic mb-4">
-                            "{scores.line || scores.lines[0]}"
-                        </p>
-                    )}
-
-                    {/* Tagline - Uses mode colors for secondary accent */}
-                    <div
-                        className="inline-block px-4 py-1.5 rounded-full border"
-                        style={{
-                            borderColor: `${modeColors.accent}33`,
-                            background: `${modeColors.accent}11`
-                        }}
-                    >
-                        <span className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: modeColors.accent }}>
-                            {scores.tagline}
-                        </span>
-                    </div>
-
-                    {/* Social Proof */}
-                    <div className="mt-4 pt-4 border-t border-white/5">
-                        <p className="text-base font-bold" style={{ color: socialProof.color }}>{socialProof.msg}</p>
-                        <p className="text-xs text-white/40 mt-1">Top {Math.max(1, 100 - scores.percentile)}% of all fits today</p>
-                    </div>
-
-                    {/* Pull-Quote Strip - Mode-Themed */}
-                    {scores.tagline && (
-                        <div
-                            className="mt-4 pt-3 border-t"
-                            style={{ borderColor: `${modeColors.accent}22` }}
-                        >
-                            <p
-                                className="text-sm italic"
-                                style={{ color: `${modeColors.accent}cc` }}
-                            >
-                                "{scores.tagline}"
+                    {/* Split Layout: Text Left, Photo Right */}
+                    <div className="flex gap-4">
+                        {/* Left: Verdict Content */}
+                        <div className="flex-1 text-left">
+                            {/* THE VERDICT Label */}
+                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">
+                                The Verdict
                             </p>
+
+                            {/* Verdict Name + Tier Emoji */}
+                            <h2 className={`text-xl font-black mb-1 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
+                                {scores.verdict}
+                                <span className="ml-2 text-lg">
+                                    {scoreTier === 'legendary' ? '👑' :
+                                        scoreTier === 'fire' ? '🔥' :
+                                            scoreTier === 'great' ? '✨' :
+                                                scoreTier === 'good' ? '👍' :
+                                                    scoreTier === 'mid' ? '😐' : '💀'}
+                                </span>
+                            </h2>
+
+                            {/* Sub-headline */}
+                            <p className="text-sm font-bold text-white/70 mb-2">
+                                {socialProof.msg}
+                            </p>
+
+                            {/* Identity Line */}
+                            {(scores.line || (scores.lines && scores.lines[0])) && (
+                                <p className="text-xs text-white/40 mb-3 leading-relaxed">
+                                    {scores.line || scores.lines[0]}
+                                </p>
+                            )}
+
+                            {/* Pull-Quote Strip */}
+                            <div
+                                className="py-2 px-3 rounded-lg border-l-2"
+                                style={{
+                                    borderColor: modeColors.accent,
+                                    background: `${modeColors.bg}`
+                                }}
+                            >
+                                <p className="text-xs italic" style={{ color: `${modeColors.accent}dd` }}>
+                                    "{scores.tagline}"
+                                </p>
+                            </div>
                         </div>
-                    )}
+
+                        {/* Right: Photo */}
+                        <div className="w-28 flex-shrink-0">
+                            <div
+                                className={`relative aspect-[3/4] rounded-xl overflow-hidden ${isLegendary ? 'ring-2 ring-yellow-400' : ''}`}
+                                style={{
+                                    border: `2px solid ${modeColors.accent}66`,
+                                    boxShadow: `0 8px 24px rgba(0,0,0,0.4), 0 0 20px ${modeColors.glow}`
+                                }}
+                            >
+                                <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -943,37 +945,6 @@ export default function ResultsScreen({
                     delay={0.4}
                 />
             )}
-
-            {/* ===== PHOTO + STATS ROW ===== */}
-            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                <div className="grid grid-cols-5 gap-3">
-                    {/* Photo - Takes 3 columns */}
-                    <div className="col-span-3 relative">
-                        {isLegendary && (
-                            <div
-                                className="absolute -inset-1 rounded-2xl opacity-50"
-                                style={{
-                                    background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
-                                    filter: 'blur(8px)',
-                                    animation: 'pulse-glow 2s ease-in-out infinite'
-                                }}
-                            />
-                        )}
-                        <div
-                            className={`relative aspect-[3/4] rounded-2xl overflow-hidden ${isLegendary ? 'card-golden' : ''}`}
-                            style={{
-                                border: `2px solid ${ringColors.accent}44`,
-                                boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 30px ${ringColors.glow}`
-                            }}
-                        >
-                            <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-                            <div className="absolute top-2 left-2 opacity-40">
-                                <span className="text-[8px] font-black text-white tracking-widest uppercase drop-shadow">FITRATE.APP</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* ===== UNIFIED PRO INSIGHTS SECTION ===== */}
             {isPro && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
