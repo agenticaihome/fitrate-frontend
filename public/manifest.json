@@ -1,8 +1,10 @@
 {
+  "id": "fitrate-app",
   "name": "FitRate - AI Fit Check",
   "short_name": "FitRate",
   "description": "Get rated. Get roasted. Get sharing. Your AI fit check in seconds.",
   "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#0a0a0f",

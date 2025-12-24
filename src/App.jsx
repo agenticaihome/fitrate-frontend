@@ -351,6 +351,17 @@ export default function App() {
     }
   }, [])
 
+  // PWA: Capture install prompt for later use
+  useEffect(() => {
+    const handleBeforeInstall = (e) => {
+      e.preventDefault()
+      window.deferredInstallPrompt = e
+      console.log('[PWA] Install prompt captured')
+    }
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+  }, [])
+
   // PWA STABILITY: Handle visibility changes and memory pressure
   // iOS Safari WebView can crash when backgrounding with large images in memory
   useEffect(() => {

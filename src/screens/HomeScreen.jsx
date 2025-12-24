@@ -1119,6 +1119,31 @@ export default function HomeScreen({
                 </button>
             )}
 
+            {/* Subtle PWA Install Prompt - only show if not already installed */}
+            {!window.matchMedia('(display-mode: standalone)').matches && (
+                <button
+                    onClick={() => {
+                        playSound('click')
+                        // Show iOS instructions or trigger beforeinstallprompt
+                        if (window.deferredInstallPrompt) {
+                            window.deferredInstallPrompt.prompt()
+                        } else {
+                            // iOS fallback - show toast with instructions
+                            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+                            if (isIOS) {
+                                alert('Tap the Share button (□↑) then "Add to Home Screen"')
+                            } else {
+                                alert('Tap the menu (⋮) then "Add to Home Screen" or "Install App"')
+                            }
+                        }
+                    }}
+                    className="mt-6 mb-4 text-[11px] transition-all active:opacity-60"
+                    style={{ color: 'rgba(255,255,255,0.25)' }}
+                >
+                    📲 Add to Home Screen for quick access
+                </button>
+            )}
+
             {/* Android Photo Picker Modal - dual buttons for camera vs gallery */}
             {showAndroidPhotoModal && (
                 <div
