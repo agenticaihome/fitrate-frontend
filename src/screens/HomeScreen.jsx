@@ -14,6 +14,7 @@ export default function HomeScreen({
     currentEvent,
     eventMode,
     dailyChallengeMode,  // Daily challenge mode flag
+    setDailyChallengeMode,  // Setter for daily challenge mode
     setEventMode,
     purchasedScans,
     challengeScore,
@@ -801,6 +802,12 @@ export default function HomeScreen({
                         buttonAccentEnd = '#b45309';
                         buttonGlow = 'rgba(245,158,11,0.3)';
                         innerGradient = 'linear-gradient(135deg, #78716c 0%, #57534e 50%, #44403c 100%)';
+                    } else if (dailyChallengeMode) {
+                        // Blue for Daily Challenge mode
+                        buttonAccent = '#3b82f6';
+                        buttonAccentEnd = '#1d4ed8';
+                        buttonGlow = 'rgba(59,130,246,0.5)';
+                        innerGradient = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
                     } else if (isCompeting) {
                         // Teal/emerald for competition mode
                         buttonAccent = '#10b981';
@@ -952,6 +959,56 @@ export default function HomeScreen({
                                         </span>
                                     </div>
                                 )}
+
+                                {/* Challenge Mode Toggle - Daily/Weekly */}
+                                <div
+                                    className="mt-3 flex items-center gap-2"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {/* Daily Challenge */}
+                                    <button
+                                        onClick={() => {
+                                            playSound('click')
+                                            vibrate(10)
+                                            if (dailyChallengeMode) {
+                                                setDailyChallengeMode?.(false)
+                                            } else {
+                                                setDailyChallengeMode?.(true)
+                                                setEventMode(false)
+                                            }
+                                        }}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${dailyChallengeMode
+                                            ? 'bg-blue-500/30 border border-blue-400/60 text-blue-300'
+                                            : 'bg-white/5 border border-white/10 text-white/40'
+                                            }`}
+                                    >
+                                        <span>⚡</span>
+                                        <span>Daily</span>
+                                    </button>
+
+                                    {/* Weekly Challenge - only show if event available */}
+                                    {currentEvent && (
+                                        <button
+                                            onClick={() => {
+                                                playSound('click')
+                                                vibrate(10)
+                                                if (eventMode) {
+                                                    setEventMode(false)
+                                                } else {
+                                                    setEventMode(true)
+                                                    setDailyChallengeMode?.(false)
+                                                }
+                                            }}
+                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95 ${eventMode
+                                                ? 'bg-teal-500/30 border border-teal-400/60 text-teal-300'
+                                                : 'bg-white/5 border border-white/10 text-white/40'
+                                                }`}
+                                        >
+                                            <span>🏆</span>
+                                            <span>Weekly</span>
+                                        </button>
+                                    )}
+                                </div>
                             </button>
 
                             {/* Upload from Gallery option */}

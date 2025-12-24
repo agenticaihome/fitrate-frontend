@@ -1914,6 +1914,7 @@ export default function App() {
           currentEvent={currentEvent}
           eventMode={eventMode}
           dailyChallengeMode={dailyChallengeMode}
+          setDailyChallengeMode={setDailyChallengeMode}
           setEventMode={setEventMode}
           purchasedScans={purchasedScans}
           challengeScore={challengeScore}
