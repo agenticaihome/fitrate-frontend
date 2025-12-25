@@ -114,12 +114,12 @@ export const generateShareCard = async ({
             ctx.fillStyle = accentGlow
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-            // Format-aware Y positions
+            // Format-aware Y positions (UPGRADED for viral layout)
             const headerY = isSquare ? 50 : 80
-            const scoreRingY = isSquare ? 220 : 320
-            const verdictCardY = isSquare ? 420 : 600
-            const breakdownY = isSquare ? 700 : 1050
-            const ctaY = isSquare ? 950 : 1600
+            const scoreRingY = isSquare ? 240 : 360   // Moved down for bigger ring
+            const verdictCardY = isSquare ? 480 : 700  // Bigger photo area
+            const breakdownY = isSquare ? 780 : 1180   // Simplified bars
+            const ctaY = isSquare ? 950 : 1550         // Share CTA line
 
             // ===== TODAY'S FIT VERDICT HEADER =====
             ctx.save()
@@ -168,11 +168,12 @@ export const generateShareCard = async ({
                     scores.overall >= 60 ? '#00d4ff' :
                         scores.overall >= 40 ? '#ffaa00' : '#ff4444'
 
-            // Score ring background
+            // Score ring background (BIGGER - 15% larger)
+            const ringRadius = isSquare ? 115 : 150  // Upgraded from 100/130
             ctx.beginPath()
-            ctx.arc(540, scoreRingY, isSquare ? 100 : 130, 0, Math.PI * 2)
+            ctx.arc(540, scoreRingY, ringRadius, 0, Math.PI * 2)
             ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-            ctx.lineWidth = 16
+            ctx.lineWidth = 20  // Thicker ring
             ctx.stroke()
 
             // Score ring progress (animated effect simulated)
@@ -185,21 +186,21 @@ export const generateShareCard = async ({
             ctx.beginPath()
             const startAngle = -Math.PI / 2
             const endAngle = startAngle + (scores.overall / 100) * Math.PI * 2
-            ctx.arc(540, scoreRingY, isSquare ? 100 : 130, startAngle, endAngle)
+            ctx.arc(540, scoreRingY, ringRadius, startAngle, endAngle)
             ctx.stroke()
             ctx.shadowBlur = 0
 
-            // Score number
+            // Score number (BIGGER - bolder impact)
             ctx.fillStyle = '#fff'
-            ctx.font = `bold ${isSquare ? 80 : 100}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.font = `bold ${isSquare ? 95 : 120}px -apple-system, BlinkMacSystemFont, sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(Math.round(scores.overall), 540, scoreRingY)
 
             // /100 below
             ctx.fillStyle = 'rgba(255,255,255,0.4)'
-            ctx.font = `bold ${isSquare ? 24 : 30}px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText('/ 100', 540, scoreRingY + (isSquare ? 55 : 70))
+            ctx.font = `bold ${isSquare ? 28 : 36}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText('/ 100', 540, scoreRingY + (isSquare ? 65 : 85))
             ctx.textBaseline = 'alphabetic'
 
             // Verdict name below ring
@@ -238,10 +239,10 @@ export const generateShareCard = async ({
             // Split: Left side = text, Right side = photo
             const textAreaWidth = cardWidth * 0.6
             const photoAreaWidth = cardWidth * 0.35
-            const photoX = cardX + textAreaWidth + 30
-            const photoY = verdictCardY + 20
-            const photoW = isSquare ? 200 : 280
-            const photoH = isSquare ? 200 : cardHeight - 40
+            const photoX = cardX + textAreaWidth + 20
+            const photoY = verdictCardY + 15
+            const photoW = isSquare ? 240 : 340  // 20% BIGGER photo
+            const photoH = isSquare ? 240 : cardHeight - 30
 
             // THE VERDICT label
             ctx.fillStyle = 'rgba(255,255,255,0.4)'
@@ -310,89 +311,135 @@ export const generateShareCard = async ({
             ctx.stroke()
 
 
-            // ===== FIT BREAKDOWN SECTION (2x2 Grid) =====
-            ctx.textAlign = 'left'
-
-            // FIT BREAKDOWN header
-            ctx.fillStyle = 'rgba(255,255,255,0.5)'
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+            // ===== SIMPLIFIED BAR BREAKDOWN (Viral-Optimized) =====
             ctx.textAlign = 'center'
-            ctx.fillText('━━━ FIT BREAKDOWN ━━━', 540, breakdownY)
-            ctx.fillStyle = 'rgba(255,255,255,0.3)'
-            ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText(scores.overall >= 50 ? '(what went right)' : '(what went wrong)', 540, breakdownY + 20)
 
-            // 2x2 Grid of metrics
-            const metrics = [
-                { emoji: '🎨', label: 'Color Energy', score: scores.colorEnergy || Math.round(scores.overall * 0.9), desc: (scores.colorEnergy || scores.overall) >= 60 ? 'Bold palette' : 'Safe palette' },
-                { emoji: '📐', label: 'Silhouette', score: scores.silhouette || Math.round(scores.overall * 0.85), desc: (scores.silhouette || scores.overall) >= 60 ? 'Sharp lines' : 'Angles off' },
-                { emoji: '✨', label: 'Outfit Intent', score: scores.intent || Math.round(scores.overall * 0.95), desc: (scores.intent || scores.overall) >= 60 ? 'Clear vision' : 'No game plan' },
-                { emoji: '🎲', label: 'Risk Taken', score: scores.riskTaken || Math.round(scores.overall * 0.7), desc: (scores.riskTaken || scores.overall * 0.7) >= 50 ? 'Bold moves' : 'Played safe' }
+            // 3-bar metrics (cleaner, more scannable)
+            const barMetrics = [
+                { label: 'Style', score: scores.colorEnergy || Math.round(scores.overall * 0.9) },
+                { label: 'Risk', score: scores.riskTaken || Math.round(scores.overall * 0.7) },
+                { label: 'Intent', score: scores.intent || Math.round(scores.overall * 0.95) }
             ]
 
-            const gridStartY = breakdownY + 45
-            const cellWidth = isSquare ? 200 : 240
-            const cellHeight = isSquare ? 70 : 90
-            const gridGap = isSquare ? 20 : 30
-            const gridStartX = (1080 - (cellWidth * 2 + gridGap)) / 2
+            const barStartX = 180
+            const barWidth = 720
+            const barHeight = isSquare ? 10 : 14
+            const barSpacing = isSquare ? 40 : 55
+            const barStartY = breakdownY + 20
 
-            metrics.forEach((metric, i) => {
-                const col = i % 2
-                const row = Math.floor(i / 2)
-                const x = gridStartX + col * (cellWidth + gridGap)
-                const y = gridStartY + row * (cellHeight + gridGap)
+            barMetrics.forEach((metric, i) => {
+                const y = barStartY + i * barSpacing
 
-                // Cell background
-                ctx.fillStyle = 'rgba(255,255,255,0.04)'
-                ctx.beginPath()
-                ctx.roundRect(x, y, cellWidth, cellHeight, 12)
-                ctx.fill()
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)'
-                ctx.lineWidth = 1
-                ctx.stroke()
-
-                // Emoji + Label
-                ctx.fillStyle = 'rgba(255,255,255,0.8)'
-                ctx.font = `bold ${isSquare ? 14 : 16}px -apple-system, BlinkMacSystemFont, sans-serif`
+                // Label
+                ctx.fillStyle = 'rgba(255,255,255,0.7)'
+                ctx.font = `bold ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
                 ctx.textAlign = 'left'
-                ctx.fillText(`${metric.emoji} ${metric.label}`, x + 12, y + (isSquare ? 22 : 28))
+                ctx.fillText(metric.label, barStartX - 80, y + (barHeight / 2) + 5)
 
-                // Score number (mode colored)
+                // Bar background
+                ctx.fillStyle = 'rgba(255,255,255,0.1)'
+                ctx.beginPath()
+                ctx.roundRect(barStartX, y, barWidth, barHeight, barHeight / 2)
+                ctx.fill()
+
+                // Bar fill (percentage-based)
+                const fillWidth = (metric.score / 100) * barWidth
                 ctx.fillStyle = modeColors.accent
-                ctx.font = `bold ${isSquare ? 24 : 32}px -apple-system, BlinkMacSystemFont, sans-serif`
-                ctx.fillText(metric.score.toString(), x + 12, y + (isSquare ? 52 : 65))
-
-                // Description
-                ctx.fillStyle = 'rgba(255,255,255,0.4)'
-                ctx.font = `${isSquare ? 11 : 13}px -apple-system, BlinkMacSystemFont, sans-serif`
-                ctx.fillText(metric.desc, x + (isSquare ? 55 : 75), y + (isSquare ? 50 : 62))
+                ctx.shadowColor = modeColors.accent
+                ctx.shadowBlur = 8
+                ctx.beginPath()
+                ctx.roundRect(barStartX, y, fillWidth, barHeight, barHeight / 2)
+                ctx.fill()
+                ctx.shadowBlur = 0
             })
 
-            // AI Summary line
-            const summaryY = gridStartY + (cellHeight * 2) + (gridGap * 2) + 20
-            const summaryText = scores.summaryLine || scores.tagline || `${scores.overall >= 60 ? 'Strong presence.' : 'Low presence.'} ${scores.overall >= 70 ? 'High intention.' : 'Needs focus.'}`
-            ctx.fillStyle = 'rgba(255,255,255,0.05)'
+            // ===== SHARE CTA LINE (Viral Trigger) =====
+            const ctaLineY = barStartY + (barSpacing * 3) + 30
+            ctx.fillStyle = 'rgba(255,255,255,0.06)'
             ctx.beginPath()
-            ctx.roundRect(120, summaryY - 20, 840, 50, 25)
+            ctx.roundRect(150, ctaLineY - 25, 780, 55, 28)
             ctx.fill()
-            ctx.fillStyle = 'rgba(255,255,255,0.6)'
-            ctx.font = `italic ${isSquare ? 16 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.strokeStyle = `${modeColors.accent}40`
+            ctx.lineWidth = 1
+            ctx.stroke()
+
+            // CTA Text - conversation starter
+            const ctaOptions = [
+                "Think this is wrong? Prove it.",
+                "Post yours. Let the internet decide.",
+                "Agree or nah? Your turn.",
+                "Valid or violence? You decide."
+            ]
+            const ctaText = ctaOptions[Math.floor(Math.random() * ctaOptions.length)]
+            ctx.fillStyle = modeColors.accent
+            ctx.font = `bold ${isSquare ? 18 : 22}px -apple-system, BlinkMacSystemFont, sans-serif`
             ctx.textAlign = 'center'
-            ctx.fillText(summaryText, 540, summaryY + 8)
+            ctx.fillText(ctaText, 540, ctaLineY + 5)
 
-            // ===== FOOTER =====
-            const footerY = isSquare ? 1020 : 1800
+            // ===== DNA BADGES (Time-of-Day + Streak) =====
+            const dnaBadgesY = ctaLineY + (isSquare ? 55 : 75)
+            const timeBadge = cardDNA?.copySlots?.timeBadge
+            const streakBadge = cardDNA?.copySlots?.streakBadge
+            const timeAccent = cardDNA?.timeContext?.accent || modeColors.accent
 
-            // TOP X% badge
-            ctx.fillStyle = 'rgba(255,255,255,0.3)'
-            ctx.font = `bold ${isSquare ? 16 : 20}px -apple-system, BlinkMacSystemFont, sans-serif`
+            // Render badges side by side if both exist, centered if only one
+            const badges = [timeBadge, streakBadge].filter(Boolean)
+            if (badges.length > 0) {
+                const badgeSpacing = isSquare ? 12 : 18
+                const badgePadding = isSquare ? 20 : 28
+                const badgeFontSize = isSquare ? 13 : 16
+
+                // Measure total width
+                ctx.font = `bold ${badgeFontSize}px -apple-system, BlinkMacSystemFont, sans-serif`
+                const badgeWidths = badges.map(b => ctx.measureText(b).width + badgePadding * 2)
+                const totalWidth = badgeWidths.reduce((a, b) => a + b, 0) + (badges.length - 1) * badgeSpacing
+
+                let currentX = 540 - totalWidth / 2
+
+                badges.forEach((badge, i) => {
+                    const width = badgeWidths[i]
+                    const isTime = badge === timeBadge
+                    const badgeColor = isTime ? timeAccent : '#FFB347'
+
+                    // Badge background
+                    ctx.fillStyle = `${badgeColor}20`
+                    ctx.beginPath()
+                    ctx.roundRect(currentX, dnaBadgesY - (isSquare ? 12 : 15), width, isSquare ? 26 : 32, (isSquare ? 26 : 32) / 2)
+                    ctx.fill()
+                    ctx.strokeStyle = `${badgeColor}50`
+                    ctx.lineWidth = 1
+                    ctx.stroke()
+
+                    // Badge text
+                    ctx.fillStyle = badgeColor
+                    ctx.font = `bold ${badgeFontSize}px -apple-system, BlinkMacSystemFont, sans-serif`
+                    ctx.textAlign = 'center'
+                    ctx.fillText(badge, currentX + width / 2, dnaBadgesY + (isSquare ? 2 : 3))
+
+                    currentX += width + badgeSpacing
+                })
+            }
+
+            // ===== FOOTER (Stronger Branding) =====
+            const footerY = isSquare ? 1020 : 1800  // Adjusted for badges
+
+            // Percentile context (tighter copy)
             const footerPercent = Math.max(1, 100 - (scores.percentile || 50))
-            ctx.fillText(`TOP ${footerPercent}% OF ALL FITS TODAY`, 540, footerY)
-
-            // FITRATE.APP branding
-            ctx.fillStyle = 'rgba(255,255,255,0.2)'
+            const percentCopy = scores.overall >= 50
+                ? `Outscored ${footerPercent}% of fits today`
+                : `Top ${100 - footerPercent}% avoided this fate`
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'
             ctx.font = `bold ${isSquare ? 14 : 18}px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText('FITRATE.APP', 540, footerY + (isSquare ? 28 : 35))
+            ctx.textAlign = 'center'
+            ctx.fillText(percentCopy, 540, footerY)
+
+            // FITRATE branding - memorable tagline
+            ctx.fillStyle = 'rgba(255,255,255,0.6)'
+            ctx.font = `bold ${isSquare ? 18 : 24}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText('FitRate', 540, footerY + (isSquare ? 35 : 45))
+            ctx.fillStyle = 'rgba(255,255,255,0.35)'
+            ctx.font = `${isSquare ? 12 : 16}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText('Get rated. Get roasted.', 540, footerY + (isSquare ? 55 : 72))
 
             // Generate Conversation-Starter Share Text
             const getShareText = () => {
