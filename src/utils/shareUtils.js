@@ -242,15 +242,15 @@ export const generateShareCard = async ({
             const vibeTag = pickRandom(VIBE_TAGS[vibeBand])
             const vibeY = verdictY + (verdictLines.length * 40) + 18
 
-            ctx.fillStyle = 'rgba(255,255,255,0.55)'  // Increased opacity
-            ctx.font = 'italic 600 17px -apple-system, BlinkMacSystemFont, sans-serif'  // Italic for intentional feel
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'
+            ctx.font = 'italic 600 20px -apple-system, BlinkMacSystemFont, sans-serif'  // BIGGER for readability
             ctx.fillText(vibeTag, canvas.width / 2, vibeY)
 
-            // ===== SECTION 5: MICRO SCORES (3 Pills with emojis) =====
-            const pillY = vibeY + 45
-            const pillWidth = 110  // Slightly wider
-            const pillHeight = 42
-            const pillGap = 16  // Tighter spacing
+            // ===== SECTION 5: MICRO SCORES (3 Pills with emojis - BIGGER for accessibility) =====
+            const pillY = vibeY + 50
+            const pillWidth = 130  // Wider for larger text
+            const pillHeight = 48  // Taller
+            const pillGap = 12
             const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
             const pillStartX = (canvas.width - totalPillWidth) / 2
 
@@ -274,54 +274,54 @@ export const generateShareCard = async ({
                 ctx.lineWidth = 1
                 ctx.stroke()
 
-                // Emoji + Label
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'  // Higher contrast
-                ctx.font = '15px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Emoji + Label (BIGGER - 18px min for accessibility)
+                ctx.fillStyle = 'rgba(255,255,255,0.7)'
+                ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'left'
-                ctx.fillText(`${item.emoji} ${item.label}`, x + 10, pillY + 27)
+                ctx.fillText(`${item.emoji} ${item.label}`, x + 10, pillY + 30)
 
-                // Score value
+                // Score value (BIGGER - 20px for emphasis)
                 ctx.fillStyle = badgeColors.from
-                ctx.font = 'bold 17px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'right'
-                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 27)
+                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 30)
             })
 
-            // ===== SECTION 6: "REAL TALK" LINE (Trust Anchor) =====
-            const realTalkY = pillY + pillHeight + 38
+            // ===== SECTION 6: "REAL TALK" LINE (Trust Anchor - BIGGER) =====
+            const realTalkY = pillY + pillHeight + 42
             const realTalkPrefix = pickRandom(REAL_TALK_VARIANTS)
 
             // Draw as single formatted line: "Honest score: 48 / 100"
             ctx.textAlign = 'center'
 
-            // Measure to center properly
-            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
+            // Measure to center properly (BIGGER sizes for readability)
+            ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
             const prefixText = `${realTalkPrefix}:`
             const scoreText = ` ${score} / 100`
             const prefixWidth = ctx.measureText(prefixText).width
-            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
             const scoreWidth = ctx.measureText(scoreText).width
             const totalWidth = prefixWidth + scoreWidth
             const startX = canvas.width / 2 - totalWidth / 2
 
             // Prefix (lighter)
-            ctx.fillStyle = 'rgba(255,255,255,0.45)'
-            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.5)'
+            ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'left'
             ctx.fillText(prefixText, startX, realTalkY)
 
             // Score (heavier, with proper spacing)
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText(scoreText, startX + prefixWidth, realTalkY)
 
-            // ===== SECTION 7: CTA BUTTON (Firmer, more button-like) =====
-            const ctaY = realTalkY + 55
-            const ctaWidth = 360
-            const ctaHeight = 60  // Taller
+            // ===== SECTION 7: CTA BUTTON (Firmer, more button-like - BIGGER) =====
+            const ctaY = realTalkY + 58
+            const ctaWidth = 400  // Wider
+            const ctaHeight = 68  // Taller
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
-            const ctaRadius = 16  // Less pill, more button
+            const ctaRadius = 18
 
             // Button background (slightly more visible)
             ctx.fillStyle = 'rgba(255,255,255,0.10)'
@@ -334,16 +334,16 @@ export const generateShareCard = async ({
             ctx.lineWidth = 2
             ctx.stroke()
 
-            // Button text (slightly larger)
+            // Button text (BIGGER - 22px for all ages)
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 19px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(ctaText, canvas.width / 2, ctaY + 38)
+            ctx.fillText(ctaText, canvas.width / 2, ctaY + 42)
 
-            // ===== SECTION 8: FOOTER TAGLINE =====
-            const footerY = ctaY + ctaHeight + 35
-            ctx.fillStyle = 'rgba(255,255,255,0.25)'
-            ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+            // ===== SECTION 8: FOOTER TAGLINE (BIGGER - 18px for accessibility) =====
+            const footerY = ctaY + ctaHeight + 38
+            ctx.fillStyle = 'rgba(255,255,255,0.35)'
+            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText('Rate your fit in seconds', canvas.width / 2, footerY)
 
             // ===== GENERATE SHARE TEXT =====
