@@ -301,69 +301,71 @@ export const generateShareCard = async ({
 
             // ===== SECTION 6: MICRO SCORES (HARD-SPEC: 🎨 Color ## 👔 Fit ## ✨ Style ##) =====
             const pillY = insightY + (insightLines.length * 26) + 35
-            const pillWidth = 130
-            const pillHeight = 48
-            const pillGap = 12
+            const pillWidth = 120  // Slightly smaller for mobile fit
+            const pillHeight = 44
+            const pillGap = 16  // More gap for breathing room
             const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
             const pillStartX = (canvas.width - totalPillWidth) / 2
 
             const microScores = [
                 { emoji: '🎨', label: 'Color', score: scores.colorEnergy || Math.round(score * 0.95) },
-                { emoji: '👔', label: 'Fit', score: scores.silhouette || Math.round(score * 0.9) },
+                { emoji: '👕', label: 'Fit', score: scores.silhouette || Math.round(score * 0.9) },
                 { emoji: '✨', label: 'Style', score: scores.intent || Math.round(score * 1.02) }
             ]
 
             microScores.forEach((item, i) => {
                 const x = pillStartX + (i * (pillWidth + pillGap))
 
-                // Pill background (better contrast)
-                ctx.fillStyle = 'rgba(255,255,255,0.12)'
+                // Pill background - darker for contrast
+                ctx.fillStyle = 'rgba(255,255,255,0.06)'
                 ctx.beginPath()
-                ctx.roundRect(x, pillY, pillWidth, pillHeight, pillHeight / 2)
+                ctx.roundRect(x, pillY, pillWidth, pillHeight, 12)
                 ctx.fill()
 
-                // Pill border (more visible)
-                ctx.strokeStyle = 'rgba(255,255,255,0.22)'
-                ctx.lineWidth = 1.5
+                // Pill border
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+                ctx.lineWidth = 1
                 ctx.stroke()
 
-                // Emoji + Label (BIGGER - 18px min for accessibility)
-                ctx.fillStyle = 'rgba(255,255,255,0.7)'
-                ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Emoji
+                ctx.fillStyle = '#ffffff'
+                ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'left'
-                ctx.fillText(`${item.emoji} ${item.label}`, x + 10, pillY + 30)
+                ctx.textBaseline = 'middle'
+                ctx.fillText(item.emoji, x + 10, pillY + pillHeight / 2)
 
-                // Score value (BIGGER - 20px for emphasis)
-                ctx.fillStyle = badgeColors.from
-                ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Label (gray)
+                ctx.fillStyle = 'rgba(255,255,255,0.5)'
+                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText(item.label, x + 32, pillY + pillHeight / 2)
+
+                // Score value (white, bold)
+                ctx.fillStyle = '#ffffff'
+                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'right'
-                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 30)
+                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + pillHeight / 2)
             })
 
-            // ===== SECTION 7: CTA BUTTON (directly after micro scores) =====
+            // ===== SECTION 7: CTA BUTTON (SOLID GREEN - high visibility) =====
             const ctaY = pillY + pillHeight + 48
             const ctaWidth = 420
             const ctaHeight = 64
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
-            const ctaRadius = 18
+            const ctaRadius = 16
 
-            // Button background (more punch)
-            ctx.fillStyle = 'rgba(255,255,255,0.12)'
+            // Solid green background (matches reference)
+            ctx.fillStyle = '#10b981'
             ctx.beginPath()
             ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
             ctx.fill()
 
-            // Button border (stronger definition)
-            ctx.strokeStyle = 'rgba(255,255,255,0.35)'
-            ctx.lineWidth = 2
-            ctx.stroke()
-
-            // Button text (BIGGER - 22px for all ages)
+            // Button text (white, bold)
             ctx.fillStyle = '#ffffff'
             ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(ctaText, canvas.width / 2, ctaY + 42)
+            ctx.textBaseline = 'middle'
+            ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
