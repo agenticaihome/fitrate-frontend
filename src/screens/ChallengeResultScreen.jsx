@@ -8,13 +8,15 @@ import { playSound, vibrate } from '../utils/soundEffects'
 export default function ChallengeResultScreen({
     userScore,           // User's new score
     challengeScore,      // Opponent's score from URL
+    userImage,           // User's outfit photo
     onViewResults,       // Go to full results
     onChallengeBack,     // Start new challenge share flow
     onTryAgain           // Go home to scan again
 }) {
     const won = userScore > challengeScore
     const tied = userScore === challengeScore
-    const diff = Math.abs(userScore - challengeScore)
+    // Fix floating point precision (0.20000000000000284 → 0.2)
+    const diff = Math.round(Math.abs(userScore - challengeScore) * 10) / 10
 
     // Play victory/defeat sound on mount
     React.useEffect(() => {
@@ -62,17 +64,42 @@ export default function ChallengeResultScreen({
             </h1>
 
             {/* Score Comparison */}
-            <div className="flex items-center gap-4 my-8">
-                {/* Your Score */}
+            <div className="flex items-center gap-6 my-8">
+                {/* Your Score with Photo */}
                 <div className="flex flex-col items-center">
                     <span className="text-sm text-white/50 uppercase tracking-wide mb-2">You</span>
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
-                        style={{
-                            background: won ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.1)',
-                            border: won ? '3px solid #00ff88' : '3px solid rgba(255,255,255,0.2)',
-                            color: won ? '#00ff88' : '#fff'
-                        }}>
-                        {userScore}
+                    <div className="relative">
+                        {/* Photo circle */}
+                        <div
+                            className="w-28 h-28 rounded-full overflow-hidden"
+                            style={{
+                                border: won ? '4px solid #00ff88' : '4px solid rgba(255,255,255,0.3)',
+                                boxShadow: won ? '0 0 30px rgba(0,255,136,0.4)' : 'none'
+                            }}
+                        >
+                            {userImage ? (
+                                <img
+                                    src={userImage}
+                                    alt="Your outfit"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                    <span className="text-3xl">👤</span>
+                                </div>
+                            )}
+                        </div>
+                        {/* Score badge */}
+                        <div
+                            className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-lg font-black"
+                            style={{
+                                background: won ? '#00ff88' : '#1a1a1a',
+                                color: won ? '#000' : '#fff',
+                                border: won ? 'none' : '2px solid rgba(255,255,255,0.3)'
+                            }}
+                        >
+                            {Math.round(userScore)}
+                        </div>
                     </div>
                 </div>
 
@@ -82,13 +109,29 @@ export default function ChallengeResultScreen({
                 {/* Challenger Score */}
                 <div className="flex flex-col items-center">
                     <span className="text-sm text-white/50 uppercase tracking-wide mb-2">Them</span>
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
-                        style={{
-                            background: !won && !tied ? 'rgba(255,68,68,0.2)' : 'rgba(255,255,255,0.1)',
-                            border: !won && !tied ? '3px solid #ff4444' : '3px solid rgba(255,255,255,0.2)',
-                            color: !won && !tied ? '#ff4444' : '#fff'
-                        }}>
-                        {challengeScore}
+                    <div className="relative">
+                        {/* Placeholder circle for opponent */}
+                        <div
+                            className="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center"
+                            style={{
+                                background: !won && !tied ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.08)',
+                                border: !won && !tied ? '4px solid #ff4444' : '4px solid rgba(255,255,255,0.2)',
+                                boxShadow: !won && !tied ? '0 0 30px rgba(255,68,68,0.3)' : 'none'
+                            }}
+                        >
+                            <span className="text-4xl">🤷</span>
+                        </div>
+                        {/* Score badge */}
+                        <div
+                            className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-lg font-black"
+                            style={{
+                                background: !won && !tied ? '#ff4444' : '#1a1a1a',
+                                color: !won && !tied ? '#fff' : '#fff',
+                                border: !won && !tied ? 'none' : '2px solid rgba(255,255,255,0.3)'
+                            }}
+                        >
+                            {challengeScore}
+                        </div>
                     </div>
                 </div>
             </div>
