@@ -1355,15 +1355,17 @@ export default function App() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      // Create thumbnail for event mode submissions (Weekly Challenge)
+      // Create thumbnail for event mode OR daily challenge submissions
       const isProEventSubmission = eventMode && currentEvent && !fashionShowId;
-      let proEventThumb = null;
-      if (isProEventSubmission && imageData) {
+      const isProDailyChallengeSubmission = dailyChallengeMode && !fashionShowId;
+
+      let proChallengeThumb = null;
+      if ((isProEventSubmission || isProDailyChallengeSubmission) && imageData) {
         try {
-          proEventThumb = await createThumbnail(imageData, 150, 0.6);
-          console.log('[Event Pro] Thumbnail created:', proEventThumb ? `${Math.round(proEventThumb.length / 1024)}KB` : 'failed');
+          proChallengeThumb = await createThumbnail(imageData, 150, 0.6);
+          console.log(`[${isProDailyChallengeSubmission ? 'Daily Pro' : 'Event Pro'}] Thumbnail created:`, proChallengeThumb ? `${Math.round(proChallengeThumb.length / 1024)}KB` : 'failed');
         } catch (e) {
-          console.warn('Failed to create event thumbnail:', e);
+          console.warn('Failed to create challenge thumbnail:', e);
         }
       }
 
@@ -1375,7 +1377,8 @@ export default function App() {
           mode: effectiveMode,  // Use show's vibe when in Fashion Show
           userId,
           eventMode: isProEventSubmission,
-          imageThumb: proEventThumb  // Send thumbnail for Weekly Challenge top-5 display
+          dailyChallenge: isProDailyChallengeSubmission,  // Flag for daily challenge leaderboard
+          imageThumb: proChallengeThumb  // Send thumbnail for leaderboard display
         }),
         signal: controller.signal
       })
