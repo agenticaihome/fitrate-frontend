@@ -476,21 +476,19 @@ export default function FashionShowHub({
                                         <img
                                             src={entry.imageThumb}
                                             alt={`${entry.nickname}'s outfit`}
-                                            className="w-11 h-11 rounded-xl object-cover border-2"
+                                            className="w-14 h-14 rounded-xl object-cover border-2 flex-shrink-0"
                                             style={{ borderColor: isUser ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)' }}
                                         />
                                     ) : (
-                                        <span className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-2xl">
+                                        <span className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-2xl flex-shrink-0">
                                             {entry.emoji}
                                         </span>
                                     )}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-white font-semibold truncate">
-                                            {entry.nickname}
-                                            {isUser && <span className="text-purple-400 ml-1">(you)</span>}
-                                        </div>
-                                    </div>
-                                    <div className="text-xl font-black text-white">{entry.score?.toFixed(1)}</div>
+                                    {/* Quote/Verdict - the signature line */}
+                                    <p className="flex-1 text-sm text-white/70 italic truncate">
+                                        {entry.verdict ? `"${entry.verdict}"` : entry.nickname}
+                                    </p>
+                                    <div className="text-xl font-black text-white flex-shrink-0">{entry.score?.toFixed(1)}</div>
                                 </div>
                             )
                         })}
