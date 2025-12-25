@@ -182,14 +182,14 @@ export const generateShareCard = async ({
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.stroke()
 
-            // ===== SECTION 2: SCORE BADGE (HARD-SPEC: 100px, overlapping ~25%) =====
-            const badgeSize = 100  // HARD-SPEC: ≈100px mobile
+            // ===== SECTION 2: SCORE BADGE (BIGGER for mobile readability) =====
+            const badgeSize = 140  // BIGGER badge for impact
             const badgeX = canvas.width / 2
             const badgeY = imageY + imageHeight - badgeSize * 0.25  // Overlap ~25%
 
             // Badge outer glow (restrained - reduced blur)
             ctx.shadowColor = badgeColors.from
-            ctx.shadowBlur = 20  // Reduced from 30
+            ctx.shadowBlur = 25
 
             // Badge ring gradient
             const badgeGradient = ctx.createLinearGradient(
@@ -203,39 +203,39 @@ export const generateShareCard = async ({
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = badgeGradient
-            ctx.lineWidth = 8
+            ctx.lineWidth = 10
             ctx.stroke()
             ctx.shadowBlur = 0
 
             // Badge inner dark fill
             ctx.beginPath()
-            ctx.arc(badgeX, badgeY, badgeSize / 2 - 6, 0, Math.PI * 2)
+            ctx.arc(badgeX, badgeY, badgeSize / 2 - 8, 0, Math.PI * 2)
             ctx.fillStyle = '#0f0f18'
             ctx.fill()
 
-            // Score number
+            // Score number - MUCH BIGGER
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 56px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 78px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(score.toString(), badgeX, badgeY - 8)
+            ctx.fillText(score.toString(), badgeX, badgeY - 10)
 
-            // /100 below score
-            ctx.fillStyle = 'rgba(255,255,255,0.4)'
-            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText('/100', badgeX, badgeY + 28)
+            // /100 below score - bigger
+            ctx.fillStyle = 'rgba(255,255,255,0.5)'
+            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillText('/100', badgeX, badgeY + 38)
 
-            // ===== SECTION 3: MODE BADGE (Dynamic - above verdict) =====
+            // ===== SECTION 3: MODE BADGE (Dynamic - above verdict) - BIGGER =====
             const currentMode = scores.mode || 'honest'
             const modeConfig = MODE_CONFIG[currentMode] || MODE_CONFIG.honest
-            const modeBadgeY = imageY + imageHeight + 50
-            const modeBadgeHeight = 36
+            const modeBadgeY = imageY + imageHeight + 60
+            const modeBadgeHeight = 48
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
-            // Measure mode badge width
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+            // Measure mode badge width - BIGGER font
+            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
             const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
-            const modeBadgeWidth = modeBadgeTextWidth + 32
+            const modeBadgeWidth = modeBadgeTextWidth + 48
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
 
             // Parse gradient colors for shadow
@@ -244,7 +244,7 @@ export const generateShareCard = async ({
 
             // Mode badge glow
             ctx.shadowColor = modeGlowColor
-            ctx.shadowBlur = 16
+            ctx.shadowBlur = 20
 
             // Mode badge gradient background
             const modeBadgeGradient = ctx.createLinearGradient(modeBadgeX, modeBadgeY, modeBadgeX + modeBadgeWidth, modeBadgeY)
@@ -262,48 +262,48 @@ export const generateShareCard = async ({
             ctx.fill()
             ctx.shadowBlur = 0
 
-            // Mode badge text
+            // Mode badge text - BIGGER
             ctx.fillStyle = modeConfig.textColor
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
 
-            // ===== SECTION 4: VERDICT HEADLINE (Below mode badge) =====
-            const verdictY = modeBadgeY + modeBadgeHeight + 30
+            // ===== SECTION 4: VERDICT HEADLINE (Below mode badge) - MUCH BIGGER =====
+            const verdictY = modeBadgeY + modeBadgeHeight + 45
             const verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
             ctx.fillStyle = '#ffffff'
-            ctx.font = '800 38px -apple-system, BlinkMacSystemFont, sans-serif'  // +1 weight, +2px size
+            ctx.font = '800 52px -apple-system, BlinkMacSystemFont, sans-serif'  // MUCH BIGGER - readable on mobile
             ctx.textAlign = 'center'
             ctx.textBaseline = 'alphabetic'
 
-            // Wrap if needed (tighter line height)
-            const verdictLines = wrapText(ctx, verdict, canvas.width - 100)
-            verdictLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, verdictY + (i * 40))  // Reduced line-height
+            // Wrap if needed - allow multiple lines, that's fine
+            const verdictLines = wrapText(ctx, verdict, canvas.width - 80)
+            verdictLines.slice(0, 3).forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, verdictY + (i * 58))  // Bigger line height for bigger text
             })
 
-            // ===== SECTION 5: AI INSIGHT LINE (HARD-SPEC: explains WHY, neutral tone) =====
+            // ===== SECTION 5: AI INSIGHT LINE - BIGGER for readability =====
             const insightBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
             const aiInsight = scores.summaryLine || pickRandom(AI_INSIGHT_POOLS[insightBand])
-            const insightY = verdictY + (verdictLines.length * 40) + 20
+            const insightY = verdictY + (verdictLines.length * 58) + 25
 
-            ctx.fillStyle = 'rgba(255,255,255,0.55)'
-            ctx.font = '20px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.65)'  // Slightly brighter for readability
+            ctx.font = '30px -apple-system, BlinkMacSystemFont, sans-serif'  // MUCH BIGGER
             ctx.textAlign = 'center'
 
             // Wrap AI insight if needed
-            const insightLines = wrapText(ctx, aiInsight, canvas.width - 120)
+            const insightLines = wrapText(ctx, aiInsight, canvas.width - 100)
             insightLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, insightY + (i * 26))
+                ctx.fillText(line, canvas.width / 2, insightY + (i * 38))
             })
 
-            // ===== SECTION 6: MICRO SCORES (HARD-SPEC: 🎨 Color ## 👔 Fit ## ✨ Style ##) =====
-            const pillY = insightY + (insightLines.length * 26) + 35
-            const pillWidth = 120  // Slightly smaller for mobile fit
-            const pillHeight = 44
-            const pillGap = 16  // More gap for breathing room
+            // ===== SECTION 6: MICRO SCORES - BIGGER pills =====
+            const pillY = insightY + (insightLines.length * 38) + 40
+            const pillWidth = 150  // BIGGER pills
+            const pillHeight = 56
+            const pillGap = 20
             const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
             const pillStartX = (canvas.width - totalPillWidth) / 2
 
@@ -317,52 +317,52 @@ export const generateShareCard = async ({
                 const x = pillStartX + (i * (pillWidth + pillGap))
 
                 // Pill background - darker for contrast
-                ctx.fillStyle = 'rgba(255,255,255,0.06)'
+                ctx.fillStyle = 'rgba(255,255,255,0.08)'
                 ctx.beginPath()
-                ctx.roundRect(x, pillY, pillWidth, pillHeight, 12)
+                ctx.roundRect(x, pillY, pillWidth, pillHeight, 14)
                 ctx.fill()
 
                 // Pill border
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)'
-                ctx.lineWidth = 1
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)'
+                ctx.lineWidth = 1.5
                 ctx.stroke()
 
-                // Emoji
+                // Emoji - BIGGER
                 ctx.fillStyle = '#ffffff'
-                ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'left'
                 ctx.textBaseline = 'middle'
-                ctx.fillText(item.emoji, x + 10, pillY + pillHeight / 2)
+                ctx.fillText(item.emoji, x + 12, pillY + pillHeight / 2)
 
-                // Label (gray)
-                ctx.fillStyle = 'rgba(255,255,255,0.5)'
-                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.fillText(item.label, x + 32, pillY + pillHeight / 2)
+                // Label (gray) - BIGGER
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'
+                ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText(item.label, x + 40, pillY + pillHeight / 2)
 
-                // Score value (white, bold)
+                // Score value (white, bold) - BIGGER
                 ctx.fillStyle = '#ffffff'
-                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'right'
-                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + pillHeight / 2)
+                ctx.fillText(item.score.toString(), x + pillWidth - 14, pillY + pillHeight / 2)
             })
 
-            // ===== SECTION 7: CTA BUTTON (SOLID GREEN - high visibility) =====
-            const ctaY = pillY + pillHeight + 48
-            const ctaWidth = 420
-            const ctaHeight = 64
+            // ===== SECTION 7: CTA BUTTON - BIGGER =====
+            const ctaY = pillY + pillHeight + 50
+            const ctaWidth = 520  // Wider
+            const ctaHeight = 76  // Taller
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
-            const ctaRadius = 16
+            const ctaRadius = 20
 
-            // Solid green background (matches reference)
+            // Solid green background
             ctx.fillStyle = '#10b981'
             ctx.beginPath()
             ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
             ctx.fill()
 
-            // Button text (white, bold)
+            // Button text (white, bold) - BIGGER
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
