@@ -221,11 +221,11 @@ export default function ChallengesScreen({
                                                         <img
                                                             src={entry.imageThumb}
                                                             alt="Outfit"
-                                                            className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
+                                                            className="w-14 h-14 rounded-xl object-cover border-2 flex-shrink-0"
                                                             style={{ borderColor: isCurrentUser ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)' }}
                                                         />
                                                     ) : (
-                                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
+                                                        <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{
                                                             background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
                                                         }}>
                                                             <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
@@ -235,7 +235,7 @@ export default function ChallengesScreen({
                                                     <span className="flex-1 text-sm font-bold text-white/80 truncate">
                                                         {entry.tagline || (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
                                                     </span>
-                                                    <span className="font-black text-2xl" style={{ color }}>{entry.score}</span>
+                                                    <span className="font-black text-2xl" style={{ color }}>{entry.score?.toFixed?.(1) || entry.score}</span>
                                                 </div>
                                             </div>
                                         )
@@ -395,11 +395,11 @@ export default function ChallengesScreen({
                                                                 <img
                                                                     src={entry.imageThumb}
                                                                     alt="Outfit"
-                                                                    className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
+                                                                    className="w-14 h-14 rounded-xl object-cover border-2 flex-shrink-0"
                                                                     style={{ borderColor: isCurrentUser ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)' }}
                                                                 />
                                                             ) : (
-                                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
+                                                                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{
                                                                     background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
                                                                 }}>
                                                                     <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
@@ -409,7 +409,7 @@ export default function ChallengesScreen({
                                                             <span className="flex-1 text-sm font-bold text-white/80 truncate">
                                                                 {entry.tagline || (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
                                                             </span>
-                                                            <span className="font-black text-2xl" style={{ color }}>{entry.score}</span>
+                                                            <span className="font-black text-2xl" style={{ color }}>{entry.score?.toFixed?.(1) || entry.score}</span>
                                                         </div>
                                                     </div>
                                                 )
