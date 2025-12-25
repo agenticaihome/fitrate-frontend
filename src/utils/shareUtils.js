@@ -145,21 +145,22 @@ export const generateShareCard = async ({
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.clip()
 
-            // Cover scaling for image
+            // Cover scaling for image (TIGHTER CROP - 8% more zoom, face in upper third)
             const imgAspect = img.width / img.height
             const targetAspect = imageWidth / imageHeight
             let drawWidth, drawHeight, drawX, drawY
+            const cropTightness = 1.08  // 8% tighter crop
 
             if (imgAspect > targetAspect) {
-                drawHeight = imageHeight
-                drawWidth = imageHeight * imgAspect
+                drawHeight = imageHeight * cropTightness
+                drawWidth = drawHeight * imgAspect
                 drawX = imageMargin + (imageWidth - drawWidth) / 2
-                drawY = imageY
+                drawY = imageY - (drawHeight - imageHeight) * 0.3  // Shift up for face focus
             } else {
-                drawWidth = imageWidth
-                drawHeight = imageWidth / imgAspect
-                drawX = imageMargin
-                drawY = imageY + (imageHeight - drawHeight) / 2
+                drawWidth = imageWidth * cropTightness
+                drawHeight = drawWidth / imgAspect
+                drawX = imageMargin - (drawWidth - imageWidth) / 2
+                drawY = imageY - (drawHeight - imageHeight) * 0.3  // Shift up for face focus
             }
             ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
 
@@ -179,14 +180,14 @@ export const generateShareCard = async ({
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.stroke()
 
-            // ===== SECTION 2: SCORE BADGE (Overlapping image bottom) =====
+            // ===== SECTION 2: SCORE BADGE (Anchored to image bottom) =====
             const badgeSize = 120
             const badgeX = canvas.width / 2
-            const badgeY = imageY + imageHeight - badgeSize / 2 + 10  // Overlaps image
+            const badgeY = imageY + imageHeight - badgeSize / 2 + 20  // Lowered 10px for anchor
 
-            // Badge outer glow (restrained)
+            // Badge outer glow (restrained - reduced blur)
             ctx.shadowColor = badgeColors.from
-            ctx.shadowBlur = 30
+            ctx.shadowBlur = 20  // Reduced from 30
 
             // Badge ring gradient
             const badgeGradient = ctx.createLinearGradient(
@@ -222,111 +223,122 @@ export const generateShareCard = async ({
             ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText('/100', badgeX, badgeY + 28)
 
-            // ===== SECTION 3: VERDICT HEADLINE =====
-            const verdictY = imageY + imageHeight + 100
+            // ===== SECTION 3: VERDICT HEADLINE (Heavier, closer to badge) =====
+            const verdictY = imageY + imageHeight + 85  // Pulled 15px closer to badge
             const verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = '800 38px -apple-system, BlinkMacSystemFont, sans-serif'  // +1 weight, +2px size
             ctx.textAlign = 'center'
 
-            // Wrap if needed
-            const verdictLines = wrapText(ctx, verdict, canvas.width - 120)
+            // Wrap if needed (tighter line height)
+            const verdictLines = wrapText(ctx, verdict, canvas.width - 100)
             verdictLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, verdictY + (i * 44))
+                ctx.fillText(line, canvas.width / 2, verdictY + (i * 40))  // Reduced line-height
             })
 
-            // ===== SECTION 4: VIBE / STYLE TAG =====
+            // ===== SECTION 4: VIBE / STYLE TAG (Slightly more visible) =====
             const vibeBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
             const vibeTag = pickRandom(VIBE_TAGS[vibeBand])
-            const vibeY = verdictY + (verdictLines.length * 44) + 20
+            const vibeY = verdictY + (verdictLines.length * 40) + 18
 
-            ctx.fillStyle = 'rgba(255,255,255,0.45)'
-            ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'  // Increased opacity
+            ctx.font = 'italic 600 17px -apple-system, BlinkMacSystemFont, sans-serif'  // Italic for intentional feel
             ctx.fillText(vibeTag, canvas.width / 2, vibeY)
 
-            // ===== SECTION 5: MICRO SCORES (3 Pills) =====
-            const pillY = vibeY + 50
-            const pillWidth = 100
-            const pillHeight = 40
-            const pillGap = 20
+            // ===== SECTION 5: MICRO SCORES (3 Pills with emojis) =====
+            const pillY = vibeY + 45
+            const pillWidth = 110  // Slightly wider
+            const pillHeight = 42
+            const pillGap = 16  // Tighter spacing
             const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
             const pillStartX = (canvas.width - totalPillWidth) / 2
 
             const microScores = [
-                { label: 'Color', score: scores.colorEnergy || Math.round(score * 0.95) },
-                { label: 'Fit', score: scores.silhouette || Math.round(score * 0.9) },
-                { label: 'Style', score: scores.intent || Math.round(score * 1.02) }
+                { emoji: '🎨', label: 'Color', score: scores.colorEnergy || Math.round(score * 0.95) },
+                { emoji: '👔', label: 'Fit', score: scores.silhouette || Math.round(score * 0.9) },
+                { emoji: '✨', label: 'Style', score: scores.intent || Math.round(score * 1.02) }
             ]
 
             microScores.forEach((item, i) => {
                 const x = pillStartX + (i * (pillWidth + pillGap))
 
-                // Pill background
-                ctx.fillStyle = 'rgba(255,255,255,0.06)'
+                // Pill background (higher contrast)
+                ctx.fillStyle = 'rgba(255,255,255,0.08)'
                 ctx.beginPath()
                 ctx.roundRect(x, pillY, pillWidth, pillHeight, pillHeight / 2)
                 ctx.fill()
 
-                // Pill border
-                ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+                // Pill border (more visible)
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)'
                 ctx.lineWidth = 1
                 ctx.stroke()
 
-                // Label
-                ctx.fillStyle = 'rgba(255,255,255,0.5)'
-                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Emoji + Label
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'  // Higher contrast
+                ctx.font = '15px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'left'
-                ctx.fillText(item.label, x + 12, pillY + 26)
+                ctx.fillText(`${item.emoji} ${item.label}`, x + 10, pillY + 27)
 
                 // Score value
                 ctx.fillStyle = badgeColors.from
-                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.font = 'bold 17px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'right'
-                ctx.fillText(item.score.toString(), x + pillWidth - 12, pillY + 26)
+                ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 27)
             })
 
-            // ===== SECTION 6: "REAL TALK" LINE =====
-            const realTalkY = pillY + pillHeight + 40
+            // ===== SECTION 6: "REAL TALK" LINE (Trust Anchor) =====
+            const realTalkY = pillY + pillHeight + 38
             const realTalkPrefix = pickRandom(REAL_TALK_VARIANTS)
 
+            // Draw as single formatted line: "Honest score: 48 / 100"
             ctx.textAlign = 'center'
-            ctx.fillStyle = 'rgba(255,255,255,0.4)'
+
+            // Measure to center properly
             ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
-            const realTalkText = `${realTalkPrefix}: `
-            const realTalkWidth = ctx.measureText(realTalkText).width
+            const prefixText = `${realTalkPrefix}:`
+            const scoreText = ` ${score} / 100`
+            const prefixWidth = ctx.measureText(prefixText).width
+            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
+            const scoreWidth = ctx.measureText(scoreText).width
+            const totalWidth = prefixWidth + scoreWidth
+            const startX = canvas.width / 2 - totalWidth / 2
 
-            // Draw prefix lighter
-            ctx.fillText(realTalkPrefix + ':', canvas.width / 2 - 30, realTalkY)
+            // Prefix (lighter)
+            ctx.fillStyle = 'rgba(255,255,255,0.45)'
+            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'left'
+            ctx.fillText(prefixText, startX, realTalkY)
 
-            // Draw score heavier
+            // Score (heavier, with proper spacing)
             ctx.fillStyle = '#ffffff'
             ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText(`${score}/100`, canvas.width / 2 + 50, realTalkY)
+            ctx.fillText(scoreText, startX + prefixWidth, realTalkY)
 
-            // ===== SECTION 7: CTA BUTTON =====
-            const ctaY = realTalkY + 60
-            const ctaWidth = 340
-            const ctaHeight = 56
+            // ===== SECTION 7: CTA BUTTON (Firmer, more button-like) =====
+            const ctaY = realTalkY + 55
+            const ctaWidth = 360
+            const ctaHeight = 60  // Taller
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
+            const ctaRadius = 16  // Less pill, more button
 
-            // Button background
-            ctx.fillStyle = 'rgba(255,255,255,0.08)'
+            // Button background (slightly more visible)
+            ctx.fillStyle = 'rgba(255,255,255,0.10)'
             ctx.beginPath()
-            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaHeight / 2)
+            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
             ctx.fill()
 
-            // Button border
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)'
-            ctx.lineWidth = 1.5
+            // Button border (firmer)
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+            ctx.lineWidth = 2
             ctx.stroke()
 
-            // Button text
+            // Button text (slightly larger)
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 19px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(ctaText, canvas.width / 2, ctaY + 36)
+            ctx.fillText(ctaText, canvas.width / 2, ctaY + 38)
 
             // ===== SECTION 8: FOOTER TAGLINE =====
             const footerY = ctaY + ctaHeight + 35
