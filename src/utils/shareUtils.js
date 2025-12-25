@@ -242,8 +242,8 @@ export const generateShareCard = async ({
             const vibeTag = pickRandom(VIBE_TAGS[vibeBand])
             const vibeY = verdictY + (verdictLines.length * 40) + 18
 
-            ctx.fillStyle = 'rgba(255,255,255,0.55)'
-            ctx.font = 'italic 600 20px -apple-system, BlinkMacSystemFont, sans-serif'  // BIGGER for readability
+            ctx.fillStyle = 'rgba(255,255,255,0.65)'  // Increased for better visibility
+            ctx.font = 'italic 600 20px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText(vibeTag, canvas.width / 2, vibeY)
 
             // ===== SECTION 5: MICRO SCORES (3 Pills with emojis - BIGGER for accessibility) =====
@@ -263,15 +263,15 @@ export const generateShareCard = async ({
             microScores.forEach((item, i) => {
                 const x = pillStartX + (i * (pillWidth + pillGap))
 
-                // Pill background (higher contrast)
-                ctx.fillStyle = 'rgba(255,255,255,0.08)'
+                // Pill background (better contrast)
+                ctx.fillStyle = 'rgba(255,255,255,0.12)'
                 ctx.beginPath()
                 ctx.roundRect(x, pillY, pillWidth, pillHeight, pillHeight / 2)
                 ctx.fill()
 
                 // Pill border (more visible)
-                ctx.strokeStyle = 'rgba(255,255,255,0.15)'
-                ctx.lineWidth = 1
+                ctx.strokeStyle = 'rgba(255,255,255,0.22)'
+                ctx.lineWidth = 1.5
                 ctx.stroke()
 
                 // Emoji + Label (BIGGER - 18px min for accessibility)
@@ -304,8 +304,8 @@ export const generateShareCard = async ({
             const totalWidth = prefixWidth + scoreWidth
             const startX = canvas.width / 2 - totalWidth / 2
 
-            // Prefix (lighter)
-            ctx.fillStyle = 'rgba(255,255,255,0.5)'
+            // Prefix (more visible)
+            ctx.fillStyle = 'rgba(255,255,255,0.6)'
             ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'left'
             ctx.fillText(prefixText, startX, realTalkY)
@@ -323,14 +323,14 @@ export const generateShareCard = async ({
             const ctaText = pickRandom(CTA_VARIANTS)
             const ctaRadius = 18
 
-            // Button background (slightly more visible)
-            ctx.fillStyle = 'rgba(255,255,255,0.10)'
+            // Button background (more punch)
+            ctx.fillStyle = 'rgba(255,255,255,0.12)'
             ctx.beginPath()
             ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
             ctx.fill()
 
-            // Button border (firmer)
-            ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+            // Button border (stronger definition)
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)'
             ctx.lineWidth = 2
             ctx.stroke()
 
@@ -340,9 +340,9 @@ export const generateShareCard = async ({
             ctx.textAlign = 'center'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + 42)
 
-            // ===== SECTION 8: FOOTER TAGLINE (BIGGER - 18px for accessibility) =====
+            // ===== SECTION 8: FOOTER TAGLINE =====
             const footerY = ctaY + ctaHeight + 38
-            ctx.fillStyle = 'rgba(255,255,255,0.35)'
+            ctx.fillStyle = 'rgba(255,255,255,0.45)'  // More readable
             ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText('Rate your fit in seconds', canvas.width / 2, footerY)
 
