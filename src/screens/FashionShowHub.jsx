@@ -467,28 +467,30 @@ export default function FashionShowHub({
                             return (
                                 <div
                                     key={`${entry.userId}-${idx}`}
-                                    className={`flex items-center gap-3 p-3 rounded-xl ${isUser ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-white/5'
-                                        }`}
+                                    className={`p-3 rounded-xl ${isUser ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-white/5'}`}
                                 >
-                                    <span className="text-lg w-8 text-center">{rankEmoji}</span>
-                                    {/* Outfit Thumbnail or Emoji Fallback */}
-                                    {entry.imageThumb ? (
-                                        <img
-                                            src={entry.imageThumb}
-                                            alt={`${entry.nickname}'s outfit`}
-                                            className="w-14 h-14 rounded-xl object-cover border-2 flex-shrink-0"
-                                            style={{ borderColor: isUser ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)' }}
-                                        />
-                                    ) : (
-                                        <span className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-2xl flex-shrink-0">
-                                            {entry.emoji}
+                                    {/* Top row: Rank, Image, Score */}
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-lg w-8 text-center">{rankEmoji}</span>
+                                        {/* Outfit Thumbnail or Emoji Fallback */}
+                                        {entry.imageThumb ? (
+                                            <img
+                                                src={entry.imageThumb}
+                                                alt={`${entry.nickname}'s outfit`}
+                                                className="w-14 h-14 rounded-xl object-cover border-2 flex-shrink-0"
+                                                style={{ borderColor: isUser ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)' }}
+                                            />
+                                        ) : (
+                                            <span className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-2xl flex-shrink-0">
+                                                {entry.emoji}
+                                            </span>
+                                        )}
+                                        {/* Tagline - short funny title (2-5 words) */}
+                                        <span className="flex-1 text-sm font-bold text-white/80 truncate">
+                                            {entry.tagline || entry.nickname}
                                         </span>
-                                    )}
-                                    {/* Quote/Verdict - the signature line */}
-                                    <p className="flex-1 text-sm text-white/70 italic truncate">
-                                        {entry.verdict ? `"${entry.verdict}"` : entry.nickname}
-                                    </p>
-                                    <div className="text-xl font-black text-white flex-shrink-0">{entry.score?.toFixed(1)}</div>
+                                        <div className="text-2xl font-black text-white">{entry.score?.toFixed(1)}</div>
+                                    </div>
                                 </div>
                             )
                         })}

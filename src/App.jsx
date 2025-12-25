@@ -1307,6 +1307,7 @@ export default function App() {
                   emoji: emoji,
                   score: data.scores.overall,
                   verdict: data.scores.verdict || '',
+                  tagline: data.scores.tagline || '',  // Short funny title for leaderboard
                   imageThumb: imageThumb // Will be null if content was flagged
                 })
               })

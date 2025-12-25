@@ -204,7 +204,7 @@ export default function ChallengesScreen({
                                         return (
                                             <div
                                                 key={entry.userId || i}
-                                                className="flex items-center gap-3 p-3 rounded-xl"
+                                                className="p-3 rounded-xl"
                                                 style={{
                                                     background: isCurrentUser
                                                         ? 'rgba(59, 130, 246, 0.2)'
@@ -214,29 +214,29 @@ export default function ChallengesScreen({
                                                         : i === 0 ? '1px solid rgba(255, 215, 0, 0.3)' : '1px solid rgba(255,255,255,0.05)'
                                                 }}
                                             >
-                                                {/* Rank */}
-                                                <span className="text-lg w-8 text-center flex-shrink-0">{icon}</span>
-                                                {/* Thumbnail or Icon Fallback */}
-                                                {entry.imageThumb ? (
-                                                    <img
-                                                        src={entry.imageThumb}
-                                                        alt="Outfit"
-                                                        className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
-                                                        style={{ borderColor: isCurrentUser ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)' }}
-                                                    />
-                                                ) : (
-                                                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
-                                                        background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
-                                                    }}>
-                                                        <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
-                                                    </div>
-                                                )}
-                                                {/* Quote or Name */}
-                                                <p className="flex-1 text-sm text-white/70 italic truncate">
-                                                    {entry.verdict ? `"${entry.verdict}"` : (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
-                                                </p>
-                                                {/* Score */}
-                                                <span className="font-black text-xl flex-shrink-0" style={{ color }}>{entry.score}</span>
+                                                {/* Top row: Rank, Image, Score */}
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-lg w-8 text-center flex-shrink-0">{icon}</span>
+                                                    {entry.imageThumb ? (
+                                                        <img
+                                                            src={entry.imageThumb}
+                                                            alt="Outfit"
+                                                            className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
+                                                            style={{ borderColor: isCurrentUser ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.1)' }}
+                                                        />
+                                                    ) : (
+                                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
+                                                            background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
+                                                        }}>
+                                                            <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Tagline - short funny title */}
+                                                    <span className="flex-1 text-sm font-bold text-white/80 truncate">
+                                                        {entry.tagline || (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
+                                                    </span>
+                                                    <span className="font-black text-2xl" style={{ color }}>{entry.score}</span>
+                                                </div>
                                             </div>
                                         )
                                     })}
@@ -388,29 +388,29 @@ export default function ChallengesScreen({
                                                                 : i === 0 ? '1px solid rgba(255, 215, 0, 0.3)' : '1px solid rgba(255,255,255,0.05)'
                                                         }}
                                                     >
-                                                        {/* Rank */}
-                                                        <span className="text-lg w-8 text-center flex-shrink-0">{icon}</span>
-                                                        {/* Thumbnail or Icon Fallback */}
-                                                        {entry.imageThumb ? (
-                                                            <img
-                                                                src={entry.imageThumb}
-                                                                alt="Outfit"
-                                                                className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
-                                                                style={{ borderColor: isCurrentUser ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)' }}
-                                                            />
-                                                        ) : (
-                                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
-                                                                background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
-                                                            }}>
-                                                                <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
-                                                            </div>
-                                                        )}
-                                                        {/* Quote or Name */}
-                                                        <p className="flex-1 text-sm text-white/70 italic truncate">
-                                                            {entry.verdict ? `"${entry.verdict}"` : (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
-                                                        </p>
-                                                        {/* Score */}
-                                                        <span className="font-black text-xl flex-shrink-0" style={{ color }}>{entry.score}</span>
+                                                        {/* Top row: Rank, Image, Score */}
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-lg w-8 text-center flex-shrink-0">{icon}</span>
+                                                            {entry.imageThumb ? (
+                                                                <img
+                                                                    src={entry.imageThumb}
+                                                                    alt="Outfit"
+                                                                    className="w-12 h-12 rounded-xl object-cover border-2 flex-shrink-0"
+                                                                    style={{ borderColor: isCurrentUser ? 'rgba(0,212,255,0.5)' : 'rgba(255,255,255,0.1)' }}
+                                                                />
+                                                            ) : (
+                                                                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{
+                                                                    background: i === 0 ? 'linear-gradient(135deg, #ffd700, #ff8c00)' : 'rgba(255,255,255,0.1)'
+                                                                }}>
+                                                                    <span className="text-xl">{isCurrentUser ? '👤' : '🔥'}</span>
+                                                                </div>
+                                                            )}
+                                                            {/* Tagline - short funny title */}
+                                                            <span className="flex-1 text-sm font-bold text-white/80 truncate">
+                                                                {entry.tagline || (isCurrentUser ? 'You' : (entry.displayName || 'Anonymous'))}
+                                                            </span>
+                                                            <span className="font-black text-2xl" style={{ color }}>{entry.score}</span>
+                                                        </div>
                                                     </div>
                                                 )
                                             })}
