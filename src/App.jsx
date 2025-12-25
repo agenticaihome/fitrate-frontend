@@ -1455,7 +1455,7 @@ export default function App() {
     } finally {
       setIsAnalyzing(false)
     }
-  }, [mode, isPro, eventMode, currentEvent, userId, isAnalyzing, scansRemaining])
+  }, [mode, isPro, eventMode, currentEvent, userId, isAnalyzing, scansRemaining, dailyChallengeMode])
 
 
 
