@@ -1850,9 +1850,11 @@ export default function App() {
           }
         }}
         onBack={() => {
+          // Clean exit: reset all Fashion Show state and go home
           setFashionShowScreen(null)
           setFashionShowId(null)
           setFashionShowData(null)
+          setScreen('home')  // Explicit navigation to prevent render glitch
           window.history.pushState({}, '', '/')
         }}
       />
