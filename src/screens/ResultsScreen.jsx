@@ -363,6 +363,7 @@ const StatPill = ({ label, displayLabel, value, icon, delay, color, contribution
 
 export default function ResultsScreen({
     scores,
+    cardDNA = null,  // Unique visual DNA for this card
     mode,
     uploadedImage,
     isPro,
@@ -391,6 +392,65 @@ export default function ResultsScreen({
     useEffect(() => {
         return () => { isMounted.current = false }
     }, [])
+
+    // ===== CARD DNA: Extract DNA-driven styling =====
+    const dnaStyleTokens = cardDNA?.styleTokens || {}
+    const dnaCopySlots = cardDNA?.copySlots || {}
+
+    // DNA-driven background gradient (falls back to default deep-space)
+    const dnaGradient = dnaStyleTokens.gradient?.colors || ['#0a0a15', '#1a1a2e']
+    const dnaBackground = `linear-gradient(to bottom, ${dnaGradient[0]}, ${dnaGradient[1]})`
+
+    // DNA-driven ring style variations
+    const dnaRingStyle = dnaStyleTokens.ringStyle?.id || 'solid'
+
+    // DNA-driven headline weight
+    const dnaHeadlineWeight = dnaStyleTokens.headlineWeight || 700
+
+    // DNA ring style properties (solid, segmented, neon, double)
+    const dnaRingProps = useMemo(() => {
+        switch (dnaRingStyle) {
+            case 'segmented':
+                return { strokeWidth: 10, strokeDasharray: '20 5', linecap: 'butt' }
+            case 'neon':
+                return { strokeWidth: 5, strokeDasharray: '264', linecap: 'round' }
+            case 'double':
+                return { strokeWidth: 6, strokeDasharray: '264', linecap: 'round', hasOuterRing: true }
+            default: // 'solid'
+                return { strokeWidth: 8, strokeDasharray: '264', linecap: 'round' }
+        }
+    }, [dnaRingStyle])
+
+    // DNA pattern overlay style
+    const dnaPatternId = dnaStyleTokens.pattern?.id || 'none'
+    const dnaPatternOpacity = dnaStyleTokens.pattern?.opacity || 0
+    const dnaPatternStyle = useMemo(() => {
+        if (dnaPatternId === 'none') return null
+        const patterns = {
+            'dots': `radial-gradient(circle, rgba(255,255,255,${dnaPatternOpacity}) 1px, transparent 1px)`,
+            'grid': `linear-gradient(rgba(255,255,255,${dnaPatternOpacity}) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,${dnaPatternOpacity}) 1px, transparent 1px)`,
+            'noise': null // Handled via filter
+        }
+        return patterns[dnaPatternId]
+    }, [dnaPatternId, dnaPatternOpacity])
+
+    // DNA copy slots (verdict badge, next action)
+    const dnaVerdictBadge = dnaCopySlots.verdictBadge || null
+    const dnaNextAction = dnaCopySlots.nextAction || null
+    const dnaMotivation = dnaCopySlots.motivation || null
+    const dnaTimeBadge = dnaCopySlots.timeBadge || null
+    const dnaStreakBadge = dnaCopySlots.streakBadge || null
+
+    // Time-of-day context
+    const timeContext = cardDNA?.timeContext || {}
+    const timePeriod = timeContext.period || 'afternoon'
+    const timeAccent = timeContext.accent || null
+
+    // Streak context (for enhanced visuals)
+    const streakContext = cardDNA?.streakContext || {}
+    const streakTier = streakContext.tier || 'none'
+    const streakRingGlow = streakContext.ringGlow || 1.0
+    const streakEffects = streakContext.effects || []
 
     // Scroll to top when results appear (fixes scroll position bugs)
     useEffect(() => {
@@ -492,18 +552,20 @@ export default function ResultsScreen({
     // Keep theme for backward compatibility
     const theme = ringColors
 
-    // Background gradient based on tier
+    // Background gradient based on tier + DNA variation
     const bgGradient = useMemo(() => {
+        // DNA provides base gradient colors, tier provides accent overlay
+        const baseColor = dnaGradient[1] || '#0a0a0f'
         const gradients = {
-            legendary: 'radial-gradient(ellipse at top, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.08) 40%, #0a0a0f 70%)',
-            fire: 'radial-gradient(ellipse at top, rgba(255,107,53,0.12) 0%, rgba(255,0,128,0.06) 40%, #0a0a0f 70%)',
-            great: 'radial-gradient(ellipse at top, rgba(0,212,255,0.12) 0%, rgba(0,102,255,0.06) 40%, #0a0a0f 70%)',
-            good: 'radial-gradient(ellipse at top, rgba(0,255,136,0.1) 0%, rgba(0,212,255,0.05) 40%, #0a0a0f 70%)',
-            mid: 'radial-gradient(ellipse at top, rgba(255,170,0,0.1) 0%, rgba(255,107,0,0.05) 40%, #0a0a0f 70%)',
-            low: 'radial-gradient(ellipse at top, rgba(255,68,68,0.12) 0%, rgba(204,0,0,0.06) 40%, #0a0a0f 70%)'
+            legendary: `radial-gradient(ellipse at top, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.08) 40%, ${baseColor} 70%)`,
+            fire: `radial-gradient(ellipse at top, rgba(255,107,53,0.12) 0%, rgba(255,0,128,0.06) 40%, ${baseColor} 70%)`,
+            great: `radial-gradient(ellipse at top, rgba(0,212,255,0.12) 0%, rgba(0,102,255,0.06) 40%, ${baseColor} 70%)`,
+            good: `radial-gradient(ellipse at top, rgba(0,255,136,0.1) 0%, rgba(0,212,255,0.05) 40%, ${baseColor} 70%)`,
+            mid: `radial-gradient(ellipse at top, rgba(255,170,0,0.1) 0%, rgba(255,107,0,0.05) 40%, ${baseColor} 70%)`,
+            low: `radial-gradient(ellipse at top, rgba(255,68,68,0.12) 0%, rgba(204,0,0,0.06) 40%, ${baseColor} 70%)`
         }
         return gradients[scoreTier]
-    }, [scoreTier])
+    }, [scoreTier, dnaGradient])
 
     // Social proof message
     const socialProof = useMemo(() => {
@@ -548,6 +610,19 @@ export default function ResultsScreen({
                 paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
             }}
         >
+            {/* DNA Pattern Overlay */}
+            {dnaPatternStyle && (
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        backgroundImage: dnaPatternStyle,
+                        backgroundSize: dnaPatternId === 'dots' ? '20px 20px' : '40px 40px',
+                        opacity: 1,
+                        zIndex: 0
+                    }}
+                />
+            )}
+
             {/* ===== HERO SECTION: GIANT SCORE ===== */}
             <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 overflow-visible ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
 
@@ -644,12 +719,13 @@ export default function ResultsScreen({
 
                 {/* MASSIVE Score Ring */}
                 <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
-                    {/* Outer glow */}
+                    {/* Outer glow - intensity boosted by streak tier */}
                     <div
                         className="absolute inset-[-30px] rounded-full"
                         style={{
-                            background: `radial-gradient(circle, ${theme.accent}50 0%, transparent 70%)`,
-                            filter: 'blur(30px)',
+                            background: `radial-gradient(circle, ${streakEffects.includes('golden-ring') ? '#FFD700' : theme.accent}50 0%, transparent 70%)`,
+                            filter: `blur(${30 * streakRingGlow}px)`,
+                            opacity: Math.min(1, 0.7 * streakRingGlow),
                             animation: revealStage >= 2 ? 'scoreGlowPulse 2.5s ease-in-out infinite' : 'none'
                         }}
                     />
@@ -674,16 +750,32 @@ export default function ResultsScreen({
                                 </filter>
                             </defs>
 
-                            {/* Progress ring */}
+                            {/* Double ring outer stroke (DNA variant) */}
+                            {dnaRingProps.hasOuterRing && (
+                                <circle
+                                    cx="50" cy="50" r="46"
+                                    fill="none"
+                                    stroke="url(#ringGrad)"
+                                    strokeWidth="2"
+                                    strokeOpacity="0.3"
+                                    strokeDasharray="264"
+                                    strokeDashoffset={264 - (displayedScore * 2.64)}
+                                />
+                            )}
+
+                            {/* Progress ring - DNA styled */}
                             <circle
                                 cx="50" cy="50" r="42"
                                 fill="none"
                                 stroke="url(#ringGrad)"
-                                strokeWidth="8"
-                                strokeLinecap="round"
-                                strokeDasharray="264"
-                                strokeDashoffset={264 - (displayedScore * 2.64)}
+                                strokeWidth={dnaRingProps.strokeWidth}
+                                strokeLinecap={dnaRingProps.linecap}
+                                strokeDasharray={dnaRingStyle === 'segmented' ? dnaRingProps.strokeDasharray : '264'}
+                                strokeDashoffset={dnaRingStyle === 'segmented' ? 0 : 264 - (displayedScore * 2.64)}
                                 filter="url(#ringGlow)"
+                                style={dnaRingStyle === 'segmented' ? {
+                                    clipPath: `url(#progressClip${Math.round(displayedScore)})`
+                                } : undefined}
                             />
                         </svg>
 
@@ -731,6 +823,50 @@ export default function ResultsScreen({
                 <div className={`transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                     <TierBadge tier={scoreTier} score={scores.overall} />
                 </div>
+
+                {/* DNA Verdict Badge - Unique per card */}
+                {dnaVerdictBadge && (
+                    <div
+                        className={`mt-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            color: 'rgba(255,255,255,0.9)'
+                        }}
+                    >
+                        {dnaVerdictBadge}
+                    </div>
+                )}
+
+                {/* Time-of-Day Badge */}
+                {dnaTimeBadge && (
+                    <div
+                        className={`mt-1.5 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
+                        style={{
+                            background: timeAccent ? `${timeAccent}20` : 'rgba(255,255,255,0.05)',
+                            border: `1px solid ${timeAccent || 'rgba(255,255,255,0.1)'}40`,
+                            color: timeAccent || 'rgba(255,255,255,0.7)'
+                        }}
+                    >
+                        {dnaTimeBadge}
+                    </div>
+                )}
+
+                {/* Streak Badge - Only shows for 3+ day streaks */}
+                {dnaStreakBadge && (
+                    <div
+                        className={`mt-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wide transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
+                        style={{
+                            background: streakTier === 'legendary' ? 'linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.15))' :
+                                streakTier === 'dedicated' ? 'rgba(255,215,0,0.12)' :
+                                    'rgba(255,107,53,0.12)',
+                            border: '1px solid rgba(255,140,0,0.3)',
+                            color: '#FFB347'
+                        }}
+                    >
+                        {dnaStreakBadge}
+                    </div>
+                )}
 
                 {/* Percentile Context Line */}
                 <p className={`text-sm text-white/50 mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>

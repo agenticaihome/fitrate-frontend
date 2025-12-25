@@ -300,6 +300,7 @@ export default function App() {
   const [totalReferrals, setTotalReferrals] = useState(() => parseInt(localStorage.getItem('fitrate_total_referrals') || '0'))
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [scores, setScores] = useState(null)
+  const [cardDNA, setCardDNA] = useState(null)  // Unique visual DNA for results card
   const [uploadedImage, setUploadedImage] = useState(null)
   const [mode, setMode] = useState(() => localStorage.getItem('fitrate_mode') || 'roast') // Persist mode preference
   const [timeUntilReset, setTimeUntilReset] = useState(null)
@@ -1428,8 +1429,16 @@ export default function App() {
         // Include eventInfo if present in the response (for weekly challenge tracking)
         eventInfo: data.eventInfo,
         // Include eventStatus for share card rank display
-        eventStatus: data.eventStatus
+        eventStatus: data.eventStatus,
+        // Daily challenge data for share card
+        dailyChallenge: data.dailyChallenge
       })
+
+      // Store Card DNA separately for results card rendering
+      if (data.cardDNA) {
+        setCardDNA(data.cardDNA)
+        console.log('[CardDNA] Received unique DNA:', data.cardDNA.signature)
+      }
 
       // Refresh event status if user participated in event mode
       if (eventMode && currentEvent) {
@@ -1526,7 +1535,8 @@ export default function App() {
         userId,
         isPro: isPro || false,
         eventContext: eventShareContext,
-        dailyChallengeContext: dailyChallengeShareContext
+        dailyChallengeContext: dailyChallengeShareContext,
+        cardDNA
       })
 
       // Store shareData for potential future use
@@ -2074,6 +2084,7 @@ export default function App() {
       <>
         <ResultsScreen
           scores={scores}
+          cardDNA={cardDNA}
           mode={mode}
           uploadedImage={uploadedImage}
           isPro={isPro}

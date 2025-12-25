@@ -96,12 +96,13 @@ export const generateShareCard = async ({
                 img.src = uploadedImage
             })
 
-            // SIMPLE DARK GRADIENT BACKGROUND (single image approach)
+            // DNA-DRIVEN BACKGROUND (uses Card DNA gradient or fallback)
+            const dnaGradientColors = cardDNA?.styleTokens?.gradient?.colors || ['#0a0a15', '#0f0f1a']
             const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-            bgGradient.addColorStop(0, '#0a0a15')
-            bgGradient.addColorStop(0.3, '#0f0f1a')
-            bgGradient.addColorStop(0.7, '#0f0f1a')
-            bgGradient.addColorStop(1, '#0a0a15')
+            bgGradient.addColorStop(0, dnaGradientColors[0])
+            bgGradient.addColorStop(0.3, dnaGradientColors[1])
+            bgGradient.addColorStop(0.7, dnaGradientColors[1])
+            bgGradient.addColorStop(1, dnaGradientColors[0])
             ctx.fillStyle = bgGradient
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
