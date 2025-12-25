@@ -1330,6 +1330,9 @@ export default function App() {
         setDailyChallengeMode(false)
         setEventMode(false)
 
+        // CRITICAL: Reset analyzing flag so user can scan again
+        setIsAnalyzing(false)
+
         // If user came from a challenge link, show comparison screen first
         if (challengeScore) {
           setScreen('challenge-result')
