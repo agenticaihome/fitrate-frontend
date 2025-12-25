@@ -403,8 +403,8 @@ export default function FashionShowHub({
                             onClick={handleJoin}
                             disabled={loading || !nickname.trim()}
                             className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${loading || !nickname.trim()
-                                    ? 'bg-white/10 text-white/30'
-                                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]'
+                                ? 'bg-white/10 text-white/30'
+                                : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]'
                                 }`}
                         >
                             {loading ? '⏳ Joining...' : '📸 Walk the Runway'}
@@ -423,8 +423,8 @@ export default function FashionShowHub({
                         onClick={canWalk ? startCamera : undefined}
                         disabled={!canWalk}
                         className={`w-full py-6 rounded-3xl font-black text-xl flex flex-col items-center justify-center gap-1 transition-all ${canWalk
-                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
-                                : 'bg-white/10 text-white/30'
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
+                            : 'bg-white/10 text-white/30'
                             }`}
                     >
                         {walksUsed > 0 ? (
@@ -471,7 +471,19 @@ export default function FashionShowHub({
                                         }`}
                                 >
                                     <span className="text-lg w-8 text-center">{rankEmoji}</span>
-                                    <span className="text-2xl">{entry.emoji}</span>
+                                    {/* Outfit Thumbnail or Emoji Fallback */}
+                                    {entry.imageThumb ? (
+                                        <img
+                                            src={entry.imageThumb}
+                                            alt={`${entry.nickname}'s outfit`}
+                                            className="w-11 h-11 rounded-xl object-cover border-2"
+                                            style={{ borderColor: isUser ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)' }}
+                                        />
+                                    ) : (
+                                        <span className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-2xl">
+                                            {entry.emoji}
+                                        </span>
+                                    )}
                                     <div className="flex-1 min-w-0">
                                         <div className="text-white font-semibold truncate">
                                             {entry.nickname}

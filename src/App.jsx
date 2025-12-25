@@ -1279,28 +1279,44 @@ export default function App() {
         // ============================================
         // FASHION SHOW: Record walk to scoreboard
         // ============================================
-        if (fashionShowId && fashionShowNickname) {
-          try {
-            // Create thumbnail for leaderboard display
-            const imageThumb = await createThumbnail(imageData, 150, 0.6);
-            console.log('[FashionShow] Thumbnail created:', imageThumb ? `${Math.round(imageThumb.length / 1024)}KB` : 'failed');
+        if (fashionShowId) {
+          // Read nickname/emoji from localStorage directly (state may not be updated yet due to React async)
+          const nickname = localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || fashionShowNickname || 'Guest'
+          const emoji = localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || fashionShowEmoji || '😎'
 
-            await fetch(`${API_BASE}/show/${fashionShowId}/walk`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId,
-                nickname: fashionShowNickname,
-                emoji: fashionShowEmoji,
-                score: data.scores.overall,
-                verdict: data.scores.verdict || '',
-                imageThumb: imageThumb // Include outfit thumbnail
+          if (nickname) {
+            try {
+              // CONTENT MODERATION: Block thumbnail if AI flagged content as inappropriate
+              const isContentSafe = !data.scores.contentFlagged;
+
+              // Create thumbnail only if content is safe
+              let imageThumb = null;
+              if (isContentSafe) {
+                imageThumb = await createThumbnail(imageData, 150, 0.6);
+                console.log('[FashionShow] Thumbnail created:', imageThumb ? `${Math.round(imageThumb.length / 1024)}KB` : 'failed');
+              } else {
+                console.warn('[FashionShow] Content flagged as inappropriate - skipping thumbnail');
+              }
+
+              await fetch(`${API_BASE}/show/${fashionShowId}/walk`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  userId,
+                  nickname: nickname,
+                  emoji: emoji,
+                  score: data.scores.overall,
+                  verdict: data.scores.verdict || '',
+                  imageThumb: imageThumb // Will be null if content was flagged
+                })
               })
-            })
-            setFashionShowWalks(prev => prev + 1)
-            console.log(`[FashionShow] Walk recorded: ${data.scores.overall} (thumb: ${imageThumb ? 'yes' : 'no'})`)
-          } catch (err) {
-            console.error('[FashionShow] Failed to record walk:', err)
+              setFashionShowWalks(prev => prev + 1)
+              console.log(`[FashionShow] Walk recorded: ${data.scores.overall} (thumb: ${imageThumb ? 'yes' : 'no - flagged'})`)
+            } catch (err) {
+              console.error('[FashionShow] Failed to record walk:', err)
+            }
+          } else {
+            console.warn('[FashionShow] Skipping walk record - no nickname found')
           }
         }
 
