@@ -173,6 +173,19 @@ export const generateShareCard = async ({
             ctx.fillStyle = vignette
             ctx.fillRect(imageMargin, imageY, imageWidth, imageHeight)
 
+            // MODE-COLORED OVERLAY - subtle tint matching mode energy
+            const currentMode = scores.mode || 'honest'
+            const modeConfig = MODE_CONFIG[currentMode] || MODE_CONFIG.honest
+            const modeGradientMatch = modeConfig.gradient.match(/#[a-fA-F0-9]{6}/g)
+            const modeColor = modeGradientMatch ? modeGradientMatch[0] : '#3b82f6'
+
+            // Subtle color wash from top
+            const colorWash = ctx.createLinearGradient(0, imageY, 0, imageY + imageHeight * 0.4)
+            colorWash.addColorStop(0, `${modeColor}25`)  // 15% opacity at top
+            colorWash.addColorStop(1, 'transparent')
+            ctx.fillStyle = colorWash
+            ctx.fillRect(imageMargin, imageY, imageWidth, imageHeight)
+
             ctx.restore()
 
             // Subtle border around image
@@ -226,8 +239,6 @@ export const generateShareCard = async ({
             ctx.fillText('/100', badgeX, badgeY + 46)
 
             // ===== SECTION 3: MODE BADGE - MASSIVE for mobile =====
-            const currentMode = scores.mode || 'honest'
-            const modeConfig = MODE_CONFIG[currentMode] || MODE_CONFIG.honest
             const modeBadgeY = imageY + imageHeight + 70
             const modeBadgeHeight = 56
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
@@ -238,9 +249,8 @@ export const generateShareCard = async ({
             const modeBadgeWidth = modeBadgeTextWidth + 48
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
 
-            // Parse gradient colors for shadow
-            const modeGradientMatch = modeConfig.gradient.match(/#[a-fA-F0-9]{6}/g)
-            const modeGlowColor = modeGradientMatch ? modeGradientMatch[0] : '#3b82f6'
+            // Use mode color for glow
+            const modeGlowColor = modeColor
 
             // Mode badge glow
             ctx.shadowColor = modeGlowColor
@@ -284,41 +294,52 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, verdictY + (i * 72))
             })
 
-            // ===== SECTION 5: AI INSIGHT LINE - HUGE for old people =====
-            const insightBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
-            const aiInsight = scores.summaryLine || pickRandom(AI_INSIGHT_POOLS[insightBand])
-            const insightY = verdictY + (verdictLines.length * 72) + 30
-
-            ctx.fillStyle = 'rgba(255,255,255,0.7)'  // Brighter for readability
-            ctx.font = '38px -apple-system, BlinkMacSystemFont, sans-serif'  // MASSIVE
-            ctx.textAlign = 'center'
-
-            // Wrap AI insight if needed
-            const insightLines = wrapText(ctx, aiInsight, canvas.width - 80)
-            insightLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, insightY + (i * 46))
-            })
-
-            // ===== SECTION 6: CTA BUTTON - MASSIVE (no micro-scores, cleaner) =====
-            const ctaY = insightY + (insightLines.length * 46) + 50
-            const ctaWidth = 580  // WIDER
-            const ctaHeight = 88  // TALLER
+            // ===== SECTION 5: CTA BUTTON - matches MODE color =====
+            const ctaY = verdictY + (verdictLines.length * 72) + 50
+            const ctaWidth = 580
+            const ctaHeight = 88
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
             const ctaRadius = 22
 
-            // Solid green background
-            ctx.fillStyle = '#10b981'
+            // CTA gradient matches mode color
+            const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY)
+            if (modeGradientMatch && modeGradientMatch.length >= 2) {
+                ctaGradient.addColorStop(0, modeGradientMatch[0])
+                ctaGradient.addColorStop(1, modeGradientMatch[1])
+            } else {
+                ctaGradient.addColorStop(0, '#10b981')
+                ctaGradient.addColorStop(1, '#06b6d4')
+            }
+
+            ctx.fillStyle = ctaGradient
             ctx.beginPath()
             ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
             ctx.fill()
 
-            // Button text - MASSIVE
-            ctx.fillStyle = '#ffffff'
+            // Button text
+            ctx.fillStyle = modeConfig.textColor
             ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
+
+            // ===== SECTION 6: TIMESTAMP - adds authenticity =====
+            const now = new Date()
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            const modeVerb = currentMode === 'roast' ? 'Roasted' : currentMode === 'nice' ? 'Rated' : 'Scored'
+            const timestamp = `${modeVerb} ${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'
+            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 45)
+
+            // ===== SECTION 7: FITRATE WATERMARK =====
+            ctx.fillStyle = 'rgba(255,255,255,0.35)'
+            ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText('FitRate.app', canvas.width / 2, canvas.height - 50)
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
