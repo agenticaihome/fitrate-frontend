@@ -26,7 +26,8 @@ export const generateShareCard = async ({
     userId,
     isPro,
     eventContext = null,  // { theme, themeEmoji, rank, weekId }
-    dailyChallengeContext = null  // { rank, totalParticipants }
+    dailyChallengeContext = null,  // { rank, totalParticipants }
+    cardDNA = null  // Card DNA for unique visuals
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
