@@ -87,7 +87,8 @@ export const generateShareCard = async ({
     isPro,
     eventContext = null,
     dailyChallengeContext = null,
-    cardDNA = null
+    cardDNA = null,
+    isChallenge = false  // When true, generates a challenge link with score
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -380,7 +381,18 @@ export const generateShareCard = async ({
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
                 const baseUrl = 'https://fitrate.app'
-                const link = `${baseUrl}?ref=${userId}`
+                // Challenge link includes score so friend can compare after they scan
+                const link = isChallenge
+                    ? `${baseUrl}?ref=${userId}&challenge=${score}`
+                    : `${baseUrl}?ref=${userId}`
+
+                // Challenge-specific copy - competitive and clear
+                if (isChallenge) {
+                    if (score >= 90) return `I got ${score}/100. Think you can beat that? 🔥 ${link}`
+                    if (score >= 75) return `${score}/100. Your turn — let's see what you got 👀 ${link}`
+                    if (score >= 50) return `I got ${score}. Can you do better? ${link}`
+                    return `${score}/100... surely you can beat this 😅 ${link}`
+                }
 
                 if (scores.roastMode || scores.mode === 'roast') {
                     if (score < 40) return `AI gave me a ${score}. Fair or personal? 💀 ${link}`
@@ -406,13 +418,17 @@ export const generateShareCard = async ({
                 }
                 const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
                 const text = getShareText()
-                const url = `https://fitrate.app?ref=${userId}`
+                // URL matches the share text - includes challenge param if challenge mode
+                const url = isChallenge
+                    ? `https://fitrate.app?ref=${userId}&challenge=${score}`
+                    : `https://fitrate.app?ref=${userId}`
 
                 resolve({
                     file,
                     text,
                     url,
-                    imageBlob: blob
+                    imageBlob: blob,
+                    isChallenge  // Pass through so caller knows this was a challenge share
                 })
             }, 'image/png')
 
