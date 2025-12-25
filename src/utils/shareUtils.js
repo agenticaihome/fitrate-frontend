@@ -20,59 +20,45 @@ const wrapText = (ctx, text, maxWidth) => {
 }
 
 // ============================================
-// UNIQUENESS ENGINE - Rotation Pools
+// HARD-SPEC: UNIQUENESS ENGINE - Rotation Pools
 // ============================================
 
-// Vibe tag pools (Aesthetic · Reference format)
-const VIBE_TAGS = {
+// AI INSIGHT LINE pools (explains WHY the score exists - neutral, editor tone)
+// HARD-SPEC: ONE sentence, neutral, max ~90 chars, no emojis, no advice
+const AI_INSIGHT_POOLS = {
     high: [
-        'Main Character · Street Edit',
-        'Clean Money · Quiet Flex',
-        'Effortless · NYC Core',
-        'Old Money · New Energy',
-        'Soft Launch · Premium',
-        'Editorial · Off-Duty',
-        'Understated · On Point'
+        'Color harmony works well; proportions carry the look.',
+        'Clear intention with solid execution across the board.',
+        'Silhouette and palette are working in sync here.',
+        'Everything reads intentional, nothing feels forced.',
+        'Strong fundamentals with a confident finish.'
     ],
     mid: [
-        'Casual Friday · Extended',
-        'Comfort Zone · Unlocked',
-        'Low Effort · Decent Return',
-        'Safe Choice · Solid',
-        'Weekend Mode · Enabled',
-        'Cozy Core · Activated'
+        'Comfort-first approach with minimal styling risk.',
+        'Functional fit; reads practical more than polished.',
+        'Some coordination, but the pieces don\'t quite gel.',
+        'Safe choices that don\'t push in any direction.',
+        'Color is fine, but silhouette needs attention.'
     ],
     low: [
-        'Laundry Day · Vibes',
-        'Comfort Over Style',
-        'Function First · Always',
-        'Zero Effort · Zero Shame',
-        'NPC Energy · Detected'
+        'Fit does most of the work here — not much else lands.',
+        'Color and proportion are working against each other.',
+        'Reads more random than intentional.',
+        'Missing cohesion between the pieces.',
+        'Function over form — styling didn\'t show up.'
     ]
 }
 
-// "Real Talk" prefix variants
-const REAL_TALK_VARIANTS = [
-    'Real talk',
-    'No spin',
-    'Honest score',
-    'Call it',
-    'The verdict',
-    'Straight up'
-]
-
-// CTA button variants
+// CTA button variants - HARD-SPEC: ONLY these 3 allowed
 const CTA_VARIANTS = [
     'Post yours → fitrate.app',
-    'Your turn → fitrate.app',
-    'Think you\'d score higher?',
-    'Let\'s see yours',
-    'Beat this? → fitrate.app',
-    'Your fit next'
+    'Your fit next → fitrate.app',
+    'Think you\'d score higher? → fitrate.app'
 ]
 
 // Pick random from array
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
+
 
 // ============================================
 // GOLDEN RESULT CARD GENERATOR
@@ -106,14 +92,15 @@ export const generateShareCard = async ({
                 img.src = uploadedImage
             })
 
-            // ===== SCORE-BASED COLOR SYSTEM =====
+            // ===== SCORE-BASED COLOR SYSTEM (HARD-SPEC ranges) =====
             const score = Math.round(scores.overall)
             const getScoreBadgeColors = () => {
-                if (score >= 90) return { from: '#ffd700', to: '#fff8dc' }      // Gold → soft white
-                if (score >= 80) return { from: '#50C878', to: '#98FB98' }      // Green → mint
-                if (score >= 70) return { from: '#20B2AA', to: '#50C878' }      // Teal → green
-                if (score >= 60) return { from: '#DAA520', to: '#20B2AA' }      // Amber → teal
-                return { from: '#FF8C00', to: '#DAA520' }                        // Orange → amber
+                // HARD-SPEC: exact color tiers
+                if (score >= 90) return { from: '#ffd700', to: '#fff8dc' }      // 90+ → Gold → soft white
+                if (score >= 80) return { from: '#50C878', to: '#98FB98' }      // 80-89 → Green → mint
+                if (score >= 70) return { from: '#20B2AA', to: '#50C878' }      // 70-79 → Teal → green
+                if (score >= 50) return { from: '#DAA520', to: '#20B2AA' }      // 50-69 → Amber → teal
+                return { from: '#CD853F', to: '#DAA520' }                        // 0-49 → Muted amber / tired orange
             }
             const badgeColors = getScoreBadgeColors()
 
@@ -180,10 +167,10 @@ export const generateShareCard = async ({
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.stroke()
 
-            // ===== SECTION 2: SCORE BADGE (Anchored to image bottom) =====
-            const badgeSize = 120
+            // ===== SECTION 2: SCORE BADGE (HARD-SPEC: 100px, overlapping ~25%) =====
+            const badgeSize = 100  // HARD-SPEC: ≈100px mobile
             const badgeX = canvas.width / 2
-            const badgeY = imageY + imageHeight - badgeSize / 2 + 20  // Lowered 10px for anchor
+            const badgeY = imageY + imageHeight - badgeSize * 0.25  // Overlap ~25%
 
             // Badge outer glow (restrained - reduced blur)
             ctx.shadowColor = badgeColors.from
@@ -237,19 +224,25 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, verdictY + (i * 40))  // Reduced line-height
             })
 
-            // ===== SECTION 4: VIBE / STYLE TAG (Slightly more visible) =====
-            const vibeBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
-            const vibeTag = pickRandom(VIBE_TAGS[vibeBand])
-            const vibeY = verdictY + (verdictLines.length * 40) + 18
+            // ===== SECTION 4: AI INSIGHT LINE (HARD-SPEC: explains WHY, neutral tone) =====
+            const insightBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
+            const aiInsight = scores.summaryLine || pickRandom(AI_INSIGHT_POOLS[insightBand])
+            const insightY = verdictY + (verdictLines.length * 40) + 20
 
-            ctx.fillStyle = 'rgba(255,255,255,0.65)'  // Increased for better visibility
-            ctx.font = 'italic 600 20px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText(vibeTag, canvas.width / 2, vibeY)
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'
+            ctx.font = '20px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
 
-            // ===== SECTION 5: MICRO SCORES (3 Pills with emojis - BIGGER for accessibility) =====
-            const pillY = vibeY + 50
-            const pillWidth = 130  // Wider for larger text
-            const pillHeight = 48  // Taller
+            // Wrap AI insight if needed
+            const insightLines = wrapText(ctx, aiInsight, canvas.width - 120)
+            insightLines.slice(0, 2).forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, insightY + (i * 26))
+            })
+
+            // ===== SECTION 5: MICRO SCORES (HARD-SPEC: 🎨 Color ## 👔 Fit ## ✨ Style ##) =====
+            const pillY = insightY + (insightLines.length * 26) + 35
+            const pillWidth = 130
+            const pillHeight = 48
             const pillGap = 12
             const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
             const pillStartX = (canvas.width - totalPillWidth) / 2
@@ -287,16 +280,15 @@ export const generateShareCard = async ({
                 ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 30)
             })
 
-            // ===== SECTION 6: "REAL TALK" LINE (Trust Anchor - BIGGER) =====
-            const realTalkY = pillY + pillHeight + 42
-            const realTalkPrefix = pickRandom(REAL_TALK_VARIANTS)
+            // ===== SECTION 6: TRUST LINE (HARD-SPEC: EXACTLY "Honest score: ## / 100") =====
+            const trustY = pillY + pillHeight + 42
 
-            // Draw as single formatted line: "Honest score: 48 / 100"
+            // HARD-SPEC: Fixed text, no variation
             ctx.textAlign = 'center'
 
-            // Measure to center properly (BIGGER sizes for readability)
+            // Measure to center properly
             ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-            const prefixText = `${realTalkPrefix}:`
+            const prefixText = 'Honest score:'
             const scoreText = ` ${score} / 100`
             const prefixWidth = ctx.measureText(prefixText).width
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
@@ -304,21 +296,21 @@ export const generateShareCard = async ({
             const totalWidth = prefixWidth + scoreWidth
             const startX = canvas.width / 2 - totalWidth / 2
 
-            // Prefix (more visible)
-            ctx.fillStyle = 'rgba(255,255,255,0.6)'
+            // "Honest score" lighter weight
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'
             ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'left'
-            ctx.fillText(prefixText, startX, realTalkY)
+            ctx.fillText(prefixText, startX, trustY)
 
-            // Score (heavier, with proper spacing)
+            // Numbers heavier
             ctx.fillStyle = '#ffffff'
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText(scoreText, startX + prefixWidth, realTalkY)
+            ctx.fillText(scoreText, startX + prefixWidth, trustY)
 
-            // ===== SECTION 7: CTA BUTTON (Firmer, more button-like - BIGGER) =====
-            const ctaY = realTalkY + 58
-            const ctaWidth = 400  // Wider
-            const ctaHeight = 68  // Taller
+            // ===== SECTION 7: CTA BUTTON (HARD-SPEC: subtle glow, feels tappable) =====
+            const ctaY = trustY + 58
+            const ctaWidth = 420
+            const ctaHeight = 64
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = pickRandom(CTA_VARIANTS)
             const ctaRadius = 18
