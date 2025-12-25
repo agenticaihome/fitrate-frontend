@@ -246,6 +246,7 @@ export default function ChallengesScreen({
                         {/* CTA */}
                         <button
                             onClick={() => { playSound('click'); vibrate(30); onCompeteDaily?.(); }}
+                            aria-label="Take a photo for daily challenge"
                             className="w-full py-5 rounded-2xl font-black text-xl transition-all active:scale-[0.98]"
                             style={{
                                 background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
@@ -422,6 +423,7 @@ export default function ChallengesScreen({
                                 {(isPro || !freeEventEntryUsed) ? (
                                     <button
                                         onClick={() => { playSound('click'); vibrate(30); onCompeteWeekly?.(); }}
+                                        aria-label="Take a photo for weekly challenge"
                                         className="w-full py-5 rounded-2xl font-black text-xl transition-all active:scale-[0.98]"
                                         style={{
                                             background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
@@ -441,6 +443,7 @@ export default function ChallengesScreen({
                                         </div>
                                         <button
                                             onClick={() => { playSound('click'); vibrate(20); onShowPaywall?.(); }}
+                                            aria-label="Upgrade to Pro for more tries"
                                             className="w-full py-5 rounded-2xl font-black text-xl"
                                             style={{
                                                 background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',

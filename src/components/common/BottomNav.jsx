@@ -60,6 +60,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
                 {/* Home */}
                 <button
                     onClick={() => handleTap('home')}
+                    aria-label="Go to home"
                     className="relative flex items-center justify-center w-12 h-10 transition-all active:scale-90"
                 >
                     <HomeIcon active={activeTab === 'home'} />
@@ -71,6 +72,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
                 {/* Scan - Elegant floating button */}
                 <button
                     onClick={() => handleTap('scan')}
+                    aria-label="Take a photo to rate your outfit"
                     className="relative flex items-center justify-center transition-all active:scale-95"
                     style={{
                         width: 44,
@@ -94,6 +96,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
                 {/* Challenges */}
                 <button
                     onClick={() => handleTap('challenges')}
+                    aria-label="View challenges"
                     className="relative flex items-center justify-center w-12 h-10 transition-all active:scale-90"
                 >
                     <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />

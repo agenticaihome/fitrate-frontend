@@ -1796,8 +1796,10 @@ export default function App() {
 
   // ============================================
   // FASHION SHOW HUB (Merged Join + Runway + Camera)
+  // Skip if showing results/analyzing - let those screens take priority
   // ============================================
-  if (fashionShowScreen === 'join' || fashionShowScreen === 'runway') {
+  if ((fashionShowScreen === 'join' || fashionShowScreen === 'runway') &&
+    screen !== 'analyzing' && screen !== 'results' && screen !== 'error') {
     return (
       <FashionShowHub
         showId={fashionShowId}
