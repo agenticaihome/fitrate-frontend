@@ -59,6 +59,21 @@ const CTA_VARIANTS = [
 // Pick random from array
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
+// ============================================
+// MODE CONFIGURATION - Dynamic mode badge styling
+// ============================================
+const MODE_CONFIG = {
+    nice: { gradient: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)', emoji: '😊', label: 'NICE MODE', textColor: '#000' },
+    roast: { gradient: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)', emoji: '🔥', label: 'ROAST MODE', textColor: '#fff' },
+    honest: { gradient: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)', emoji: '💯', label: 'HONEST MODE', textColor: '#fff' },
+    savage: { gradient: 'linear-gradient(135deg, #ff1493 0%, #ff0066 100%)', emoji: '💀', label: 'SAVAGE MODE', textColor: '#fff' },
+    rizz: { gradient: 'linear-gradient(135deg, #ff69b4 0%, #ff1493 100%)', emoji: '😏', label: 'RIZZ MODE', textColor: '#fff' },
+    celeb: { gradient: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', emoji: '⭐', label: 'CELEB MODE', textColor: '#000' },
+    aura: { gradient: 'linear-gradient(135deg, #9b59b6 0%, #8b5cf6 100%)', emoji: '✨', label: 'AURA MODE', textColor: '#fff' },
+    chaos: { gradient: 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)', emoji: '🎲', label: 'CHAOS MODE', textColor: '#fff' },
+    event: { gradient: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)', emoji: '🏆', label: 'EVENT MODE', textColor: '#fff' }
+}
+
 
 // ============================================
 // GOLDEN RESULT CARD GENERATOR
@@ -210,13 +225,58 @@ export const generateShareCard = async ({
             ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText('/100', badgeX, badgeY + 28)
 
-            // ===== SECTION 3: VERDICT HEADLINE (Heavier, closer to badge) =====
-            const verdictY = imageY + imageHeight + 85  // Pulled 15px closer to badge
+            // ===== SECTION 3: MODE BADGE (Dynamic - above verdict) =====
+            const currentMode = scores.mode || 'honest'
+            const modeConfig = MODE_CONFIG[currentMode] || MODE_CONFIG.honest
+            const modeBadgeY = imageY + imageHeight + 50
+            const modeBadgeHeight = 36
+            const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
+
+            // Measure mode badge width
+            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+            const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
+            const modeBadgeWidth = modeBadgeTextWidth + 32
+            const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
+
+            // Parse gradient colors for shadow
+            const modeGradientMatch = modeConfig.gradient.match(/#[a-fA-F0-9]{6}/g)
+            const modeGlowColor = modeGradientMatch ? modeGradientMatch[0] : '#3b82f6'
+
+            // Mode badge glow
+            ctx.shadowColor = modeGlowColor
+            ctx.shadowBlur = 16
+
+            // Mode badge gradient background
+            const modeBadgeGradient = ctx.createLinearGradient(modeBadgeX, modeBadgeY, modeBadgeX + modeBadgeWidth, modeBadgeY)
+            if (modeGradientMatch && modeGradientMatch.length >= 2) {
+                modeBadgeGradient.addColorStop(0, modeGradientMatch[0])
+                modeBadgeGradient.addColorStop(1, modeGradientMatch[1])
+            } else {
+                modeBadgeGradient.addColorStop(0, '#3b82f6')
+                modeBadgeGradient.addColorStop(1, '#06b6d4')
+            }
+
+            ctx.fillStyle = modeBadgeGradient
+            ctx.beginPath()
+            ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
+            ctx.fill()
+            ctx.shadowBlur = 0
+
+            // Mode badge text
+            ctx.fillStyle = modeConfig.textColor
+            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
+
+            // ===== SECTION 4: VERDICT HEADLINE (Below mode badge) =====
+            const verdictY = modeBadgeY + modeBadgeHeight + 30
             const verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
             ctx.fillStyle = '#ffffff'
             ctx.font = '800 38px -apple-system, BlinkMacSystemFont, sans-serif'  // +1 weight, +2px size
             ctx.textAlign = 'center'
+            ctx.textBaseline = 'alphabetic'
 
             // Wrap if needed (tighter line height)
             const verdictLines = wrapText(ctx, verdict, canvas.width - 100)
@@ -224,7 +284,7 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, verdictY + (i * 40))  // Reduced line-height
             })
 
-            // ===== SECTION 4: AI INSIGHT LINE (HARD-SPEC: explains WHY, neutral tone) =====
+            // ===== SECTION 5: AI INSIGHT LINE (HARD-SPEC: explains WHY, neutral tone) =====
             const insightBand = score >= 75 ? 'high' : score >= 50 ? 'mid' : 'low'
             const aiInsight = scores.summaryLine || pickRandom(AI_INSIGHT_POOLS[insightBand])
             const insightY = verdictY + (verdictLines.length * 40) + 20
@@ -239,7 +299,7 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, insightY + (i * 26))
             })
 
-            // ===== SECTION 5: MICRO SCORES (HARD-SPEC: 🎨 Color ## 👔 Fit ## ✨ Style ##) =====
+            // ===== SECTION 6: MICRO SCORES (HARD-SPEC: 🎨 Color ## 👔 Fit ## ✨ Style ##) =====
             const pillY = insightY + (insightLines.length * 26) + 35
             const pillWidth = 130
             const pillHeight = 48
@@ -280,35 +340,8 @@ export const generateShareCard = async ({
                 ctx.fillText(item.score.toString(), x + pillWidth - 10, pillY + 30)
             })
 
-            // ===== SECTION 6: TRUST LINE (HARD-SPEC: EXACTLY "Honest score: ## / 100") =====
-            const trustY = pillY + pillHeight + 42
-
-            // HARD-SPEC: Fixed text, no variation
-            ctx.textAlign = 'center'
-
-            // Measure to center properly
-            ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-            const prefixText = 'Honest score:'
-            const scoreText = ` ${score} / 100`
-            const prefixWidth = ctx.measureText(prefixText).width
-            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
-            const scoreWidth = ctx.measureText(scoreText).width
-            const totalWidth = prefixWidth + scoreWidth
-            const startX = canvas.width / 2 - totalWidth / 2
-
-            // "Honest score" lighter weight
-            ctx.fillStyle = 'rgba(255,255,255,0.55)'
-            ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.textAlign = 'left'
-            ctx.fillText(prefixText, startX, trustY)
-
-            // Numbers heavier
-            ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText(scoreText, startX + prefixWidth, trustY)
-
-            // ===== SECTION 7: CTA BUTTON (HARD-SPEC: subtle glow, feels tappable) =====
-            const ctaY = trustY + 58
+            // ===== SECTION 7: CTA BUTTON (directly after micro scores) =====
+            const ctaY = pillY + pillHeight + 48
             const ctaWidth = 420
             const ctaHeight = 64
             const ctaX = (canvas.width - ctaWidth) / 2
@@ -331,12 +364,6 @@ export const generateShareCard = async ({
             ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + 42)
-
-            // ===== SECTION 8: FOOTER TAGLINE =====
-            const footerY = ctaY + ctaHeight + 38
-            ctx.fillStyle = 'rgba(255,255,255,0.45)'  // More readable
-            ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText('Rate your fit in seconds', canvas.width / 2, footerY)
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
