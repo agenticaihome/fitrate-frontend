@@ -49,11 +49,11 @@ const AI_INSIGHT_POOLS = {
     ]
 }
 
-// CTA button variants - HARD-SPEC: ONLY these 3 allowed
+// CTA button variants - clearer, punchier
 const CTA_VARIANTS = [
-    'Post yours → fitrate.app',
-    'Your fit next → fitrate.app',
-    'Think you\'d score higher? → fitrate.app'
+    'Get roasted → fitrate.app',
+    'Rate YOUR fit → fitrate.app',
+    'Can you do better? → fitrate.app'
 ]
 
 // Pick random from array
@@ -299,55 +299,8 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, insightY + (i * 46))
             })
 
-            // ===== SECTION 6: MICRO SCORES - MASSIVE pills =====
-            const pillY = insightY + (insightLines.length * 46) + 45
-            const pillWidth = 180  // MASSIVE pills
-            const pillHeight = 68
-            const pillGap = 24
-            const totalPillWidth = (pillWidth * 3) + (pillGap * 2)
-            const pillStartX = (canvas.width - totalPillWidth) / 2
-
-            const microScores = [
-                { emoji: '🎨', label: 'Color', score: scores.colorEnergy || Math.round(score * 0.95) },
-                { emoji: '👕', label: 'Fit', score: scores.silhouette || Math.round(score * 0.9) },
-                { emoji: '✨', label: 'Style', score: scores.intent || Math.round(score * 1.02) }
-            ]
-
-            microScores.forEach((item, i) => {
-                const x = pillStartX + (i * (pillWidth + pillGap))
-
-                // Pill background
-                ctx.fillStyle = 'rgba(255,255,255,0.1)'
-                ctx.beginPath()
-                ctx.roundRect(x, pillY, pillWidth, pillHeight, 16)
-                ctx.fill()
-
-                // Pill border
-                ctx.strokeStyle = 'rgba(255,255,255,0.2)'
-                ctx.lineWidth = 2
-                ctx.stroke()
-
-                // Emoji - MASSIVE
-                ctx.fillStyle = '#ffffff'
-                ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.textAlign = 'left'
-                ctx.textBaseline = 'middle'
-                ctx.fillText(item.emoji, x + 14, pillY + pillHeight / 2)
-
-                // Label - MASSIVE
-                ctx.fillStyle = 'rgba(255,255,255,0.7)'
-                ctx.font = '22px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.fillText(item.label, x + 48, pillY + pillHeight / 2)
-
-                // Score value - MASSIVE
-                ctx.fillStyle = '#ffffff'
-                ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.textAlign = 'right'
-                ctx.fillText(item.score.toString(), x + pillWidth - 16, pillY + pillHeight / 2)
-            })
-
-            // ===== SECTION 7: CTA BUTTON - MASSIVE =====
-            const ctaY = pillY + pillHeight + 55
+            // ===== SECTION 6: CTA BUTTON - MASSIVE (no micro-scores, cleaner) =====
+            const ctaY = insightY + (insightLines.length * 46) + 50
             const ctaWidth = 580  // WIDER
             const ctaHeight = 88  // TALLER
             const ctaX = (canvas.width - ctaWidth) / 2
