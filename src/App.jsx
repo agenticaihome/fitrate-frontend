@@ -2099,7 +2099,7 @@ export default function App() {
           playSound={playSound}
           vibrate={vibrate}
           currentEvent={eventMode ? currentEvent : null}
-          onStartFashionShow={() => setScreen('fashion-create')}
+          onStartFashionShow={() => setFashionShowScreen('create')}
           totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
           fashionShowId={fashionShowId}
           fashionShowName={fashionShowData?.name}
@@ -2116,6 +2116,9 @@ export default function App() {
           eventMode={eventMode}
           onNavigate={(tab) => {
             if (tab === 'home') {
+              // Clear Fashion Show state to prevent stale navigation
+              setFashionShowScreen(null)
+              setScores(null)
               setScreen('home');
             } else if (tab === 'challenges') {
               fetchDailyLeaderboard();
@@ -2318,6 +2321,18 @@ export default function App() {
       />
     )
   }
+
+  // ============================================
+  // FALLBACK: No matching screen - redirect home
+  // This should never happen, but prevents blank screen
+  // ============================================
+  console.warn('[Navigation] No matching screen condition - redirecting to home. Current state:', { screen, fashionShowScreen, showPaywall, showLeaderboard, showRules })
+
+  // Use useEffect-safe reset: schedule redirect for next tick
+  setTimeout(() => {
+    setScreen('home')
+    setFashionShowScreen(null)
+  }, 0)
 
   return null
 }
