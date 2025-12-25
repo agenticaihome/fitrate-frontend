@@ -197,31 +197,31 @@ export const generateShareCard = async ({
 
             ctx.restore()
 
-            // GLOWING border around image - matches mode color
+            // GLOWING border around image - THICK and bold
             ctx.shadowColor = modeColor
-            ctx.shadowBlur = 40
+            ctx.shadowBlur = 60
             ctx.strokeStyle = modeColor
-            ctx.lineWidth = 4
+            ctx.lineWidth = 8  // WIDER border
             ctx.beginPath()
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.stroke()
             ctx.shadowBlur = 0
 
             // Inner subtle white border for polish
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)'
-            ctx.lineWidth = 1
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+            ctx.lineWidth = 2
             ctx.beginPath()
-            ctx.roundRect(imageMargin + 2, imageY + 2, imageWidth - 4, imageHeight - 4, imageRadius - 2)
+            ctx.roundRect(imageMargin + 4, imageY + 4, imageWidth - 8, imageHeight - 8, imageRadius - 4)
             ctx.stroke()
 
-            // ===== SECTION 2: SCORE BADGE - uses MODE color for cohesion =====
-            const badgeSize = 170  // MASSIVE badge
+            // ===== SECTION 2: SCORE BADGE - DOUBLED SIZE =====
+            const badgeSize = 240  // DOUBLED from 170
             const badgeX = canvas.width / 2
-            const badgeY = imageY + imageHeight - badgeSize * 0.25
+            const badgeY = imageY + imageHeight - badgeSize * 0.30  // More overlap
 
             // Badge outer glow - MODE color
             ctx.shadowColor = modeColor
-            ctx.shadowBlur = 40
+            ctx.shadowBlur = 60
 
             // Badge ring gradient - MODE colors
             const badgeGradient = ctx.createLinearGradient(
@@ -236,34 +236,34 @@ export const generateShareCard = async ({
                 badgeGradient.addColorStop(1, '#06b6d4')
             }
 
-            // Draw ring - thicker
+            // Draw ring - THICKER
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = badgeGradient
-            ctx.lineWidth = 12
+            ctx.lineWidth = 16  // Thicker ring
             ctx.stroke()
             ctx.shadowBlur = 0
 
             // Badge inner dark fill
             ctx.beginPath()
-            ctx.arc(badgeX, badgeY, badgeSize / 2 - 10, 0, Math.PI * 2)
+            ctx.arc(badgeX, badgeY, badgeSize / 2 - 14, 0, Math.PI * 2)
             ctx.fillStyle = '#0f0f18'
             ctx.fill()
 
-            // Score number - MASSIVE
+            // Score number - DOUBLED
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 92px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 130px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(score.toString(), badgeX, badgeY - 12)
+            ctx.fillText(score.toString(), badgeX, badgeY - 16)
 
             // /100 below score - bigger
             ctx.fillStyle = 'rgba(255,255,255,0.6)'
-            ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText('/100', badgeX, badgeY + 46)
+            ctx.font = '36px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillText('/100', badgeX, badgeY + 58)
 
-            // ===== SECTION 3: MODE BADGE - MASSIVE for mobile =====
-            const modeBadgeY = imageY + imageHeight + 70
+            // ===== SECTION 3: MODE BADGE - adjust for larger score badge =====
+            const modeBadgeY = imageY + imageHeight + 100  // More space for bigger badge
             const modeBadgeHeight = 56
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
@@ -359,22 +359,22 @@ export const generateShareCard = async ({
             ctx.textAlign = 'center'
             ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 45)
 
-            // ===== SECTION 7: FITRATE LOGO WATERMARK =====
-            const logoY = canvas.height - 80
+            // ===== SECTION 7: FITRATE LOGO WATERMARK - TRIPLED =====
+            const logoY = canvas.height - 140
             if (logoImg) {
-                // Draw actual logo - scale to ~40px height
-                const logoHeight = 45
+                // Draw actual logo - TRIPLED size
+                const logoHeight = 100  // Tripled from 45
                 const logoWidth = (logoImg.width / logoImg.height) * logoHeight
                 const logoX = (canvas.width - logoWidth) / 2
-                ctx.globalAlpha = 0.5
+                ctx.globalAlpha = 0.6
                 ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight)
                 ctx.globalAlpha = 1.0
             } else {
-                // Fallback to text
-                ctx.fillStyle = 'rgba(255,255,255,0.4)'
-                ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Fallback to text - bigger
+                ctx.fillStyle = 'rgba(255,255,255,0.5)'
+                ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.textAlign = 'center'
-                ctx.fillText('FitRate.app', canvas.width / 2, logoY + 30)
+                ctx.fillText('FitRate.app', canvas.width / 2, logoY + 60)
             }
 
             // ===== GENERATE SHARE TEXT =====
