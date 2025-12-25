@@ -2079,6 +2079,7 @@ export default function App() {
       <ChallengeResultScreen
         userScore={scores.overall}
         challengeScore={challengeScore}
+        userImage={uploadedImage}
         onViewResults={() => setScreen('results')}
         onChallengeBack={() => {
           // Clear challenge score and trigger share for rematch
