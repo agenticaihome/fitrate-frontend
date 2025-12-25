@@ -89,6 +89,16 @@ export default function FashionShowHub({
         return () => clearInterval(interval)
     }, [])
 
+    // Cleanup camera stream on unmount (prevents glitch when navigating away)
+    useEffect(() => {
+        return () => {
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop())
+                streamRef.current = null
+            }
+        }
+    }, [])
+
     // Poll scoreboard
     useEffect(() => {
         const fetchScoreboard = async () => {

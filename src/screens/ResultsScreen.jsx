@@ -762,7 +762,7 @@ export default function ResultsScreen({
                         style={{ bottom: '-40px' }}
                     >
                         <div
-                            className="relative w-24 h-24 rounded-full flex flex-col items-center justify-center"
+                            className="relative w-[100px] h-[100px] rounded-full flex flex-col items-center justify-center"
                             style={{
                                 background: '#0a0a15',
                                 border: `4px solid ${theme.accent}`,
@@ -781,7 +781,7 @@ export default function ResultsScreen({
                                 {displayedScore}
                             </span>
                             {/* /100 */}
-                            <span className="text-[10px] font-bold text-white/40">/100</span>
+                            <span className="text-xs font-bold text-white/40">/100</span>
                         </div>
 
                         {/* Score ring progress around badge */}
@@ -945,19 +945,12 @@ export default function ResultsScreen({
             {/* ===== SIMPLIFIED VERDICT SECTION (Golden Result Card style) ===== */}
             <div className={`w-full max-w-sm px-4 mb-4 text-center transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-                {/* Verdict Headline - BIGGER, HEAVIER */}
+                {/* Verdict Headline - BIGGER, HEAVIER (matches share card 38px) */}
                 <h2
-                    className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}
+                    className={`text-[38px] leading-tight mb-2 ${isLegendary ? 'legendary-text' : 'text-white'}`}
                     style={{ fontWeight: 800 }}
                 >
                     {scores.verdict}
-                    <span className="ml-2 text-xl">
-                        {scoreTier === 'legendary' ? '👑' :
-                            scoreTier === 'fire' ? '🔥' :
-                                scoreTier === 'great' ? '✨' :
-                                    scoreTier === 'good' ? '👍' :
-                                        scoreTier === 'mid' ? '😐' : '💀'}
-                    </span>
                 </h2>
 
                 {/* Vibe Tag Line (Aesthetic · Celeb Reference) */}
@@ -990,8 +983,8 @@ export default function ResultsScreen({
                         }}
                     >
                         <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-base">🎨</span>
-                            <span className="text-xs font-semibold text-white/60">Color</span>
+                            <span className="text-lg">🎨</span>
+                            <span className="text-base font-semibold text-white/60">Color</span>
                         </div>
                         <span
                             className="text-xl font-black"
@@ -1010,8 +1003,8 @@ export default function ResultsScreen({
                         }}
                     >
                         <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-base">👔</span>
-                            <span className="text-xs font-semibold text-white/60">Fit</span>
+                            <span className="text-lg">👔</span>
+                            <span className="text-base font-semibold text-white/60">Fit</span>
                         </div>
                         <span
                             className="text-xl font-black"
@@ -1030,8 +1023,8 @@ export default function ResultsScreen({
                         }}
                     >
                         <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-base">✨</span>
-                            <span className="text-xs font-semibold text-white/60">Style</span>
+                            <span className="text-lg">✨</span>
+                            <span className="text-base font-semibold text-white/60">Style</span>
                         </div>
                         <span
                             className="text-xl font-black"
