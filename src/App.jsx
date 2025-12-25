@@ -1513,13 +1513,20 @@ export default function App() {
         weekId: currentEvent.weekId
       } : null
 
+      // Build daily challenge context for themed share card
+      const dailyChallengeShareContext = scores?.dailyChallenge ? {
+        rank: scores.dailyChallenge.rank,
+        totalParticipants: scores.dailyChallenge.totalParticipants
+      } : null
+
       const { file, text, url, imageBlob } = await generateShareCardUtil({
         scores,
         shareFormat,
         uploadedImage,
         userId,
         isPro: isPro || false,
-        eventContext: eventShareContext
+        eventContext: eventShareContext,
+        dailyChallengeContext: dailyChallengeShareContext
       })
 
       // Store shareData for potential future use

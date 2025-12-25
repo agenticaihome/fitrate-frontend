@@ -25,7 +25,8 @@ export const generateShareCard = async ({
     uploadedImage,
     userId,
     isPro,
-    eventContext = null  // { theme, themeEmoji, rank, weekId }
+    eventContext = null,  // { theme, themeEmoji, rank, weekId }
+    dailyChallengeContext = null  // { rank, totalParticipants }
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -134,12 +135,30 @@ export const generateShareCard = async ({
             ctx.lineTo(880, headerY + 20)
             ctx.stroke()
 
-            // Header text
-            ctx.fillStyle = modeColors.accent
+            // Header text - Daily Challenge or regular
+            ctx.fillStyle = dailyChallengeContext ? '#00d4ff' : modeColors.accent
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.letterSpacing = '8px'
-            ctx.fillText("TODAY'S FIT VERDICT", 540, headerY + 28)
+            const headerText = dailyChallengeContext ? '⚡ DAILY CHALLENGE ⚡' : "TODAY'S FIT VERDICT"
+            ctx.fillText(headerText, 540, headerY + 28)
             ctx.restore()
+
+            // Daily Challenge Rank Badge (if applicable)
+            if (dailyChallengeContext && dailyChallengeContext.rank) {
+                const rankY = headerY + 60
+                ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+                ctx.beginPath()
+                ctx.roundRect(380, rankY - 15, 320, 35, 20)
+                ctx.fill()
+                ctx.strokeStyle = 'rgba(0, 212, 255, 0.5)'
+                ctx.lineWidth = 2
+                ctx.stroke()
+                ctx.fillStyle = '#00d4ff'
+                ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'center'
+                const rankText = `🏅 Rank #${dailyChallengeContext.rank}/${dailyChallengeContext.totalParticipants || '?'} Today`
+                ctx.fillText(rankText, 540, rankY + 5)
+            }
 
             // ===== GIANT SCORE RING =====
             const scoreColor = scores.overall >= 85 ? '#ffd700' :
@@ -413,6 +432,14 @@ export const generateShareCard = async ({
                 // Chaos Mode Strategy: Absurdist share
                 if (scores.mode === 'chaos') {
                     return `"${scores.absurdComparison || 'The AI went feral'}" 🎪 ${link}`
+                }
+
+                // Daily Challenge Strategy: Competitive hook
+                if (dailyChallengeContext && dailyChallengeContext.rank) {
+                    const rankText = dailyChallengeContext.rank === 1
+                        ? `#1 in today's Daily Challenge! 👑`
+                        : `Rank #${dailyChallengeContext.rank} in today's Daily Challenge ⚡`
+                    return `${rankText} ${scores.overall}/100. Can you beat me? ${link}`
                 }
 
                 // High Scores Strategy: Flex + challenge
