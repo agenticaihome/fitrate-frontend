@@ -114,12 +114,12 @@ export const generateShareCard = async ({
             ctx.fillStyle = accentGlow
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-            // Format-aware Y positions (UPGRADED for viral layout)
-            const headerY = isSquare ? 50 : 80
-            const scoreRingY = isSquare ? 240 : 360   // Moved down for bigger ring
-            const verdictCardY = isSquare ? 480 : 700  // Bigger photo area
-            const breakdownY = isSquare ? 780 : 1180   // Simplified bars
-            const ctaY = isSquare ? 950 : 1550         // Share CTA line
+            // Format-aware Y positions (COMPRESSED 20% for poster-like density)
+            const headerY = isSquare ? 40 : 60
+            const scoreRingY = isSquare ? 190 : 280   // Tighter to header
+            const verdictCardY = isSquare ? 400 : 580  // Closer to score
+            const breakdownY = isSquare ? 660 : 1000   // Tighter to card
+            const ctaY = isSquare ? 820 : 1250         // Moved up significantly
 
             // ===== TODAY'S FIT VERDICT HEADER =====
             ctx.save()
@@ -190,44 +190,47 @@ export const generateShareCard = async ({
             ctx.stroke()
             ctx.shadowBlur = 0
 
-            // Score number (BIGGER - bolder impact)
+            // Score number (BIGGER with glow - eye snaps in <200ms)
+            ctx.shadowColor = scoreColor
+            ctx.shadowBlur = 25  // Glow behind number
             ctx.fillStyle = '#fff'
-            ctx.font = `bold ${isSquare ? 95 : 120}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.font = `bold ${isSquare ? 110 : 140}px -apple-system, BlinkMacSystemFont, sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(Math.round(scores.overall), 540, scoreRingY)
+            ctx.shadowBlur = 0
 
-            // /100 below
-            ctx.fillStyle = 'rgba(255,255,255,0.4)'
-            ctx.font = `bold ${isSquare ? 28 : 36}px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText('/ 100', 540, scoreRingY + (isSquare ? 65 : 85))
+            // /100 below (50% quieter)
+            ctx.fillStyle = 'rgba(255,255,255,0.2)'
+            ctx.font = `${isSquare ? 22 : 28}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText('/ 100', 540, scoreRingY + (isSquare ? 55 : 75))
             ctx.textBaseline = 'alphabetic'
 
-            // Verdict name below ring
+            // Verdict headline (HEAVIER + closer to score)
             ctx.fillStyle = scoreColor
-            ctx.font = `bold ${isSquare ? 32 : 42}px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText(scores.verdict || 'The Verdict', 540, scoreRingY + (isSquare ? 110 : 140))
+            ctx.font = `800 ${isSquare ? 36 : 48}px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText(scores.verdict || 'The Verdict', 540, scoreRingY + (isSquare ? 95 : 125))
 
-            // Percentile context
+            // Percentile context (tighter)
             const percent = Math.max(1, Math.round(scores.percentile || 50))
             const percentText = scores.overall >= 50
                 ? `Better than ${percent}% of fits today`
                 : `Worse than ${100 - percent}% of fits today`
-            ctx.fillStyle = 'rgba(255,255,255,0.5)'
-            ctx.font = `18px -apple-system, BlinkMacSystemFont, sans-serif`
-            ctx.fillText(percentText, 540, scoreRingY + (isSquare ? 145 : 180))
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'
+            ctx.font = `16px -apple-system, BlinkMacSystemFont, sans-serif`
+            ctx.fillText(percentText, 540, scoreRingY + (isSquare ? 125 : 160))
 
-            // ===== THE VERDICT CARD (Split Layout) =====
-            const cardX = 60
-            const cardWidth = 960
-            const cardHeight = isSquare ? 240 : 360
+            // ===== THE VERDICT CARD (Tighter Layout) =====
+            const cardX = 80
+            const cardWidth = 920
+            const cardHeight = isSquare ? 200 : 320  // Reduced height
 
             // Card background
-            ctx.fillStyle = 'rgba(255,255,255,0.04)'
+            ctx.fillStyle = 'rgba(255,255,255,0.03)'
             ctx.shadowColor = modeColors.glow
-            ctx.shadowBlur = 40
+            ctx.shadowBlur = 25
             ctx.beginPath()
-            ctx.roundRect(cardX, verdictCardY, cardWidth, cardHeight, 32)
+            ctx.roundRect(cardX, verdictCardY, cardWidth, cardHeight, 24)
             ctx.fill()
             ctx.shadowBlur = 0
 
@@ -420,8 +423,8 @@ export const generateShareCard = async ({
                 })
             }
 
-            // ===== FOOTER (Stronger Branding) =====
-            const footerY = isSquare ? 1020 : 1800  // Adjusted for badges
+            // ===== FOOTER (Stronger Branding - tighter) =====
+            const footerY = isSquare ? 960 : 1550  // Compressed for tighter layout
 
             // Percentile context (tighter copy)
             const footerPercent = Math.max(1, 100 - (scores.percentile || 50))
