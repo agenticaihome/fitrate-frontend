@@ -129,6 +129,43 @@ export default function App() {
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const [inAppBrowser, setInAppBrowser] = useState(null)
 
+  // ============================================
+  // APP VERSION CHECK - Force update for stale caches
+  // Bump this version when deploying breaking changes
+  // ============================================
+  const APP_VERSION = '2024.12.25.2'
+
+  useEffect(() => {
+    const storedVersion = localStorage.getItem('fitrate_app_version')
+
+    // If user has older version, clear everything and reload
+    if (storedVersion && storedVersion !== APP_VERSION) {
+      console.log(`[Version] Outdated: ${storedVersion} → ${APP_VERSION}, forcing update...`)
+
+      // Clear service worker registrations
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(reg => reg.unregister())
+        })
+      }
+
+      // Clear all caches
+      if ('caches' in window) {
+        caches.keys().then(keys => {
+          keys.forEach(key => caches.delete(key))
+        })
+      }
+
+      // Update version and force reload
+      localStorage.setItem('fitrate_app_version', APP_VERSION)
+      window.location.reload(true)
+      return
+    }
+
+    // First visit or same version - store current
+    localStorage.setItem('fitrate_app_version', APP_VERSION)
+  }, [])
+
   // Detect standalone mode (PWA)
   useEffect(() => {
     const checkStandalone = () => {
@@ -147,6 +184,7 @@ export default function App() {
     }
     checkStandalone()
   }, [])
+
 
   // Detect in-app browser on mount (Twitter/Instagram/etc)
   useEffect(() => {

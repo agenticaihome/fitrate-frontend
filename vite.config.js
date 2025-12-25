@@ -6,11 +6,17 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      // AUTO-UPDATE: Automatically activate new SW and reload when update available
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       workbox: {
         // Import push notification handler into generated service worker
         importScripts: ['push-handler.js'],
+        // AGGRESSIVE UPDATE: Skip waiting and claim all clients immediately
+        skipWaiting: true,
+        clientsClaim: true,
+        // Clean up old caches from previous versions
+        cleanupOutdatedCaches: true,
         // Runtime caching for API requests
         runtimeCaching: [
           {
