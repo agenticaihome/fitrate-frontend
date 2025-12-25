@@ -1159,13 +1159,16 @@ export default function App() {
 
         // Create thumbnail for event mode submissions (Weekly Challenge)
         const isEventSubmission = eventMode && currentEvent && !fashionShowId;
-        let eventThumb = null;
-        if (isEventSubmission && imageData) {
+        const isDailyChallengeSubmission = dailyChallengeMode && !fashionShowId;
+
+        // Create thumbnail for event OR daily challenge submissions
+        let challengeThumb = null;
+        if ((isEventSubmission || isDailyChallengeSubmission) && imageData) {
           try {
-            eventThumb = await createThumbnail(imageData, 150, 0.6);
-            console.log('[Event] Thumbnail created:', eventThumb ? `${Math.round(eventThumb.length / 1024)}KB` : 'failed');
+            challengeThumb = await createThumbnail(imageData, 150, 0.6);
+            console.log(`[${isDailyChallengeSubmission ? 'Daily' : 'Event'}] Thumbnail created:`, challengeThumb ? `${Math.round(challengeThumb.length / 1024)}KB` : 'failed');
           } catch (e) {
-            console.warn('Failed to create event thumbnail:', e);
+            console.warn('Failed to create challenge thumbnail:', e);
           }
         }
 
@@ -1178,7 +1181,8 @@ export default function App() {
             mode: effectiveMode,  // Use show's vibe when in Fashion Show
             userId,
             eventMode: isEventSubmission,
-            imageThumb: eventThumb  // Send thumbnail for Weekly Challenge top-5 display
+            dailyChallenge: isDailyChallengeSubmission,  // Flag for daily challenge leaderboard
+            imageThumb: challengeThumb  // Send thumbnail for leaderboard display
           }),
           signal: controller.signal
         })
