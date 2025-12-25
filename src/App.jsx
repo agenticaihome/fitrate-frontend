@@ -1779,35 +1779,9 @@ export default function App() {
   }
 
   // ============================================
-  // IN-APP BROWSER WARNING (Twitter/Instagram/etc)
+  // IN-APP BROWSER: No longer blocking - let users try the app
+  // Camera may have quirks but sharing/viewing works fine
   // ============================================
-  if (inAppBrowser) {
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-    return (
-      <div
-        className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0a0a0f] text-white"
-        style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" }}
-      >
-        <span className="text-6xl mb-6">🌐</span>
-        <h2 className="text-2xl font-black mb-4 text-center">Open in Browser</h2>
-        <p className="text-white/60 text-center mb-6 max-w-xs">
-          FitRate works best in {isIOS ? 'Safari' : 'Chrome'}. {inAppBrowser}'s browser has limited features.
-        </p>
-        <div className="text-center space-y-4 w-full max-w-xs">
-          <p className="text-sm text-white/40">
-            Tap the menu ({isIOS ? '•••' : '⋮'}) then "Open in {isIOS ? 'Safari' : 'Browser'}"
-          </p>
-          <button
-            onClick={() => setInAppBrowser(null)}
-            className="w-full py-3 mt-4 rounded-xl font-bold text-sm transition-all active:scale-95"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.5)' }}
-          >
-            Continue Anyway (may not work)
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   // ============================================
   // EVENT EXPLAINER MODAL (First-time users)
