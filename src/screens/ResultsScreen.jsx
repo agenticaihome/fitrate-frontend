@@ -717,112 +717,95 @@ export default function ResultsScreen({
                     <DailyRankBadge leaderboard={scores.leaderboard} />
                 )}
 
-                {/* MASSIVE Score Ring */}
-                <div className={`relative mb-4 ${isLegendary ? 'floating' : ''}`}>
-                    {/* Outer glow - intensity boosted by streak tier */}
+                {/* ===== HERO IMAGE SECTION (60% viewport - Golden Result Card style) ===== */}
+                <div className={`relative w-full max-w-sm mx-auto mb-4 transition-all duration-700 ${revealStage >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                    {/* Hero Image Container */}
                     <div
-                        className="absolute inset-[-30px] rounded-full"
+                        className="relative w-full rounded-3xl overflow-hidden"
                         style={{
-                            background: `radial-gradient(circle, ${streakEffects.includes('golden-ring') ? '#FFD700' : theme.accent}50 0%, transparent 70%)`,
-                            filter: `blur(${30 * streakRingGlow}px)`,
-                            opacity: Math.min(1, 0.7 * streakRingGlow),
-                            animation: revealStage >= 2 ? 'scoreGlowPulse 2.5s ease-in-out infinite' : 'none'
+                            height: '55vh',
+                            maxHeight: '500px',
+                            minHeight: '320px'
                         }}
-                    />
+                    >
+                        {/* User Photo - DOMINANT */}
+                        <img
+                            src={uploadedImage}
+                            alt="Your outfit"
+                            className="w-full h-full object-cover"
+                            style={{
+                                objectPosition: 'center 20%'  // Face focus
+                            }}
+                        />
 
-                    <div className="relative w-48 h-48 md:w-56 md:h-56">
-                        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                            {/* Background track */}
-                            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+                        {/* Vignette gradient for text legibility */}
+                        <div
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                                background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%)'
+                            }}
+                        />
 
-                            {/* Gradient def */}
-                            <defs>
-                                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor={theme.accent} />
-                                    <stop offset="100%" stopColor={theme.end} />
-                                </linearGradient>
-                                <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur stdDeviation="4" result="blur" />
-                                    <feMerge>
-                                        <feMergeNode in="blur" />
-                                        <feMergeNode in="SourceGraphic" />
-                                    </feMerge>
-                                </filter>
-                            </defs>
+                        {/* Subtle border */}
+                        <div
+                            className="absolute inset-0 rounded-3xl pointer-events-none"
+                            style={{
+                                border: `2px solid ${modeColors.accent}30`,
+                                boxShadow: `0 20px 60px rgba(0,0,0,0.4), 0 0 40px ${modeColors.glow}`
+                            }}
+                        />
+                    </div>
 
-                            {/* Double ring outer stroke (DNA variant) */}
-                            {dnaRingProps.hasOuterRing && (
-                                <circle
-                                    cx="50" cy="50" r="46"
-                                    fill="none"
-                                    stroke="url(#ringGrad)"
-                                    strokeWidth="2"
-                                    strokeOpacity="0.3"
-                                    strokeDasharray="264"
-                                    strokeDashoffset={264 - (displayedScore * 2.64)}
-                                />
-                            )}
+                    {/* Score Badge - Overlapping image bottom (like Golden Result Card) */}
+                    <div
+                        className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
+                        style={{ bottom: '-40px' }}
+                    >
+                        <div
+                            className="relative w-24 h-24 rounded-full flex flex-col items-center justify-center"
+                            style={{
+                                background: '#0a0a15',
+                                border: `4px solid ${theme.accent}`,
+                                boxShadow: `0 0 30px ${theme.glow}, 0 8px 24px rgba(0,0,0,0.5)`
+                            }}
+                        >
+                            {/* Score Number */}
+                            <span
+                                className={`text-4xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
+                                style={{
+                                    color: isLegendary ? undefined : '#fff',
+                                    textShadow: `0 0 20px ${theme.glow}`,
+                                    animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
+                                }}
+                            >
+                                {displayedScore}
+                            </span>
+                            {/* /100 */}
+                            <span className="text-[10px] font-bold text-white/40">/100</span>
+                        </div>
 
-                            {/* Progress ring - DNA styled */}
+                        {/* Score ring progress around badge */}
+                        <svg
+                            className="absolute inset-0 w-full h-full -rotate-90"
+                            viewBox="0 0 100 100"
+                        >
                             <circle
-                                cx="50" cy="50" r="42"
+                                cx="50" cy="50" r="46"
                                 fill="none"
-                                stroke="url(#ringGrad)"
-                                strokeWidth={dnaRingProps.strokeWidth}
-                                strokeLinecap={dnaRingProps.linecap}
-                                strokeDasharray={dnaRingStyle === 'segmented' ? dnaRingProps.strokeDasharray : '264'}
-                                strokeDashoffset={dnaRingStyle === 'segmented' ? 0 : 264 - (displayedScore * 2.64)}
-                                filter="url(#ringGlow)"
-                                style={dnaRingStyle === 'segmented' ? {
-                                    clipPath: `url(#progressClip${Math.round(displayedScore)})`
-                                } : undefined}
+                                stroke={theme.accent}
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                strokeDasharray="289"
+                                strokeDashoffset={289 - (displayedScore * 2.89)}
+                                style={{ filter: `drop-shadow(0 0 4px ${theme.glow})` }}
                             />
                         </svg>
-
-                        {/* Score Number - HUGE with Pro decimal precision */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            {isPro ? (
-                                // PRO: Show decimal precision with gold highlight
-                                <div className="flex items-baseline" style={{
-                                    animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
-                                }}>
-                                    <span
-                                        className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
-                                        style={{
-                                            color: isLegendary ? undefined : theme.accent,
-                                            textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`
-                                        }}
-                                    >
-                                        {Math.floor(scores.overall)}
-                                    </span>
-                                    <span className="text-4xl md:text-5xl font-black text-yellow-400" style={{
-                                        textShadow: '0 0 20px rgba(255,215,0,0.5)'
-                                    }}>
-                                        .{Math.round((scores.overall % 1) * 10)}
-                                    </span>
-                                </div>
-                            ) : (
-                                // FREE: Integer only
-                                <span
-                                    className={`text-7xl md:text-8xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
-                                    style={{
-                                        color: isLegendary ? undefined : theme.accent,
-                                        textShadow: isLegendary ? undefined : `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}`,
-                                        animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
-                                    }}
-                                >
-                                    {displayedScore}
-                                </span>
-                            )}
-                            <span className="text-sm font-bold text-white/30 tracking-widest">/ 100</span>
-                        </div>
                     </div>
                 </div>
 
-                {/* Tier Badge */}
-                <div className={`transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                    <TierBadge tier={scoreTier} score={scores.overall} />
-                </div>
+                {/* Spacer for badge overlap */}
+                <div className="h-12" />
+
 
                 {/* DNA Verdict Badge - Unique per card */}
                 {dnaVerdictBadge && (
@@ -959,163 +942,112 @@ export default function ResultsScreen({
                 </div>
             </div>
 
-            {/* ===== VERDICT CARD ===== */}
-            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                <div
-                    className="p-4 rounded-3xl border backdrop-blur-xl"
-                    style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        borderColor: `${modeColors.accent}44`,
-                        boxShadow: `0 20px 60px rgba(0,0,0,0.3), 0 0 30px ${modeColors.glow}`
-                    }}
+            {/* ===== SIMPLIFIED VERDICT SECTION (Golden Result Card style) ===== */}
+            <div className={`w-full max-w-sm px-4 mb-4 text-center transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+
+                {/* Verdict Headline - BIGGER, HEAVIER */}
+                <h2
+                    className={`text-2xl md:text-3xl font-black mb-2 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}
+                    style={{ fontWeight: 800 }}
                 >
-                    {/* Split Layout: Text Left, Photo Right */}
-                    <div className="flex gap-4">
-                        {/* Left: Verdict Content */}
-                        <div className="flex-1 text-left">
-                            {/* THE VERDICT Label */}
-                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2">
-                                The Verdict
-                            </p>
+                    {scores.verdict}
+                    <span className="ml-2 text-xl">
+                        {scoreTier === 'legendary' ? '👑' :
+                            scoreTier === 'fire' ? '🔥' :
+                                scoreTier === 'great' ? '✨' :
+                                    scoreTier === 'good' ? '👍' :
+                                        scoreTier === 'mid' ? '😐' : '💀'}
+                    </span>
+                </h2>
 
-                            {/* Verdict Name + Tier Emoji */}
-                            <h2 className={`text-xl font-black mb-1 leading-tight ${isLegendary ? 'legendary-text' : 'text-white'}`}>
-                                {scores.verdict}
-                                <span className="ml-2 text-lg">
-                                    {scoreTier === 'legendary' ? '👑' :
-                                        scoreTier === 'fire' ? '🔥' :
-                                            scoreTier === 'great' ? '✨' :
-                                                scoreTier === 'good' ? '👍' :
-                                                    scoreTier === 'mid' ? '😐' : '💀'}
-                                </span>
-                            </h2>
-
-                            {/* Sub-headline */}
-                            <p className="text-sm font-bold text-white/70 mb-2">
-                                {socialProof.msg}
-                            </p>
-
-                            {/* Identity Line */}
-                            {(scores.line || (scores.lines && scores.lines[0])) && (
-                                <p className="text-xs text-white/40 mb-3 leading-relaxed">
-                                    {scores.line || scores.lines[0]}
-                                </p>
-                            )}
-
-                            {/* Pull-Quote Strip */}
-                            <div
-                                className="py-2 px-3 rounded-lg border-l-2"
-                                style={{
-                                    borderColor: modeColors.accent,
-                                    background: `${modeColors.bg}`
-                                }}
-                            >
-                                <p className="text-xs italic" style={{ color: `${modeColors.accent}dd` }}>
-                                    "{scores.tagline}"
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Right: Photo */}
-                        <div className="w-28 flex-shrink-0">
-                            <div
-                                className={`relative aspect-[3/4] rounded-xl overflow-hidden ${isLegendary ? 'ring-2 ring-yellow-400' : ''}`}
-                                style={{
-                                    border: `2px solid ${modeColors.accent}66`,
-                                    boxShadow: `0 8px 24px rgba(0,0,0,0.4), 0 0 20px ${modeColors.glow}`
-                                }}
-                            >
-                                <img src={uploadedImage} alt="Your outfit" className="w-full h-full object-cover" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ===== FIT BREAKDOWN SECTION ===== */}
-            <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-white/20" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Fit Breakdown</span>
-                    <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/20 to-white/20" />
-                </div>
-                <p className="text-[10px] text-white/30 text-center mb-4">
-                    ({scores.overall >= 50 ? 'what went right' : 'what went wrong'})
+                {/* Vibe Tag Line (Aesthetic · Celeb Reference) */}
+                <p className="text-sm text-white/55 italic mb-4">
+                    {scores.aesthetic && scores.celebMatch
+                        ? `${scores.aesthetic} · ${scores.celebMatch}`
+                        : scores.aesthetic
+                            ? `${scores.aesthetic} Aesthetic`
+                            : scores.celebMatch
+                                ? `Vibes like ${scores.celebMatch}`
+                                : socialProof.msg}
                 </p>
 
-                {/* 2x2 Metric Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                    {/* Color Energy */}
-                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">🎨</span>
-                            <span className="text-xs font-bold text-white/80">Color Energy</span>
-                        </div>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.colorEnergy || Math.round(scores.overall * 0.9)}</span>
-                            <span className="text-[10px] text-white/40">{(scores.colorEnergy || scores.overall) >= 60 ? 'Bold palette' : 'Safe palette'}</span>
-                        </div>
-                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${scores.colorEnergy || scores.overall}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
-                        </div>
-                    </div>
-
-                    {/* Silhouette Control */}
-                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">📐</span>
-                            <span className="text-xs font-bold text-white/80">Silhouette</span>
-                        </div>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.silhouette || Math.round(scores.overall * 0.85)}</span>
-                            <span className="text-[10px] text-white/40">{(scores.silhouette || scores.overall) >= 60 ? 'Sharp lines' : 'Angles off'}</span>
-                        </div>
-                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${scores.silhouette || scores.overall * 0.85}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
-                        </div>
-                    </div>
-
-                    {/* Outfit Intent */}
-                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">✨</span>
-                            <span className="text-xs font-bold text-white/80">Outfit Intent</span>
-                        </div>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.intent || Math.round(scores.overall * 0.95)}</span>
-                            <span className="text-[10px] text-white/40">{(scores.intent || scores.overall) >= 60 ? 'Clear vision' : 'No game plan'}</span>
-                        </div>
-                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${scores.intent || scores.overall}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
-                        </div>
-                    </div>
-
-                    {/* Risk Taken */}
-                    <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">🎲</span>
-                            <span className="text-xs font-bold text-white/80">Risk Taken</span>
-                        </div>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black" style={{ color: modeColors.accent }}>{scores.riskTaken || Math.round(scores.overall * 0.7)}</span>
-                            <span className="text-[10px] text-white/40">{(scores.riskTaken || scores.overall * 0.7) >= 50 ? 'Bold moves' : 'Played safe'}</span>
-                        </div>
-                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${scores.riskTaken || scores.overall * 0.7}%`, background: `linear-gradient(90deg, ${modeColors.accent}, ${modeColors.end})` }} />
-                        </div>
-                    </div>
-                </div>
-
-                {/* AI Summary Line */}
-                <div
-                    className="mt-4 py-3 px-4 rounded-xl text-center"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                {/* AI Tagline Quote */}
+                <p
+                    className="text-base font-medium mb-5"
+                    style={{ color: modeColors.accent }}
                 >
-                    <p className="text-sm text-white/60 italic">
-                        {scores.summaryLine || scores.tagline || `${scores.overall >= 60 ? 'Strong presence.' : 'Low presence.'} ${scores.overall >= 70 ? 'High intention.' : 'Needs focus.'} ${scores.overall >= 50 ? 'Room to push.' : 'Time to experiment.'}`}
-                    </p>
+                    "{scores.tagline}"
+                </p>
+
+                {/* 3-Pill Micro Scores (inline like share card) */}
+                <div className="flex justify-center gap-2 mb-4">
+                    {/* Color */}
+                    <div
+                        className="flex-1 max-w-[120px] py-3 px-3 rounded-2xl"
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.12)'
+                        }}
+                    >
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-base">🎨</span>
+                            <span className="text-xs font-semibold text-white/60">Color</span>
+                        </div>
+                        <span
+                            className="text-xl font-black"
+                            style={{ color: modeColors.accent }}
+                        >
+                            {scores.colorEnergy || Math.round(scores.overall * 0.95)}
+                        </span>
+                    </div>
+
+                    {/* Fit */}
+                    <div
+                        className="flex-1 max-w-[120px] py-3 px-3 rounded-2xl"
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.12)'
+                        }}
+                    >
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-base">👔</span>
+                            <span className="text-xs font-semibold text-white/60">Fit</span>
+                        </div>
+                        <span
+                            className="text-xl font-black"
+                            style={{ color: modeColors.accent }}
+                        >
+                            {scores.silhouette || Math.round(scores.overall * 0.9)}
+                        </span>
+                    </div>
+
+                    {/* Style */}
+                    <div
+                        className="flex-1 max-w-[120px] py-3 px-3 rounded-2xl"
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.12)'
+                        }}
+                    >
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-base">✨</span>
+                            <span className="text-xs font-semibold text-white/60">Style</span>
+                        </div>
+                        <span
+                            className="text-xl font-black"
+                            style={{ color: modeColors.accent }}
+                        >
+                            {scores.intent || Math.round(scores.overall * 1.02)}
+                        </span>
+                    </div>
                 </div>
+
+                {/* Percentile line */}
+                <p className="text-xs text-white/40">
+                    {scores.overall >= 50
+                        ? `Better than ${getPercentile(scores.overall)}% of fits today`
+                        : `Keep styling — room to grow`}
+                </p>
             </div>
 
             {/* ===== CHALLENGE CARD - Weekly Event Entry ===== */}
@@ -1128,219 +1060,232 @@ export default function ResultsScreen({
                     themeVerdict={scores.themeVerdict}
                     delay={0.4}
                 />
-            )}
+            )
+            }
 
             {/* ===== UNIFIED PRO INSIGHTS SECTION ===== */}
-            {isPro && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    <div
-                        className="p-5 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden"
-                        style={{
-                            background: 'linear-gradient(145deg, rgba(255,215,0,0.08) 0%, rgba(255,180,0,0.04) 50%, rgba(255,140,0,0.02) 100%)',
-                            borderColor: 'rgba(255,215,0,0.35)',
-                            boxShadow: '0 0 40px rgba(255,215,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
-                        }}
-                    >
-                        {/* Premium glow effect */}
-                        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30"
-                            style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%)' }}
-                        />
+            {
+                isPro && (scores.proTip || scores.identityReflection || scores.socialPerception) && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        <div
+                            className="p-5 rounded-3xl border-2 backdrop-blur-xl relative overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(145deg, rgba(255,215,0,0.08) 0%, rgba(255,180,0,0.04) 50%, rgba(255,140,0,0.02) 100%)',
+                                borderColor: 'rgba(255,215,0,0.35)',
+                                boxShadow: '0 0 40px rgba(255,215,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                            }}
+                        >
+                            {/* Premium glow effect */}
+                            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-30"
+                                style={{ background: 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%)' }}
+                            />
 
-                        {/* Section Header */}
-                        <div className="relative z-10 flex items-center justify-between mb-5">
-                            <div className="flex items-center gap-2">
-                                <span className="text-xl">✨</span>
-                                <span className="text-sm font-black uppercase tracking-widest text-yellow-400">
-                                    Pro Insights
-                                </span>
+                            {/* Section Header */}
+                            <div className="relative z-10 flex items-center justify-between mb-5">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xl">✨</span>
+                                    <span className="text-sm font-black uppercase tracking-widest text-yellow-400">
+                                        Pro Insights
+                                    </span>
+                                </div>
+                                <div className="px-2 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30">
+                                    <span className="text-[9px] font-bold text-yellow-400/80 uppercase">Premium</span>
+                                </div>
                             </div>
-                            <div className="px-2 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/30">
-                                <span className="text-[9px] font-bold text-yellow-400/80 uppercase">Premium</span>
+
+                            <div className="relative z-10 space-y-4">
+                                {/* Pro Tip */}
+                                {scores.proTip && (
+                                    <div className="p-3 rounded-xl bg-black/20">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-base">💡</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Style Upgrade</span>
+                                        </div>
+                                        <p className="text-sm text-white/90 leading-relaxed italic">"{scores.proTip}"</p>
+                                    </div>
+                                )}
+
+                                {/* Identity Reflection */}
+                                {scores.identityReflection && (
+                                    <div className="p-3 rounded-xl bg-black/20">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-base">🪞</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Identity</span>
+                                        </div>
+                                        <p className="text-sm text-white/90 leading-relaxed">{scores.identityReflection}</p>
+                                    </div>
+                                )}
+
+                                {/* Social Perception */}
+                                {scores.socialPerception && (
+                                    <div className="p-3 rounded-xl bg-black/20">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-base">👥</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Perception</span>
+                                        </div>
+                                        <p className="text-sm text-white/90 leading-relaxed">{scores.socialPerception}</p>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-
-                        <div className="relative z-10 space-y-4">
-                            {/* Pro Tip */}
-                            {scores.proTip && (
-                                <div className="p-3 rounded-xl bg-black/20">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-base">💡</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Style Upgrade</span>
-                                    </div>
-                                    <p className="text-sm text-white/90 leading-relaxed italic">"{scores.proTip}"</p>
-                                </div>
-                            )}
-
-                            {/* Identity Reflection */}
-                            {scores.identityReflection && (
-                                <div className="p-3 rounded-xl bg-black/20">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-base">🪞</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Identity</span>
-                                    </div>
-                                    <p className="text-sm text-white/90 leading-relaxed">{scores.identityReflection}</p>
-                                </div>
-                            )}
-
-                            {/* Social Perception */}
-                            {scores.socialPerception && (
-                                <div className="p-3 rounded-xl bg-black/20">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-base">👥</span>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-yellow-300">Perception</span>
-                                    </div>
-                                    <p className="text-sm text-white/90 leading-relaxed">{scores.socialPerception}</p>
-                                </div>
-                            )}
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
 
             {/* ===== SAVAGE ROASTS - Pro Mode Card ===== */}
-            {scores.savageLevel && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    {/* Mode Context - Users know why they see this */}
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😈 Savage Mode Active</p>
-                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,68,68,0.08)', borderColor: 'rgba(255,68,68,0.25)' }}>
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Brutality Level</span>
-                            <span className="text-2xl font-black text-red-500">{scores.savageLevel}/10</span>
-                        </div>
-                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
-                            <div
-                                className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full stat-bar-fill"
-                                style={{ '--fill-width': `${scores.savageLevel * 10}%`, '--delay': '0.2s' }}
-                            />
-                        </div>
-                        {scores.itemRoasts && (
-                            <div className="space-y-2">
-                                {Object.entries(scores.itemRoasts).filter(([_, r]) => r && r !== 'N/A').map(([k, v]) => (
-                                    <div key={k}>
-                                        <span className="text-[9px] font-black text-red-500/70 uppercase">{k}:</span>
-                                        <p className="text-xs text-white/80">{v}</p>
-                                    </div>
-                                ))}
+            {
+                scores.savageLevel && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {/* Mode Context - Users know why they see this */}
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😈 Savage Mode Active</p>
+                        <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,68,68,0.08)', borderColor: 'rgba(255,68,68,0.25)' }}>
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Brutality Level</span>
+                                <span className="text-2xl font-black text-red-500">{scores.savageLevel}/10</span>
                             </div>
-                        )}
+                            <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+                                <div
+                                    className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full stat-bar-fill"
+                                    style={{ '--fill-width': `${scores.savageLevel * 10}%`, '--delay': '0.2s' }}
+                                />
+                            </div>
+                            {scores.itemRoasts && (
+                                <div className="space-y-2">
+                                    {Object.entries(scores.itemRoasts).filter(([_, r]) => r && r !== 'N/A').map(([k, v]) => (
+                                        <div key={k}>
+                                            <span className="text-[9px] font-black text-red-500/70 uppercase">{k}:</span>
+                                            <p className="text-xs text-white/80">{v}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ===== RIZZ MODE CARD - Pro Mode ===== */}
-            {scores.mode === 'rizz' && scores.rizzType && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    {/* Mode Context */}
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😏 Rizz Mode Active</p>
-                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,105,180,0.08)', borderColor: 'rgba(255,105,180,0.25)' }}>
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black text-pink-400 uppercase tracking-widest">😏 Rizz Rating</span>
-                            <span className="text-2xl font-black text-pink-400">{scores.pullProbability || scores.overall}%</span>
-                        </div>
-                        <div className="text-center mb-3">
-                            <span className="text-3xl font-black text-white">{scores.rizzType}</span>
-                        </div>
-                        {scores.pickupLine && (
-                            <div className="bg-pink-500/10 rounded-xl p-3 mb-3">
-                                <span className="text-[10px] font-bold text-pink-300 uppercase">Pickup Line:</span>
-                                <p className="text-sm text-white/90 italic">"{scores.pickupLine}"</p>
+            {
+                scores.mode === 'rizz' && scores.rizzType && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {/* Mode Context */}
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😏 Rizz Mode Active</p>
+                        <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,105,180,0.08)', borderColor: 'rgba(255,105,180,0.25)' }}>
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-xs font-black text-pink-400 uppercase tracking-widest">😏 Rizz Rating</span>
+                                <span className="text-2xl font-black text-pink-400">{scores.pullProbability || scores.overall}%</span>
                             </div>
-                        )}
-                        {scores.datingApps && (
-                            <div className="flex justify-around text-center">
-                                <div><span className="text-lg">🔥</span><p className="text-xs text-white/60">Tinder</p><p className="text-lg font-black text-pink-400">{scores.datingApps.tinder}/10</p></div>
-                                <div><span className="text-lg">💜</span><p className="text-xs text-white/60">Hinge</p><p className="text-lg font-black text-pink-400">{scores.datingApps.hinge}/10</p></div>
-                                <div><span className="text-lg">🐝</span><p className="text-xs text-white/60">Bumble</p><p className="text-lg font-black text-pink-400">{scores.datingApps.bumble}/10</p></div>
+                            <div className="text-center mb-3">
+                                <span className="text-3xl font-black text-white">{scores.rizzType}</span>
                             </div>
-                        )}
+                            {scores.pickupLine && (
+                                <div className="bg-pink-500/10 rounded-xl p-3 mb-3">
+                                    <span className="text-[10px] font-bold text-pink-300 uppercase">Pickup Line:</span>
+                                    <p className="text-sm text-white/90 italic">"{scores.pickupLine}"</p>
+                                </div>
+                            )}
+                            {scores.datingApps && (
+                                <div className="flex justify-around text-center">
+                                    <div><span className="text-lg">🔥</span><p className="text-xs text-white/60">Tinder</p><p className="text-lg font-black text-pink-400">{scores.datingApps.tinder}/10</p></div>
+                                    <div><span className="text-lg">💜</span><p className="text-xs text-white/60">Hinge</p><p className="text-lg font-black text-pink-400">{scores.datingApps.hinge}/10</p></div>
+                                    <div><span className="text-lg">🐝</span><p className="text-xs text-white/60">Bumble</p><p className="text-lg font-black text-pink-400">{scores.datingApps.bumble}/10</p></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ===== CELEBRITY JUDGE CARD - Pro Mode ===== */}
-            {scores.mode === 'celeb' && scores.celebrityJudge && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    {/* Mode Context */}
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
-                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">🎭</span>
-                            <span className="text-lg font-black text-yellow-400">{scores.celebrityJudge}</span>
-                        </div>
-                        {scores.celebQuote && (
-                            <blockquote className="bg-yellow-500/10 rounded-xl p-4 mb-3 border-l-4 border-yellow-500">
-                                <p className="text-sm text-white/90 italic">"{scores.celebQuote}"</p>
-                                <cite className="text-[10px] text-yellow-400/70 mt-2 block">— {scores.celebrityJudge}</cite>
-                            </blockquote>
-                        )}
-                        <div className="text-center">
-                            <span className={`text-xl font-black ${scores.wouldTheyWear ? 'text-green-400' : 'text-red-400'}`}>
-                                {scores.wouldTheyWear ? '✅ Would Wear' : '❌ Would NOT Wear'}
-                            </span>
+            {
+                scores.mode === 'celeb' && scores.celebrityJudge && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {/* Mode Context */}
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
+                        <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="text-2xl">🎭</span>
+                                <span className="text-lg font-black text-yellow-400">{scores.celebrityJudge}</span>
+                            </div>
+                            {scores.celebQuote && (
+                                <blockquote className="bg-yellow-500/10 rounded-xl p-4 mb-3 border-l-4 border-yellow-500">
+                                    <p className="text-sm text-white/90 italic">"{scores.celebQuote}"</p>
+                                    <cite className="text-[10px] text-yellow-400/70 mt-2 block">— {scores.celebrityJudge}</cite>
+                                </blockquote>
+                            )}
+                            <div className="text-center">
+                                <span className={`text-xl font-black ${scores.wouldTheyWear ? 'text-green-400' : 'text-red-400'}`}>
+                                    {scores.wouldTheyWear ? '✅ Would Wear' : '❌ Would NOT Wear'}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ===== AURA / VIBE CHECK CARD - Pro Mode ===== */}
-            {scores.mode === 'aura' && scores.auraColor && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    {/* Mode Context */}
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🔮 Aura Mode Active</p>
-                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.25)' }}>
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black text-purple-400 uppercase tracking-widest">🔮 Aura Reading</span>
-                            <span className="text-lg font-black text-purple-400">{scores.energyLevel || scores.overall}% Energy</span>
+            {
+                scores.mode === 'aura' && scores.auraColor && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {/* Mode Context */}
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🔮 Aura Mode Active</p>
+                        <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.25)' }}>
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-xs font-black text-purple-400 uppercase tracking-widest">🔮 Aura Reading</span>
+                                <span className="text-lg font-black text-purple-400">{scores.energyLevel || scores.overall}% Energy</span>
+                            </div>
+                            <div className="text-center mb-4">
+                                <div className="inline-block px-6 py-3 rounded-full" style={{ background: 'linear-gradient(135deg, rgba(155,89,182,0.3), rgba(155,89,182,0.1))', border: '2px solid rgba(155,89,182,0.5)' }}>
+                                    <span className="text-3xl font-black text-purple-300">{scores.auraColor} Aura</span>
+                                </div>
+                            </div>
+                            {scores.vibeAssessment && (
+                                <div className="text-center mb-3">
+                                    <span className="text-xs uppercase text-white/40">Vibe Assessment</span>
+                                    <p className="text-xl font-black text-white">{scores.vibeAssessment}</p>
+                                </div>
+                            )}
+                            {scores.spiritualRoast && (
+                                <div className="bg-purple-500/10 rounded-xl p-3">
+                                    <p className="text-sm text-white/80 italic text-center">"✨ {scores.spiritualRoast}"</p>
+                                </div>
+                            )}
                         </div>
-                        <div className="text-center mb-4">
-                            <div className="inline-block px-6 py-3 rounded-full" style={{ background: 'linear-gradient(135deg, rgba(155,89,182,0.3), rgba(155,89,182,0.1))', border: '2px solid rgba(155,89,182,0.5)' }}>
-                                <span className="text-3xl font-black text-purple-300">{scores.auraColor} Aura</span>
-                            </div>
-                        </div>
-                        {scores.vibeAssessment && (
-                            <div className="text-center mb-3">
-                                <span className="text-xs uppercase text-white/40">Vibe Assessment</span>
-                                <p className="text-xl font-black text-white">{scores.vibeAssessment}</p>
-                            </div>
-                        )}
-                        {scores.spiritualRoast && (
-                            <div className="bg-purple-500/10 rounded-xl p-3">
-                                <p className="text-sm text-white/80 italic text-center">"✨ {scores.spiritualRoast}"</p>
-                            </div>
-                        )}
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ===== CHAOS MODE CARD - Pro Mode ===== */}
-            {scores.mode === 'chaos' && scores.chaosLevel && (
-                <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                    {/* Mode Context */}
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎪 Chaos Mode Active</p>
-                    <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,107,107,0.08)', borderColor: 'rgba(255,107,107,0.25)', animation: scores.chaosLevel >= 8 ? 'shake 0.5s infinite' : 'none' }}>
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black text-red-400 uppercase tracking-widest">🎪 Chaos Level</span>
-                            <span className="text-2xl font-black text-red-400">{scores.chaosLevel}/10</span>
-                        </div>
-                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
-                            <div className="h-full bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full" style={{ width: `${scores.chaosLevel * 10}%` }} />
-                        </div>
-                        {scores.absurdComparison && (
-                            <div className="bg-red-500/10 rounded-xl p-3 mb-3">
-                                <span className="text-[10px] font-bold text-red-300 uppercase">Chaos Take:</span>
-                                <p className="text-sm text-white/90">"{scores.absurdComparison}"</p>
+            {
+                scores.mode === 'chaos' && scores.chaosLevel && (
+                    <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                        {/* Mode Context */}
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎪 Chaos Mode Active</p>
+                        <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,107,107,0.08)', borderColor: 'rgba(255,107,107,0.25)', animation: scores.chaosLevel >= 8 ? 'shake 0.5s infinite' : 'none' }}>
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-xs font-black text-red-400 uppercase tracking-widest">🎪 Chaos Level</span>
+                                <span className="text-2xl font-black text-red-400">{scores.chaosLevel}/10</span>
                             </div>
-                        )}
-                        {scores.alternateReality && (
-                            <div className="text-center">
-                                <span className="text-[10px] uppercase text-white/40">In Another Universe</span>
-                                <p className="text-sm text-white/70 italic">{scores.alternateReality}</p>
+                            <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+                                <div className="h-full bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full" style={{ width: `${scores.chaosLevel * 10}%` }} />
                             </div>
-                        )}
+                            {scores.absurdComparison && (
+                                <div className="bg-red-500/10 rounded-xl p-3 mb-3">
+                                    <span className="text-[10px] font-bold text-red-300 uppercase">Chaos Take:</span>
+                                    <p className="text-sm text-white/90">"{scores.absurdComparison}"</p>
+                                </div>
+                            )}
+                            {scores.alternateReality && (
+                                <div className="text-center">
+                                    <span className="text-[10px] uppercase text-white/40">In Another Universe</span>
+                                    <p className="text-sm text-white/70 italic">{scores.alternateReality}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* ===== VIRAL SHARE PRIMING ===== */}
             <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
@@ -1471,25 +1416,27 @@ export default function ResultsScreen({
 
             {/* ===== LEGENDARY CONFETTI SYSTEM ===== */}
             {/* Tier-based confetti with scoreKey to prevent re-trigger bugs */}
-            {animationComplete && revealStage >= 6 && scoreTier !== 'low' && scoreTier !== 'mid' && (
-                <Confetti
-                    key={`confetti-${scores.overall}-${scores.mode}`}
-                    scoreKey={scores.overall}
-                    count={scoreTier === 'legendary' ? 50 : scoreTier === 'fire' ? 40 : 25}
-                    colors={
-                        scoreTier === 'legendary'
-                            ? ['#ffd700', '#ff8c00', '#fff', '#ffe066']  // Golden celebration
-                            : scoreTier === 'fire'
-                                ? ['#ff6b35', '#ff0080', '#ffd700', '#fff']  // Fire party
-                                : ['#00d4ff', '#0066ff', '#00ff88', '#fff']  // Cool success
-                    }
-                />
-            )}
+            {
+                animationComplete && revealStage >= 6 && scoreTier !== 'low' && scoreTier !== 'mid' && (
+                    <Confetti
+                        key={`confetti-${scores.overall}-${scores.mode}`}
+                        scoreKey={scores.overall}
+                        count={scoreTier === 'legendary' ? 50 : scoreTier === 'fire' ? 40 : 25}
+                        colors={
+                            scoreTier === 'legendary'
+                                ? ['#ffd700', '#ff8c00', '#fff', '#ffe066']  // Golden celebration
+                                : scoreTier === 'fire'
+                                    ? ['#ff6b35', '#ff0080', '#ffd700', '#fff']  // Fire party
+                                    : ['#00d4ff', '#0066ff', '#00ff88', '#fff']  // Cool success
+                        }
+                    />
+                )
+            }
 
             {/* Extra bottom padding for sticky CTA visibility */}
             <div className="h-4" />
 
             <Footer className="opacity-30 pt-6 pb-4" />
-        </div>
+        </div >
     )
 }
