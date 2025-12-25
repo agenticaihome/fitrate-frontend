@@ -98,14 +98,23 @@ export const generateShareCard = async ({
             canvas.width = 1080
             canvas.height = 1920
 
-            // Load user image
-            const img = await new Promise((imgResolve, imgReject) => {
-                const img = new Image()
-                img.crossOrigin = 'anonymous'
-                img.onload = () => imgResolve(img)
-                img.onerror = imgReject
-                img.src = uploadedImage
-            })
+            // Load user image AND logo in parallel
+            const [img, logoImg] = await Promise.all([
+                new Promise((imgResolve, imgReject) => {
+                    const img = new Image()
+                    img.crossOrigin = 'anonymous'
+                    img.onload = () => imgResolve(img)
+                    img.onerror = imgReject
+                    img.src = uploadedImage
+                }),
+                new Promise((logoResolve) => {
+                    const logo = new Image()
+                    logo.crossOrigin = 'anonymous'
+                    logo.onload = () => logoResolve(logo)
+                    logo.onerror = () => logoResolve(null) // Don't fail if logo missing
+                    logo.src = '/logo.svg'
+                })
+            ])
 
             // ===== SCORE-BASED COLOR SYSTEM (HARD-SPEC ranges) =====
             const score = Math.round(scores.overall)
@@ -188,29 +197,44 @@ export const generateShareCard = async ({
 
             ctx.restore()
 
-            // Subtle border around image
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)'
-            ctx.lineWidth = 2
+            // GLOWING border around image - matches mode color
+            ctx.shadowColor = modeColor
+            ctx.shadowBlur = 40
+            ctx.strokeStyle = modeColor
+            ctx.lineWidth = 4
             ctx.beginPath()
             ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
             ctx.stroke()
+            ctx.shadowBlur = 0
 
-            // ===== SECTION 2: SCORE BADGE - MASSIVE for mobile =====
+            // Inner subtle white border for polish
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'
+            ctx.lineWidth = 1
+            ctx.beginPath()
+            ctx.roundRect(imageMargin + 2, imageY + 2, imageWidth - 4, imageHeight - 4, imageRadius - 2)
+            ctx.stroke()
+
+            // ===== SECTION 2: SCORE BADGE - uses MODE color for cohesion =====
             const badgeSize = 170  // MASSIVE badge
             const badgeX = canvas.width / 2
             const badgeY = imageY + imageHeight - badgeSize * 0.25
 
-            // Badge outer glow
-            ctx.shadowColor = badgeColors.from
-            ctx.shadowBlur = 30
+            // Badge outer glow - MODE color
+            ctx.shadowColor = modeColor
+            ctx.shadowBlur = 40
 
-            // Badge ring gradient
+            // Badge ring gradient - MODE colors
             const badgeGradient = ctx.createLinearGradient(
                 badgeX - badgeSize / 2, badgeY - badgeSize / 2,
                 badgeX + badgeSize / 2, badgeY + badgeSize / 2
             )
-            badgeGradient.addColorStop(0, badgeColors.from)
-            badgeGradient.addColorStop(1, badgeColors.to)
+            if (modeGradientMatch && modeGradientMatch.length >= 2) {
+                badgeGradient.addColorStop(0, modeGradientMatch[0])
+                badgeGradient.addColorStop(1, modeGradientMatch[1])
+            } else {
+                badgeGradient.addColorStop(0, '#3b82f6')
+                badgeGradient.addColorStop(1, '#06b6d4')
+            }
 
             // Draw ring - thicker
             ctx.beginPath()
@@ -335,11 +359,23 @@ export const generateShareCard = async ({
             ctx.textAlign = 'center'
             ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 45)
 
-            // ===== SECTION 7: FITRATE WATERMARK =====
-            ctx.fillStyle = 'rgba(255,255,255,0.35)'
-            ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.textAlign = 'center'
-            ctx.fillText('FitRate.app', canvas.width / 2, canvas.height - 50)
+            // ===== SECTION 7: FITRATE LOGO WATERMARK =====
+            const logoY = canvas.height - 80
+            if (logoImg) {
+                // Draw actual logo - scale to ~40px height
+                const logoHeight = 45
+                const logoWidth = (logoImg.width / logoImg.height) * logoHeight
+                const logoX = (canvas.width - logoWidth) / 2
+                ctx.globalAlpha = 0.5
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight)
+                ctx.globalAlpha = 1.0
+            } else {
+                // Fallback to text
+                ctx.fillStyle = 'rgba(255,255,255,0.4)'
+                ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'center'
+                ctx.fillText('FitRate.app', canvas.width / 2, logoY + 30)
+            }
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
