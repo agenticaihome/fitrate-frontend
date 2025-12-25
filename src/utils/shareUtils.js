@@ -357,10 +357,10 @@ export const generateShareCard = async ({
             ctx.fillStyle = 'rgba(255,255,255,0.4)'
             ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 50)
+            ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 40)  // Closer to button
 
             // ===== SECTION 7: FITRATE LOGO WATERMARK - TRIPLED =====
-            const logoY = canvas.height - 120  // More space from timestamp
+            const logoY = canvas.height - 130  // Gap from timestamp above
             if (logoImg) {
                 // Draw actual logo - TRIPLED size
                 const logoHeight = 100  // Tripled from 45
