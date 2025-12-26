@@ -836,7 +836,7 @@ export default function HomeScreen({
                     // Pro Flow: User has Pro subscription OR purchased scans
                     const isProFlow = isPro || purchasedScans > 0;
 
-                    // Choose colors based on mode
+                    // Choose colors based on mode - each of 8 modes has unique styling
                     let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
                     if (entryBlocked) {
                         // Amber/gray for blocked state
@@ -856,24 +856,59 @@ export default function HomeScreen({
                         buttonAccentEnd = '#0d9488';
                         buttonGlow = 'rgba(16,185,129,0.5)';
                         innerGradient = 'linear-gradient(135deg, #10b981 0%, #0d9488 50%, #047857 100%)';
-                    } else if (isProFlow) {
-                        // GOLD for Pro users - premium feel
-                        buttonAccent = '#ffd700';
-                        buttonAccentEnd = '#ff8c00';
-                        buttonGlow = 'rgba(255,215,0,0.5)';
-                        innerGradient = isRoast
-                            ? 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)'
-                            : 'linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #cc7000 100%)';
-                    } else if (isRoast) {
-                        buttonAccent = '#ff6b35';
-                        buttonAccentEnd = '#ff4444';
-                        buttonGlow = 'rgba(255,68,68,0.4)';
-                        innerGradient = 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)';
                     } else {
-                        buttonAccent = '#00d4ff';
-                        buttonAccentEnd = '#00a8cc';
-                        buttonGlow = 'rgba(0,212,255,0.4)';
-                        innerGradient = 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)';
+                        // Mode-specific colors for all 8 AI modes
+                        switch (mode) {
+                            case 'roast':
+                                buttonAccent = '#ff6b35';
+                                buttonAccentEnd = '#ff4444';
+                                buttonGlow = 'rgba(255,68,68,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)';
+                                break;
+                            case 'honest':
+                                buttonAccent = '#3b82f6';
+                                buttonAccentEnd = '#1d4ed8';
+                                buttonGlow = 'rgba(59,130,246,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
+                                break;
+                            case 'savage':
+                                buttonAccent = '#8b00ff';
+                                buttonAccentEnd = '#6b21a8';
+                                buttonGlow = 'rgba(139,0,255,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #8b00ff 0%, #7c3aed 50%, #6b21a8 100%)';
+                                break;
+                            case 'rizz':
+                                buttonAccent = '#ff69b4';
+                                buttonAccentEnd = '#ec4899';
+                                buttonGlow = 'rgba(255,105,180,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ff69b4 0%, #ec4899 50%, #db2777 100%)';
+                                break;
+                            case 'celeb':
+                                buttonAccent = '#ffd700';
+                                buttonAccentEnd = '#f59e0b';
+                                buttonGlow = 'rgba(255,215,0,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ffd700 0%, #f59e0b 50%, #d97706 100%)';
+                                break;
+                            case 'aura':
+                                buttonAccent = '#9b59b6';
+                                buttonAccentEnd = '#8e44ad';
+                                buttonGlow = 'rgba(155,89,182,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #7c3aed 100%)';
+                                break;
+                            case 'chaos':
+                                buttonAccent = '#ff6b6b';
+                                buttonAccentEnd = '#ef4444';
+                                buttonGlow = 'rgba(255,107,107,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ef4444 50%, #dc2626 100%)';
+                                break;
+                            case 'nice':
+                            default:
+                                buttonAccent = '#00d4ff';
+                                buttonAccentEnd = '#00a8cc';
+                                buttonGlow = 'rgba(0,212,255,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)';
+                                break;
+                        }
                     }
 
                     return (
@@ -917,24 +952,42 @@ export default function HomeScreen({
                                     aria-hidden="true"
                                 />
 
-                                {/* Emoji */}
+                                {/* Emoji - uses mode-specific emoji for all 8 modes */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
+                                    {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : getModeEmoji()}
                                 </span>
 
-                                {/* Main Text - size based on length for long theme names */}
+                                {/* Main Text - mode-specific call to action */}
                                 <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
                                     }`}>
-                                    {entryBlocked ? 'ENTRY USED' : dailyChallengeMode ? 'DAILY CHALLENGE' : isCompeting ? (currentEvent.theme || 'COMPETE') : isRoast ? 'ROAST MY FIT' : 'RATE MY FIT'}
+                                    {entryBlocked ? 'ENTRY USED'
+                                        : dailyChallengeMode ? 'DAILY CHALLENGE'
+                                            : isCompeting ? (currentEvent.theme || 'COMPETE')
+                                                : mode === 'nice' ? 'RATE MY FIT'
+                                                    : mode === 'roast' ? 'ROAST MY FIT'
+                                                        : mode === 'honest' ? 'HONEST RATE'
+                                                            : mode === 'savage' ? 'SAVAGE MODE'
+                                                                : mode === 'rizz' ? 'RIZZ CHECK'
+                                                                    : mode === 'celeb' ? 'CELEB JUDGE'
+                                                                        : mode === 'aura' ? 'AURA READ'
+                                                                            : mode === 'chaos' ? 'CHAOS MODE'
+                                                                                : 'RATE MY FIT'}
                                 </span>
 
-                                {/* Subtitle - changes based on mode */}
+                                {/* Subtitle - mode-specific description */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
                                     {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
                                         : entryBlocked ? 'Go Pro for daily entries!'
                                             : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
-                                                : isRoast ? 'Brutally honest AI'
-                                                    : 'Supportive AI feedback'}
+                                                : mode === 'nice' ? 'Supportive AI feedback'
+                                                    : mode === 'roast' ? 'Brutally honest AI'
+                                                        : mode === 'honest' ? 'Balanced analysis'
+                                                            : mode === 'savage' ? 'Maximum destruction'
+                                                                : mode === 'rizz' ? 'Dating vibe check'
+                                                                    : mode === 'celeb' ? 'Celebrity judge'
+                                                                        : mode === 'aura' ? 'Mystical energy read'
+                                                                            : mode === 'chaos' ? 'Unhinged chaos'
+                                                                                : 'AI feedback'}
                                 </span>
 
                                 {/* Mode Selector - Compact pill that opens mode drawer */}
