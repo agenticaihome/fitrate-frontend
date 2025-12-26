@@ -53,10 +53,10 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm">
             <div className="w-full max-w-sm mx-4 flex flex-col items-center">
 
-                {/* Skip button */}
                 {!isLastSlide && (
                     <button
                         onClick={handleSkip}
+                        aria-label="Skip onboarding and go to app"
                         className="absolute top-6 right-6 text-xs text-white/40 font-bold uppercase tracking-wider hover:text-white/60 transition-colors"
                     >
                         Skip
@@ -107,6 +107,7 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
                 {/* CTA Button */}
                 <button
                     onClick={handleNext}
+                    aria-label={isLastSlide ? "Start using FitRate" : "Go to next onboarding slide"}
                     className="w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.97]"
                     style={{
                         background: `linear-gradient(135deg, ${slide.color} 0%, ${slide.color}cc 100%)`,

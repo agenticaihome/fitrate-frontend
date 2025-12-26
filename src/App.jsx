@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, Suspense, lazy } from 'react'
 import { playSound, vibrate } from './utils/soundEffects'
 import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
@@ -8,32 +8,47 @@ import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
 
-// Screens
-import ResultsScreen from './screens/ResultsScreen'
-import AnalyzingScreen from './screens/AnalyzingScreen'
-import HomeScreen from './screens/HomeScreen'
-import ErrorScreen from './screens/ErrorScreen'
-import ProEmailPromptScreen from './screens/ProEmailPromptScreen'
-import ProWelcomeScreen from './screens/ProWelcomeScreen'
-// SharePreviewScreen removed - share now triggers directly from Results
-import ShareSuccessScreen from './screens/ShareSuccessScreen'
-import PaywallScreen from './screens/PaywallScreen'
-import RulesScreen from './screens/RulesScreen'
-import ChallengeResultScreen from './screens/ChallengeResultScreen'
-import ChallengePartyScreen from './screens/ChallengePartyScreen'
-// Fashion Show screens
-import FashionShowCreate from './screens/FashionShowCreate'
-import FashionShowInvite from './screens/FashionShowInvite'
-import FashionShowHub from './screens/FashionShowHub'
-// Combined Challenges screen (Daily + Weekly)
-import ChallengesScreen from './screens/ChallengesScreen'
+// ============================================
+// LAZY-LOADED SCREENS (Code Splitting)
+// Critical screens loaded immediately, others on-demand
+// ============================================
 
-import PaywallModal from './components/modals/PaywallModal'
-import LeaderboardModal from './components/modals/LeaderboardModal'
-import EventExplainerModal from './components/modals/EventExplainerModal'
-import RestoreProModal from './components/modals/RestoreProModal'
-import ChallengeResultShareCard from './components/modals/ChallengeResultShareCard'
+// Critical path - loaded immediately
+import HomeScreen from './screens/HomeScreen'
+import AnalyzingScreen from './screens/AnalyzingScreen'
+
+// Lazy-loaded screens - reduces initial bundle size
+const ResultsScreen = lazy(() => import('./screens/ResultsScreen'))
+const ErrorScreen = lazy(() => import('./screens/ErrorScreen'))
+const ProEmailPromptScreen = lazy(() => import('./screens/ProEmailPromptScreen'))
+const ProWelcomeScreen = lazy(() => import('./screens/ProWelcomeScreen'))
+const ShareSuccessScreen = lazy(() => import('./screens/ShareSuccessScreen'))
+const PaywallScreen = lazy(() => import('./screens/PaywallScreen'))
+const RulesScreen = lazy(() => import('./screens/RulesScreen'))
+const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
+const ChallengePartyScreen = lazy(() => import('./screens/ChallengePartyScreen'))
+const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
+const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
+const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
+const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
+
+// Modals - less critical, lazy loaded
+const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
+const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
+const EventExplainerModal = lazy(() => import('./components/modals/EventExplainerModal'))
+const RestoreProModal = lazy(() => import('./components/modals/RestoreProModal'))
+const ChallengeResultShareCard = lazy(() => import('./components/modals/ChallengeResultShareCard'))
 import OnboardingModal from './components/modals/OnboardingModal'
+
+// Loading fallback for Suspense
+const LoadingFallback = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="text-center">
+      <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-white/60 text-sm">Loading...</p>
+    </div>
+  </div>
+)
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'

@@ -995,7 +995,10 @@ export default function HomeScreen({
                 }}
             >
                 <p className="text-center text-white/60 text-sm">
-                    {isPro ? '⚡ Unlimited scans' : `✨ ${scansRemaining} scan${scansRemaining !== 1 ? 's' : ''} left today`}
+                    {purchasedScans > 0
+                        ? `💎 ${purchasedScans} bonus + ${scansRemaining} free scans`
+                        : `✨ ${scansRemaining} scan${scansRemaining !== 1 ? 's' : ''} left today`
+                    }
                     {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak}-day streak</span>}
                 </p>
             </div>
@@ -1331,6 +1334,7 @@ export default function HomeScreen({
                             <p className="text-center text-white/40 text-xs mt-4">Nice & Roast always available above</p>
                             <button
                                 onClick={() => setShowModeDrawer(false)}
+                                aria-label="Close mode selector"
                                 className="w-full py-3 text-white/50 text-sm font-medium mt-2"
                             >
                                 Cancel
