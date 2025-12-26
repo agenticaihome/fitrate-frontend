@@ -858,13 +858,6 @@ export default function ResultsScreen({
                         : `Worse than ${100 - getPercentile(scores.overall)}% of fits today`
                     }
                 </p>
-
-                {/* Verdict Complete Divider */}
-                <div className={`flex items-center gap-4 mt-4 mb-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    <span className="text-[10px] text-white/30 uppercase tracking-widest">verdict complete</span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                </div>
                 {/* AI TIER BADGE - Shows for ALL users (eliminates dead space) */}
                 <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                     {isPro ? (
@@ -1280,58 +1273,67 @@ export default function ResultsScreen({
                 )
             }
 
-            {/* ===== VIRAL SHARE PRIMING ===== */}
+            {/* ===== SHARE SECTION ===== */}
             <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
+                {/* Score-aware copy */}
                 <p className="text-center text-sm text-white/40 mb-2">
-                    Your friends will be honest. Probably.
+                    {scores.overall >= 75
+                        ? "Your friends will be honest. Probably."
+                        : scores.overall >= 50
+                            ? "See what your friends think"
+                            : "Get a second opinion"}
                 </p>
                 <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-[10px] uppercase tracking-widest text-white/30">Share the verdict</span>
+                    <span className="text-[10px] uppercase tracking-widest text-white/30">Share</span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
             </div>
 
-            {/* ===== CTAs ===== */}
+            {/* ===== CTAs - Simplified ===== */}
             <div className={`w-full max-w-sm px-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-                {/* Challenge a Friend - PRIMARY CTA per Founders Council */}
-                <button
-                    onClick={() => {
-                        playSound('click')
-                        vibrate(30)
-                        // Generate share card with challenge link
-                        onGenerateShareCard('challenge')
-                    }}
-                    aria-label="Challenge a friend to beat your score"
-                    className="btn-physical btn-shine w-full py-5 rounded-2xl font-black text-xl flex flex-col items-center justify-center gap-1 mb-3 relative overflow-hidden"
-                    style={{
-                        background: `linear-gradient(135deg, ${modeColors.accent} 0%, ${modeColors.end} 100%)`,
-                        boxShadow: `0 8px 0 rgba(0,0,0,0.25), 0 20px 40px ${modeColors.glow}`,
-                        color: '#fff'
-                    }}
-                >
-                    <span className="flex items-center gap-2">
-                        <span className="text-2xl">🔥</span> CHALLENGE A FRIEND
-                    </span>
-                    <span className="text-xs font-medium opacity-80">Let them try to do better</span>
-                </button>
+                {/* Two share options in a row */}
+                <div className="flex gap-3 mb-3">
+                    {/* Challenge - Competitive share */}
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(30)
+                            onGenerateShareCard('challenge')
+                        }}
+                        aria-label="Challenge a friend to beat your score"
+                        className="flex-1 py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97]"
+                        style={{
+                            background: `linear-gradient(135deg, ${modeColors.accent} 0%, ${modeColors.end} 100%)`,
+                            boxShadow: `0 4px 20px ${modeColors.glow}`,
+                            color: '#fff'
+                        }}
+                    >
+                        <span className="flex items-center gap-2 text-lg font-black">
+                            <span>🔥</span> Challenge
+                        </span>
+                        <span className="text-[10px] opacity-80">They scan, you compare</span>
+                    </button>
 
-                {/* Share Button - Secondary */}
-                <button
-                    onClick={onGenerateShareCard}
-                    aria-label="Share your outfit rating"
-                    className="w-full py-4 rounded-2xl font-bold text-base flex flex-col items-center justify-center gap-1 mb-3 transition-all active:scale-[0.97]"
-                    style={{
-                        background: `${modeColors.bg}`,
-                        border: `1px solid ${modeColors.border}`,
-                        color: 'rgba(255,255,255,0.8)'
-                    }}
-                >
-                    <span className="flex items-center gap-2">
-                        <span className="text-lg">📤</span> Share This Fit
-                    </span>
-                    <span className="text-[10px] opacity-60">Public shame builds character</span>
-                </button>
+                    {/* Share - Just show off */}
+                    <button
+                        onClick={onGenerateShareCard}
+                        aria-label="Share your outfit rating"
+                        className="flex-1 py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97]"
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            color: 'rgba(255,255,255,0.9)'
+                        }}
+                    >
+                        <span className="flex items-center gap-2 text-lg font-black">
+                            <span>📤</span> Share
+                        </span>
+                        <span className="text-[10px] opacity-60">
+                            {scores.overall >= 75 ? "Flex on them" : scores.overall >= 50 ? "Show your fit" : "Get feedback"}
+                        </span>
+                    </button>
+                </div>
 
                 {/* Try Again + Back to Runway (side-by-side when in Fashion Show) */}
                 <div className={`flex gap-2 ${fashionShowId && onReturnToRunway ? 'flex-row' : 'flex-col'}`}>
@@ -1377,18 +1379,14 @@ export default function ResultsScreen({
                                 boxShadow: '0 0 40px rgba(255,215,0,0.15)'
                             }}
                         >
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-lg">⏰</span>
-                                <span className="text-xs font-black text-yellow-500 uppercase tracking-wider animate-pulse">
-                                    Daily Limit Reached
-                                </span>
-                                <span className="text-lg">🔒</span>
+                            <div className="text-center mb-3">
+                                <span className="text-3xl">🔥</span>
                             </div>
-                            <h3 className="text-base font-black text-white text-center mb-2">
-                                Want more ratings?
+                            <h3 className="text-base font-black text-white text-center mb-1">
+                                You're on a roll!
                             </h3>
-                            <p className="text-xs text-white/60 text-center mb-4">
-                                Unlock unlimited scans + Pro analysis
+                            <p className="text-xs text-white/50 text-center mb-3">
+                                Free scans refresh tomorrow
                             </p>
                             <div
                                 className="w-full py-3 rounded-xl font-bold text-sm text-center transition-all group-hover:brightness-110"
@@ -1398,7 +1396,7 @@ export default function ResultsScreen({
                                     boxShadow: '0 4px 0 rgba(0,0,0,0.2)'
                                 }}
                             >
-                                Upgrade Now →
+                                Go Unlimited →
                             </div>
                         </div>
                     )

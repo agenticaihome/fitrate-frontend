@@ -32,6 +32,7 @@ import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
 import EventExplainerModal from './components/modals/EventExplainerModal'
 import RestoreProModal from './components/modals/RestoreProModal'
+import ChallengeResultShareCard from './components/modals/ChallengeResultShareCard'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -331,6 +332,7 @@ export default function App() {
 
   const [screen, setScreen] = useState('home')
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showChallengeResultShare, setShowChallengeResultShare] = useState(false)
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
   const [emailChecking, setEmailChecking] = useState(false)
   const [proEmail, setProEmail] = useState('')
@@ -1550,7 +1552,10 @@ export default function App() {
 
 
   // Generate viral share card AND trigger native share directly (1-tap share)
-  const generateShareCard = useCallback(async () => {
+  // type: 'challenge' generates a 1v1 challenge link with score, otherwise normal share
+  const generateShareCard = useCallback(async (type) => {
+    const isChallenge = type === 'challenge'
+
     // Satisfying feedback when generating
     playSound('share')
     vibrate(30)
@@ -1568,7 +1573,7 @@ export default function App() {
 
       // Copy caption to clipboard
       navigator.clipboard.writeText(text).then(() => {
-        setToastMessage('Image saved! Caption copied ✅')
+        setToastMessage(isChallenge ? 'Challenge ready! Send to a friend 🔥' : 'Image saved! Caption copied ✅')
         setShowToast(true)
         playSound('pop')
         vibrate(20)
@@ -1577,7 +1582,7 @@ export default function App() {
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'share', {
             method: 'download',
-            content_type: 'outfit_rating',
+            content_type: isChallenge ? 'challenge' : 'outfit_rating',
             item_id: scores?.overall
           })
         }
@@ -1586,7 +1591,7 @@ export default function App() {
         setTimeout(() => setScreen('share-success'), 1500)
       }).catch((err) => {
         console.warn('[Share] Clipboard copy failed:', err?.message || err)
-        setToastMessage('Image saved! Paste caption manually.')
+        setToastMessage(isChallenge ? 'Challenge ready! Paste caption to send' : 'Image saved! Paste caption manually.')
         setShowToast(true)
         setTimeout(() => setScreen('share-success'), 1500)
       })
@@ -1615,7 +1620,8 @@ export default function App() {
         isPro: isPro || false,
         eventContext: eventShareContext,
         dailyChallengeContext: dailyChallengeShareContext,
-        cardDNA
+        cardDNA,
+        isChallenge  // Pass through to generate challenge URL with score
       })
 
       // Store shareData for potential future use
@@ -1625,7 +1631,7 @@ export default function App() {
       if (navigator.share) {
         try {
           const sharePayload = {
-            title: 'My FitRate Score',
+            title: isChallenge ? 'FitRate Challenge' : 'My FitRate Score',
             text: text,
           }
 
@@ -1640,7 +1646,7 @@ export default function App() {
           if (typeof window.gtag === 'function') {
             window.gtag('event', 'share', {
               method: 'native_share',
-              content_type: 'outfit_rating',
+              content_type: isChallenge ? 'challenge' : 'outfit_rating',
               item_id: scores?.overall
             })
           }
@@ -2110,22 +2116,41 @@ export default function App() {
 
   if (screen === 'challenge-result' && scores && challengeScore) {
     return (
-      <ChallengeResultScreen
-        userScore={scores.overall}
-        challengeScore={challengeScore}
-        onViewResults={() => setScreen('results')}
-        onChallengeBack={() => {
-          // Clear challenge score and trigger share for rematch
-          setChallengeScore(null)
-          setScreen('results')
-          // Auto-trigger share after a short delay
-          setTimeout(() => generateShareCard(), 500)
-        }}
-        onTryAgain={() => {
-          setChallengeScore(null) // Clear so next scan goes to results
-          resetApp()
-        }}
-      />
+      <>
+        <ChallengeResultScreen
+          userScore={scores.overall}
+          challengeScore={challengeScore}
+          userImage={uploadedImage}
+          onViewResults={() => setScreen('results')}
+          onChallengeBack={() => {
+            // Clear challenge score and trigger share for rematch
+            setChallengeScore(null)
+            setScreen('results')
+            // Auto-trigger share after a short delay
+            setTimeout(() => generateShareCard(), 500)
+          }}
+          onTryAgain={() => {
+            setChallengeScore(null) // Clear so next scan goes to results
+            resetApp()
+          }}
+          onSendResultBack={() => {
+            // Open the visual share card modal
+            playSound('click')
+            vibrate(20)
+            setShowChallengeResultShare(true)
+          }}
+        />
+
+        {/* Challenge Result Share Card Modal */}
+        {showChallengeResultShare && (
+          <ChallengeResultShareCard
+            userScore={scores.overall}
+            challengeScore={challengeScore}
+            userImage={uploadedImage}
+            onClose={() => setShowChallengeResultShare(false)}
+          />
+        )}
+      </>
     )
   }
 
