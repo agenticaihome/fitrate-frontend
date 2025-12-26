@@ -24,6 +24,27 @@ function ConfettiPiece({ delay, color, left }) {
     )
 }
 
+// Falling ember for loss state
+function FallingEmber({ delay, left, size }) {
+    return (
+        <div
+            className="absolute pointer-events-none"
+            style={{
+                left: `${left}%`,
+                top: '-10px',
+                width: `${size}px`,
+                height: `${size}px`,
+                background: 'linear-gradient(135deg, #ff4444 0%, #ff8800 100%)',
+                borderRadius: '50%',
+                boxShadow: '0 0 6px 2px rgba(255,68,68,0.6)',
+                animation: `emberFall 3s ease-in forwards`,
+                animationDelay: `${delay}s`,
+                opacity: 0.8
+            }}
+        />
+    )
+}
+
 // Floating sparkle particle
 function Sparkle({ style }) {
     return (
@@ -91,10 +112,12 @@ export default function ChallengeResultScreen({
     userImage,
     onViewResults,
     onChallengeBack,
-    onTryAgain
+    onTryAgain,
+    onSendResultBack  // NEW: callback to share result back to challenger
 }) {
     const won = userScore > challengeScore
     const tied = userScore === challengeScore
+    const lost = !won && !tied
     const diff = Math.round(Math.abs(userScore - challengeScore) * 10) / 10
 
     // Animation states
@@ -102,6 +125,7 @@ export default function ChallengeResultScreen({
     const [displayedUserScore, setDisplayedUserScore] = useState(0)
     const [displayedChallengerScore, setDisplayedChallengerScore] = useState(0)
     const [showConfetti, setShowConfetti] = useState(false)
+    const [showEmbers, setShowEmbers] = useState(false)
     const isMounted = useRef(true)
 
     // Generate confetti pieces
@@ -118,6 +142,16 @@ export default function ChallengeResultScreen({
             delay: Math.random() * 0.5
         })) : []
     }, [won, tied])
+
+    // Generate embers for loss
+    const embers = useMemo(() => {
+        return Array.from({ length: 20 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            delay: Math.random() * 2,
+            size: 3 + Math.random() * 4
+        }))
+    }, [])
 
     // Generate sparkles
     const sparkles = useMemo(() => {
@@ -150,12 +184,18 @@ export default function ChallengeResultScreen({
         }
     }, [])
 
-    // Confetti trigger
+    // Confetti/ember trigger
     useEffect(() => {
-        if (revealStage >= 3 && (won || tied)) {
-            setShowConfetti(true)
-            const timer = setTimeout(() => setShowConfetti(false), 3500)
-            return () => clearTimeout(timer)
+        if (revealStage >= 3) {
+            if (won || tied) {
+                setShowConfetti(true)
+                const timer = setTimeout(() => setShowConfetti(false), 3500)
+                return () => clearTimeout(timer)
+            } else {
+                setShowEmbers(true)
+                const timer = setTimeout(() => setShowEmbers(false), 4000)
+                return () => clearTimeout(timer)
+            }
         }
     }, [revealStage, won, tied])
 
@@ -195,8 +235,9 @@ export default function ChallengeResultScreen({
                 playSound('pop')
                 vibrate([50, 30, 50])
             } else {
-                playSound('click')
-                vibrate(30)
+                // Dramatic loss sound
+                playSound('womp')
+                vibrate([200, 100, 200]) // Heavy defeat pattern
             }
         }
     }, [revealStage, won, tied])
@@ -205,6 +246,18 @@ export default function ChallengeResultScreen({
     const loseColor = '#ff4444'
     const tieColor = '#ffd700'
     const accentColor = won ? winColor : tied ? tieColor : loseColor
+
+    // Loss-specific messages for motivation
+    const lossMessages = [
+        "Time for a comeback!",
+        "This isn't over...",
+        "Rematch incoming!",
+        "They got lucky.",
+        "Revenge loading..."
+    ]
+    const lossMessage = useMemo(() =>
+        lossMessages[Math.floor(Math.random() * lossMessages.length)],
+    [])
 
     return (
         <div
@@ -227,7 +280,7 @@ export default function ChallengeResultScreen({
                         ? 'radial-gradient(circle at 50% 40%, rgba(0,255,136,0.25) 0%, transparent 60%)'
                         : tied
                             ? 'radial-gradient(circle at 50% 40%, rgba(255,215,0,0.25) 0%, transparent 60%)'
-                            : 'radial-gradient(circle at 50% 40%, rgba(255,68,68,0.15) 0%, transparent 60%)',
+                            : 'radial-gradient(circle at 50% 40%, rgba(255,68,68,0.2) 0%, transparent 60%)',
                     animation: revealStage >= 2 ? 'pulse 3s ease-in-out infinite' : 'none',
                     opacity: revealStage >= 1 ? 1 : 0,
                     transition: 'opacity 0.8s ease-out'
@@ -252,7 +305,7 @@ export default function ChallengeResultScreen({
                 }}
             />
 
-            {/* Floating Sparkles */}
+            {/* Floating Sparkles (win) */}
             {won && revealStage >= 4 && sparkles.map(sparkle => (
                 <Sparkle
                     key={sparkle.id}
@@ -262,6 +315,16 @@ export default function ChallengeResultScreen({
                         animationDelay: sparkle.animationDelay,
                         opacity: sparkle.opacity
                     }}
+                />
+            ))}
+
+            {/* Falling Embers (loss) */}
+            {showEmbers && embers.map(ember => (
+                <FallingEmber
+                    key={ember.id}
+                    left={ember.left}
+                    delay={ember.delay}
+                    size={ember.size}
                 />
             ))}
 
@@ -285,10 +348,14 @@ export default function ChallengeResultScreen({
                         : 'scale(0) rotate(-180deg)',
                     transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     filter: revealStage >= 3 ? `drop-shadow(0 0 30px ${accentColor})` : 'none',
-                    animation: revealStage >= 3 ? 'float 3s ease-in-out infinite' : 'none'
+                    animation: revealStage >= 3
+                        ? lost
+                            ? 'shake 0.5s ease-in-out 3'
+                            : 'float 3s ease-in-out infinite'
+                        : 'none'
                 }}
             >
-                {won ? '🏆' : tied ? '🤝' : '😭'}
+                {won ? '🏆' : tied ? '🤝' : '💀'}
             </div>
 
             {/* Result Title - Animated gradient text */}
@@ -303,11 +370,26 @@ export default function ChallengeResultScreen({
                         ? `0 0 40px ${winColor}, 0 0 80px ${winColor}40`
                         : tied
                             ? `0 0 30px ${tieColor}80`
-                            : `0 0 20px ${loseColor}60`
+                            : `0 0 30px ${loseColor}80`
                 }}
             >
-                {won ? 'YOU WON!' : tied ? "IT'S A TIE!" : 'THEY WON...'}
+                {won ? 'YOU WON!' : tied ? "IT'S A TIE!" : 'DEFEATED'}
             </h1>
+
+            {/* Sub-title for loss */}
+            {lost && revealStage >= 3 && (
+                <p
+                    className="text-lg font-medium mb-2"
+                    style={{
+                        color: 'rgba(255,255,255,0.5)',
+                        opacity: revealStage >= 3 ? 1 : 0,
+                        transform: revealStage >= 3 ? 'translateY(0)' : 'translateY(10px)',
+                        transition: 'all 0.4s ease-out 0.2s'
+                    }}
+                >
+                    {lossMessage}
+                </p>
+            )}
 
             {/* Score Comparison */}
             <div
@@ -420,8 +502,8 @@ export default function ChallengeResultScreen({
                         {revealStage >= 5 && (
                             <ScoreRing
                                 score={challengeScore}
-                                isWinner={!won && !tied}
-                                color={!won && !tied ? loseColor : 'rgba(255,255,255,0.3)'}
+                                isWinner={lost}
+                                color={lost ? loseColor : 'rgba(255,255,255,0.3)'}
                             />
                         )}
 
@@ -429,27 +511,27 @@ export default function ChallengeResultScreen({
                         <div
                             className="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center relative z-10"
                             style={{
-                                background: !won && !tied ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.08)',
-                                border: !won && !tied ? `3px solid ${loseColor}` : '3px solid rgba(255,255,255,0.2)',
-                                boxShadow: !won && !tied
+                                background: lost ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.08)',
+                                border: lost ? `3px solid ${loseColor}` : '3px solid rgba(255,255,255,0.2)',
+                                boxShadow: lost
                                     ? `0 0 30px ${loseColor}50, inset 0 0 20px ${loseColor}20`
                                     : 'none',
-                                animation: !won && !tied && revealStage >= 5 ? 'pulse 2s ease-in-out infinite' : 'none'
+                                animation: lost && revealStage >= 5 ? 'pulse 2s ease-in-out infinite' : 'none'
                             }}
                         >
-                            <span className="text-4xl">🤷</span>
+                            <span className="text-4xl">{lost ? '😎' : '🤷'}</span>
                         </div>
 
                         {/* Score badge */}
                         <div
                             className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xl font-black z-20"
                             style={{
-                                background: !won && !tied
+                                background: lost
                                     ? `linear-gradient(135deg, ${loseColor} 0%, #ff8800 100%)`
                                     : '#1a1a1a',
                                 color: '#fff',
-                                border: !won && !tied ? 'none' : '2px solid rgba(255,255,255,0.3)',
-                                boxShadow: !won && !tied
+                                border: lost ? 'none' : '2px solid rgba(255,255,255,0.3)',
+                                boxShadow: lost
                                     ? `0 4px 20px ${loseColor}60`
                                     : 'none',
                                 transform: revealStage >= 5 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0)',
@@ -476,7 +558,7 @@ export default function ChallengeResultScreen({
                     ? <span>You beat them by <strong style={{ color: winColor }}>{diff} points</strong>! 🔥</span>
                     : tied
                         ? <span>Exactly the same! <strong style={{ color: tieColor }}>Fate has spoken.</strong></span>
-                        : <span>They got you by <strong style={{ color: loseColor }}>{diff} points</strong>. Revenge time?</span>}
+                        : <span>They won by <strong style={{ color: loseColor }}>{diff} points</strong></span>}
             </p>
 
             {/* CTAs - Staggered reveal */}
@@ -504,7 +586,7 @@ export default function ChallengeResultScreen({
                         background: won
                             ? `linear-gradient(135deg, ${winColor} 0%, #00d4ff 100%)`
                             : `linear-gradient(135deg, ${loseColor} 0%, #ff8800 100%)`,
-                        color: '#000',
+                        color: won ? '#000' : '#fff',
                         boxShadow: won
                             ? `0 8px 30px ${winColor}50, 0 0 60px ${winColor}30`
                             : `0 8px 30px ${loseColor}40`,
@@ -512,8 +594,30 @@ export default function ChallengeResultScreen({
                         '--glow-color': won ? winColor : loseColor
                     }}
                 >
-                    {won ? '🏆 Flex Your Victory' : '🔥 Challenge Them Back!'}
+                    {won ? '🏆 Flex Your Victory' : '⚔️ Demand Rematch!'}
                 </button>
+
+                {/* Send Result Back - Let challenger know! */}
+                {onSendResultBack && (
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(15)
+                            onSendResultBack()
+                        }}
+                        className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
+                        style={{
+                            background: won
+                                ? 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,212,255,0.2) 100%)'
+                                : 'linear-gradient(135deg, rgba(255,68,68,0.2) 0%, rgba(255,136,0,0.2) 100%)',
+                            color: accentColor,
+                            border: `1px solid ${accentColor}40`,
+                            backdropFilter: 'blur(10px)'
+                        }}
+                    >
+                        {won ? '📤 Send Them Your Victory' : '📤 Tell Them You Accept'}
+                    </button>
+                )}
 
                 {/* Secondary CTA */}
                 <button
@@ -534,7 +638,7 @@ export default function ChallengeResultScreen({
                         backdropFilter: 'blur(10px)'
                     }}
                 >
-                    {won ? '👊 Challenge Someone Else' : '📸 Try a Different Outfit'}
+                    {won ? '👊 Challenge Someone Else' : '📸 Try Different Outfit'}
                 </button>
 
                 {/* View Full Results */}
