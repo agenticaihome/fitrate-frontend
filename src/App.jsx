@@ -28,12 +28,12 @@ import FashionShowHub from './screens/FashionShowHub'
 // Combined Challenges screen (Daily + Weekly)
 import ChallengesScreen from './screens/ChallengesScreen'
 
-// Modals
 import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
 import EventExplainerModal from './components/modals/EventExplainerModal'
 import RestoreProModal from './components/modals/RestoreProModal'
 import ChallengeResultShareCard from './components/modals/ChallengeResultShareCard'
+import OnboardingModal from './components/modals/OnboardingModal'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -128,6 +128,10 @@ export default function App() {
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [isStandalone, setIsStandalone] = useState(false)
+  // First-time user onboarding
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('fitrate_onboarded')
+  })
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const [inAppBrowser, setInAppBrowser] = useState(null)
 
@@ -1979,6 +1983,19 @@ export default function App() {
   // IN-APP BROWSER: No longer blocking - let users try the app
   // Camera may have quirks but sharing/viewing works fine
   // ============================================
+
+  // ============================================
+  // FIRST-TIME USER ONBOARDING (highest priority)
+  // ============================================
+  if (showOnboarding) {
+    return (
+      <OnboardingModal
+        onComplete={() => setShowOnboarding(false)}
+        playSound={playSound}
+        vibrate={vibrate}
+      />
+    )
+  }
 
   // ============================================
   // EVENT EXPLAINER MODAL (First-time users)

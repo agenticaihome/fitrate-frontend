@@ -80,19 +80,17 @@ export const BUTTONS = {
 };
 
 // ============================================
-// PAYWALL COPY (Honest, no fake urgency)
+// PAYWALL COPY (Scan Packs - Clash of Clans style)
 // ============================================
 export const PAYWALL = {
-    headline: 'Go Pro',
-    subheadline: 'Unlock 25 scans per day',
+    headline: 'Get More Scans',
+    subheadline: 'All 8 AI modes included free!',
     benefits: [
-        '25 ratings/day (vs 5 free)',
-        '6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos',
-        'Precision scoring (87.4 vs 87)',
-        '1 Weekly Challenge entry/day',
-        'Golden Insights (Identity + Social Perception)',
-        'Pro Tips on every result',
+        '2 free scans every day',
+        'All 8 AI modes unlocked',
+        'Purchased scans never expire',
+        'Instant access after purchase',
     ],
-    reassurance: '🔐 Secure checkout · Cancel anytime',
-    outOfScans: 'You\'ve used your free scans for today. Upgrade for unlimited outfit ratings.',
+    reassurance: '🔐 Secure checkout · Instant access',
+    outOfScans: 'You\'ve used your free scans for today. Get more to keep rating!',
 };

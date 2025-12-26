@@ -634,34 +634,26 @@ export default function HomeScreen({
                 </button>
             </div>
 
-            {/* Pro/Free Status Badge */}
+            {/* Scans Status Badge */}
             <div className="flex justify-center mb-4">
-                {isPro || purchasedScans > 0 ? (
-                    <div
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,180,0,0.1) 100%)',
-                            border: '1px solid rgba(255,215,0,0.4)',
-                            boxShadow: '0 0 20px rgba(255,215,0,0.2)'
-                        }}
-                    >
-                        <span className="text-lg">👑</span>
-                        <span className="text-xs font-black uppercase tracking-widest text-yellow-400">Pro Mode</span>
-                        <span className="text-[9px] font-bold text-yellow-400/60">GPT-4o</span>
-                    </div>
-                ) : (
-                    <div
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                        style={{
-                            background: 'rgba(0,212,255,0.08)',
-                            border: '1px solid rgba(0,212,255,0.25)',
-                        }}
-                    >
-                        <span className="text-sm">⚡</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">Free</span>
-                        <span className="text-[9px] font-bold text-cyan-400/60">Gemini Flash</span>
-                    </div>
-                )}
+                <div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer transition-all active:scale-95"
+                    style={{
+                        background: purchasedScans > 0
+                            ? 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,180,0,0.1) 100%)'
+                            : 'rgba(0,212,255,0.08)',
+                        border: purchasedScans > 0
+                            ? '1px solid rgba(255,215,0,0.4)'
+                            : '1px solid rgba(0,212,255,0.25)',
+                    }}
+                    onClick={() => { playSound('click'); vibrate(10); onShowPaywall(); }}
+                >
+                    <span className="text-sm">{purchasedScans > 0 ? '💎' : '⚡'}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${purchasedScans > 0 ? 'text-yellow-400' : 'text-cyan-400'}`}>
+                        {purchasedScans > 0 ? `${purchasedScans} Bonus Scans` : `${scansRemaining} Free Scans`}
+                    </span>
+                    <span className="text-[10px] text-white/40">+ Get More</span>
+                </div>
             </div>
 
             {/* Install Banner moved to footer - not above-fold */}
@@ -1136,15 +1128,11 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* Advanced AI Modes Section */}
+            {/* All AI Modes - Unlocked for everyone! */}
             <button
                 onClick={() => {
                     playSound('click'); vibrate(15);
-                    if (isPro) {
-                        setShowModeDrawer(true);
-                    } else {
-                        onShowPaywall();
-                    }
+                    setShowModeDrawer(true);
                 }}
                 className="w-full max-w-sm p-4 rounded-2xl transition-all active:scale-[0.99] mb-4"
                 style={{
@@ -1154,12 +1142,11 @@ export default function HomeScreen({
             >
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <span className="text-lg">⚡</span>
-                    <span className="text-white/80 font-semibold">Advanced AI Modes</span>
-                    <span className="text-white/40">(6)</span>
-                    {!isPro && <span className="text-sm">🔒</span>}
+                    <span className="text-white/80 font-semibold">All AI Modes</span>
+                    <span className="text-white/40">(8)</span>
                 </div>
                 <p className="text-white/40 text-xs text-center">
-                    Honest • Savage • Rizz • Celebrity • Aura • Chaos
+                    Nice • Roast • Honest • Savage • Rizz • Celebrity • Aura • Chaos
                 </p>
             </button>
 
