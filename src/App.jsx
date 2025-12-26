@@ -2075,6 +2075,10 @@ export default function App() {
   }
 
   if (screen === 'challenge-result' && scores && challengeScore) {
+    const won = scores.overall > challengeScore
+    const tied = scores.overall === challengeScore
+    const diff = Math.round(Math.abs(scores.overall - challengeScore) * 10) / 10
+
     return (
       <ChallengeResultScreen
         userScore={scores.overall}
@@ -2091,6 +2095,37 @@ export default function App() {
         onTryAgain={() => {
           setChallengeScore(null) // Clear so next scan goes to results
           resetApp()
+        }}
+        onSendResultBack={async () => {
+          // Send result back to the original challenger
+          playSound('share')
+          vibrate(30)
+
+          const resultText = won
+            ? `🏆 I beat your FitRate challenge!\n\nMe: ${scores.overall} vs You: ${challengeScore}\nI won by ${diff} points!\n\nThink you can do better? 👀`
+            : tied
+              ? `🤝 We tied on FitRate!\n\nMe: ${scores.overall} vs You: ${challengeScore}\nExactly the same - rematch?\n\nfitrate.app`
+              : `💀 You got me on FitRate...\n\nMe: ${scores.overall} vs You: ${challengeScore}\nYou won by ${diff} points.\n\nBut I want a rematch! ⚔️`
+
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                title: won ? 'I Won!' : tied ? 'We Tied!' : 'You Got Me...',
+                text: resultText
+              })
+              displayToast(won ? 'Victory sent! 🏆' : 'Result sent!')
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                // User didn't cancel, something went wrong - copy to clipboard
+                await navigator.clipboard.writeText(resultText)
+                displayToast('Copied to clipboard!')
+              }
+            }
+          } else {
+            // Fallback: copy to clipboard
+            await navigator.clipboard.writeText(resultText)
+            displayToast('Copied! Paste to send 📋')
+          }
         }}
       />
     )
