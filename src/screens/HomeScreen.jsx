@@ -848,7 +848,7 @@ export default function HomeScreen({
                     // Pro Flow: User has Pro subscription OR purchased scans
                     const isProFlow = isPro || purchasedScans > 0;
 
-                    // Choose colors based on mode - each of 8 modes has unique styling
+                    // Choose colors based on mode - each of 12 modes has unique styling
                     let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
                     if (entryBlocked) {
                         // Amber/gray for blocked state
@@ -869,7 +869,7 @@ export default function HomeScreen({
                         buttonGlow = 'rgba(16,185,129,0.5)';
                         innerGradient = 'linear-gradient(135deg, #10b981 0%, #0d9488 50%, #047857 100%)';
                     } else {
-                        // Mode-specific colors for all 8 AI modes
+                        // Mode-specific colors for all 12 AI modes
                         switch (mode) {
                             case 'roast':
                                 buttonAccent = '#ff6b35';
@@ -988,7 +988,7 @@ export default function HomeScreen({
                                     aria-hidden="true"
                                 />
 
-                                {/* Emoji - uses mode-specific emoji for all 8 modes */}
+                                {/* Emoji - uses mode-specific emoji for all 12 modes */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
                                     {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : getModeEmoji()}
                                 </span>
@@ -1063,7 +1063,7 @@ export default function HomeScreen({
 
                                         {/* Separator + Mode count hint */}
                                         <span className="text-white/30">•</span>
-                                        <span className="text-[11px] text-white/50">8 modes</span>
+                                        <span className="text-[11px] text-white/50">12 modes</span>
 
                                         {/* Chevron indicator */}
                                         <span className="text-white/40 text-xs ml-1">▼</span>
@@ -1369,7 +1369,7 @@ export default function HomeScreen({
             )
             }
 
-            {/* Mode Drawer - All 8 AI Modes */}
+            {/* Mode Drawer - All 12 AI Modes */}
             {showModeDrawer && (
                 <div
                     className="fixed inset-0 z-[60] flex items-end justify-center"

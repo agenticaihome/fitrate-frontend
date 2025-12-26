@@ -7,6 +7,17 @@ import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants
 import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
+import {
+  trackScanComplete,
+  trackModeSelect,
+  trackBeginCheckout,
+  trackBattleCreate,
+  trackBattleAccept,
+  trackPaywallView,
+  trackDailyChallengeJoin,
+  trackWeeklyChallengeJoin,
+  trackScanError
+} from './utils/analytics'
 
 // ============================================
 // LAZY-LOADED SCREENS (Code Splitting)
@@ -89,8 +100,8 @@ const getWeekStart = (date) => {
 }
 
 // Daily Challenge: Rotating mode based on day of year
-// All 8 AI modes cycle through daily
-const DAILY_CHALLENGE_MODES = ['nice', 'roast', 'honest', 'savage', 'rizz', 'celeb', 'aura', 'chaos']
+// All 12 AI modes cycle through daily
+const DAILY_CHALLENGE_MODES = ['nice', 'roast', 'honest', 'savage', 'rizz', 'celeb', 'aura', 'chaos', 'y2k', 'villain', 'coquette', 'hypebeast']
 
 const getDailyMode = () => {
   const now = new Date()
@@ -1636,6 +1647,13 @@ export default function App() {
         console.log('[CardDNA] Received unique DNA:', data.cardDNA.signature)
       }
 
+      // Track scan completion for GA4 analytics
+      trackScanComplete(effectiveMode, overall, {
+        isDailyChallenge: isProDailyChallengeSubmission,
+        isWeeklyChallenge: isProEventSubmission,
+        isFashionShow: Boolean(activeFashionShow?.id)
+      })
+
       // Refresh event status if user participated in event mode
       if (eventMode && currentEvent) {
         fetchUserEventStatus()
@@ -1700,6 +1718,7 @@ export default function App() {
         setError(err.message || "Something went wrong — try again!")
         // errorCode may have been set above from API response
       }
+      trackScanError(errorCode || 'UNKNOWN', err.message)
       setScreen('error')
     } finally {
       setIsAnalyzing(false)
@@ -1788,6 +1807,7 @@ export default function App() {
           const data = await res.json()
           if (data.challengeId) {
             challengeUrl = `https://fitrate.app/c/${data.challengeId}`
+            trackBattleCreate(scores.overall)
             // Track locally that we created this challenge
             const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
             created.push(data.challengeId)

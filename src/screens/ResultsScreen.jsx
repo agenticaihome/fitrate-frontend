@@ -571,7 +571,7 @@ export default function ResultsScreen({
         return gradients[scoreTier]
     }, [scoreTier, dnaGradient])
 
-    // Social proof message - DISTINCT for each of 8 modes
+    // Social proof message - DISTINCT for each of 12 modes
     const socialProof = useMemo(() => {
         if (!scores) return { msg: '', color: '#fff' }
         const s = scores.overall

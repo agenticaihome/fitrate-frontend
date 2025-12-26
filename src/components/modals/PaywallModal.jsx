@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { PRICES, STRIPE_LINKS, SUBSCRIPTIONS } from '../../config/constants'
 import { playSound, vibrate } from '../../utils/soundEffects'
+import { trackPaywallView, trackBeginCheckout, trackFirstTimeOfferView } from '../../utils/analytics'
 
 /**
  * PaywallModal - Premium Monetization System
@@ -20,12 +21,22 @@ export default function PaywallModal({
     const [showFirstTimeOffer, setShowFirstTimeOffer] = useState(false)
     const [viewMode, setViewMode] = useState('packs') // 'packs' or 'unlimited'
 
+    // Track paywall view on mount
+    useEffect(() => {
+        if (showPaywall) {
+            trackPaywallView('scan_limit')
+        }
+    }, [showPaywall])
+
     useEffect(() => {
         const hasPurchased = localStorage.getItem('fitrate_has_purchased')
         if (hasPurchased) {
             setIsFirstTimeBuyer(false)
         } else {
-            const timer = setTimeout(() => setShowFirstTimeOffer(true), 500)
+            const timer = setTimeout(() => {
+                setShowFirstTimeOffer(true)
+                trackFirstTimeOfferView()
+            }, 500)
             return () => clearTimeout(timer)
         }
     }, [])
@@ -33,6 +44,11 @@ export default function PaywallModal({
     if (!showPaywall) return null
 
     const handleCheckout = (product) => {
+        const price = scanPacks.find(p => p.id === product)?.price ||
+            (product === 'firstTimeOffer' ? PRICES.FIRST_TIME_PRICE :
+                product === 'proMonthly' ? SUBSCRIPTIONS.MONTHLY_PRICE :
+                    product === 'proYearly' ? SUBSCRIPTIONS.YEARLY_PRICE : 0)
+        trackBeginCheckout(product, price)
         localStorage.setItem('fitrate_has_purchased', 'true')
         playSound('click')
         vibrate(20)
@@ -66,7 +82,7 @@ export default function PaywallModal({
                 <div className="text-center mb-4">
                     <div className="text-4xl mb-2">💎</div>
                     <h2 className="text-xl font-black text-white mb-1">Get More Scans</h2>
-                    <p className="text-sm text-white/50">All 8 AI modes included!</p>
+                    <p className="text-sm text-white/50">All 12 AI modes included!</p>
                 </div>
 
                 {/* Toggle: Packs vs Unlimited */}
@@ -74,8 +90,8 @@ export default function PaywallModal({
                     <button
                         onClick={() => setViewMode('packs')}
                         className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === 'packs'
-                                ? 'bg-cyan-500 text-black'
-                                : 'text-white/50'
+                            ? 'bg-cyan-500 text-black'
+                            : 'text-white/50'
                             }`}
                     >
                         Scan Packs
@@ -83,8 +99,8 @@ export default function PaywallModal({
                     <button
                         onClick={() => setViewMode('unlimited')}
                         className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === 'unlimited'
-                                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                                : 'text-white/50'
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                            : 'text-white/50'
                             }`}
                     >
                         ♾️ Unlimited
@@ -228,7 +244,7 @@ export default function PaywallModal({
                             <p className="text-xs font-bold text-white/60 uppercase mb-2 text-center">Pro Benefits</p>
                             <div className="grid grid-cols-2 gap-2 text-[11px] text-white/70">
                                 <div>✓ 25 scans every day</div>
-                                <div>✓ All 8 AI modes</div>
+                                <div>✓ All 12 AI modes</div>
                                 <div>✓ Priority processing</div>
                                 <div>✓ Cancel anytime</div>
                             </div>

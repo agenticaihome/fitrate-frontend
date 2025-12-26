@@ -10,8 +10,9 @@
 
 import React, { useState } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
+import { trackFashionShowCreate } from '../utils/analytics'
 
-// All 8 AI modes for Fashion Show - everyone competes in same mode
+// All 12 AI modes for Fashion Show - everyone competes in same mode
 const VIBES = [
     { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive & encouraging', color: 'cyan', proOnly: false },
     { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: 'orange', proOnly: false },
@@ -20,7 +21,11 @@ const VIBES = [
     { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Dating vibes', color: 'pink', proOnly: false },
     { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star treatment', color: 'yellow', proOnly: false },
     { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Mystical energy', color: 'violet', proOnly: false },
-    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged chaos', color: 'red', proOnly: false }
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged chaos', color: 'red', proOnly: false },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: "That's hot", color: 'pink', proOnly: false },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main villain', color: 'slate', proOnly: false },
+    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft & dainty', color: 'rose', proOnly: false },
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Drip check', color: 'amber', proOnly: false }
 ]
 
 // Color mappings for each mode
@@ -32,7 +37,11 @@ const VIBE_COLORS = {
     rizz: { bg: 'rgba(255,105,180,0.15)', ring: 'ring-pink-400', text: 'text-pink-300' },
     celeb: { bg: 'rgba(255,215,0,0.15)', ring: 'ring-yellow-400', text: 'text-yellow-300' },
     aura: { bg: 'rgba(155,89,182,0.15)', ring: 'ring-violet-400', text: 'text-violet-300' },
-    chaos: { bg: 'rgba(255,107,107,0.15)', ring: 'ring-red-400', text: 'text-red-300' }
+    chaos: { bg: 'rgba(255,107,107,0.15)', ring: 'ring-red-400', text: 'text-red-300' },
+    y2k: { bg: 'rgba(255,192,203,0.15)', ring: 'ring-pink-400', text: 'text-pink-300' },
+    villain: { bg: 'rgba(71,85,105,0.15)', ring: 'ring-slate-400', text: 'text-slate-300' },
+    coquette: { bg: 'rgba(251,207,232,0.15)', ring: 'ring-rose-400', text: 'text-rose-300' },
+    hypebeast: { bg: 'rgba(251,191,36,0.15)', ring: 'ring-amber-400', text: 'text-amber-300' }
 }
 
 const DURATIONS = [
@@ -102,6 +111,7 @@ export default function FashionShowCreate({
 
             playSound('success')
             vibrate([50, 30, 50])
+            trackFashionShowCreate(vibe)
             onShowCreated(data)
         } catch (err) {
             console.error('[FashionShow] Create error:', err)
@@ -180,9 +190,8 @@ export default function FashionShowCreate({
                                         }
                                     }}
                                     disabled={isLocked}
-                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all active:scale-95 ${
-                                        isSelected ? `ring-2 ${colors.ring}` : ''
-                                    } ${isLocked ? 'opacity-40' : ''}`}
+                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all active:scale-95 ${isSelected ? `ring-2 ${colors.ring}` : ''
+                                        } ${isLocked ? 'opacity-40' : ''}`}
                                     style={{ background: colors.bg }}
                                 >
                                     <span className="text-2xl">{v.emoji}</span>

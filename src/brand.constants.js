@@ -84,10 +84,10 @@ export const BUTTONS = {
 // ============================================
 export const PAYWALL = {
     headline: 'Get More Scans',
-    subheadline: 'All 8 AI modes included free!',
+    subheadline: 'All 12 AI modes included free!',
     benefits: [
         '2 free scans every day',
-        'All 8 AI modes unlocked',
+        'All 12 AI modes unlocked',
         'Purchased scans never expire',
         'Instant access after purchase',
     ],
