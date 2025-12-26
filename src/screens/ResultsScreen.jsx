@@ -29,6 +29,10 @@ const getModeColors = (mode) => {
         celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.4)', border: 'rgba(255,215,0,0.3)', bg: 'rgba(255,215,0,0.08)' },
         aura: { accent: '#9b59b6', end: '#8b5cf6', glow: 'rgba(155,89,182,0.4)', border: 'rgba(155,89,182,0.3)', bg: 'rgba(155,89,182,0.08)' },
         chaos: { accent: '#ff4444', end: '#ff6b6b', glow: 'rgba(255,68,68,0.4)', border: 'rgba(255,68,68,0.3)', bg: 'rgba(255,68,68,0.08)' },
+        y2k: { accent: '#ff69b4', end: '#da70d6', glow: 'rgba(255,105,180,0.4)', border: 'rgba(255,105,180,0.3)', bg: 'rgba(255,105,180,0.08)' },
+        villain: { accent: '#4c1d95', end: '#2d1b4e', glow: 'rgba(76,29,149,0.4)', border: 'rgba(76,29,149,0.3)', bg: 'rgba(76,29,149,0.08)' },
+        coquette: { accent: '#ffb6c1', end: '#ffc0cb', glow: 'rgba(255,182,193,0.4)', border: 'rgba(255,182,193,0.3)', bg: 'rgba(255,182,193,0.08)' },
+        hypebeast: { accent: '#f97316', end: '#ea580c', glow: 'rgba(249,115,22,0.4)', border: 'rgba(249,115,22,0.3)', bg: 'rgba(249,115,22,0.08)' },
         event: { accent: '#10b981', end: '#06b6d4', glow: 'rgba(16,185,129,0.4)', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.08)' }
     }
     return colors[mode] || colors.honest
@@ -567,33 +571,87 @@ export default function ResultsScreen({
         return gradients[scoreTier]
     }, [scoreTier, dnaGradient])
 
-    // Social proof message
+    // Social proof message - DISTINCT for each of 8 modes
     const socialProof = useMemo(() => {
         if (!scores) return { msg: '', color: '#fff' }
-        if (scores.roastMode) {
-            if (scores.mode === 'savage') {
-                if (scores.overall >= 40) return { msg: '💀 YOU SURVIVED (Barely)', color: '#ffaa00' }
-                if (scores.overall >= 20) return { msg: '🩸 AI drew blood', color: '#ff6b6b' }
+        const s = scores.overall
+        const m = scores.mode || mode
+
+        switch (m) {
+            case 'savage':
+                if (s >= 60) return { msg: '💀 YOU SURVIVED (Barely)', color: '#ffaa00' }
+                if (s >= 35) return { msg: '🩸 AI drew blood', color: '#ff6b6b' }
                 return { msg: '☠️ ABSOLUTE ANNIHILATION', color: '#ff4444' }
-            }
-            if (scores.overall >= 60) return { msg: '😏 You survived the roast', color: '#00d4ff' }
-            if (scores.overall >= 45) return { msg: '💀 Rough day for your closet', color: '#ffaa00' }
-            return { msg: '☠️ AI showed no mercy', color: '#ff6b6b' }
-        } else if (scores.mode === 'honest') {
-            if (scores.overall >= 95) return { msg: '💎 STYLE GOD — Pure Perfection', color: '#ffd700' }
-            if (scores.overall >= 85) return { msg: '🔥 Post this immediately', color: '#ff6b35' }
-            if (scores.overall >= 70) return { msg: '👍 Solid fit, respectable', color: '#00d4ff' }
-            if (scores.overall >= 55) return { msg: '📊 Average range', color: '#ffaa00' }
-            return { msg: '📉 Needs some work', color: '#ff6b6b' }
-        } else {
-            if (scores.overall >= 95) return { msg: '👑 ICONIC — Internet-breaking fit', color: '#ffd700' }
-            if (scores.overall >= 85) return { msg: '🔥 LEGENDARY — Post this NOW', color: '#ff6b35' }
-            if (scores.overall >= 75) return { msg: '✨ Main character energy', color: '#00d4ff' }
-            if (scores.overall >= 65) return { msg: '💅 Serve! TikTok would approve', color: '#00ff88' }
-            if (scores.overall >= 50) return { msg: '👀 Cute! Minor tweaks = viral', color: '#ffaa00' }
-            return { msg: '💪 Good foundation, keep styling!', color: '#ff6b6b' }
+
+            case 'roast':
+                if (s >= 70) return { msg: '😏 You survived the roast', color: '#00d4ff' }
+                if (s >= 45) return { msg: '💀 Rough day for your closet', color: '#ffaa00' }
+                return { msg: '☠️ AI showed no mercy', color: '#ff6b6b' }
+
+            case 'honest':
+                if (s >= 90) return { msg: '💎 STYLE GOD — Pure Perfection', color: '#ffd700' }
+                if (s >= 75) return { msg: '📊 Analysis: Strong fit', color: '#00d4ff' }
+                if (s >= 55) return { msg: '📈 Decent. Room to improve', color: '#ffaa00' }
+                return { msg: '📉 Needs work', color: '#ff6b6b' }
+
+            case 'rizz':
+                if (s >= 85) return { msg: '💋 MAIN CHARACTER RIZZ', color: '#ff69b4' }
+                if (s >= 70) return { msg: '😏 Strong dating potential', color: '#ff69b4' }
+                if (s >= 50) return { msg: '💭 Work on the approach', color: '#ffaa00' }
+                return { msg: '💔 Swipe left energy', color: '#ff6b6b' }
+
+            case 'celeb':
+                if (s >= 90) return { msg: '⭐ RED CARPET READY', color: '#ffd700' }
+                if (s >= 75) return { msg: '📸 Paparazzi worthy', color: '#ffd700' }
+                if (s >= 55) return { msg: '🎭 Almost A-list', color: '#ffaa00' }
+                return { msg: '🎬 Needs a stylist', color: '#ff6b6b' }
+
+            case 'aura':
+                if (s >= 85) return { msg: '🔮 TRANSCENDENT ENERGY', color: '#9b59b6' }
+                if (s >= 70) return { msg: '✨ Strong vibes detected', color: '#9b59b6' }
+                if (s >= 50) return { msg: '💫 Energy fluctuating', color: '#ffaa00' }
+                return { msg: '🌑 Chakras misaligned', color: '#ff6b6b' }
+
+            case 'chaos':
+                if (s >= 80) return { msg: '🎪 GLORIOUS CHAOS', color: '#ff6b6b' }
+                if (s >= 60) return { msg: '🌀 Acceptable madness', color: '#ff6b6b' }
+                if (s >= 40) return { msg: '🤡 Confusion achieved', color: '#ffaa00' }
+                return { msg: '❓ Error 404: Style not found', color: '#ff4444' }
+
+            case 'y2k':
+                if (s >= 85) return { msg: "💎 THAT'S HOT — Paris approved", color: '#ff69b4' }
+                if (s >= 70) return { msg: '🦋 So 2003 coded', color: '#ff69b4' }
+                if (s >= 50) return { msg: '✨ Needs more bling', color: '#ffaa00' }
+                return { msg: '📱 Wrong decade, bestie', color: '#ff6b6b' }
+
+            case 'villain':
+                if (s >= 85) return { msg: '🖤 MAIN VILLAIN ENERGY', color: '#4c1d95' }
+                if (s >= 70) return { msg: '👿 Antagonist in training', color: '#4c1d95' }
+                if (s >= 50) return { msg: '🌑 Side villain at best', color: '#ffaa00' }
+                return { msg: '😇 Too protagonist-coded', color: '#ff6b6b' }
+
+            case 'coquette':
+                if (s >= 85) return { msg: '🎀 PINTEREST PRINCESS', color: '#ffb6c1' }
+                if (s >= 70) return { msg: '🩰 Balletcore approved', color: '#ffb6c1' }
+                if (s >= 50) return { msg: '🌸 Needs more bows', color: '#ffaa00' }
+                return { msg: '🖤 Too edgy for coquette', color: '#ff6b6b' }
+
+            case 'hypebeast':
+                if (s >= 85) return { msg: '👟 CERTIFIED DRIP', color: '#f97316' }
+                if (s >= 70) return { msg: '💸 Valid streetwear', color: '#f97316' }
+                if (s >= 50) return { msg: '🏷️ Outlet mall energy', color: '#ffaa00' }
+                return { msg: "👎 Where's the hype?", color: '#ff6b6b' }
+
+            case 'nice':
+            default:
+                if (s >= 95) return { msg: '👑 ICONIC — Internet-breaking fit', color: '#ffd700' }
+                if (s >= 85) return { msg: '🔥 LEGENDARY — Post this NOW', color: '#ff6b35' }
+                if (s >= 75) return { msg: '✨ Main character energy', color: '#00d4ff' }
+                if (s >= 65) return { msg: '💅 Serve! TikTok approved', color: '#00ff88' }
+                if (s >= 50) return { msg: '👀 Cute! Minor tweaks = viral', color: '#ffaa00' }
+                return { msg: '💪 Good foundation, keep styling!', color: '#ff6b6b' }
         }
-    }, [scores])
+    }, [scores, mode])
 
     if (!scores) return null
 
@@ -626,7 +684,7 @@ export default function ResultsScreen({
             {/* ===== HERO SECTION: GIANT SCORE ===== */}
             <div className={`w-full px-4 pt-4 pb-6 flex flex-col items-center transition-all duration-700 overflow-visible ${revealStage >= 1 ? 'opacity-100' : 'opacity-0'}`}>
 
-                {/* TODAY'S FIT VERDICT Header with Mode-Themed Lines */}
+                {/* MODE-SPECIFIC Header with Mode-Themed Lines */}
                 <div className="flex items-center gap-3 mb-4">
                     <div
                         className="h-px w-12"
@@ -636,7 +694,24 @@ export default function ResultsScreen({
                         className="text-xs font-black uppercase tracking-[0.2em]"
                         style={{ color: modeColors.accent }}
                     >
-                        Today's Fit Verdict
+                        {(() => {
+                            const m = scores?.mode || mode
+                            switch (m) {
+                                case 'roast': return 'The Roast Report'
+                                case 'savage': return 'Destruction Report'
+                                case 'honest': return 'Honest Analysis'
+                                case 'rizz': return 'Rizz Assessment'
+                                case 'celeb': return 'Celebrity Verdict'
+                                case 'aura': return 'Aura Reading'
+                                case 'chaos': return 'Chaos Evaluation'
+                                case 'y2k': return 'Y2K Verdict'
+                                case 'villain': return 'Villain Assessment'
+                                case 'coquette': return 'Coquette Verdict'
+                                case 'hypebeast': return 'Hype Report'
+                                case 'nice':
+                                default: return "Today's Fit Verdict"
+                            }
+                        })()}
                     </span>
                     <div
                         className="h-px w-12"
@@ -860,42 +935,49 @@ export default function ResultsScreen({
                 </p>
                 {/* AI TIER BADGE - Shows for ALL users (eliminates dead space) */}
                 <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                    {isPro ? (
-                        // Pro users: Gold GPT-4o badge
-                        <div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,140,0,0.1) 100%)',
-                                border: '1px solid rgba(255,215,0,0.4)',
-                                boxShadow: '0 0 20px rgba(255,215,0,0.2)'
-                            }}
-                        >
-                            <span className="text-sm">⚡</span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400">
-                                Pro Analysis
-                            </span>
-                            <span className="text-[8px] font-bold text-yellow-400/60 uppercase">
-                                GPT-4o
-                            </span>
-                        </div>
-                    ) : (
-                        // Free users: Cyan Gemini badge (fast & fun!)
-                        <div
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(0,212,255,0.12) 0%, rgba(0,255,136,0.08) 100%)',
-                                border: '1px solid rgba(0,212,255,0.3)',
-                            }}
-                        >
-                            <span className="text-sm">⚡</span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">
-                                Quick Scan
-                            </span>
-                            <span className="text-[8px] font-bold text-cyan-400/60 uppercase">
-                                Gemini Flash
-                            </span>
-                        </div>
-                    )}
+                    {/* Mode-Themed Badge - Shows mode emoji, name, and description */}
+                    {(() => {
+                        const m = scores?.mode || mode
+                        const modeBadges = {
+                            nice: { emoji: '😇', name: 'Nice Mode', desc: 'Supportive AI', color: '#00d4ff', bg: 'rgba(0,212,255,0.12)' },
+                            roast: { emoji: '🔥', name: 'Roast Mode', desc: 'Brutally Honest', color: '#ff6b35', bg: 'rgba(255,107,53,0.12)' },
+                            honest: { emoji: '📊', name: 'Honest Mode', desc: 'Real Talk', color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+                            savage: { emoji: '💀', name: 'Savage Mode', desc: 'No Mercy', color: '#ff1493', bg: 'rgba(255,20,147,0.12)' },
+                            rizz: { emoji: '😏', name: 'Rizz Mode', desc: 'Dating Coach', color: '#ff69b4', bg: 'rgba(255,105,180,0.12)' },
+                            celeb: { emoji: '⭐', name: 'Celeb Mode', desc: 'Star Treatment', color: '#ffd700', bg: 'rgba(255,215,0,0.12)' },
+                            aura: { emoji: '🔮', name: 'Aura Mode', desc: 'Energy Reading', color: '#9b59b6', bg: 'rgba(155,89,182,0.12)' },
+                            chaos: { emoji: '🎪', name: 'Chaos Mode', desc: 'Unhinged AI', color: '#ff6b6b', bg: 'rgba(255,107,107,0.12)' },
+                            y2k: { emoji: '💎', name: 'Y2K Mode', desc: "That's Hot", color: '#ff69b4', bg: 'rgba(255,105,180,0.12)' },
+                            villain: { emoji: '🖤', name: 'Villain Mode', desc: 'Main Character', color: '#4c1d95', bg: 'rgba(76,29,149,0.12)' },
+                            coquette: { emoji: '🎀', name: 'Coquette Mode', desc: 'So Dainty', color: '#ffb6c1', bg: 'rgba(255,182,193,0.12)' },
+                            hypebeast: { emoji: '👟', name: 'Hypebeast Mode', desc: 'Certified Drip', color: '#f97316', bg: 'rgba(249,115,22,0.12)' }
+                        }
+                        const badge = modeBadges[m] || modeBadges.nice
+                        return (
+                            <div
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                                style={{
+                                    background: badge.bg,
+                                    border: `1px solid ${badge.color}40`,
+                                    boxShadow: `0 0 15px ${badge.color}20`
+                                }}
+                            >
+                                <span className="text-base">{badge.emoji}</span>
+                                <span
+                                    className="text-[10px] font-black uppercase tracking-widest"
+                                    style={{ color: badge.color }}
+                                >
+                                    {badge.name}
+                                </span>
+                                <span
+                                    className="text-[8px] font-bold uppercase"
+                                    style={{ color: `${badge.color}99` }}
+                                >
+                                    {badge.desc}
+                                </span>
+                            </div>
+                        )
+                    })()}
                 </div>
 
                 {/* ===== AESTHETIC & CELEB MATCH BADGES ===== */}

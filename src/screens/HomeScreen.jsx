@@ -4,7 +4,7 @@ import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
 
-// Daily Challenge: Rotating mode based on day of year
+// Daily Challenge: Rotating mode based on day of year (12 modes)
 const DAILY_MODES = [
     { id: 'nice', emoji: '😇', label: 'Nice' },
     { id: 'roast', emoji: '🔥', label: 'Roast' },
@@ -13,7 +13,11 @@ const DAILY_MODES = [
     { id: 'rizz', emoji: '😏', label: 'Rizz' },
     { id: 'celeb', emoji: '⭐', label: 'Celebrity' },
     { id: 'aura', emoji: '🔮', label: 'Aura' },
-    { id: 'chaos', emoji: '🎪', label: 'Chaos' }
+    { id: 'chaos', emoji: '🎪', label: 'Chaos' },
+    { id: 'y2k', emoji: '💎', label: 'Y2K' },
+    { id: 'villain', emoji: '🖤', label: 'Villain' },
+    { id: 'coquette', emoji: '🎀', label: 'Coquette' },
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast' }
 ]
 
 const getDailyMode = () => {
@@ -345,9 +349,13 @@ export default function HomeScreen({
             case 'honest': return '📊'
             case 'savage': return '💀'
             case 'rizz': return '😏'
-            case 'celeb': return '🎭'
+            case 'celeb': return '⭐'
             case 'aura': return '🔮'
             case 'chaos': return '🎪'
+            case 'y2k': return '💎'
+            case 'villain': return '🖤'
+            case 'coquette': return '🎀'
+            case 'hypebeast': return '👟'
             default: return '🔥'
         }
     }
@@ -363,6 +371,10 @@ export default function HomeScreen({
             case 'celeb': return 'Celebrity'
             case 'aura': return 'Aura'
             case 'chaos': return 'Chaos'
+            case 'y2k': return 'Y2K'
+            case 'villain': return 'Villain'
+            case 'coquette': return 'Coquette'
+            case 'hypebeast': return 'Hypebeast'
             default: return 'Roast'
         }
     }
@@ -901,6 +913,30 @@ export default function HomeScreen({
                                 buttonGlow = 'rgba(255,107,107,0.4)';
                                 innerGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ef4444 50%, #dc2626 100%)';
                                 break;
+                            case 'y2k':
+                                buttonAccent = '#ff69b4';
+                                buttonAccentEnd = '#da70d6';
+                                buttonGlow = 'rgba(255,105,180,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ff69b4 0%, #da70d6 50%, #ba55d3 100%)';
+                                break;
+                            case 'villain':
+                                buttonAccent = '#2d1b4e';
+                                buttonAccentEnd = '#4c1d95';
+                                buttonGlow = 'rgba(76,29,149,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #4c1d95 100%)';
+                                break;
+                            case 'coquette':
+                                buttonAccent = '#ffb6c1';
+                                buttonAccentEnd = '#ffc0cb';
+                                buttonGlow = 'rgba(255,182,193,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 50%, #ff69b4 100%)';
+                                break;
+                            case 'hypebeast':
+                                buttonAccent = '#f97316';
+                                buttonAccentEnd = '#ea580c';
+                                buttonGlow = 'rgba(249,115,22,0.4)';
+                                innerGradient = 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)';
+                                break;
                             case 'nice':
                             default:
                                 buttonAccent = '#00d4ff';
@@ -971,7 +1007,11 @@ export default function HomeScreen({
                                                                     : mode === 'celeb' ? 'CELEB JUDGE'
                                                                         : mode === 'aura' ? 'AURA READ'
                                                                             : mode === 'chaos' ? 'CHAOS MODE'
-                                                                                : 'RATE MY FIT'}
+                                                                                : mode === 'y2k' ? 'Y2K CHECK'
+                                                                                    : mode === 'villain' ? 'VILLAIN ERA'
+                                                                                        : mode === 'coquette' ? 'COQUETTE'
+                                                                                            : mode === 'hypebeast' ? 'DRIP CHECK'
+                                                                                                : 'RATE MY FIT'}
                                 </span>
 
                                 {/* Subtitle - mode-specific description */}
@@ -987,7 +1027,11 @@ export default function HomeScreen({
                                                                     : mode === 'celeb' ? 'Celebrity judge'
                                                                         : mode === 'aura' ? 'Mystical energy read'
                                                                             : mode === 'chaos' ? 'Unhinged chaos'
-                                                                                : 'AI feedback'}
+                                                                                : mode === 'y2k' ? "That's hot 💎"
+                                                                                    : mode === 'villain' ? 'Main villain energy'
+                                                                                        : mode === 'coquette' ? 'Soft & romantic'
+                                                                                            : mode === 'hypebeast' ? 'Certified drip'
+                                                                                                : 'AI feedback'}
                                 </span>
 
                                 {/* Mode Selector - Compact pill that opens mode drawer */}
@@ -1351,91 +1395,140 @@ export default function HomeScreen({
                             <p className="text-white/40 text-xs">Pick how you want your fit rated</p>
                         </div>
 
-                        {/* Mode Grid - 4 columns, scales well */}
-                        <div className="grid grid-cols-4 gap-2.5">
+                        {/* Mode Grid - 4 columns, 3 rows for 12 modes */}
+                        <div className="grid grid-cols-4 gap-2">
                             {/* Nice */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'nice' ? 'ring-2 ring-cyan-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'nice' ? 'ring-2 ring-cyan-400' : ''}`}
                                 style={{ background: 'rgba(0,212,255,0.15)' }}
                             >
-                                <span className="text-2xl">😇</span>
-                                <span className="text-[10px] font-semibold text-cyan-300">Nice</span>
+                                <span className="text-xl">😇</span>
+                                <span className="text-[9px] font-bold text-cyan-300">Nice</span>
+                                <span className="text-[7px] text-cyan-300/60">Hype friend</span>
                             </button>
 
                             {/* Roast */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'roast' ? 'ring-2 ring-orange-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'roast' ? 'ring-2 ring-orange-400' : ''}`}
                                 style={{ background: 'rgba(255,68,68,0.15)' }}
                             >
-                                <span className="text-2xl">🔥</span>
-                                <span className="text-[10px] font-semibold text-orange-300">Roast</span>
+                                <span className="text-xl">🔥</span>
+                                <span className="text-[9px] font-bold text-orange-300">Roast</span>
+                                <span className="text-[7px] text-orange-300/60">Brutally honest</span>
                             </button>
 
                             {/* Honest */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
                                 style={{ background: 'rgba(59,130,246,0.15)' }}
                             >
-                                <span className="text-2xl">📊</span>
-                                <span className="text-[10px] font-semibold text-blue-300">Honest</span>
+                                <span className="text-xl">📊</span>
+                                <span className="text-[9px] font-bold text-blue-300">Honest</span>
+                                <span className="text-[7px] text-blue-300/60">Real talk</span>
                             </button>
 
                             {/* Savage */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
                                 style={{ background: 'rgba(139,0,255,0.15)' }}
                             >
-                                <span className="text-2xl">💀</span>
-                                <span className="text-[10px] font-semibold text-purple-300">Savage</span>
+                                <span className="text-xl">💀</span>
+                                <span className="text-[9px] font-bold text-purple-300">Savage</span>
+                                <span className="text-[7px] text-purple-300/60">No mercy</span>
                             </button>
 
                             {/* Rizz */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
                                 style={{ background: 'rgba(255,105,180,0.15)' }}
                             >
-                                <span className="text-2xl">😏</span>
-                                <span className="text-[10px] font-semibold text-pink-300">Rizz</span>
+                                <span className="text-xl">😏</span>
+                                <span className="text-[9px] font-bold text-pink-300">Rizz</span>
+                                <span className="text-[7px] text-pink-300/60">Dating vibes</span>
                             </button>
 
                             {/* Celebrity */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
                                 style={{ background: 'rgba(255,215,0,0.15)' }}
                             >
-                                <span className="text-2xl">⭐</span>
-                                <span className="text-[10px] font-semibold text-yellow-300">Celebrity</span>
+                                <span className="text-xl">⭐</span>
+                                <span className="text-[9px] font-bold text-yellow-300">Celebrity</span>
+                                <span className="text-[7px] text-yellow-300/60">Star judge</span>
                             </button>
 
                             {/* Aura */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-violet-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-violet-400' : ''}`}
                                 style={{ background: 'rgba(155,89,182,0.15)' }}
                             >
-                                <span className="text-2xl">🔮</span>
-                                <span className="text-[10px] font-semibold text-violet-300">Aura</span>
+                                <span className="text-xl">🔮</span>
+                                <span className="text-[9px] font-bold text-violet-300">Aura</span>
+                                <span className="text-[7px] text-violet-300/60">Energy read</span>
                             </button>
 
                             {/* Chaos */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
                                 style={{ background: 'rgba(255,107,107,0.15)' }}
                             >
-                                <span className="text-2xl">🎪</span>
-                                <span className="text-[10px] font-semibold text-red-300">Chaos</span>
+                                <span className="text-xl">🎪</span>
+                                <span className="text-[9px] font-bold text-red-300">Chaos</span>
+                                <span className="text-[7px] text-red-300/60">Unhinged AI</span>
+                            </button>
+
+                            {/* Y2K */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('y2k'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'y2k' ? 'ring-2 ring-pink-400' : ''}`}
+                                style={{ background: 'rgba(255,105,180,0.15)' }}
+                            >
+                                <span className="text-xl">💎</span>
+                                <span className="text-[9px] font-bold text-pink-300">Y2K</span>
+                                <span className="text-[7px] text-pink-300/60">That's hot</span>
+                            </button>
+
+                            {/* Villain */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('villain'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'villain' ? 'ring-2 ring-indigo-400' : ''}`}
+                                style={{ background: 'rgba(76,29,149,0.15)' }}
+                            >
+                                <span className="text-xl">🖤</span>
+                                <span className="text-[9px] font-bold text-indigo-300">Villain</span>
+                                <span className="text-[7px] text-indigo-300/60">Main villain</span>
+                            </button>
+
+                            {/* Coquette */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('coquette'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'coquette' ? 'ring-2 ring-pink-300' : ''}`}
+                                style={{ background: 'rgba(255,182,193,0.15)' }}
+                            >
+                                <span className="text-xl">🎀</span>
+                                <span className="text-[9px] font-bold text-pink-200">Coquette</span>
+                                <span className="text-[7px] text-pink-200/60">Soft & dainty</span>
+                            </button>
+
+                            {/* Hypebeast */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('hypebeast'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'hypebeast' ? 'ring-2 ring-orange-400' : ''}`}
+                                style={{ background: 'rgba(249,115,22,0.15)' }}
+                            >
+                                <span className="text-xl">👟</span>
+                                <span className="text-[9px] font-bold text-orange-300">Hypebeast</span>
+                                <span className="text-[7px] text-orange-300/60">Drip check</span>
                             </button>
                         </div>
-
-                        {/* Footer hint */}
-                        <p className="text-center text-white/30 text-[10px] mt-4">More modes coming soon!</p>
 
                         {/* Cancel */}
                         <button
