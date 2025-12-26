@@ -26,7 +26,7 @@ const ShareSuccessScreen = lazy(() => import('./screens/ShareSuccessScreen'))
 const PaywallScreen = lazy(() => import('./screens/PaywallScreen'))
 const RulesScreen = lazy(() => import('./screens/RulesScreen'))
 const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
-const ChallengePartyScreen = lazy(() => import('./screens/ChallengePartyScreen'))
+const BattleScreen = lazy(() => import('./screens/BattleScreen'))
 const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
@@ -854,7 +854,7 @@ export default function App() {
     const fetchChallengeParty = async () => {
       setChallengePartyLoading(true)
       try {
-        const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`, {
+        const res = await fetch(`${API_BASE}/battle/${challengePartyId}`, {
           headers: getApiHeaders()
         })
         if (res.ok) {
@@ -882,7 +882,7 @@ export default function App() {
     if (!challengePartyId) return
     setChallengePartyLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`, {
+      const res = await fetch(`${API_BASE}/battle/${challengePartyId}`, {
         headers: getApiHeaders()
       })
       if (res.ok) {
@@ -1647,7 +1647,7 @@ export default function App() {
       const respondingChallengeId = localStorage.getItem('fitrate_responding_challenge')
       if (respondingChallengeId) {
         try {
-          const res = await fetch(`${API_BASE}/challenges/${respondingChallengeId}/respond`, {
+          const res = await fetch(`${API_BASE}/battle/${respondingChallengeId}/respond`, {
             method: 'POST',
             headers: getApiHeaders(),
             body: JSON.stringify({
@@ -1667,7 +1667,7 @@ export default function App() {
           // Fetch the updated challenge data
           setChallengePartyLoading(true)
           try {
-            const partyRes = await fetch(`${API_BASE}/challenges/${respondingChallengeId}`, {
+            const partyRes = await fetch(`${API_BASE}/battle/${respondingChallengeId}`, {
               headers: getApiHeaders()
             })
             if (partyRes.ok) {
@@ -1777,7 +1777,7 @@ export default function App() {
       let challengeUrl = null
       if (isChallenge && scores?.overall) {
         try {
-          const res = await fetch(`${API_BASE}/challenges`, {
+          const res = await fetch(`${API_BASE}/battle`, {
             method: 'POST',
             headers: getApiHeaders(),
             body: JSON.stringify({
@@ -2185,29 +2185,29 @@ export default function App() {
   }
 
   // ============================================
-  // CHALLENGE PARTY SCREEN - New 1v1 System (/c/:id)
+  // BATTLE SCREEN - 1v1 Outfit Battles (/c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // ============================================
   if (challengePartyId && (challengePartyData || challengePartyLoading)) {
     return (
-      <ChallengePartyScreen
-        challengeId={challengePartyId}
-        challengeData={challengePartyData}
+      <BattleScreen
+        battleId={challengePartyId}
+        battleData={challengePartyData}
         isCreator={isCreatorOfChallenge}
         loading={challengePartyLoading}
         onRefresh={refreshChallengeParty}
         onAcceptChallenge={() => {
-          // Navigate to home to scan - store that we're responding to this challenge
+          // Navigate to home to scan - store that we're responding to this battle
           localStorage.setItem('fitrate_responding_challenge', challengePartyId)
           setChallengePartyId(null)
           setChallengePartyData(null)
           window.history.pushState({}, '', '/')
           setScreen('home')
           // Show toast explaining what to do
-          displayToast('📸 Take a photo to complete the challenge!')
+          displayToast('📸 Take a photo to complete the battle!')
         }}
         onShare={() => {
-          // Re-share the challenge link
+          // Re-share the battle link
           const shareUrl = `https://fitrate.app/c/${challengePartyId}`
           const shareText = challengePartyData?.creatorScore
             ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`

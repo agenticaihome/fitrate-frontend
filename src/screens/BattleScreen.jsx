@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 
 /**
- * ChallengePartyScreen - The shared "room" for a 1v1 challenge
+ * BattleScreen - The shared "room" for a 1v1 outfit battle
  *
  * Both challenger and responder can visit this page to see:
  * - Waiting state (if no response yet)
@@ -26,11 +26,11 @@ function ConfettiPiece({ delay, color, left }) {
     )
 }
 
-export default function ChallengePartyScreen({
-    challengeId,
-    challengeData, // { creatorScore, responderScore?, status: 'waiting'|'completed', createdAt }
-    isCreator,     // Did the current user create this challenge?
-    onRefresh,     // Refresh challenge data
+export default function BattleScreen({
+    battleId,
+    battleData, // { creatorScore, responderScore?, status: 'waiting'|'completed', createdAt }
+    isCreator,     // Did the current user create this battle?
+    onRefresh,     // Refresh battle data
     onAcceptChallenge, // Responder wants to scan their outfit
     onShare,       // Re-share the challenge link
     onHome,        // Go back home
@@ -39,9 +39,9 @@ export default function ChallengePartyScreen({
     const [showConfetti, setShowConfetti] = useState(false)
     const [revealed, setRevealed] = useState(false)
 
-    const isCompleted = challengeData?.status === 'completed'
-    const creatorScore = challengeData?.creatorScore || 0
-    const responderScore = challengeData?.responderScore || 0
+    const isCompleted = battleData?.status === 'completed'
+    const creatorScore = battleData?.creatorScore || 0
+    const responderScore = battleData?.responderScore || 0
 
     // Determine winner
     const creatorWon = creatorScore > responderScore
@@ -137,7 +137,7 @@ export default function ChallengePartyScreen({
                         {Math.round(creatorScore)}
                     </p>
                     <p className="text-xs text-white/30 mt-2">
-                        {formatTimeAgo(challengeData?.createdAt)}
+                        {formatTimeAgo(battleData?.createdAt)}
                     </p>
                 </div>
 
@@ -290,7 +290,7 @@ export default function ChallengePartyScreen({
                 opacity: revealed ? 1 : 0,
                 transition: 'opacity 0.5s ease-out 0.3s'
             }}>
-                Challenge #{challengeId?.slice(-6)}
+                Battle #{battleId?.slice(-6)}
             </p>
 
             {/* Score Comparison */}
