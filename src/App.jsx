@@ -19,6 +19,9 @@ import {
   trackScanError
 } from './utils/analytics'
 
+// Note: Custom hooks created in src/hooks/ but not yet integrated
+// Future refactor will use: useAuth, useScanLimits, useBattle
+
 // ============================================
 // LAZY-LOADED SCREENS (Code Splitting)
 // Critical screens loaded immediately, others on-demand
