@@ -8,20 +8,22 @@
  */
 
 export async function onRequest(context) {
-    const { request, next, params } = context;
+    const { request, env, params } = context;
     const challengeId = params.challengeId;
 
     try {
-        // Get the original response (the SPA HTML)
-        const response = await next();
+        // Get the origin URL to fetch the SPA's index.html
+        const url = new URL(request.url);
+        const indexUrl = `${url.origin}/index.html`;
 
-        // Only modify HTML responses
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('text/html')) {
-            return response;
+        // Fetch the SPA's index.html directly
+        const response = await fetch(indexUrl);
+
+        if (!response.ok) {
+            // Fallback: redirect to home
+            return Response.redirect(`${url.origin}/`, 302);
         }
 
-        // Clone the response since we need to read it
         const html = await response.text();
 
         // Challenge OG meta tags
@@ -57,14 +59,16 @@ export async function onRequest(context) {
 
         // Return modified response
         return new Response(modifiedHtml, {
-            status: response.status,
-            statusText: response.statusText,
+            status: 200,
             headers: {
-                'content-type': 'text/html; charset=utf-8'
+                'content-type': 'text/html; charset=utf-8',
+                'cache-control': 'no-cache'
             }
         });
     } catch (error) {
         console.error('[Challenge OG] Error:', error);
-        return await next();
+        // Fallback: redirect to home
+        const url = new URL(request.url);
+        return Response.redirect(`${url.origin}/`, 302);
     }
 }
