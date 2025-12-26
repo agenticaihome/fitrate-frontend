@@ -42,20 +42,47 @@ export const RESETS = {
 };
 
 // Stripe Checkout Links
-// NOTE: You'll need to create these products in Stripe!
+// You have 4 existing links - just edit them in Stripe Dashboard to match these:
 export const STRIPE_LINKS = {
-    // Legacy
-    proWeekly: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',
+    // ============================================
+    // 5-TIER SCAN PACKS (Edit existing 4, create 2)
+    // ============================================
 
-    // 5-Tier Scan Packs (create these in Stripe)
-    tinyPack: 'STRIPE_LINK_PLACEHOLDER_3_SCANS',       // 3 scans - $0.99
-    starterPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04', // 10 scans - $2.99
-    popularPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05', // 25 scans - $4.99
-    valuePack: 'STRIPE_LINK_PLACEHOLDER_50_SCANS',     // 50 scans - $7.99
-    proPack: 'STRIPE_LINK_PLACEHOLDER_100_SCANS',      // 100 scans - $12.99
+    // Tier 1: 3 scans @ $0.99 (EDIT your old starterPack product)
+    tinyPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04',
 
-    // First-Time Offer (create this in Stripe)
-    firstTimeOffer: 'STRIPE_LINK_PLACEHOLDER_FIRST_TIME', // 10 scans - $0.99
+    // Tier 2: 10 scans @ $2.99 (EDIT your old popularPack product)  
+    starterPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05',
+
+    // Tier 3: 25 scans @ $4.99 ⭐ MOST POPULAR (EDIT your old powerPack product)
+    popularPack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06',
+
+    // Tier 4: 50 scans @ $7.99 (EDIT your old proWeekly OR create new)
+    valuePack: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',
+
+    // Tier 5: 100 scans @ $12.99 (CREATE NEW in Stripe)
+    proPack: 'NEED_TO_CREATE_100_SCAN_LINK',
+
+    // First-Time Offer: 10 scans @ $0.99 (CREATE NEW in Stripe)
+    firstTimeOffer: 'NEED_TO_CREATE_FIRST_TIME_LINK',
+
+    // ============================================
+    // SUBSCRIPTIONS - 25 scans/day (CREATE NEW)
+    // ============================================
+
+    // Monthly: $4.99/mo - 25 scans/day
+    proMonthly: 'NEED_TO_CREATE_MONTHLY_SUB',
+
+    // Yearly: $29.99/yr - 25 scans/day (50% off = "2 months free")
+    proYearly: 'NEED_TO_CREATE_YEARLY_SUB',
+};
+
+// Subscription Pricing
+export const SUBSCRIPTIONS = {
+    MONTHLY_PRICE: 4.99,
+    YEARLY_PRICE: 29.99,
+    YEARLY_SAVINGS: 30,      // $60 - $30 = $30 saved
+    SCANS_PER_DAY: 25,
 };
 
 // Internal Routes & Modal Keys
