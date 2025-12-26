@@ -1,8 +1,28 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
+
+// Daily Challenge: Rotating mode based on day of year
+const DAILY_MODES = [
+    { id: 'nice', emoji: '😇', label: 'Nice' },
+    { id: 'roast', emoji: '🔥', label: 'Roast' },
+    { id: 'honest', emoji: '📊', label: 'Honest' },
+    { id: 'savage', emoji: '💀', label: 'Savage' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity' },
+    { id: 'aura', emoji: '🔮', label: 'Aura' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos' }
+]
+
+const getDailyMode = () => {
+    const now = new Date()
+    const start = new Date(now.getFullYear(), 0, 0)
+    const diff = now - start
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
+    return DAILY_MODES[dayOfYear % DAILY_MODES.length]
+}
 
 export default function HomeScreen({
     mode,
@@ -314,6 +334,36 @@ export default function HomeScreen({
             case 'aura': return 'rgba(155,89,182,0.4)'
             case 'chaos': return 'rgba(255,107,107,0.4)'
             default: return 'rgba(0,212,255,0.4)'
+        }
+    }
+
+    // Get emoji for current mode
+    const getModeEmoji = () => {
+        switch (mode) {
+            case 'nice': return '😇'
+            case 'roast': return '🔥'
+            case 'honest': return '📊'
+            case 'savage': return '💀'
+            case 'rizz': return '😏'
+            case 'celeb': return '🎭'
+            case 'aura': return '🔮'
+            case 'chaos': return '🎪'
+            default: return '🔥'
+        }
+    }
+
+    // Get display name for current mode
+    const getModeDisplayName = () => {
+        switch (mode) {
+            case 'nice': return 'Nice'
+            case 'roast': return 'Roast'
+            case 'honest': return 'Honest'
+            case 'savage': return 'Savage'
+            case 'rizz': return 'Rizz'
+            case 'celeb': return 'Celebrity'
+            case 'aura': return 'Aura'
+            case 'chaos': return 'Chaos'
+            default: return 'Roast'
         }
     }
 
@@ -869,7 +919,7 @@ export default function HomeScreen({
 
                                 {/* Emoji */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {entryBlocked ? '🔒' : dailyChallengeMode ? '⚡' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
+                                    {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
                                 {/* Main Text - size based on length for long theme names */}
@@ -880,29 +930,29 @@ export default function HomeScreen({
 
                                 {/* Subtitle - changes based on mode */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {dailyChallengeMode ? 'Highest score wins 5 Pro scans!'
+                                    {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
                                         : entryBlocked ? 'Go Pro for daily entries!'
                                             : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
                                                 : isRoast ? 'Brutally honest AI'
                                                     : 'Supportive AI feedback'}
                                 </span>
 
-                                {/* Mode Toggle - HIDE when in challenge mode */}
+                                {/* Mode Selector - Compact pill that opens mode drawer */}
                                 {!dailyChallengeMode && !isCompeting && (
                                     <div
-                                        className={`relative mt-4 rounded-full flex items-center cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
+                                        className={`relative mt-4 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
                                         style={{
                                             background: 'rgba(0,0,0,0.5)',
                                             backdropFilter: 'blur(10px)',
-                                            border: '2px solid rgba(255,255,255,0.25)',
-                                            padding: '4px'
+                                            border: `2px solid ${getModeColor()}40`,
+                                            padding: '8px 16px',
+                                            boxShadow: `0 0 20px ${getModeGlow()}`
                                         }}
                                         onClick={(e) => {
                                             e.stopPropagation()
                                             playSound('click')
                                             vibrate(15)
-                                            setMode(mode === 'roast' ? 'nice' : 'roast')
-                                            setEventMode(false)
+                                            setShowModeDrawer(true)
                                             // Clear nudge on interaction
                                             if (showNudge) {
                                                 localStorage.setItem('fitrate_seen_mode_nudge', 'true')
@@ -910,31 +960,20 @@ export default function HomeScreen({
                                             }
                                         }}
                                     >
-                                        {/* Nice option */}
-                                        <div
-                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'nice'
-                                                ? 'bg-cyan-500/30 border border-cyan-400/50'
-                                                : 'opacity-50'
-                                                }`}
-                                        >
-                                            <span className="text-base">😇</span>
-                                            <span className={`font-bold text-sm ${mode === 'nice' ? 'text-cyan-300' : 'text-white/40'}`}>Nice</span>
-                                        </div>
+                                        {/* Current mode indicator */}
+                                        <span className="text-xl">{getModeEmoji()}</span>
+                                        <span className="font-bold text-sm text-white">{getModeDisplayName()}</span>
 
-                                        {/* Roast option */}
-                                        <div
-                                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 ${mode === 'roast'
-                                                ? 'bg-orange-500/30 border border-orange-400/50'
-                                                : 'opacity-50'
-                                                }`}
-                                        >
-                                            <span className="text-base">🔥</span>
-                                            <span className={`font-bold text-sm ${mode === 'roast' ? 'text-orange-300' : 'text-white/40'}`}>Roast</span>
-                                        </div>
+                                        {/* Separator + Mode count hint */}
+                                        <span className="text-white/30">•</span>
+                                        <span className="text-[11px] text-white/50">8 modes</span>
+
+                                        {/* Chevron indicator */}
+                                        <span className="text-white/40 text-xs ml-1">▼</span>
 
                                         {/* Hint text for first-time users */}
                                         <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white/40 whitespace-nowrap">
-                                            tap to switch
+                                            tap to change
                                         </span>
                                     </div>
                                 )}
@@ -1131,28 +1170,6 @@ export default function HomeScreen({
                 )}
             </div>
 
-            {/* All AI Modes - Unlocked for everyone! */}
-            <button
-                onClick={() => {
-                    playSound('click'); vibrate(15);
-                    setShowModeDrawer(true);
-                }}
-                className="w-full max-w-sm p-4 rounded-2xl transition-all active:scale-[0.99] mb-4"
-                style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px dashed rgba(255,255,255,0.15)'
-                }}
-            >
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-lg">⚡</span>
-                    <span className="text-white/80 font-semibold">All AI Modes</span>
-                    <span className="text-white/40">(8)</span>
-                </div>
-                <p className="text-white/40 text-xs text-center">
-                    Nice • Roast • Honest • Savage • Rizz • Celebrity • Aura • Chaos
-                </p>
-            </button>
-
             {/* Pro CTA Button - Yellow, rounded, premium with pulsing glow */}
             {!isPro && (
                 <button
@@ -1255,94 +1272,129 @@ export default function HomeScreen({
             )
             }
 
-            {/* Pro Mode Drawer */}
-            {
-                showModeDrawer && (
+            {/* Mode Drawer - All 8 AI Modes */}
+            {showModeDrawer && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-end justify-center"
+                    style={{ background: 'rgba(0,0,0,0.85)' }}
+                    onClick={() => setShowModeDrawer(false)}
+                >
                     <div
-                        className="fixed inset-0 z-[60] flex items-end justify-center"
-                        style={{ background: 'rgba(0,0,0,0.8)' }}
-                        onClick={() => setShowModeDrawer(false)}
+                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl"
+                        style={{
+                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
+                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                        }}
+                        onClick={e => e.stopPropagation()}
                     >
-                        <div
-                            className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
-                            style={{
-                                background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
-                                boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
-                            }}
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4" />
-                            <h3 className="text-white text-lg font-bold text-center mb-4">
-                                Choose Your Mode
+                        {/* Drag handle */}
+                        <div className="w-10 h-1 bg-white/30 rounded-full mx-auto mb-4" />
+
+                        {/* Header */}
+                        <div className="text-center mb-5">
+                            <h3 className="text-white text-lg font-bold mb-1">
+                                Choose AI Mode
                             </h3>
-                            <div className="grid grid-cols-3 gap-3">
-                                {/* Honest */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
-                                    style={{ background: 'rgba(74,144,217,0.2)' }}
-                                >
-                                    <span className="text-2xl">📊</span>
-                                    <span className="text-xs font-medium text-white/80">Honest</span>
-                                </button>
-                                {/* Savage */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
-                                    style={{ background: 'rgba(139,0,255,0.2)' }}
-                                >
-                                    <span className="text-2xl">💀</span>
-                                    <span className="text-xs font-medium text-white/80">Savage</span>
-                                </button>
-                                {/* Rizz */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
-                                    style={{ background: 'rgba(255,105,180,0.2)' }}
-                                >
-                                    <span className="text-2xl">😏</span>
-                                    <span className="text-xs font-medium text-white/80">Rizz</span>
-                                </button>
-                                {/* Celeb */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
-                                    style={{ background: 'rgba(255,215,0,0.2)' }}
-                                >
-                                    <span className="text-2xl">🎭</span>
-                                    <span className="text-xs font-medium text-white/80">Celeb</span>
-                                </button>
-                                {/* Aura */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-purple-400' : ''}`}
-                                    style={{ background: 'rgba(155,89,182,0.2)' }}
-                                >
-                                    <span className="text-2xl">🔮</span>
-                                    <span className="text-xs font-medium text-white/80">Aura</span>
-                                </button>
-                                {/* Chaos */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-4 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
-                                    style={{ background: 'rgba(255,107,107,0.2)' }}
-                                >
-                                    <span className="text-2xl">🎪</span>
-                                    <span className="text-xs font-medium text-white/80">Chaos</span>
-                                </button>
-                            </div>
-                            <p className="text-center text-white/40 text-xs mt-4">Nice & Roast always available above</p>
+                            <p className="text-white/40 text-xs">Pick how you want your fit rated</p>
+                        </div>
+
+                        {/* Mode Grid - 4 columns, scales well */}
+                        <div className="grid grid-cols-4 gap-2.5">
+                            {/* Nice */}
                             <button
-                                onClick={() => setShowModeDrawer(false)}
-                                aria-label="Close mode selector"
-                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                                onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'nice' ? 'ring-2 ring-cyan-400' : ''}`}
+                                style={{ background: 'rgba(0,212,255,0.15)' }}
                             >
-                                Cancel
+                                <span className="text-2xl">😇</span>
+                                <span className="text-[10px] font-semibold text-cyan-300">Nice</span>
+                            </button>
+
+                            {/* Roast */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'roast' ? 'ring-2 ring-orange-400' : ''}`}
+                                style={{ background: 'rgba(255,68,68,0.15)' }}
+                            >
+                                <span className="text-2xl">🔥</span>
+                                <span className="text-[10px] font-semibold text-orange-300">Roast</span>
+                            </button>
+
+                            {/* Honest */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
+                                style={{ background: 'rgba(59,130,246,0.15)' }}
+                            >
+                                <span className="text-2xl">📊</span>
+                                <span className="text-[10px] font-semibold text-blue-300">Honest</span>
+                            </button>
+
+                            {/* Savage */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
+                                style={{ background: 'rgba(139,0,255,0.15)' }}
+                            >
+                                <span className="text-2xl">💀</span>
+                                <span className="text-[10px] font-semibold text-purple-300">Savage</span>
+                            </button>
+
+                            {/* Rizz */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
+                                style={{ background: 'rgba(255,105,180,0.15)' }}
+                            >
+                                <span className="text-2xl">😏</span>
+                                <span className="text-[10px] font-semibold text-pink-300">Rizz</span>
+                            </button>
+
+                            {/* Celebrity */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
+                                style={{ background: 'rgba(255,215,0,0.15)' }}
+                            >
+                                <span className="text-2xl">⭐</span>
+                                <span className="text-[10px] font-semibold text-yellow-300">Celebrity</span>
+                            </button>
+
+                            {/* Aura */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-violet-400' : ''}`}
+                                style={{ background: 'rgba(155,89,182,0.15)' }}
+                            >
+                                <span className="text-2xl">🔮</span>
+                                <span className="text-[10px] font-semibold text-violet-300">Aura</span>
+                            </button>
+
+                            {/* Chaos */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
+                                className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
+                                style={{ background: 'rgba(255,107,107,0.15)' }}
+                            >
+                                <span className="text-2xl">🎪</span>
+                                <span className="text-[10px] font-semibold text-red-300">Chaos</span>
                             </button>
                         </div>
+
+                        {/* Footer hint */}
+                        <p className="text-center text-white/30 text-[10px] mt-4">More modes coming soon!</p>
+
+                        {/* Cancel */}
+                        <button
+                            onClick={() => setShowModeDrawer(false)}
+                            aria-label="Close mode selector"
+                            className="w-full py-2.5 text-white/40 text-sm font-medium mt-3 transition-all active:text-white/60"
+                        >
+                            Cancel
+                        </button>
                     </div>
-                )
-            }
+                </div>
+            )}
         </div >
     )
 }

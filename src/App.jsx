@@ -88,6 +88,18 @@ const getWeekStart = (date) => {
   return d.toISOString().split('T')[0]
 }
 
+// Daily Challenge: Rotating mode based on day of year
+// All 8 AI modes cycle through daily
+const DAILY_CHALLENGE_MODES = ['nice', 'roast', 'honest', 'savage', 'rizz', 'celeb', 'aura', 'chaos']
+
+const getDailyMode = () => {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 0)
+  const diff = now - start
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
+  return DAILY_CHALLENGE_MODES[dayOfYear % DAILY_CHALLENGE_MODES.length]
+}
+
 // Helper: Random share tips for virality (universal appeal)
 const SHARE_TIPS = [
   "Challenge a friend to beat this 👀",
@@ -1318,13 +1330,18 @@ export default function App() {
       return
     }
 
-    // FASHION SHOW MODE ENFORCEMENT: Use show's vibe instead of user's selected mode
-    const effectiveMode = fashionShowId && fashionShowData?.vibe
-      ? fashionShowData.vibe  // Use the show's vibe setting
-      : mode                   // Use user's selected mode
+    // MODE ENFORCEMENT: Use show's vibe for Fashion Shows, daily rotating mode for Daily Challenge
+    let effectiveMode = mode  // Default to user's selected mode
 
-    if (fashionShowId && fashionShowData?.vibe && fashionShowData.vibe !== mode) {
-      console.log(`[FashionShow] Mode overridden: ${mode} → ${fashionShowData.vibe} (show vibe)`)
+    // Fashion Show: Use show's vibe
+    if (fashionShowId && fashionShowData?.vibe) {
+      effectiveMode = fashionShowData.vibe
+      console.log(`[FashionShow] Mode overridden: ${mode} → ${effectiveMode} (show vibe)`)
+    }
+    // Daily Challenge: Use today's rotating mode
+    else if (dailyChallengeMode) {
+      effectiveMode = getDailyMode()
+      console.log(`[DailyChallenge] Mode overridden: ${mode} → ${effectiveMode} (today's rotating mode)`)
     }
 
     // Free users: call backend (routes to Gemini for real AI analysis)

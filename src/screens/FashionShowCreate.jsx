@@ -1,9 +1,9 @@
 /**
  * FashionShowCreate Screen
- * 
+ *
  * Host creates a new Fashion Show with:
  * - Show name
- * - Vibe (Nice, Roast, Savage, Chaos)
+ * - Vibe/AI Mode (8 options)
  * - Duration (24h or 7 days)
  * - Family Safe toggle
  */
@@ -11,12 +11,29 @@
 import React, { useState } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 
+// All 8 AI modes for Fashion Show - everyone competes in same mode
 const VIBES = [
-    { id: 'nice', label: 'Nice 😇', desc: 'Supportive & encouraging', proOnly: false },
-    { id: 'roast', label: 'Roast 🔥', desc: 'Playful teasing', proOnly: false },
-    { id: 'savage', label: 'Savage 😈', desc: 'No mercy (Pro)', proOnly: true },
-    { id: 'chaos', label: 'Chaos 🌀', desc: 'Unhinged fun (Pro)', proOnly: true }
+    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive & encouraging', color: 'cyan', proOnly: false },
+    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: 'orange', proOnly: false },
+    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'Balanced analysis', color: 'blue', proOnly: false },
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: 'purple', proOnly: false },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Dating vibes', color: 'pink', proOnly: false },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star treatment', color: 'yellow', proOnly: false },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Mystical energy', color: 'violet', proOnly: false },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged chaos', color: 'red', proOnly: false }
 ]
+
+// Color mappings for each mode
+const VIBE_COLORS = {
+    nice: { bg: 'rgba(0,212,255,0.15)', ring: 'ring-cyan-400', text: 'text-cyan-300' },
+    roast: { bg: 'rgba(255,68,68,0.15)', ring: 'ring-orange-400', text: 'text-orange-300' },
+    honest: { bg: 'rgba(59,130,246,0.15)', ring: 'ring-blue-400', text: 'text-blue-300' },
+    savage: { bg: 'rgba(139,0,255,0.15)', ring: 'ring-purple-400', text: 'text-purple-300' },
+    rizz: { bg: 'rgba(255,105,180,0.15)', ring: 'ring-pink-400', text: 'text-pink-300' },
+    celeb: { bg: 'rgba(255,215,0,0.15)', ring: 'ring-yellow-400', text: 'text-yellow-300' },
+    aura: { bg: 'rgba(155,89,182,0.15)', ring: 'ring-violet-400', text: 'text-violet-300' },
+    chaos: { bg: 'rgba(255,107,107,0.15)', ring: 'ring-red-400', text: 'text-red-300' }
+}
 
 const DURATIONS = [
     { hours: 24, label: '24 Hours' },
@@ -141,15 +158,17 @@ export default function FashionShowCreate({
                     </p>
                 </div>
 
-                {/* Vibe Selector */}
+                {/* Vibe/AI Mode Selector */}
                 <div className="mb-6">
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
-                        Vibe
+                        AI Mode
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <p className="text-xs text-white/40 mb-3">Everyone in the show gets rated in this mode</p>
+                    <div className="grid grid-cols-4 gap-2">
                         {VIBES.map((v) => {
                             const isLocked = v.proOnly && !isPro
                             const isSelected = vibe === v.id
+                            const colors = VIBE_COLORS[v.id]
                             return (
                                 <button
                                     key={v.id}
@@ -161,19 +180,15 @@ export default function FashionShowCreate({
                                         }
                                     }}
                                     disabled={isLocked}
-                                    className={`p-4 rounded-2xl border-2 transition-all text-left relative ${isSelected
-                                        ? 'border-purple-500 bg-purple-500/20'
-                                        : isLocked
-                                            ? 'border-white/10 bg-white/5 opacity-50'
-                                            : 'border-white/20 bg-white/5 hover:border-white/30'
-                                        }`}
+                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all active:scale-95 ${
+                                        isSelected ? `ring-2 ${colors.ring}` : ''
+                                    } ${isLocked ? 'opacity-40' : ''}`}
+                                    style={{ background: colors.bg }}
                                 >
-                                    <div className="text-xl mb-1">{v.label}</div>
-                                    <div className="text-xs text-white/50">{v.desc}</div>
+                                    <span className="text-2xl">{v.emoji}</span>
+                                    <span className={`text-[10px] font-semibold ${colors.text}`}>{v.label}</span>
                                     {isLocked && (
-                                        <div className="absolute top-2 right-2 text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
-                                            PRO
-                                        </div>
+                                        <span className="absolute top-1 right-1 text-[8px] bg-yellow-500/30 text-yellow-400 px-1 rounded">PRO</span>
                                     )}
                                 </button>
                             )
