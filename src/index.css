@@ -930,6 +930,36 @@ button,
   animation: float 4s ease-in-out infinite;
 }
 
+/* Pulse animation for glows */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* Sparkle float for victory particles */
+@keyframes sparkleFloat {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-15px) scale(1.2);
+    opacity: 1;
+  }
+}
+
 /* Badge Pop Animation */
 @keyframes badgePop {
   0% {
