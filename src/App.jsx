@@ -1974,7 +1974,7 @@ export default function App() {
   // EVENT RULES SCREEN
   // ============================================
   if (showEventRules) {
-    return <RulesScreen currentEvent={currentEvent} onClose={() => setShowEventRules(false)} />
+    return <Suspense fallback={<LoadingFallback />}><RulesScreen currentEvent={currentEvent} onClose={() => setShowEventRules(false)} /></Suspense>
   }
 
   // ============================================
@@ -2084,26 +2084,28 @@ export default function App() {
   // ============================================
   if (showEventExplainer && currentEvent) {
     return (
-      <EventExplainerModal
-        event={currentEvent}
-        isPro={isPro}
-        freeEventEntryUsed={freeEventEntryUsed}
-        onJoin={() => {
-          localStorage.setItem('fitrate_seen_event_explainer', 'true')
-          setHasSeenEventExplainer(true)
-          setShowEventExplainer(false)
-          setEventMode(true)
-        }}
-        onClose={() => {
-          localStorage.setItem('fitrate_seen_event_explainer', 'true')
-          setHasSeenEventExplainer(true)
-          setShowEventExplainer(false)
-        }}
-        onUpgrade={() => {
-          setShowEventExplainer(false)
-          setShowPaywall(true)
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <EventExplainerModal
+          event={currentEvent}
+          isPro={isPro}
+          freeEventEntryUsed={freeEventEntryUsed}
+          onJoin={() => {
+            localStorage.setItem('fitrate_seen_event_explainer', 'true')
+            setHasSeenEventExplainer(true)
+            setShowEventExplainer(false)
+            setEventMode(true)
+          }}
+          onClose={() => {
+            localStorage.setItem('fitrate_seen_event_explainer', 'true')
+            setHasSeenEventExplainer(true)
+            setShowEventExplainer(false)
+          }}
+          onUpgrade={() => {
+            setShowEventExplainer(false)
+            setShowPaywall(true)
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2112,37 +2114,41 @@ export default function App() {
   // ============================================
   if (fashionShowScreen === 'create') {
     return (
-      <FashionShowCreate
-        isPro={isPro}
-        userId={userId}
-        onShowCreated={(showData) => {
-          setFashionShowData(showData)
-          setFashionShowId(showData.showId)
-          addToActiveShows(showData.showId, showData.name, showData.vibe, showData.vibeLabel) // Track in My Shows with vibe
-          setFashionShowScreen('invite')
-        }}
-        onBack={() => {
-          setFashionShowScreen(null)
-          window.history.pushState({}, '', '/')
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <FashionShowCreate
+          isPro={isPro}
+          userId={userId}
+          onShowCreated={(showData) => {
+            setFashionShowData(showData)
+            setFashionShowId(showData.showId)
+            addToActiveShows(showData.showId, showData.name, showData.vibe, showData.vibeLabel) // Track in My Shows with vibe
+            setFashionShowScreen('invite')
+          }}
+          onBack={() => {
+            setFashionShowScreen(null)
+            window.history.pushState({}, '', '/')
+          }}
+        />
+      </Suspense>
     )
   }
 
   if (fashionShowScreen === 'invite') {
     return (
-      <FashionShowInvite
-        showData={fashionShowData}
-        onGoToRunway={() => {
-          setFashionShowNickname('Host')
-          setFashionShowScreen('runway')
-          window.history.pushState({}, '', `/f/${fashionShowId}`)
-        }}
-        onBack={() => {
-          setFashionShowScreen(null)
-          window.history.pushState({}, '', '/')
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <FashionShowInvite
+          showData={fashionShowData}
+          onGoToRunway={() => {
+            setFashionShowNickname('Host')
+            setFashionShowScreen('runway')
+            window.history.pushState({}, '', `/f/${fashionShowId}`)
+          }}
+          onBack={() => {
+            setFashionShowScreen(null)
+            window.history.pushState({}, '', '/')
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2153,47 +2159,49 @@ export default function App() {
   if ((fashionShowScreen === 'join' || fashionShowScreen === 'runway') &&
     screen !== 'analyzing' && screen !== 'results' && screen !== 'error') {
     return (
-      <FashionShowHub
-        showId={fashionShowId}
-        showData={fashionShowData}
-        userId={userId}
-        isPro={isPro}
-        walksUsed={fashionShowWalks}
-        walksAllowed={isPro ? 3 : 1}
-        onImageSelected={(file, scanType) => {
-          // Record nickname before analyzing
-          const nickname = localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest'
-          const emoji = localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎'
-          setFashionShowNickname(nickname)
-          setFashionShowEmoji(emoji)
-          addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show', fashionShowData?.vibe, fashionShowData?.vibeLabel)
+      <Suspense fallback={<LoadingFallback />}>
+        <FashionShowHub
+          showId={fashionShowId}
+          showData={fashionShowData}
+          userId={userId}
+          isPro={isPro}
+          walksUsed={fashionShowWalks}
+          walksAllowed={isPro ? 3 : 1}
+          onImageSelected={(file, scanType) => {
+            // Record nickname before analyzing
+            const nickname = localStorage.getItem(`fashionshow_${fashionShowId}_nickname`) || 'Guest'
+            const emoji = localStorage.getItem(`fashionshow_${fashionShowId}_emoji`) || '😎'
+            setFashionShowNickname(nickname)
+            setFashionShowEmoji(emoji)
+            addToActiveShows(fashionShowId, fashionShowData?.name || 'Fashion Show', fashionShowData?.vibe, fashionShowData?.vibeLabel)
 
-          // Start analysis
-          setUploadedImage(file)
-          setScreen('analyzing')
-          analyzeOutfit(file, scanType)
-        }}
-        onShare={() => {
-          const url = `https://fitrate.app/f/${fashionShowId}`
-          if (navigator.share) {
-            navigator.share({
-              title: `Join ${fashionShowData?.name}`,
-              text: `🎭 Join my Fashion Show on FitRate!`,
-              url
-            })
-          } else {
-            navigator.clipboard.writeText(url)
-          }
-        }}
-        onBack={() => {
-          // Clean exit: reset all Fashion Show state and go home
-          setFashionShowScreen(null)
-          setFashionShowId(null)
-          setFashionShowData(null)
-          setScreen('home')  // Explicit navigation to prevent render glitch
-          window.history.pushState({}, '', '/')
-        }}
-      />
+            // Start analysis
+            setUploadedImage(file)
+            setScreen('analyzing')
+            analyzeOutfit(file, scanType)
+          }}
+          onShare={() => {
+            const url = `https://fitrate.app/f/${fashionShowId}`
+            if (navigator.share) {
+              navigator.share({
+                title: `Join ${fashionShowData?.name}`,
+                text: `🎭 Join my Fashion Show on FitRate!`,
+                url
+              })
+            } else {
+              navigator.clipboard.writeText(url)
+            }
+          }}
+          onBack={() => {
+            // Clean exit: reset all Fashion Show state and go home
+            setFashionShowScreen(null)
+            setFashionShowId(null)
+            setFashionShowData(null)
+            setScreen('home')  // Explicit navigation to prevent render glitch
+            window.history.pushState({}, '', '/')
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2202,35 +2210,37 @@ export default function App() {
   // ============================================
   if (screen === 'challenges') {
     return (
-      <ChallengesScreen
-        // Daily challenge props
-        dailyLeaderboard={dailyLeaderboard}
-        userDailyRank={userDailyRank}
-        // Weekly challenge props
-        currentEvent={currentEvent}
-        weeklyLeaderboard={leaderboard}
-        userEventStatus={userEventStatus}
-        userId={userId}
-        isPro={isPro}
-        freeEventEntryUsed={freeEventEntryUsed}
-        // Actions
-        onCompeteDaily={() => {
-          setDailyChallengeMode(true)
-          setEventMode(false)
-          setScreen('home')
-        }}
-        onCompeteWeekly={() => {
-          setDailyChallengeMode(false)
-          setEventMode(true)
-          setScreen('home')
-        }}
-        onShowPaywall={() => setShowPaywall(true)}
-        onShowFullLeaderboard={() => setShowLeaderboard(true)}
-        onBack={() => setScreen('home')}
-        // Data fetching
-        fetchDailyLeaderboard={fetchDailyLeaderboard}
-        fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <ChallengesScreen
+          // Daily challenge props
+          dailyLeaderboard={dailyLeaderboard}
+          userDailyRank={userDailyRank}
+          // Weekly challenge props
+          currentEvent={currentEvent}
+          weeklyLeaderboard={leaderboard}
+          userEventStatus={userEventStatus}
+          userId={userId}
+          isPro={isPro}
+          freeEventEntryUsed={freeEventEntryUsed}
+          // Actions
+          onCompeteDaily={() => {
+            setDailyChallengeMode(true)
+            setEventMode(false)
+            setScreen('home')
+          }}
+          onCompeteWeekly={() => {
+            setDailyChallengeMode(false)
+            setEventMode(true)
+            setScreen('home')
+          }}
+          onShowPaywall={() => setShowPaywall(true)}
+          onShowFullLeaderboard={() => setShowLeaderboard(true)}
+          onBack={() => setScreen('home')}
+          // Data fetching
+          fetchDailyLeaderboard={fetchDailyLeaderboard}
+          fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
+        />
+      </Suspense>
     )
   }
 
@@ -2239,15 +2249,17 @@ export default function App() {
   // ============================================
   if (screen === 'judges') {
     return (
-      <MeetTheJudges
-        onBack={() => setScreen('home')}
-        onSelectMode={(selectedMode) => {
-          setMode(selectedMode)
-          localStorage.setItem('fitrate_mode', selectedMode)
-          setScreen('home')
-          displayToast(`${selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1)} mode selected! 🎯`)
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <MeetTheJudges
+          onBack={() => setScreen('home')}
+          onSelectMode={(selectedMode) => {
+            setMode(selectedMode)
+            localStorage.setItem('fitrate_mode', selectedMode)
+            setScreen('home')
+            displayToast(`${selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1)} mode selected! 🎯`)
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2257,43 +2269,45 @@ export default function App() {
   // ============================================
   if (challengePartyId && (challengePartyData || challengePartyLoading)) {
     return (
-      <BattleScreen
-        battleId={challengePartyId}
-        battleData={challengePartyData}
-        isCreator={isCreatorOfChallenge}
-        loading={challengePartyLoading}
-        onRefresh={refreshChallengeParty}
-        onAcceptChallenge={() => {
-          // Navigate to home to scan - store that we're responding to this battle
-          localStorage.setItem('fitrate_responding_challenge', challengePartyId)
-          setChallengePartyId(null)
-          setChallengePartyData(null)
-          window.history.pushState({}, '', '/')
-          setScreen('home')
-          // Show toast explaining what to do
-          displayToast('📸 Take a photo to complete the battle!')
-        }}
-        onShare={() => {
-          // Re-share the battle link
-          const shareUrl = `https://fitrate.app/c/${challengePartyId}`
-          const shareText = challengePartyData?.creatorScore
-            ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
-            : `Think you can beat me? 👀\n${shareUrl}`
+      <Suspense fallback={<LoadingFallback />}>
+        <BattleScreen
+          battleId={challengePartyId}
+          battleData={challengePartyData}
+          isCreator={isCreatorOfChallenge}
+          loading={challengePartyLoading}
+          onRefresh={refreshChallengeParty}
+          onAcceptChallenge={() => {
+            // Navigate to home to scan - store that we're responding to this battle
+            localStorage.setItem('fitrate_responding_challenge', challengePartyId)
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+            // Show toast explaining what to do
+            displayToast('📸 Take a photo to complete the battle!')
+          }}
+          onShare={() => {
+            // Re-share the battle link
+            const shareUrl = `https://fitrate.app/c/${challengePartyId}`
+            const shareText = challengePartyData?.creatorScore
+              ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
+              : `Think you can beat me? 👀\n${shareUrl}`
 
-          if (navigator.share) {
-            navigator.share({ title: 'FitRate Battle', text: shareText })
-          } else {
-            navigator.clipboard.writeText(shareText)
-            displayToast('Battle link copied!')
-          }
-        }}
-        onHome={() => {
-          setChallengePartyId(null)
-          setChallengePartyData(null)
-          window.history.pushState({}, '', '/')
-          setScreen('home')
-        }}
-      />
+            if (navigator.share) {
+              navigator.share({ title: 'FitRate Battle', text: shareText })
+            } else {
+              navigator.clipboard.writeText(shareText)
+              displayToast('Battle link copied!')
+            }
+          }}
+          onHome={() => {
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2435,41 +2449,43 @@ export default function App() {
 
   if (screen === 'challenge-result' && scores && challengeScore) {
     return (
-      <>
-        <ChallengeResultScreen
-          userScore={scores.overall}
-          challengeScore={challengeScore}
-          userImage={uploadedImage}
-          onViewResults={() => setScreen('results')}
-          onChallengeBack={() => {
-            // Clear challenge score and trigger share for rematch
-            setChallengeScore(null)
-            setScreen('results')
-            // Auto-trigger share after a short delay
-            setTimeout(() => generateShareCard(), 500)
-          }}
-          onTryAgain={() => {
-            setChallengeScore(null) // Clear so next scan goes to results
-            resetApp()
-          }}
-          onSendResultBack={() => {
-            // Open the visual share card modal
-            playSound('click')
-            vibrate(20)
-            setShowChallengeResultShare(true)
-          }}
-        />
-
-        {/* Challenge Result Share Card Modal */}
-        {showChallengeResultShare && (
-          <ChallengeResultShareCard
+      <Suspense fallback={<LoadingFallback />}>
+        <>
+          <ChallengeResultScreen
             userScore={scores.overall}
             challengeScore={challengeScore}
             userImage={uploadedImage}
-            onClose={() => setShowChallengeResultShare(false)}
+            onViewResults={() => setScreen('results')}
+            onChallengeBack={() => {
+              // Clear challenge score and trigger share for rematch
+              setChallengeScore(null)
+              setScreen('results')
+              // Auto-trigger share after a short delay
+              setTimeout(() => generateShareCard(), 500)
+            }}
+            onTryAgain={() => {
+              setChallengeScore(null) // Clear so next scan goes to results
+              resetApp()
+            }}
+            onSendResultBack={() => {
+              // Open the visual share card modal
+              playSound('click')
+              vibrate(20)
+              setShowChallengeResultShare(true)
+            }}
           />
-        )}
-      </>
+
+          {/* Challenge Result Share Card Modal */}
+          {showChallengeResultShare && (
+            <ChallengeResultShareCard
+              userScore={scores.overall}
+              challengeScore={challengeScore}
+              userImage={uploadedImage}
+              onClose={() => setShowChallengeResultShare(false)}
+            />
+          )}
+        </>
+      </Suspense>
     )
   }
 
@@ -2478,55 +2494,57 @@ export default function App() {
   // ============================================
   if (screen === 'results' && scores) {
     return (
-      <>
-        <ResultsScreen
-          scores={scores}
-          cardDNA={cardDNA}
-          mode={mode}
-          uploadedImage={uploadedImage}
-          isPro={isPro}
-          scansRemaining={scansRemaining}
-          onReset={resetApp}
-          onSetMode={setMode}
-          onGenerateShareCard={generateShareCard}
-          onShowPaywall={() => setShowPaywall(true)}
-          playSound={playSound}
-          vibrate={vibrate}
-          currentEvent={eventMode ? currentEvent : null}
-          onStartFashionShow={() => setFashionShowScreen('create')}
-          totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
-          fashionShowId={fashionShowId}
-          fashionShowName={fashionShowData?.name}
-          dailyStreak={dailyStreak}
-          showToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
-          onReturnToRunway={() => {
-            setFashionShowScreen('runway')
-            setScores(null)
-            setScreen('home')
-          }}
-        />
-        <BottomNav
-          activeTab={null}
-          eventMode={eventMode}
-          onNavigate={(tab) => {
-            if (tab === 'home') {
-              // Clear Fashion Show state to prevent stale navigation
-              setFashionShowScreen(null)
+      <Suspense fallback={<LoadingFallback />}>
+        <>
+          <ResultsScreen
+            scores={scores}
+            cardDNA={cardDNA}
+            mode={mode}
+            uploadedImage={uploadedImage}
+            isPro={isPro}
+            scansRemaining={scansRemaining}
+            onReset={resetApp}
+            onSetMode={setMode}
+            onGenerateShareCard={generateShareCard}
+            onShowPaywall={() => setShowPaywall(true)}
+            playSound={playSound}
+            vibrate={vibrate}
+            currentEvent={eventMode ? currentEvent : null}
+            onStartFashionShow={() => setFashionShowScreen('create')}
+            totalScans={LIMITS.TOTAL_FREE_DAILY - scansRemaining}
+            fashionShowId={fashionShowId}
+            fashionShowName={fashionShowData?.name}
+            dailyStreak={dailyStreak}
+            showToast={(msg) => { setToastMessage(msg); setShowToast(true); }}
+            onReturnToRunway={() => {
+              setFashionShowScreen('runway')
               setScores(null)
-              setScreen('home');
-            } else if (tab === 'challenges') {
-              fetchDailyLeaderboard();
-              fetchLeaderboard();
-              fetchUserEventStatus();
-              setScreen('challenges');
-            }
-          }}
-          onScan={() => {
-            // Go home to scan again
-            resetApp();
-          }}
-        />
-      </>
+              setScreen('home')
+            }}
+          />
+          <BottomNav
+            activeTab={null}
+            eventMode={eventMode}
+            onNavigate={(tab) => {
+              if (tab === 'home') {
+                // Clear Fashion Show state to prevent stale navigation
+                setFashionShowScreen(null)
+                setScores(null)
+                setScreen('home');
+              } else if (tab === 'challenges') {
+                fetchDailyLeaderboard();
+                fetchLeaderboard();
+                fetchUserEventStatus();
+                setScreen('challenges');
+              }
+            }}
+            onScan={() => {
+              // Go home to scan again
+              resetApp();
+            }}
+          />
+        </>
+      </Suspense>
     )
   }
 
@@ -2535,24 +2553,26 @@ export default function App() {
   // ============================================
   if (screen === 'error') {
     return (
-      <ErrorScreen
-        error={error}
-        errorCode={errorCode}
-        onReset={() => {
-          // Clear error state and go home
-          setError(null)
-          setErrorCode(null)
-          setIsAnalyzing(false)
-          setScreen('home')
-        }}
-        onUpgrade={() => setShowPaywall(true)}
-        onHome={() => {
-          setError(null)
-          setErrorCode(null)
-          setIsAnalyzing(false)
-          setScreen('home')
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <ErrorScreen
+          error={error}
+          errorCode={errorCode}
+          onReset={() => {
+            // Clear error state and go home
+            setError(null)
+            setErrorCode(null)
+            setIsAnalyzing(false)
+            setScreen('home')
+          }}
+          onUpgrade={() => setShowPaywall(true)}
+          onHome={() => {
+            setError(null)
+            setErrorCode(null)
+            setIsAnalyzing(false)
+            setScreen('home')
+          }}
+        />
+      </Suspense>
     )
   }
 
@@ -2564,12 +2584,14 @@ export default function App() {
   // ============================================
   if (screen === 'pro-email-prompt') {
     return (
-      <ProEmailPromptScreen
-        emailInput={emailInput}
-        setEmailInput={setEmailInput}
-        onSubmit={handleEmailSubmit}
-        checking={emailChecking}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <ProEmailPromptScreen
+          emailInput={emailInput}
+          setEmailInput={setEmailInput}
+          onSubmit={handleEmailSubmit}
+          checking={emailChecking}
+        />
+      </Suspense>
     )
   }
 
@@ -2624,13 +2646,15 @@ export default function App() {
   // ============================================
   if (screen === 'paywall' || screen === 'limit-reached') {
     return (
-      <PaywallScreen
-        screen={screen}
-        mode={mode}
-        timeUntilReset={timeUntilReset}
-        onShowPaywall={() => setShowPaywall(true)}
-        onClose={() => setScreen('home')}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <PaywallScreen
+          screen={screen}
+          mode={mode}
+          timeUntilReset={timeUntilReset}
+          onShowPaywall={() => setShowPaywall(true)}
+          onClose={() => setScreen('home')}
+        />
+      </Suspense>
     )
   }
 
@@ -2646,14 +2670,16 @@ export default function App() {
   // ============================================
   if (screen === 'share-success') {
     return (
-      <ShareSuccessScreen
-        mode={mode}
-        setMode={setMode}
-        setScreen={setScreen}
-        userId={userId}
-        score={scores?.overall}
-        totalReferrals={totalReferrals}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <ShareSuccessScreen
+          mode={mode}
+          setMode={setMode}
+          setScreen={setScreen}
+          userId={userId}
+          score={scores?.overall}
+          totalReferrals={totalReferrals}
+        />
+      </Suspense>
     )
   }
 
@@ -2665,15 +2691,17 @@ export default function App() {
   // ============================================
   if (showPaywall) {
     return (
-      <PaywallModal
-        showPaywall={showPaywall}
-        setShowPaywall={setShowPaywall}
-        showDeclineOffer={showDeclineOffer}
-        setShowDeclineOffer={setShowDeclineOffer}
-        declineCountdown={declineCountdown}
-        checkoutLoading={checkoutLoading}
-        startCheckout={startCheckout}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <PaywallModal
+          showPaywall={showPaywall}
+          setShowPaywall={setShowPaywall}
+          showDeclineOffer={showDeclineOffer}
+          setShowDeclineOffer={setShowDeclineOffer}
+          declineCountdown={declineCountdown}
+          checkoutLoading={checkoutLoading}
+          startCheckout={startCheckout}
+        />
+      </Suspense>
     )
   }
 
@@ -2682,15 +2710,17 @@ export default function App() {
   // ============================================
   if (showLeaderboard) {
     return (
-      <LeaderboardModal
-        showLeaderboard={showLeaderboard}
-        setShowLeaderboard={setShowLeaderboard}
-        currentEvent={currentEvent}
-        leaderboard={leaderboard}
-        userEventStatus={userEventStatus}
-        isPro={isPro}
-        upcomingEvent={upcomingEvent}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <LeaderboardModal
+          showLeaderboard={showLeaderboard}
+          setShowLeaderboard={setShowLeaderboard}
+          currentEvent={currentEvent}
+          leaderboard={leaderboard}
+          userEventStatus={userEventStatus}
+          isPro={isPro}
+          upcomingEvent={upcomingEvent}
+        />
+      </Suspense>
     )
   }
 
@@ -2703,16 +2733,18 @@ export default function App() {
   // ============================================
   if (showRestoreModal) {
     return (
-      <RestoreProModal
-        userId={userId}
-        onClose={() => setShowRestoreModal(false)}
-        onRestoreSuccess={() => {
-          setIsPro(true)
-          localStorage.setItem('fitrate_pro', 'true')
-          setShowRestoreModal(false)
-          setScreen('home')
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <RestoreProModal
+          userId={userId}
+          onClose={() => setShowRestoreModal(false)}
+          onRestoreSuccess={() => {
+            setIsPro(true)
+            localStorage.setItem('fitrate_pro', 'true')
+            setShowRestoreModal(false)
+            setScreen('home')
+          }}
+        />
+      </Suspense>
     )
   }
 
