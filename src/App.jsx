@@ -41,6 +41,7 @@ const PaywallScreen = lazy(() => import('./screens/PaywallScreen'))
 const RulesScreen = lazy(() => import('./screens/RulesScreen'))
 const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
 const BattleScreen = lazy(() => import('./screens/BattleScreen'))
+const BattleRoom = lazy(() => import('./screens/BattleRoom'))
 const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
@@ -255,31 +256,39 @@ export default function App() {
   })
 
   // ============================================
-  // CHALLENGE PARTY STATE - NEW SYSTEM (/c/:id)
+  // BATTLE ROOM STATE - Legendary 1v1 Battles
+  // Supports both /b/:battleId (new) and /c/:id (legacy)
   // ============================================
   const [challengePartyId, setChallengePartyId] = useState(() => {
-    // Check for /c/:challengeId pattern in URL path
     const path = window.location.pathname
-    const pathMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
-    if (pathMatch) return pathMatch[1]
-
+    // Check for /b/:battleId pattern (new battle room URL)
+    const battleMatch = path.match(/^\/b\/([a-zA-Z0-9_-]+)$/)
+    if (battleMatch) return battleMatch[1]
+    // Check for /c/:challengeId pattern (legacy URL)
+    const challengeMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
+    if (challengeMatch) return challengeMatch[1]
     // Also check for ?challenge_id= query param (from challenge.html redirect)
     const params = new URLSearchParams(window.location.search)
     const queryId = params.get('challenge_id')
     if (queryId) return queryId
-
     return null
   })
   const [challengePartyData, setChallengePartyData] = useState(null)
-  // Start loading immediately if we detected a challenge ID to prevent HomeScreen flash
+  // Start loading immediately if we detected a battle ID to prevent HomeScreen flash
   const [challengePartyLoading, setChallengePartyLoading] = useState(() => {
     const path = window.location.pathname
-    const pathMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
+    const battleMatch = path.match(/^\/b\/([a-zA-Z0-9_-]+)$/)
+    const challengeMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
     const params = new URLSearchParams(window.location.search)
     const queryId = params.get('challenge_id')
-    return !!(pathMatch || queryId)
+    return !!(battleMatch || challengeMatch || queryId)
   })
   const [isCreatorOfChallenge, setIsCreatorOfChallenge] = useState(false)
+  // Track if we're using new battle room (/b/) vs legacy (/c/)
+  const [useBattleRoom, setUseBattleRoom] = useState(() => {
+    const path = window.location.pathname
+    return path.match(/^\/b\/([a-zA-Z0-9_-]+)$/) !== null
+  })
 
   // Store last analyzed image thumbnail for battle photo display
   const [lastAnalyzedThumb, setLastAnalyzedThumb] = useState(null)
@@ -863,7 +872,7 @@ export default function App() {
   }, [fashionShowId])
 
   // ============================================
-  // CHALLENGE PARTY - Fetch data when ID detected
+  // BATTLE ROOM - Fetch data when ID detected
   // ============================================
   useEffect(() => {
     if (!challengePartyId) return
@@ -884,7 +893,7 @@ export default function App() {
           setChallengePartyData(null)
         }
       } catch (err) {
-        console.error('[Challenge] Fetch error:', err)
+        console.error('[Battle] Fetch error:', err)
         setChallengePartyData(null)
       } finally {
         setChallengePartyLoading(false)
@@ -894,7 +903,36 @@ export default function App() {
     fetchChallengeParty()
   }, [challengePartyId])
 
-  // Refresh challenge party data
+  // Auto-refresh battle data every 10 seconds (while waiting for responder)
+  useEffect(() => {
+    if (!challengePartyId) return
+    if (challengePartyData?.status === 'completed') return // Don't poll if completed
+
+    const pollBattle = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/battle/${challengePartyId}`, {
+          headers: getApiHeaders()
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setChallengePartyData(data)
+          // If completed, play celebration sound
+          if (data.status === 'completed' && challengePartyData?.status !== 'completed') {
+            playSound('celebrate')
+            vibrate([100, 50, 100])
+          }
+        }
+      } catch (err) {
+        console.error('[Battle] Poll error:', err)
+      }
+    }
+
+    // Poll every 10 seconds
+    const interval = setInterval(pollBattle, 10000)
+    return () => clearInterval(interval)
+  }, [challengePartyId, challengePartyData?.status])
+
+  // Refresh battle data (manual)
   const refreshChallengeParty = async () => {
     if (!challengePartyId) return
     setChallengePartyLoading(true)
@@ -907,7 +945,7 @@ export default function App() {
         setChallengePartyData(data)
       }
     } catch (err) {
-      console.error('[Challenge] Refresh error:', err)
+      console.error('[Battle] Refresh error:', err)
     } finally {
       setChallengePartyLoading(false)
     }
@@ -1801,7 +1839,8 @@ export default function App() {
       } : null
 
       // ============================================
-      // CHALLENGE PARTY CREATION - Create backend room first
+      // BATTLE ROOM CREATION - Create backend room for 1v1 battle
+      // Uses new /b/ URL pattern for legendary battle experience
       // ============================================
       let challengeUrl = null
       if (isChallenge && scores?.overall) {
@@ -1818,16 +1857,17 @@ export default function App() {
           })
           const data = await res.json()
           if (data.challengeId) {
-            challengeUrl = `https://fitrate.app/c/${data.challengeId}`
+            // Use new /b/ URL pattern for battle rooms
+            challengeUrl = `https://fitrate.app/b/${data.challengeId}`
             trackBattleCreate(scores.overall)
-            // Track locally that we created this challenge
+            // Track locally that we created this battle
             const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
             created.push(data.challengeId)
             localStorage.setItem('fitrate_created_challenges', JSON.stringify(created))
-            console.log('[Challenge] Created party:', data.challengeId)
+            console.log('[Battle] Created room:', data.challengeId)
           }
         } catch (err) {
-          console.error('[Challenge] Failed to create party:', err)
+          console.error('[Battle] Failed to create room:', err)
           // Continue with old fallback (?challenge=XX param) if backend fails
         }
       }
@@ -2264,45 +2304,43 @@ export default function App() {
   }
 
   // ============================================
-  // BATTLE SCREEN - 1v1 Outfit Battles (/c/:id)
+  // BATTLE ROOM - Legendary 1v1 Outfit Battles (/b/:id or /c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // ============================================
   if (challengePartyId && (challengePartyData || challengePartyLoading)) {
     return (
       <Suspense fallback={<LoadingFallback />}>
-        <BattleScreen
+        <BattleRoom
           battleId={challengePartyId}
           battleData={challengePartyData}
+          userId={userId}
           isCreator={isCreatorOfChallenge}
           loading={challengePartyLoading}
-          onRefresh={refreshChallengeParty}
-          onAcceptChallenge={() => {
-            // Navigate to home to scan - store that we're responding to this battle
+          onImageSelected={async (imageData, scanType) => {
+            // Responder took a photo directly in BattleRoom - analyze and submit
             localStorage.setItem('fitrate_responding_challenge', challengePartyId)
-            setChallengePartyId(null)
-            setChallengePartyData(null)
-            window.history.pushState({}, '', '/')
-            setScreen('home')
-            // Show toast explaining what to do
-            displayToast('📸 Take a photo to complete the battle!')
+            setUploadedImage(imageData)
+            setScreen('analyzing')
+            analyzeOutfit(imageData, scanType)
           }}
           onShare={() => {
-            // Re-share the battle link
-            const shareUrl = `https://fitrate.app/c/${challengePartyId}`
+            // Share battle link (use /b/ for new pattern)
+            const shareUrl = `https://fitrate.app/b/${challengePartyId}`
             const shareText = challengePartyData?.creatorScore
-              ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
-              : `Think you can beat me? 👀\n${shareUrl}`
+              ? `⚔️ I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me?\n${shareUrl}`
+              : `⚔️ 1v1 me! Who's got better style?\n${shareUrl}`
 
             if (navigator.share) {
               navigator.share({ title: 'FitRate Battle', text: shareText })
             } else {
               navigator.clipboard.writeText(shareText)
-              displayToast('Battle link copied!')
+              displayToast('Battle link copied! ⚔️')
             }
           }}
           onHome={() => {
             setChallengePartyId(null)
             setChallengePartyData(null)
+            setUseBattleRoom(false)
             window.history.pushState({}, '', '/')
             setScreen('home')
           }}

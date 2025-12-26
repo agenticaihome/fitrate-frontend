@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a0a2e" />
+
+    <title>Battle Room — 1v1 Outfit Battle</title>
+    <meta name="description" content="Your friend challenged you to a 1v1 style battle! Take a photo to see who wins." />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fitrate.app/battle" />
+    <meta property="og:title" content="1v1 Outfit Battle" />
+    <meta property="og:description"
+        content="Your friend challenged you to a style battle! Take a photo to see who wins." />
+    <meta property="og:image" content="https://fitrate.app/og/battle.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="FitRate" />
+
+    <!-- Twitter/X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@AgenticAIHome" />
+    <meta name="twitter:url" content="https://fitrate.app/battle" />
+    <meta name="twitter:title" content="1v1 Outfit Battle" />
+    <meta name="twitter:description"
+        content="Your friend challenged you to a style battle! Take a photo to see who wins." />
+    <meta name="twitter:image" content="https://fitrate.app/og/battle.png" />
+
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .loading {
+            text-align: center;
+        }
+
+        .battle-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+        }
+    </style>
+
+    <script>
+        // Redirect to main app with Battle ID preserved
+        // URL pattern: /b/:battleId -> redirect to /?challenge_id=:battleId
+        const path = window.location.pathname;
+        const match = path.match(/^\/b\/([a-zA-Z0-9_-]+)$/);
+        if (match) {
+            window.location.replace('/?challenge_id=' + match[1]);
+        } else {
+            window.location.replace('/');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="loading">
+        <div class="battle-icon"></div>
+        <div class="spinner"></div>
+        <p>Loading Battle Room...</p>
+    </div>
+</body>
+
+</html>
