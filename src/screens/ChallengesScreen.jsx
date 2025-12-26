@@ -1,13 +1,46 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import BottomNav from '../components/common/BottomNav'
+
+// All 8 AI modes for rotating daily challenge
+const DAILY_MODES = [
+    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive & encouraging', color: 'cyan' },
+    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: 'orange' },
+    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'Balanced analysis', color: 'blue' },
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: 'purple' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Dating vibes', color: 'pink' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star treatment', color: 'yellow' },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Mystical energy', color: 'violet' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged chaos', color: 'red' }
+]
+
+// Get today's rotating mode based on day of year
+const getDailyMode = () => {
+    const now = new Date()
+    const start = new Date(now.getFullYear(), 0, 0)
+    const diff = now - start
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
+    return DAILY_MODES[dayOfYear % DAILY_MODES.length]
+}
+
+// Color mappings for mode pill
+const MODE_COLORS = {
+    nice: { bg: 'rgba(0,212,255,0.2)', border: 'rgba(0,212,255,0.4)', text: '#00d4ff' },
+    roast: { bg: 'rgba(255,68,68,0.2)', border: 'rgba(255,68,68,0.4)', text: '#ff6b35' },
+    honest: { bg: 'rgba(59,130,246,0.2)', border: 'rgba(59,130,246,0.4)', text: '#3b82f6' },
+    savage: { bg: 'rgba(139,0,255,0.2)', border: 'rgba(139,0,255,0.4)', text: '#8b00ff' },
+    rizz: { bg: 'rgba(255,105,180,0.2)', border: 'rgba(255,105,180,0.4)', text: '#ff69b4' },
+    celeb: { bg: 'rgba(255,215,0,0.2)', border: 'rgba(255,215,0,0.4)', text: '#ffd700' },
+    aura: { bg: 'rgba(155,89,182,0.2)', border: 'rgba(155,89,182,0.4)', text: '#9b59b6' },
+    chaos: { bg: 'rgba(255,107,107,0.2)', border: 'rgba(255,107,107,0.4)', text: '#ff6b6b' }
+}
 
 /**
  * ChallengesScreen
  *
  * Combined view for Daily + Weekly challenges
- * - Daily: Highest score of the day wins 5 free pro scans
+ * - Daily: Highest score of the day wins 5 free pro scans (rotating mode!)
  * - Weekly: Themed event, #1 wins 1 year free pro
  */
 export default function ChallengesScreen({
@@ -124,12 +157,36 @@ export default function ChallengesScreen({
             <div className="flex-1 px-6 overflow-y-auto">
                 {activeTab === 'daily' ? (
                     /* ==================== DAILY CHALLENGE ==================== */
+                    (() => {
+                        const todayMode = getDailyMode()
+                        const modeColors = MODE_COLORS[todayMode.id]
+                        return (
                     <div className="space-y-4">
                         {/* Title */}
                         <div className="text-center mb-2">
                             <span className="text-5xl block mb-3">⚡</span>
                             <h2 className="text-2xl font-black text-white mb-1">Daily Challenge</h2>
                             <p className="text-white/60 text-sm">Get the highest score today!</p>
+                        </div>
+
+                        {/* Today's Mode Card - Rotating daily mode! */}
+                        <div className="rounded-2xl p-4" style={{
+                            background: modeColors.bg,
+                            border: `2px solid ${modeColors.border}`
+                        }}>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl">{todayMode.emoji}</span>
+                                    <div>
+                                        <p className="text-xs text-white/50 uppercase tracking-wider">Today's Mode</p>
+                                        <p className="font-black text-lg" style={{ color: modeColors.text }}>{todayMode.label}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-white/40 text-[10px]">Changes daily</p>
+                                    <p className="text-xs text-white/50">{todayMode.desc}</p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Prize + Timer Card */}
@@ -265,6 +322,8 @@ export default function ChallengesScreen({
                             📸 Take a Photo
                         </button>
                     </div>
+                        )
+                    })()
                 ) : (
                     /* ==================== WEEKLY CHALLENGE ==================== */
                     <div className="space-y-4">

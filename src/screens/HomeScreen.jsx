@@ -1,8 +1,28 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
+
+// Daily Challenge: Rotating mode based on day of year
+const DAILY_MODES = [
+    { id: 'nice', emoji: '😇', label: 'Nice' },
+    { id: 'roast', emoji: '🔥', label: 'Roast' },
+    { id: 'honest', emoji: '📊', label: 'Honest' },
+    { id: 'savage', emoji: '💀', label: 'Savage' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity' },
+    { id: 'aura', emoji: '🔮', label: 'Aura' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos' }
+]
+
+const getDailyMode = () => {
+    const now = new Date()
+    const start = new Date(now.getFullYear(), 0, 0)
+    const diff = now - start
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
+    return DAILY_MODES[dayOfYear % DAILY_MODES.length]
+}
 
 export default function HomeScreen({
     mode,
@@ -899,7 +919,7 @@ export default function HomeScreen({
 
                                 {/* Emoji */}
                                 <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {entryBlocked ? '🔒' : dailyChallengeMode ? '⚡' : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
+                                    {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : isRoast ? '🔥' : '😇'}
                                 </span>
 
                                 {/* Main Text - size based on length for long theme names */}
@@ -910,7 +930,7 @@ export default function HomeScreen({
 
                                 {/* Subtitle - changes based on mode */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {dailyChallengeMode ? 'Highest score wins 5 Pro scans!'
+                                    {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
                                         : entryBlocked ? 'Go Pro for daily entries!'
                                             : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
                                                 : isRoast ? 'Brutally honest AI'
