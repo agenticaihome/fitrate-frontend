@@ -1372,25 +1372,25 @@ export default function ResultsScreen({
                                 ⚡ {scansRemaining} free scan{scansRemaining !== 1 ? 's' : ''} left today
                             </p>
 
-                            {/* Subtle Pro upsell - appears after user has some scans */}
+                            {/* Subtle scan pack upsell - appears after user has used some scans */}
                             {totalScans >= 2 && (
                                 <div
                                     className="p-3 rounded-xl border cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
                                     onClick={onShowPaywall}
                                     style={{
-                                        background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(59,130,246,0.08) 100%)',
-                                        borderColor: 'rgba(139,92,246,0.2)'
+                                        background: 'linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(0,255,136,0.08) 100%)',
+                                        borderColor: 'rgba(0,212,255,0.2)'
                                     }}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-lg">✨</span>
+                                            <span className="text-lg">💎</span>
                                             <div>
-                                                <p className="text-xs font-bold text-white/80">Pro gets 8 AI modes</p>
-                                                <p className="text-[10px] text-white/40">Savage Roast • Rizz Check • Aura & more</p>
+                                                <p className="text-xs font-bold text-white/80">Want more scans?</p>
+                                                <p className="text-[10px] text-white/40">5 for $1.99 • Never expire</p>
                                             </div>
                                         </div>
-                                        <span className="text-xs font-bold text-purple-400">→</span>
+                                        <span className="text-xs font-bold text-cyan-400">→</span>
                                     </div>
                                 </div>
                             )}

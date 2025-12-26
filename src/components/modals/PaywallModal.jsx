@@ -112,31 +112,6 @@ export default function PaywallModal({
                     </button>
                 </div>
 
-                {/* 💀 SAVAGE ROAST - Try it once */}
-                <div className="relative w-full mb-5">
-                    <button
-                        onClick={() => startCheckout('proRoast')}
-                        disabled={checkoutLoading}
-                        aria-label="Try Savage Roast once for $0.99"
-                        className="btn-physical w-full p-4 rounded-2xl text-center transition-all group flex items-center justify-between active:scale-95"
-                        style={{
-                            background: 'linear-gradient(135deg, #1a0000 0%, #330000 100%)',
-                            border: '1.5px solid rgba(255,68,68,0.4)'
-                        }}
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="text-3xl">💀</span>
-                            <div className="text-left">
-                                <h3 className="text-red-400 text-sm font-black">Savage Roast</h3>
-                                <p className="text-red-300/50 text-[10px]">The brutal AI truth</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <span className="block text-lg font-black text-white">$0.99</span>
-                            <span className="block text-[10px] text-white/40">1 scan</span>
-                        </div>
-                    </button>
-                </div>
 
                 {/* How It Works */}
                 <div className="mb-5 p-4 rounded-2xl bg-white/5 border border-white/10">
