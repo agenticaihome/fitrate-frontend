@@ -172,8 +172,9 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
                             onClick={onBack}
                             className="p-2 rounded-full active:scale-95 transition-transform"
                             style={{ background: 'rgba(255,255,255,0.1)' }}
+                            aria-label="Go back"
                         >
-                            <span className="text-xl">←</span>
+                            <span className="text-2xl">←</span>
                         </button>
                         <h1 className="text-xl font-black text-white tracking-tight">
                             Meet Your AI Judges
@@ -185,7 +186,7 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
 
             {/* Intro */}
             <div className="px-6 py-6 text-center">
-                <p className="text-white/60 text-sm leading-relaxed max-w-xs mx-auto">
+                <p className="text-white/80 text-sm leading-relaxed max-w-xs mx-auto">
                     12 unique AI personalities, each with their own style of judging.
                     Pick your vibe and get rated! 👇
                 </p>
@@ -225,24 +226,25 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
                                             background: `linear-gradient(135deg, ${judge.color}30 0%, ${judge.color}10 100%)`,
                                             boxShadow: `0 4px 20px ${judge.color}30`
                                         }}
+                                        aria-hidden="true"
                                     >
                                         {judge.emoji}
                                     </div>
                                     <div>
                                         <h3
-                                            className="font-black text-lg"
+                                            className="font-black text-xl"
                                             style={{ color: judge.color }}
                                         >
                                             {judge.name}
                                         </h3>
-                                        <span className="text-xs text-white/40 uppercase tracking-wider">
+                                        <span className="text-sm text-white/60 uppercase tracking-wider">
                                             {judge.id} mode
                                         </span>
                                     </div>
                                 </div>
                                 {/* Tier Badge */}
                                 <span
-                                    className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                                    className="px-2 py-1 rounded-full text-[12px] font-bold uppercase tracking-wider"
                                     style={{
                                         background: judge.tier === 'FREE'
                                             ? 'rgba(0,255,136,0.2)'
@@ -267,10 +269,10 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
                                 {judge.judges.map((item) => (
                                     <span
                                         key={item}
-                                        className="px-2 py-1 rounded-full text-[10px] font-medium"
+                                        className="px-2 py-1 rounded-full text-[11px] font-medium"
                                         style={{
                                             background: 'rgba(255,255,255,0.08)',
-                                            color: 'rgba(255,255,255,0.7)'
+                                            color: 'rgba(255,255,255,0.85)'
                                         }}
                                     >
                                         {item}
@@ -280,16 +282,16 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
 
                             {/* Sample Verdict */}
                             <div
-                                className="p-3 rounded-xl text-xs"
+                                className="p-3 rounded-xl text-[13px]"
                                 style={{
                                     background: 'rgba(0,0,0,0.3)',
                                     borderLeft: `3px solid ${judge.color}`
                                 }}
                             >
-                                <span className="text-white/50 text-[10px] uppercase tracking-wider block mb-1">
+                                <span className="text-white/70 text-[11px] uppercase tracking-wider block mb-1">
                                     Sample Verdict
                                 </span>
-                                <span className="text-white/90">{judge.sampleVerdict}</span>
+                                <span className="text-white/95">{judge.sampleVerdict}</span>
                             </div>
 
                             {/* Tap to Select */}
