@@ -5,25 +5,25 @@
  * so they preview beautifully in iMessage, WhatsApp, Instagram DMs, etc.
  *
  * Route: /c/:challengeId
+ * 
+ * Pattern: Same as Fashion Show (/f/:showId) - uses next() to get fallback HTML
  */
 
 export async function onRequest(context) {
-    const { request, env, params } = context;
+    const { request, next, params } = context;
     const challengeId = params.challengeId;
 
     try {
-        // Get the origin URL to fetch the SPA's index.html
-        const url = new URL(request.url);
-        const indexUrl = `${url.origin}/index.html`;
+        // Get the original response (the SPA HTML from challenge.html fallback)
+        const response = await next();
 
-        // Fetch the SPA's index.html directly
-        const response = await fetch(indexUrl);
-
-        if (!response.ok) {
-            // Fallback: redirect to home
-            return Response.redirect(`${url.origin}/`, 302);
+        // Only modify HTML responses
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('text/html')) {
+            return response;
         }
 
+        // Clone the response since we need to read it
         const html = await response.text();
 
         // Challenge OG meta tags
@@ -59,16 +59,14 @@ export async function onRequest(context) {
 
         // Return modified response
         return new Response(modifiedHtml, {
-            status: 200,
+            status: response.status,
+            statusText: response.statusText,
             headers: {
-                'content-type': 'text/html; charset=utf-8',
-                'cache-control': 'no-cache'
+                'content-type': 'text/html; charset=utf-8'
             }
         });
     } catch (error) {
         console.error('[Challenge OG] Error:', error);
-        // Fallback: redirect to home
-        const url = new URL(request.url);
-        return Response.redirect(`${url.origin}/`, 302);
+        return await next();
     }
 }

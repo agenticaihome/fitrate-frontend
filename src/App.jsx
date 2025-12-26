@@ -213,10 +213,17 @@ export default function App() {
   // CHALLENGE PARTY STATE - NEW SYSTEM (/c/:id)
   // ============================================
   const [challengePartyId, setChallengePartyId] = useState(() => {
-    // Check for /c/:challengeId pattern in URL
+    // Check for /c/:challengeId pattern in URL path
     const path = window.location.pathname
-    const match = path.match(/^\/c\/([a-zA-Z0-9]+)$/)
-    return match ? match[1] : null
+    const pathMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
+    if (pathMatch) return pathMatch[1]
+
+    // Also check for ?challenge_id= query param (from challenge.html redirect)
+    const params = new URLSearchParams(window.location.search)
+    const queryId = params.get('challenge_id')
+    if (queryId) return queryId
+
+    return null
   })
   const [challengePartyData, setChallengePartyData] = useState(null)
   const [challengePartyLoading, setChallengePartyLoading] = useState(false)
