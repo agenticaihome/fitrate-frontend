@@ -453,6 +453,44 @@ export default function App() {
     };
   }, []);
 
+  // PWA AUTO-UPDATE: Poll for updates every 60 seconds
+  // Ensures users get the latest version even during long sessions
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+
+    const checkForUpdates = async () => {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.update();
+          // If there's a waiting worker, it means an update is ready
+          if (registration.waiting) {
+            console.log('[PWA] Update found, reloading...');
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            window.location.reload();
+          }
+        }
+      } catch (err) {
+        console.warn('[PWA] Update check failed:', err);
+      }
+    };
+
+    // Check immediately on mount
+    checkForUpdates();
+
+    // Then check every 60 seconds
+    const interval = setInterval(checkForUpdates, 60000);
+
+    // Also check when app regains focus (user comes back to tab)
+    const handleFocus = () => checkForUpdates();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   // Handle Referrals & Payment Success
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
