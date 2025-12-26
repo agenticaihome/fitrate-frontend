@@ -226,7 +226,14 @@ export default function App() {
     return null
   })
   const [challengePartyData, setChallengePartyData] = useState(null)
-  const [challengePartyLoading, setChallengePartyLoading] = useState(false)
+  // Start loading immediately if we detected a challenge ID to prevent HomeScreen flash
+  const [challengePartyLoading, setChallengePartyLoading] = useState(() => {
+    const path = window.location.pathname
+    const pathMatch = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/)
+    const params = new URLSearchParams(window.location.search)
+    const queryId = params.get('challenge_id')
+    return !!(pathMatch || queryId)
+  })
   const [isCreatorOfChallenge, setIsCreatorOfChallenge] = useState(false)
 
   // ============================================
@@ -2129,6 +2136,52 @@ export default function App() {
   }
 
   // ============================================
+  // CHALLENGE PARTY SCREEN - New 1v1 System (/c/:id)
+  // MUST be checked BEFORE HomeScreen to take priority
+  // ============================================
+  if (challengePartyId && (challengePartyData || challengePartyLoading)) {
+    return (
+      <ChallengePartyScreen
+        challengeId={challengePartyId}
+        challengeData={challengePartyData}
+        isCreator={isCreatorOfChallenge}
+        loading={challengePartyLoading}
+        onRefresh={refreshChallengeParty}
+        onAcceptChallenge={() => {
+          // Navigate to home to scan - store that we're responding to this challenge
+          localStorage.setItem('fitrate_responding_challenge', challengePartyId)
+          setChallengePartyId(null)
+          setChallengePartyData(null)
+          window.history.pushState({}, '', '/')
+          setScreen('home')
+          // Show toast explaining what to do
+          displayToast('📸 Take a photo to complete the challenge!')
+        }}
+        onShare={() => {
+          // Re-share the challenge link
+          const shareUrl = `https://fitrate.app/c/${challengePartyId}`
+          const shareText = challengePartyData?.creatorScore
+            ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
+            : `Think you can beat me? 👀\n${shareUrl}`
+
+          if (navigator.share) {
+            navigator.share({ title: 'FitRate Challenge', text: shareText })
+          } else {
+            navigator.clipboard.writeText(shareText)
+            displayToast('Challenge link copied!')
+          }
+        }}
+        onHome={() => {
+          setChallengePartyId(null)
+          setChallengePartyData(null)
+          window.history.pushState({}, '', '/')
+          setScreen('home')
+        }}
+      />
+    )
+  }
+
+  // ============================================
   // HOME SCREEN - Camera First, Zero Friction
   // Only show if paywall/leaderboard are NOT open (modals take priority)
   // ============================================
@@ -2245,51 +2298,6 @@ export default function App() {
           setIsAnalyzing(false)
           setScreen('home')
           displayToast('Analysis cancelled')
-        }}
-      />
-    )
-  }
-
-  // ============================================
-  // CHALLENGE PARTY SCREEN - New 1v1 System (/c/:id)
-  // ============================================
-  if (challengePartyId && (challengePartyData || challengePartyLoading)) {
-    return (
-      <ChallengePartyScreen
-        challengeId={challengePartyId}
-        challengeData={challengePartyData}
-        isCreator={isCreatorOfChallenge}
-        loading={challengePartyLoading}
-        onRefresh={refreshChallengeParty}
-        onAcceptChallenge={() => {
-          // Navigate to home to scan - store that we're responding to this challenge
-          localStorage.setItem('fitrate_responding_challenge', challengePartyId)
-          setChallengePartyId(null)
-          setChallengePartyData(null)
-          window.history.pushState({}, '', '/')
-          setScreen('home')
-          // Show toast explaining what to do
-          displayToast('📸 Take a photo to complete the challenge!')
-        }}
-        onShare={() => {
-          // Re-share the challenge link
-          const shareUrl = `https://fitrate.app/c/${challengePartyId}`
-          const shareText = challengePartyData?.creatorScore
-            ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
-            : `Think you can beat me? 👀\n${shareUrl}`
-
-          if (navigator.share) {
-            navigator.share({ title: 'FitRate Challenge', text: shareText })
-          } else {
-            navigator.clipboard.writeText(shareText)
-            displayToast('Challenge link copied!')
-          }
-        }}
-        onHome={() => {
-          setChallengePartyId(null)
-          setChallengePartyData(null)
-          window.history.pushState({}, '', '/')
-          setScreen('home')
         }}
       />
     )
