@@ -1387,7 +1387,7 @@ export default function ResultsScreen({
                                             <span className="text-lg">💎</span>
                                             <div>
                                                 <p className="text-xs font-bold text-white/80">Want more scans?</p>
-                                                <p className="text-[10px] text-white/40">5 for $1.99 • Never expire</p>
+                                                <p className="text-[10px] text-white/40">3 for just $0.99 • Never expire</p>
                                             </div>
                                         </div>
                                         <span className="text-xs font-bold text-cyan-400">→</span>
