@@ -88,7 +88,8 @@ export const generateShareCard = async ({
     eventContext = null,
     dailyChallengeContext = null,
     cardDNA = null,
-    isChallenge = false  // When true, generates a challenge link with score
+    isChallenge = false,  // When true, generates a challenge link with score
+    challengeUrl = null   // NEW: If provided, use this URL for challenge links
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -381,9 +382,9 @@ export const generateShareCard = async ({
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
                 const baseUrl = 'https://fitrate.app'
-                // Challenge link includes score so friend can compare after they scan
+                // Use challenge party URL if provided, otherwise fall back to old format
                 const link = isChallenge
-                    ? `${baseUrl}?ref=${userId}&challenge=${score}`
+                    ? (challengeUrl || `${baseUrl}?ref=${userId}&challenge=${score}`)
                     : `${baseUrl}?ref=${userId}`
 
                 // Challenge-specific copy - competitive and clear
@@ -418,9 +419,9 @@ export const generateShareCard = async ({
                 }
                 const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
                 const text = getShareText()
-                // URL matches the share text - includes challenge param if challenge mode
+                // URL matches the share text - use challenge party URL if provided
                 const url = isChallenge
-                    ? `https://fitrate.app?ref=${userId}&challenge=${score}`
+                    ? (challengeUrl || `https://fitrate.app?ref=${userId}&challenge=${score}`)
                     : `https://fitrate.app?ref=${userId}`
 
                 resolve({

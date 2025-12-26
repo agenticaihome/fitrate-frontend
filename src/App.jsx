@@ -20,6 +20,7 @@ import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
 import RulesScreen from './screens/RulesScreen'
 import ChallengeResultScreen from './screens/ChallengeResultScreen'
+import ChallengePartyScreen from './screens/ChallengePartyScreen'
 // Fashion Show screens
 import FashionShowCreate from './screens/FashionShowCreate'
 import FashionShowInvite from './screens/FashionShowInvite'
@@ -202,11 +203,24 @@ export default function App() {
     return saved ? parseInt(saved) : null
   })
 
-  // Challenge a Friend (score from URL)
+  // Challenge a Friend (score from URL) - OLD METHOD (keeping for backwards compat)
   const [challengeScore, setChallengeScore] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     return parseInt(params.get('challenge')) || null
   })
+
+  // ============================================
+  // CHALLENGE PARTY STATE (NEW - with backend)
+  // ============================================
+  const [challengePartyId, setChallengePartyId] = useState(() => {
+    // Check URL for /c/:challengeId pattern
+    const path = window.location.pathname
+    const match = path.match(/^\/c\/([a-zA-Z0-9_-]+)$/i)
+    return match ? match[1] : null
+  })
+  const [challengePartyData, setChallengePartyData] = useState(null)
+  const [challengePartyLoading, setChallengePartyLoading] = useState(false)
+  const [isChallenger, setIsChallenger] = useState(false) // Did current user create this challenge?
 
   // ============================================
   // FASHION SHOW STATE
@@ -747,6 +761,107 @@ export default function App() {
 
     fetchShowData()
   }, [fashionShowId])
+
+  // ============================================
+  // CHALLENGE PARTY - Fetch challenge data when ID detected
+  // ============================================
+  useEffect(() => {
+    if (!challengePartyId) return
+
+    const fetchChallengeData = async () => {
+      setChallengePartyLoading(true)
+      try {
+        const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setChallengePartyData(data)
+
+          // Check if current user created this challenge (stored in localStorage)
+          const createdChallenges = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
+          setIsChallenger(createdChallenges.includes(challengePartyId))
+
+          // Set screen to challenge party
+          setScreen('challenge-party')
+        } else if (res.status === 410) {
+          // Challenge expired
+          setChallengePartyData({ status: 'expired' })
+          setScreen('challenge-party')
+        } else {
+          // Challenge not found
+          setChallengePartyData(null)
+          setChallengePartyId(null)
+        }
+      } catch (err) {
+        console.error('[ChallengeParty] Fetch error:', err)
+        setChallengePartyData(null)
+        setChallengePartyId(null)
+      } finally {
+        setChallengePartyLoading(false)
+      }
+    }
+
+    fetchChallengeData()
+  }, [challengePartyId])
+
+  // Helper: Create a new challenge party
+  const createChallengeParty = async (score) => {
+    try {
+      const res = await fetch(`${API_BASE}/challenges`, {
+        method: 'POST',
+        headers: getApiHeaders(),
+        body: JSON.stringify({ creatorScore: score })
+      })
+      if (res.ok) {
+        const { challengeId } = await res.json()
+
+        // Store that we created this challenge
+        const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
+        created.push(challengeId)
+        localStorage.setItem('fitrate_created_challenges', JSON.stringify(created.slice(-50))) // Keep last 50
+
+        return challengeId
+      }
+      return null
+    } catch (err) {
+      console.error('[ChallengeParty] Create error:', err)
+      return null
+    }
+  }
+
+  // Helper: Respond to a challenge
+  const respondToChallenge = async (challengeId, score) => {
+    try {
+      const res = await fetch(`${API_BASE}/challenges/${challengeId}/respond`, {
+        method: 'POST',
+        headers: getApiHeaders(),
+        body: JSON.stringify({ responderScore: score })
+      })
+      if (res.ok) {
+        return await res.json()
+      }
+      return null
+    } catch (err) {
+      console.error('[ChallengeParty] Respond error:', err)
+      return null
+    }
+  }
+
+  // Helper: Refresh challenge data
+  const refreshChallengeParty = async () => {
+    if (!challengePartyId) return
+    setChallengePartyLoading(true)
+    try {
+      const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setChallengePartyData(data)
+      }
+    } catch (err) {
+      console.error('[ChallengeParty] Refresh error:', err)
+    } finally {
+      setChallengePartyLoading(false)
+    }
+  }
 
   // Helper: Format time remaining moved to utils/dateUtils
 
@@ -1373,8 +1488,20 @@ export default function App() {
         // CRITICAL: Reset analyzing flag so user can scan again
         setIsAnalyzing(false)
 
-        // If user came from a challenge link, show comparison screen first
-        if (challengeScore) {
+        // If user came from a Challenge Party (new backend system), submit response
+        if (challengePartyId && !isChallenger && data.scores?.overall) {
+          const result = await respondToChallenge(challengePartyId, data.scores.overall)
+          if (result) {
+            // Refresh challenge party data and show the party screen
+            await refreshChallengeParty()
+            setScreen('challenge-party')
+          } else {
+            // API failed, fall back to regular results
+            setScreen('results')
+          }
+        }
+        // If user came from old challenge link (?challenge=), show comparison screen
+        else if (challengeScore) {
           setScreen('challenge-result')
         } else {
           setScreen('results')
@@ -1488,8 +1615,20 @@ export default function App() {
         fetchUserEventStatus()
       }
 
-      // If user came from a challenge link, show comparison screen first
-      if (challengeScore) {
+      // If user came from a Challenge Party (new backend system), submit response
+      if (challengePartyId && !isChallenger && data.scores?.overall) {
+        const result = await respondToChallenge(challengePartyId, data.scores.overall)
+        if (result) {
+          // Refresh challenge party data and show the party screen
+          await refreshChallengeParty()
+          setScreen('challenge-party')
+        } else {
+          // API failed, fall back to regular results
+          setScreen('results')
+        }
+      }
+      // If user came from old challenge link (?challenge=), show comparison screen
+      else if (challengeScore) {
         setScreen('challenge-result')
       } else {
         setScreen('results')
@@ -1507,7 +1646,7 @@ export default function App() {
     } finally {
       setIsAnalyzing(false)
     }
-  }, [mode, isPro, eventMode, currentEvent, userId, isAnalyzing, scansRemaining, dailyChallengeMode])
+  }, [mode, isPro, eventMode, currentEvent, userId, isAnalyzing, scansRemaining, dailyChallengeMode, challengePartyId, isChallenger])
 
 
 
@@ -1521,6 +1660,15 @@ export default function App() {
     // Satisfying feedback when generating
     playSound('share')
     vibrate(30)
+
+    // If challenge, create a challenge party first
+    let challengePartyUrl = null
+    if (isChallenge && scores?.overall) {
+      const newChallengeId = await createChallengeParty(scores.overall)
+      if (newChallengeId) {
+        challengePartyUrl = `https://fitrate.app/c/${newChallengeId}`
+      }
+    }
 
     // Helper: Download share card and copy caption (desktop fallback)
     const downloadAndCopy = (imageBlob, text) => {
@@ -1583,7 +1731,8 @@ export default function App() {
         eventContext: eventShareContext,
         dailyChallengeContext: dailyChallengeShareContext,
         cardDNA,
-        isChallenge  // Pass through to generate challenge URL with score
+        isChallenge,  // Pass through to generate challenge URL with score
+        challengeUrl: challengePartyUrl  // NEW: Use challenge party URL if created
       })
 
       // Store shareData for potential future use
@@ -2113,6 +2262,55 @@ export default function App() {
           />
         )}
       </>
+    )
+  }
+
+  // ============================================
+  // CHALLENGE PARTY SCREEN - Shared 1v1 Room
+  // ============================================
+  if (screen === 'challenge-party' && challengePartyId) {
+    return (
+      <ChallengePartyScreen
+        challengeId={challengePartyId}
+        challengeData={challengePartyData}
+        isCreator={isChallenger}
+        loading={challengePartyLoading}
+        onRefresh={refreshChallengeParty}
+        onAcceptChallenge={() => {
+          // Responder wants to scan - go to home with challenge context
+          setScreen('home')
+        }}
+        onShare={async () => {
+          // Share the challenge link
+          playSound('share')
+          vibrate(30)
+          const url = `https://fitrate.app/c/${challengePartyId}`
+          const text = challengePartyData?.status === 'completed'
+            ? `⚔️ Check out our FitRate challenge result!`
+            : `⚔️ Think you can beat my fit? Take my FitRate challenge!`
+
+          if (navigator.share) {
+            try {
+              await navigator.share({ title: 'FitRate Challenge', text, url })
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                await navigator.clipboard.writeText(`${text}\n${url}`)
+                displayToast('Link copied!')
+              }
+            }
+          } else {
+            await navigator.clipboard.writeText(`${text}\n${url}`)
+            displayToast('Link copied!')
+          }
+        }}
+        onHome={() => {
+          setChallengePartyId(null)
+          setChallengePartyData(null)
+          setScreen('home')
+          // Clean URL
+          window.history.replaceState({}, '', '/')
+        }}
+      />
     )
   }
 
