@@ -21,19 +21,20 @@ const getScoreTierColors = (score) => {
 // ============================================
 const getModeColors = (mode) => {
     const colors = {
-        nice: { accent: '#00ff88', end: '#00d4ff', glow: 'rgba(0,255,136,0.4)', border: 'rgba(0,255,136,0.3)', bg: 'rgba(0,255,136,0.08)' },
-        roast: { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.4)', border: 'rgba(255,107,53,0.3)', bg: 'rgba(255,107,53,0.08)' },
-        honest: { accent: '#3b82f6', end: '#06b6d4', glow: 'rgba(59,130,246,0.4)', border: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.08)' },
-        savage: { accent: '#ff1493', end: '#ff0066', glow: 'rgba(255,20,147,0.4)', border: 'rgba(255,20,147,0.3)', bg: 'rgba(255,20,147,0.08)' },
-        rizz: { accent: '#ff69b4', end: '#ff1493', glow: 'rgba(255,105,180,0.4)', border: 'rgba(255,105,180,0.3)', bg: 'rgba(255,105,180,0.08)' },
-        celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.4)', border: 'rgba(255,215,0,0.3)', bg: 'rgba(255,215,0,0.08)' },
-        aura: { accent: '#9b59b6', end: '#8b5cf6', glow: 'rgba(155,89,182,0.4)', border: 'rgba(155,89,182,0.3)', bg: 'rgba(155,89,182,0.08)' },
-        chaos: { accent: '#ff4444', end: '#ff6b6b', glow: 'rgba(255,68,68,0.4)', border: 'rgba(255,68,68,0.3)', bg: 'rgba(255,68,68,0.08)' },
-        y2k: { accent: '#ff69b4', end: '#da70d6', glow: 'rgba(255,105,180,0.4)', border: 'rgba(255,105,180,0.3)', bg: 'rgba(255,105,180,0.08)' },
-        villain: { accent: '#4c1d95', end: '#2d1b4e', glow: 'rgba(76,29,149,0.4)', border: 'rgba(76,29,149,0.3)', bg: 'rgba(76,29,149,0.08)' },
-        coquette: { accent: '#ffb6c1', end: '#ffc0cb', glow: 'rgba(255,182,193,0.4)', border: 'rgba(255,182,193,0.3)', bg: 'rgba(255,182,193,0.08)' },
-        hypebeast: { accent: '#f97316', end: '#ea580c', glow: 'rgba(249,115,22,0.4)', border: 'rgba(249,115,22,0.3)', bg: 'rgba(249,115,22,0.08)' },
-        event: { accent: '#10b981', end: '#06b6d4', glow: 'rgba(16,185,129,0.4)', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.08)' }
+        nice: { accent: '#00ff88', end: '#00d4ff', glow: 'rgba(0,255,136,0.4)', border: 'rgba(0,255,136,0.3)', bg: 'rgba(0,255,136,0.08)', pulse: 'gentle' },
+        roast: { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.4)', border: 'rgba(255,107,53,0.3)', bg: 'rgba(255,107,53,0.08)', pulse: 'fire' },
+        honest: { accent: '#3b82f6', end: '#06b6d4', glow: 'rgba(59,130,246,0.4)', border: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.08)', pulse: 'steady' },
+        savage: { accent: '#ff1493', end: '#ff0066', glow: 'rgba(255,20,147,0.4)', border: 'rgba(255,20,147,0.3)', bg: 'rgba(255,20,147,0.08)', pulse: 'intense' },
+        rizz: { accent: '#ff69b4', end: '#ff1493', glow: 'rgba(255,105,180,0.4)', border: 'rgba(255,105,180,0.3)', bg: 'rgba(255,105,180,0.08)', pulse: 'flirty' },
+        celeb: { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.4)', border: 'rgba(255,215,0,0.3)', bg: 'rgba(255,215,0,0.08)', pulse: 'glamour' },
+        aura: { accent: '#9b59b6', end: '#8b5cf6', glow: 'rgba(155,89,182,0.4)', border: 'rgba(155,89,182,0.3)', bg: 'rgba(155,89,182,0.08)', pulse: 'mystical' },
+        chaos: { accent: '#ff4444', end: '#ff6b6b', glow: 'rgba(255,68,68,0.4)', border: 'rgba(255,68,68,0.3)', bg: 'rgba(255,68,68,0.08)', pulse: 'chaotic' },
+        // Y2K: Now uses distinct cyan/teal to differentiate from Rizz pink
+        y2k: { accent: '#00CED1', end: '#FF69B4', glow: 'rgba(0,206,209,0.4)', border: 'rgba(0,206,209,0.3)', bg: 'rgba(0,206,209,0.08)', pulse: 'sparkle' },
+        villain: { accent: '#4c1d95', end: '#2d1b4e', glow: 'rgba(76,29,149,0.4)', border: 'rgba(76,29,149,0.3)', bg: 'rgba(76,29,149,0.08)', pulse: 'menacing' },
+        coquette: { accent: '#ffb6c1', end: '#ffc0cb', glow: 'rgba(255,182,193,0.4)', border: 'rgba(255,182,193,0.3)', bg: 'rgba(255,182,193,0.08)', pulse: 'soft' },
+        hypebeast: { accent: '#f97316', end: '#ea580c', glow: 'rgba(249,115,22,0.4)', border: 'rgba(249,115,22,0.3)', bg: 'rgba(249,115,22,0.08)', pulse: 'drip' },
+        event: { accent: '#10b981', end: '#06b6d4', glow: 'rgba(16,185,129,0.4)', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.08)', pulse: 'gentle' }
     }
     return colors[mode] || colors.honest
 }

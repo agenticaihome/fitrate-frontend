@@ -1921,20 +1921,38 @@ export default function App() {
 
   // Accent colors based on mode - DISTINCT per mode for instant recognition
   const getModeColor = () => {
-    switch (mode) {
-      case 'savage': return '#8b00ff' // Purple
-      case 'roast': return '#ff4444'  // Red
-      case 'honest': return '#0077ff' // Blue
-      default: return '#00d4ff'       // Cyan (Nice)
+    const colors = {
+      nice: '#00ff88',
+      roast: '#ff6b35',
+      honest: '#3b82f6',
+      savage: '#ff1493',
+      rizz: '#ff69b4',
+      celeb: '#ffd700',
+      aura: '#9b59b6',
+      chaos: '#ff4444',
+      y2k: '#00CED1',
+      villain: '#4c1d95',
+      coquette: '#ffb6c1',
+      hypebeast: '#f97316'
     }
+    return colors[mode] || '#00d4ff'
   }
   const getModeGlow = () => {
-    switch (mode) {
-      case 'savage': return 'rgba(139,0,255,0.4)' // Purple glow
-      case 'roast': return 'rgba(255,68,68,0.4)'  // Red glow
-      case 'honest': return 'rgba(0,119,255,0.4)' // Blue glow
-      default: return 'rgba(0,212,255,0.4)'       // Cyan glow (Nice)
+    const glows = {
+      nice: 'rgba(0,255,136,0.4)',
+      roast: 'rgba(255,107,53,0.4)',
+      honest: 'rgba(59,130,246,0.4)',
+      savage: 'rgba(255,20,147,0.4)',
+      rizz: 'rgba(255,105,180,0.4)',
+      celeb: 'rgba(255,215,0,0.4)',
+      aura: 'rgba(155,89,182,0.4)',
+      chaos: 'rgba(255,68,68,0.4)',
+      y2k: 'rgba(0,206,209,0.4)',
+      villain: 'rgba(76,29,149,0.4)',
+      coquette: 'rgba(255,182,193,0.4)',
+      hypebeast: 'rgba(249,115,22,0.4)'
     }
+    return glows[mode] || 'rgba(0,212,255,0.4)'
   }
   // Secondary gradient color per mode
 
