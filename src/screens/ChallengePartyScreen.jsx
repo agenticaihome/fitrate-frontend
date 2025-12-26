@@ -118,13 +118,13 @@ export default function ChallengePartyScreen({
 
                 {/* Title */}
                 <h1 className="text-3xl font-black mb-2" style={{ color: waitingColor }}>
-                    {isCreator ? 'Challenge Sent!' : 'Challenge Accepted!'}
+                    {isCreator ? 'Battle Sent!' : 'Battle Time!'}
                 </h1>
 
                 <p className="text-white/60 mb-8 max-w-xs">
                     {isCreator
-                        ? "Waiting for someone to accept your challenge..."
-                        : "Scan your outfit to complete the challenge!"
+                        ? "Waiting for someone to accept your battle..."
+                        : "Scan your outfit to complete the battle!"
                     }
                 </p>
 
@@ -196,7 +196,7 @@ export default function ChallengePartyScreen({
                         </>
                     ) : (
                         <>
-                            {/* Accept Challenge */}
+                            {/* Accept Battle */}
                             <button
                                 onClick={() => {
                                     playSound('click')
@@ -210,7 +210,7 @@ export default function ChallengePartyScreen({
                                     boxShadow: `0 8px 30px ${winColor}40`
                                 }}
                             >
-                                📸 Accept Challenge
+                                ⚔️ Accept Battle
                             </button>
                         </>
                     )}
@@ -390,7 +390,7 @@ export default function ChallengePartyScreen({
                         boxShadow: `0 8px 30px ${accentColor}40`
                     }}
                 >
-                    {userWon ? '🏆 Challenge Someone Else' : '⚔️ Rematch!'}
+                    {userWon ? '🏆 Battle Someone Else' : '⚔️ Rematch!'}
                 </button>
 
                 {/* Home */}

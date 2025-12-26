@@ -26,10 +26,10 @@ export async function onRequest(context) {
         // Clone the response since we need to read it
         const html = await response.text();
 
-        // Challenge OG meta tags
+        // Battle OG meta tags
         const challengeMeta = `
-    <!-- Challenge Party OG Tags -->
-    <meta property="og:title" content="⚔️ FitRate Challenge" />
+    <!-- Battle Party OG Tags -->
+    <meta property="og:title" content="⚔️ FitRate Battle" />
     <meta property="og:description" content="Think you can beat my fit? Scan yours and find out! 👀" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fitrate.app/c/${challengeId}" />
@@ -37,7 +37,7 @@ export async function onRequest(context) {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="⚔️ FitRate Challenge" />
+    <meta name="twitter:title" content="⚔️ FitRate Battle" />
     <meta name="twitter:description" content="Think you can beat my fit? Scan yours and find out! 👀" />
     <meta name="twitter:image" content="https://fitrate.app/og/challenge.png" />
 `;
@@ -48,7 +48,7 @@ export async function onRequest(context) {
         // Update title tag
         modifiedHtml = modifiedHtml.replace(
             /<title>[^<]*<\/title>/,
-            '<title>⚔️ FitRate Challenge — Can You Beat This?</title>'
+            '<title>⚔️ FitRate Battle — Can You Beat This?</title>'
         );
 
         // Inject our OG tags right after the opening head tag

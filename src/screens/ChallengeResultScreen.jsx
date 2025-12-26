@@ -257,7 +257,7 @@ export default function ChallengeResultScreen({
     ]
     const lossMessage = useMemo(() =>
         lossMessages[Math.floor(Math.random() * lossMessages.length)],
-    [])
+        [])
 
     return (
         <div
@@ -638,7 +638,7 @@ export default function ChallengeResultScreen({
                         backdropFilter: 'blur(10px)'
                     }}
                 >
-                    {won ? '👊 Challenge Someone Else' : '📸 Try Different Outfit'}
+                    {won ? '👊 Battle Someone Else' : '📸 Try Different Outfit'}
                 </button>
 
                 {/* View Full Results */}

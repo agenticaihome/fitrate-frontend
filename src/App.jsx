@@ -1784,7 +1784,7 @@ export default function App() {
       if (navigator.share) {
         try {
           const sharePayload = {
-            title: isChallenge ? 'FitRate Challenge' : 'My FitRate Score',
+            title: isChallenge ? 'FitRate Battle' : 'My FitRate Score',
             text: text,
           }
 
@@ -2165,10 +2165,10 @@ export default function App() {
             : `Think you can beat me? 👀\n${shareUrl}`
 
           if (navigator.share) {
-            navigator.share({ title: 'FitRate Challenge', text: shareText })
+            navigator.share({ title: 'FitRate Battle', text: shareText })
           } else {
             navigator.clipboard.writeText(shareText)
-            displayToast('Challenge link copied!')
+            displayToast('Battle link copied!')
           }
         }}
         onHome={() => {
