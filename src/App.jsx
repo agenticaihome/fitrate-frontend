@@ -278,6 +278,9 @@ export default function App() {
   })
   const [isCreatorOfChallenge, setIsCreatorOfChallenge] = useState(false)
 
+  // Store last analyzed image thumbnail for battle photo display
+  const [lastAnalyzedThumb, setLastAnalyzedThumb] = useState(null)
+
   // ============================================
   // FASHION SHOW STATE
   // ============================================
@@ -1563,17 +1566,20 @@ export default function App() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      // Create thumbnail for event mode OR daily challenge submissions
+      // Create thumbnail for event mode OR daily challenge submissions OR battle photos
       const isProEventSubmission = eventMode && currentEvent && !fashionShowId;
       const isProDailyChallengeSubmission = dailyChallengeMode && !fashionShowId;
 
+      // Always create thumbnail for potential battle photo display
       let proChallengeThumb = null;
-      if ((isProEventSubmission || isProDailyChallengeSubmission) && imageData) {
+      if (imageData) {
         try {
           proChallengeThumb = await createThumbnail(imageData, 150, 0.6);
-          console.log(`[${isProDailyChallengeSubmission ? 'Daily Pro' : 'Event Pro'}] Thumbnail created:`, proChallengeThumb ? `${Math.round(proChallengeThumb.length / 1024)}KB` : 'failed');
+          // Store for battle photo display
+          setLastAnalyzedThumb(proChallengeThumb);
+          console.log('[Thumbnail] Created for battle/challenge:', proChallengeThumb ? `${Math.round(proChallengeThumb.length / 1024)}KB` : 'failed');
         } catch (e) {
-          console.warn('Failed to create challenge thumbnail:', e);
+          console.warn('Failed to create thumbnail:', e);
         }
       }
 
@@ -1670,7 +1676,8 @@ export default function App() {
             headers: getApiHeaders(),
             body: JSON.stringify({
               responderScore: overall,
-              responderId: userId
+              responderId: userId,
+              responderThumb: lastAnalyzedThumb  // Send responder's outfit photo
             })
           })
           const challengeResult = await res.json()
@@ -1801,7 +1808,9 @@ export default function App() {
             headers: getApiHeaders(),
             body: JSON.stringify({
               creatorScore: scores.overall,
-              creatorId: userId
+              creatorId: userId,
+              mode: mode,  // Send the mode so responder uses same mode
+              creatorThumb: lastAnalyzedThumb  // Send creator's outfit photo
             })
           })
           const data = await res.json()

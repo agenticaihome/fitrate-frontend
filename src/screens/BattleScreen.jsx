@@ -28,7 +28,7 @@ function ConfettiPiece({ delay, color, left }) {
 
 export default function BattleScreen({
     battleId,
-    battleData, // { creatorScore, responderScore?, status: 'waiting'|'completed', createdAt }
+    battleData, // { creatorScore, responderScore?, mode?, status: 'waiting'|'completed', createdAt }
     isCreator,     // Did the current user create this battle?
     onRefresh,     // Refresh battle data
     onAcceptChallenge, // Responder wants to scan their outfit
@@ -42,6 +42,17 @@ export default function BattleScreen({
     const isCompleted = battleData?.status === 'completed'
     const creatorScore = battleData?.creatorScore || 0
     const responderScore = battleData?.responderScore || 0
+    const battleMode = battleData?.mode || 'nice'  // AI mode for this battle
+
+    // Mode display helpers
+    const getModeEmoji = (m) => {
+        const emojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏', celeb: '⭐', aura: '🔮', chaos: '🎪', y2k: '💎', villain: '🖤', coquette: '🎀', hypebeast: '👟' }
+        return emojis[m] || '😇'
+    }
+    const getModeLabel = (m) => {
+        const labels = { nice: 'Nice', roast: 'Roast', honest: 'Honest', savage: 'Savage', rizz: 'Rizz', celeb: 'Celebrity', aura: 'Aura', chaos: 'Chaos', y2k: 'Y2K', villain: 'Villain', coquette: 'Coquette', hypebeast: 'Hypebeast' }
+        return labels[m] || 'Nice'
+    }
 
     // Determine winner
     const creatorWon = creatorScore > responderScore
@@ -120,6 +131,12 @@ export default function BattleScreen({
                 <h1 className="text-3xl font-black mb-2" style={{ color: waitingColor }}>
                     {isCreator ? 'Battle Sent!' : 'Battle Time!'}
                 </h1>
+
+                {/* Mode Badge */}
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20 mb-4">
+                    <span className="text-lg">{getModeEmoji(battleMode)}</span>
+                    <span className="text-sm font-bold text-white/80">{getModeLabel(battleMode)} Mode</span>
+                </div>
 
                 <p className="text-white/60 mb-8 max-w-xs">
                     {isCreator
@@ -305,14 +322,22 @@ export default function BattleScreen({
                 {/* Creator Score */}
                 <div className="flex flex-col items-center">
                     <div
-                        className="w-24 h-24 rounded-full flex items-center justify-center mb-2"
+                        className="w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden"
                         style={{
                             background: creatorWon ? `${winColor}20` : 'rgba(255,255,255,0.08)',
                             border: `3px solid ${creatorWon ? winColor : 'rgba(255,255,255,0.2)'}`,
                             boxShadow: creatorWon ? `0 0 30px ${winColor}40` : 'none'
                         }}
                     >
-                        <span className="text-3xl">{isCreator ? '👤' : '🤷'}</span>
+                        {battleData?.creatorThumb ? (
+                            <img
+                                src={battleData.creatorThumb}
+                                alt="Creator outfit"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-3xl">{isCreator ? '👤' : '🤷'}</span>
+                        )}
                     </div>
                     <span className="text-xs text-white/50 uppercase tracking-wider">
                         {isCreator ? 'You' : 'Them'}
@@ -331,14 +356,22 @@ export default function BattleScreen({
                 {/* Responder Score */}
                 <div className="flex flex-col items-center">
                     <div
-                        className="w-24 h-24 rounded-full flex items-center justify-center mb-2"
+                        className="w-24 h-24 rounded-full flex items-center justify-center mb-2 overflow-hidden"
                         style={{
                             background: responderWon ? `${winColor}20` : 'rgba(255,255,255,0.08)',
                             border: `3px solid ${responderWon ? winColor : 'rgba(255,255,255,0.2)'}`,
                             boxShadow: responderWon ? `0 0 30px ${winColor}40` : 'none'
                         }}
                     >
-                        <span className="text-3xl">{isCreator ? '🤷' : '👤'}</span>
+                        {battleData?.responderThumb ? (
+                            <img
+                                src={battleData.responderThumb}
+                                alt="Responder outfit"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-3xl">{isCreator ? '🤷' : '👤'}</span>
+                        )}
                     </div>
                     <span className="text-xs text-white/50 uppercase tracking-wider">
                         {isCreator ? 'Them' : 'You'}
