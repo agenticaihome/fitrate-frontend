@@ -42,26 +42,27 @@ export const RESETS = {
 };
 
 // Stripe Checkout Links
-// You have 4 existing links - just edit them in Stripe Dashboard to match these:
+// YOUR EXISTING PRODUCTS: 5 scans, 15 scans, 50 scans, proRoast
 export const STRIPE_LINKS = {
     // ============================================
-    // 5-TIER SCAN PACKS (Edit existing 4, create 2)
+    // 5-TIER SCAN PACKS
+    // You have 4 existing links - edit them in Stripe:
     // ============================================
 
-    // Tier 1: 3 scans @ $0.99 (EDIT your old starterPack product)
+    // Tier 1: 3 scans @ $0.99 (EDIT your old 5-scan product → change to 3 scans @ $0.99)
     tinyPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04',
 
-    // Tier 2: 10 scans @ $2.99 (EDIT your old popularPack product)  
+    // Tier 2: 10 scans @ $2.99 (EDIT your old 15-scan product → change to 10 scans @ $2.99)
     starterPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05',
 
-    // Tier 3: 25 scans @ $4.99 ⭐ MOST POPULAR (EDIT your old powerPack product)
-    popularPack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06',
+    // Tier 3: 25 scans @ $4.99 ⭐ MOST POPULAR (CREATE NEW or edit another)
+    popularPack: 'NEED_NEW_25_SCAN_LINK',
 
-    // Tier 4: 50 scans @ $7.99 (EDIT your old proWeekly OR create new)
-    valuePack: 'https://buy.stripe.com/5kQ28tdxm3gD6HlgDxfYY02',
+    // Tier 4: 50 scans @ $7.99 (EDIT your old 50-scan product → change price to $7.99)
+    valuePack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06',
 
-    // Tier 5: 100 scans @ $12.99 (CREATE NEW in Stripe)
-    proPack: 'NEED_TO_CREATE_100_SCAN_LINK',
+    // Tier 5: 100 scans @ $12.99 (EDIT your old proRoast → change to 100 scans @ $12.99)
+    proPack: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',
 
     // First-Time Offer: 10 scans @ $0.99 (CREATE NEW in Stripe)
     firstTimeOffer: 'NEED_TO_CREATE_FIRST_TIME_LINK',
