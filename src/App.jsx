@@ -1409,13 +1409,14 @@ export default function App() {
         // Create thumbnail for event mode submissions (Weekly Challenge)
         const isEventSubmission = eventMode && currentEvent && !fashionShowId;
         const isDailyChallengeSubmission = dailyChallengeMode && !fashionShowId;
+        const isRespondingToBattle = !!localStorage.getItem('fitrate_responding_challenge');
 
-        // Create thumbnail for event OR daily challenge submissions
+        // Create thumbnail for event, daily challenge, OR battle mode submissions
         let challengeThumb = null;
-        if ((isEventSubmission || isDailyChallengeSubmission) && imageData) {
+        if ((isEventSubmission || isDailyChallengeSubmission || isRespondingToBattle) && imageData) {
           try {
             challengeThumb = await createThumbnail(imageData, 150, 0.6);
-            console.log(`[${isDailyChallengeSubmission ? 'Daily' : 'Event'}] Thumbnail created:`, challengeThumb ? `${Math.round(challengeThumb.length / 1024)}KB` : 'failed');
+            console.log(`[${isRespondingToBattle ? 'Battle' : isDailyChallengeSubmission ? 'Daily' : 'Event'}] Thumbnail created:`, challengeThumb ? `${Math.round(challengeThumb.length / 1024)}KB` : 'failed');
           } catch (e) {
             console.warn('Failed to create challenge thumbnail:', e);
           }
@@ -1578,6 +1579,52 @@ export default function App() {
         setDailyChallengeMode(false)
         setEventMode(false)
 
+        // ============================================
+        // BATTLE ROOM - Submit responder score if responding to a battle (FREE USERS)
+        // ============================================
+        const respondingBattleId = localStorage.getItem('fitrate_responding_challenge')
+        if (respondingBattleId) {
+          try {
+            const battleRes = await fetch(`${API_BASE}/battle/${respondingBattleId}/respond`, {
+              method: 'POST',
+              headers: getApiHeaders(),
+              body: JSON.stringify({
+                responderScore: overall,
+                responderId: userId,
+                responderThumb: challengeThumb  // Use locally created thumbnail
+              })
+            })
+            const battleResult = await battleRes.json()
+            console.log('[Battle] Free user submitted response:', battleResult)
+
+            // Clear the pending battle flag
+            localStorage.removeItem('fitrate_responding_challenge')
+
+            // Navigate to battle room to see results
+            setChallengePartyId(respondingBattleId)
+            window.history.pushState({}, '', `/c/${respondingBattleId}`)
+            // Fetch the updated battle data
+            setChallengePartyLoading(true)
+            try {
+              const partyRes = await fetch(`${API_BASE}/battle/${respondingBattleId}`, {
+                headers: getApiHeaders()
+              })
+              if (partyRes.ok) {
+                const partyData = await partyRes.json()
+                setChallengePartyData(partyData)
+              }
+            } finally {
+              setChallengePartyLoading(false)
+            }
+            setIsAnalyzing(false)
+            return // Don't navigate to normal results, let BattleRoom render
+          } catch (err) {
+            console.error('[Battle] Failed to submit free user response:', err)
+            localStorage.removeItem('fitrate_responding_challenge')
+            // Fall through to normal results
+          }
+        }
+
         // CRITICAL: Reset analyzing flag so user can scan again
         setIsAnalyzing(false)
 
@@ -1718,7 +1765,7 @@ export default function App() {
             body: JSON.stringify({
               responderScore: overall,
               responderId: userId,
-              responderThumb: lastAnalyzedThumb  // Send responder's outfit photo
+              responderThumb: proChallengeThumb  // Use locally created thumbnail (not stale state)
             })
           })
           const challengeResult = await res.json()

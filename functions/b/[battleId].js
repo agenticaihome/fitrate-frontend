@@ -1,7 +1,7 @@
 /**
- * Cloudflare Pages Function: Challenge Party OG Meta Tags
+ * Cloudflare Pages Function: Battle Room OG Meta Tags
  *
- * Injects custom Open Graph meta tags for Challenge links (/c/:challengeId)
+ * Injects custom Open Graph meta tags for Battle links (/b/:battleId)
  * so they preview beautifully in iMessage, WhatsApp, Instagram DMs, etc.
  *
  * Features:
@@ -9,7 +9,7 @@
  * - Shows creator's score and battle mode
  * - Falls back to static OG tags if API fails
  *
- * Route: /c/:challengeId
+ * Route: /b/:battleId
  */
 
 const API_BASE = 'https://fitrate-production.up.railway.app/api'
@@ -48,11 +48,11 @@ const MODE_LABELS = {
 
 export async function onRequest(context) {
     const { request, next, params, env } = context
-    const challengeId = params.challengeId
+    const battleId = params.battleId
 
     // Default OG values (used as fallback)
     let ogTitle = '1v1 Outfit Battle'
-    let ogDescription = 'Think you can beat my fit? Scan yours and find out!'
+    let ogDescription = 'Your friend challenged you to a style battle! Take a photo to see who wins.'
     let ogImage = 'https://fitrate.app/og/battle.png'
 
     // Try to fetch battle data for dynamic OG tags
@@ -63,7 +63,7 @@ export async function onRequest(context) {
             headers['X-API-Key'] = env.VITE_API_KEY
         }
 
-        const battleRes = await fetch(`${API_BASE}/battle/${challengeId}`, {
+        const battleRes = await fetch(`${API_BASE}/battle/${battleId}`, {
             method: 'GET',
             headers,
             // Short timeout for OG tag generation
@@ -89,11 +89,11 @@ export async function onRequest(context) {
         }
     } catch (error) {
         // Silent fail - use default OG tags
-        console.log('[Challenge OG] API fetch failed, using defaults:', error.message)
+        console.log('[Battle OG] API fetch failed, using defaults:', error.message)
     }
 
     try {
-        // Get the original response (the SPA HTML from challenge.html fallback)
+        // Get the original response (the SPA HTML from battle.html fallback)
         const response = await next()
 
         // Only modify HTML responses
@@ -106,12 +106,12 @@ export async function onRequest(context) {
         const html = await response.text()
 
         // Battle OG meta tags with dynamic content
-        const challengeMeta = `
-    <!-- Battle Party OG Tags (Dynamic) -->
+        const battleMeta = `
+    <!-- Battle Room OG Tags (Dynamic) -->
     <meta property="og:title" content="${escapeHtml(ogTitle)}" />
     <meta property="og:description" content="${escapeHtml(ogDescription)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://fitrate.app/c/${challengeId}" />
+    <meta property="og:url" content="https://fitrate.app/b/${battleId}" />
     <meta property="og:image" content="${ogImage}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -139,7 +139,7 @@ export async function onRequest(context) {
         // Inject our OG tags right after the opening head tag
         modifiedHtml = modifiedHtml.replace(
             /<head>/i,
-            '<head>' + challengeMeta
+            '<head>' + battleMeta
         )
 
         // Return modified response
@@ -151,7 +151,7 @@ export async function onRequest(context) {
             }
         })
     } catch (error) {
-        console.error('[Challenge OG] Error:', error)
+        console.error('[Battle OG] Error:', error)
         return await next()
     }
 }
