@@ -45,7 +45,7 @@ const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
 const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
-
+const MeetTheJudges = lazy(() => import('./screens/MeetTheJudges'))
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -2235,6 +2235,23 @@ export default function App() {
   }
 
   // ============================================
+  // MEET THE JUDGES - AI Personalities Showcase
+  // ============================================
+  if (screen === 'judges') {
+    return (
+      <MeetTheJudges
+        onBack={() => setScreen('home')}
+        onSelectMode={(selectedMode) => {
+          setMode(selectedMode)
+          localStorage.setItem('fitrate_mode', selectedMode)
+          setScreen('home')
+          displayToast(`${selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1)} mode selected! 🎯`)
+        }}
+      />
+    )
+  }
+
+  // ============================================
   // BATTLE SCREEN - 1v1 Outfit Battles (/c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // ============================================
@@ -2358,6 +2375,10 @@ export default function App() {
           }}
           onRemoveShow={(showId) => {
             removeFromActiveShows(showId)
+          }}
+          onNavigate={(target) => {
+            // General navigation for mode drawer links (judges, etc.)
+            setScreen(target)
           }}
         />
         <BottomNav

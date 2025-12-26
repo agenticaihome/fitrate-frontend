@@ -63,7 +63,8 @@ export default function HomeScreen({
     fashionShowVibeLabel,   // Human-readable vibe label
     activeShows = [],       // User's active Fashion Shows
     onNavigateToShow,       // Navigate to a specific Fashion Show
-    onRemoveShow            // Remove a show from the list
+    onRemoveShow,           // Remove a show from the list
+    onNavigate              // General navigation callback (for judges, etc.)
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -1540,11 +1541,24 @@ export default function HomeScreen({
                             </button>
                         </div>
 
+                        {/* Meet The Judges link */}
+                        <button
+                            onClick={() => {
+                                setShowModeDrawer(false)
+                                onNavigate?.('judges')
+                            }}
+                            className="w-full py-2.5 text-cyan-400 text-sm font-bold mt-4 transition-all active:text-cyan-300 flex items-center justify-center gap-2"
+                        >
+                            <span>👥</span>
+                            <span>Meet Your AI Judges</span>
+                            <span className="text-cyan-400/50">→</span>
+                        </button>
+
                         {/* Cancel */}
                         <button
                             onClick={() => setShowModeDrawer(false)}
                             aria-label="Close mode selector"
-                            className="w-full py-2.5 text-white/40 text-sm font-medium mt-3 transition-all active:text-white/60"
+                            className="w-full py-2.5 text-white/40 text-sm font-medium transition-all active:text-white/60"
                         >
                             Cancel
                         </button>
