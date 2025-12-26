@@ -88,7 +88,8 @@ export const generateShareCard = async ({
     eventContext = null,
     dailyChallengeContext = null,
     cardDNA = null,
-    isChallenge = false  // When true, generates a challenge link with score
+    isChallenge = false,  // When true, generates a challenge link with score
+    challengeUrl = null   // The /c/:id URL from backend (if created)
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -381,17 +382,17 @@ export const generateShareCard = async ({
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
                 const baseUrl = 'https://fitrate.app'
-                // Challenge link includes score so friend can compare after they scan
+                // Prefer the new /c/:id party URL if provided, fallback to old query param
                 const link = isChallenge
-                    ? `${baseUrl}?ref=${userId}&challenge=${score}`
+                    ? (challengeUrl || `${baseUrl}?ref=${userId}&challenge=${score}`)
                     : `${baseUrl}?ref=${userId}`
 
                 // Challenge-specific copy - competitive and clear
                 if (isChallenge) {
-                    if (score >= 90) return `I got ${score}/100. Think you can beat that? 🔥 ${link}`
-                    if (score >= 75) return `${score}/100. Your turn — let's see what you got 👀 ${link}`
-                    if (score >= 50) return `I got ${score}. Can you do better? ${link}`
-                    return `${score}/100... surely you can beat this 😅 ${link}`
+                    if (score >= 90) return `I got ${score}/100. Think you can beat that? 🔥\n${link}`
+                    if (score >= 75) return `${score}/100. Your turn — let's see what you got 👀\n${link}`
+                    if (score >= 50) return `I got ${score}. Can you do better?\n${link}`
+                    return `${score}/100... surely you can beat this 😅\n${link}`
                 }
 
                 if (scores.roastMode || scores.mode === 'roast') {
@@ -418,9 +419,9 @@ export const generateShareCard = async ({
                 }
                 const file = new File([blob], 'fitrate-score.png', { type: 'image/png' })
                 const text = getShareText()
-                // URL matches the share text - includes challenge param if challenge mode
+                // URL matches the share text - prefer party URL if created
                 const url = isChallenge
-                    ? `https://fitrate.app?ref=${userId}&challenge=${score}`
+                    ? (challengeUrl || `https://fitrate.app?ref=${userId}&challenge=${score}`)
                     : `https://fitrate.app?ref=${userId}`
 
                 resolve({

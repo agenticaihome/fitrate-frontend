@@ -20,6 +20,7 @@ import ShareSuccessScreen from './screens/ShareSuccessScreen'
 import PaywallScreen from './screens/PaywallScreen'
 import RulesScreen from './screens/RulesScreen'
 import ChallengeResultScreen from './screens/ChallengeResultScreen'
+import ChallengePartyScreen from './screens/ChallengePartyScreen'
 // Fashion Show screens
 import FashionShowCreate from './screens/FashionShowCreate'
 import FashionShowInvite from './screens/FashionShowInvite'
@@ -134,7 +135,7 @@ export default function App() {
   // APP VERSION CHECK - Force update for stale caches
   // Bump this version when deploying breaking changes
   // ============================================
-  const APP_VERSION = '2024.12.25.2'
+  const APP_VERSION = '2024.12.25.3'
 
   useEffect(() => {
     const storedVersion = localStorage.getItem('fitrate_app_version')
@@ -202,11 +203,24 @@ export default function App() {
     return saved ? parseInt(saved) : null
   })
 
-  // Challenge a Friend (score from URL)
+  // Challenge a Friend (score from URL) - OLD SYSTEM (query param)
   const [challengeScore, setChallengeScore] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     return parseInt(params.get('challenge')) || null
   })
+
+  // ============================================
+  // CHALLENGE PARTY STATE - NEW SYSTEM (/c/:id)
+  // ============================================
+  const [challengePartyId, setChallengePartyId] = useState(() => {
+    // Check for /c/:challengeId pattern in URL
+    const path = window.location.pathname
+    const match = path.match(/^\/c\/([a-zA-Z0-9]+)$/)
+    return match ? match[1] : null
+  })
+  const [challengePartyData, setChallengePartyData] = useState(null)
+  const [challengePartyLoading, setChallengePartyLoading] = useState(false)
+  const [isCreatorOfChallenge, setIsCreatorOfChallenge] = useState(false)
 
   // ============================================
   // FASHION SHOW STATE
@@ -785,6 +799,57 @@ export default function App() {
 
     fetchShowData()
   }, [fashionShowId])
+
+  // ============================================
+  // CHALLENGE PARTY - Fetch data when ID detected
+  // ============================================
+  useEffect(() => {
+    if (!challengePartyId) return
+
+    const fetchChallengeParty = async () => {
+      setChallengePartyLoading(true)
+      try {
+        const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`, {
+          headers: getApiHeaders()
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setChallengePartyData(data)
+          // Check if current user created this challenge
+          const createdChallenges = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
+          setIsCreatorOfChallenge(createdChallenges.includes(challengePartyId))
+        } else {
+          setChallengePartyData(null)
+        }
+      } catch (err) {
+        console.error('[Challenge] Fetch error:', err)
+        setChallengePartyData(null)
+      } finally {
+        setChallengePartyLoading(false)
+      }
+    }
+
+    fetchChallengeParty()
+  }, [challengePartyId])
+
+  // Refresh challenge party data
+  const refreshChallengeParty = async () => {
+    if (!challengePartyId) return
+    setChallengePartyLoading(true)
+    try {
+      const res = await fetch(`${API_BASE}/challenges/${challengePartyId}`, {
+        headers: getApiHeaders()
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setChallengePartyData(data)
+      }
+    } catch (err) {
+      console.error('[Challenge] Refresh error:', err)
+    } finally {
+      setChallengePartyLoading(false)
+    }
+  }
 
   // Helper: Format time remaining moved to utils/dateUtils
 
@@ -1526,7 +1591,51 @@ export default function App() {
         fetchUserEventStatus()
       }
 
-      // If user came from a challenge link, show comparison screen first
+      // ============================================
+      // CHALLENGE PARTY - Submit responder score if responding to a challenge
+      // ============================================
+      const respondingChallengeId = localStorage.getItem('fitrate_responding_challenge')
+      if (respondingChallengeId) {
+        try {
+          const res = await fetch(`${API_BASE}/challenges/${respondingChallengeId}/respond`, {
+            method: 'POST',
+            headers: getApiHeaders(),
+            body: JSON.stringify({
+              responderScore: overall,
+              responderId: userId
+            })
+          })
+          const challengeResult = await res.json()
+          console.log('[Challenge] Submitted response:', challengeResult)
+
+          // Clear the pending challenge
+          localStorage.removeItem('fitrate_responding_challenge')
+
+          // Navigate to challenge party screen to see results
+          setChallengePartyId(respondingChallengeId)
+          window.history.pushState({}, '', `/c/${respondingChallengeId}`)
+          // Fetch the updated challenge data
+          setChallengePartyLoading(true)
+          try {
+            const partyRes = await fetch(`${API_BASE}/challenges/${respondingChallengeId}`, {
+              headers: getApiHeaders()
+            })
+            if (partyRes.ok) {
+              const partyData = await partyRes.json()
+              setChallengePartyData(partyData)
+            }
+          } finally {
+            setChallengePartyLoading(false)
+          }
+          return // Don't navigate to normal results, let ChallengePartyScreen render
+        } catch (err) {
+          console.error('[Challenge] Failed to submit response:', err)
+          localStorage.removeItem('fitrate_responding_challenge')
+          // Fall through to normal results
+        }
+      }
+
+      // If user came from a challenge link (old system), show comparison screen first
       if (challengeScore) {
         setScreen('challenge-result')
       } else {
@@ -1612,6 +1721,35 @@ export default function App() {
         totalParticipants: scores.dailyChallenge.totalParticipants
       } : null
 
+      // ============================================
+      // CHALLENGE PARTY CREATION - Create backend room first
+      // ============================================
+      let challengeUrl = null
+      if (isChallenge && scores?.overall) {
+        try {
+          const res = await fetch(`${API_BASE}/challenges`, {
+            method: 'POST',
+            headers: getApiHeaders(),
+            body: JSON.stringify({
+              creatorScore: scores.overall,
+              creatorId: userId
+            })
+          })
+          const data = await res.json()
+          if (data.challengeId) {
+            challengeUrl = `https://fitrate.app/c/${data.challengeId}`
+            // Track locally that we created this challenge
+            const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
+            created.push(data.challengeId)
+            localStorage.setItem('fitrate_created_challenges', JSON.stringify(created))
+            console.log('[Challenge] Created party:', data.challengeId)
+          }
+        } catch (err) {
+          console.error('[Challenge] Failed to create party:', err)
+          // Continue with old fallback (?challenge=XX param) if backend fails
+        }
+      }
+
       const { file, text, url, imageBlob } = await generateShareCardUtil({
         scores,
         shareFormat,
@@ -1621,7 +1759,8 @@ export default function App() {
         eventContext: eventShareContext,
         dailyChallengeContext: dailyChallengeShareContext,
         cardDNA,
-        isChallenge  // Pass through to generate challenge URL with score
+        isChallenge,
+        challengeUrl  // Pass the party URL if created
       })
 
       // Store shareData for potential future use
@@ -2105,7 +2244,52 @@ export default function App() {
   }
 
   // ============================================
-  // CHALLENGE RESULT SCREEN - "Who Won?"
+  // CHALLENGE PARTY SCREEN - New 1v1 System (/c/:id)
+  // ============================================
+  if (challengePartyId && (challengePartyData || challengePartyLoading)) {
+    return (
+      <ChallengePartyScreen
+        challengeId={challengePartyId}
+        challengeData={challengePartyData}
+        isCreator={isCreatorOfChallenge}
+        loading={challengePartyLoading}
+        onRefresh={refreshChallengeParty}
+        onAcceptChallenge={() => {
+          // Navigate to home to scan - store that we're responding to this challenge
+          localStorage.setItem('fitrate_responding_challenge', challengePartyId)
+          setChallengePartyId(null)
+          setChallengePartyData(null)
+          window.history.pushState({}, '', '/')
+          setScreen('home')
+          // Show toast explaining what to do
+          displayToast('📸 Take a photo to complete the challenge!')
+        }}
+        onShare={() => {
+          // Re-share the challenge link
+          const shareUrl = `https://fitrate.app/c/${challengePartyId}`
+          const shareText = challengePartyData?.creatorScore
+            ? `I scored ${Math.round(challengePartyData.creatorScore)}. Can you beat me? 👀\n${shareUrl}`
+            : `Think you can beat me? 👀\n${shareUrl}`
+
+          if (navigator.share) {
+            navigator.share({ title: 'FitRate Challenge', text: shareText })
+          } else {
+            navigator.clipboard.writeText(shareText)
+            displayToast('Challenge link copied!')
+          }
+        }}
+        onHome={() => {
+          setChallengePartyId(null)
+          setChallengePartyData(null)
+          window.history.pushState({}, '', '/')
+          setScreen('home')
+        }}
+      />
+    )
+  }
+
+  // ============================================
+  // CHALLENGE RESULT SCREEN - OLD SYSTEM ("Who Won?" from query param)
   // ============================================
   // Safety fallback: if we have challengeScore but no scores (scan failed), redirect home
   if (screen === 'challenge-result' && challengeScore && !scores) {
