@@ -32,6 +32,7 @@ import PaywallModal from './components/modals/PaywallModal'
 import LeaderboardModal from './components/modals/LeaderboardModal'
 import EventExplainerModal from './components/modals/EventExplainerModal'
 import RestoreProModal from './components/modals/RestoreProModal'
+import ChallengeResultShareCard from './components/modals/ChallengeResultShareCard'
 
 // API endpoints
 const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze'
@@ -331,6 +332,7 @@ export default function App() {
 
   const [screen, setScreen] = useState('home')
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showChallengeResultShare, setShowChallengeResultShare] = useState(false)
   const [isPro, setIsPro] = useState(() => localStorage.getItem('fitrate_pro') === 'true')
   const [emailChecking, setEmailChecking] = useState(false)
   const [proEmail, setProEmail] = useState('')
@@ -2075,59 +2077,42 @@ export default function App() {
   }
 
   if (screen === 'challenge-result' && scores && challengeScore) {
-    const won = scores.overall > challengeScore
-    const tied = scores.overall === challengeScore
-    const diff = Math.round(Math.abs(scores.overall - challengeScore) * 10) / 10
-
     return (
-      <ChallengeResultScreen
-        userScore={scores.overall}
-        challengeScore={challengeScore}
-        userImage={uploadedImage}
-        onViewResults={() => setScreen('results')}
-        onChallengeBack={() => {
-          // Clear challenge score and trigger share for rematch
-          setChallengeScore(null)
-          setScreen('results')
-          // Auto-trigger share after a short delay
-          setTimeout(() => generateShareCard(), 500)
-        }}
-        onTryAgain={() => {
-          setChallengeScore(null) // Clear so next scan goes to results
-          resetApp()
-        }}
-        onSendResultBack={async () => {
-          // Send result back to the original challenger
-          playSound('share')
-          vibrate(30)
+      <>
+        <ChallengeResultScreen
+          userScore={scores.overall}
+          challengeScore={challengeScore}
+          userImage={uploadedImage}
+          onViewResults={() => setScreen('results')}
+          onChallengeBack={() => {
+            // Clear challenge score and trigger share for rematch
+            setChallengeScore(null)
+            setScreen('results')
+            // Auto-trigger share after a short delay
+            setTimeout(() => generateShareCard(), 500)
+          }}
+          onTryAgain={() => {
+            setChallengeScore(null) // Clear so next scan goes to results
+            resetApp()
+          }}
+          onSendResultBack={() => {
+            // Open the visual share card modal
+            playSound('click')
+            vibrate(20)
+            setShowChallengeResultShare(true)
+          }}
+        />
 
-          const resultText = won
-            ? `🏆 I beat your FitRate challenge!\n\nMe: ${scores.overall} vs You: ${challengeScore}\nI won by ${diff} points!\n\nThink you can do better? 👀`
-            : tied
-              ? `🤝 We tied on FitRate!\n\nMe: ${scores.overall} vs You: ${challengeScore}\nExactly the same - rematch?\n\nfitrate.app`
-              : `💀 You got me on FitRate...\n\nMe: ${scores.overall} vs You: ${challengeScore}\nYou won by ${diff} points.\n\nBut I want a rematch! ⚔️`
-
-          if (navigator.share) {
-            try {
-              await navigator.share({
-                title: won ? 'I Won!' : tied ? 'We Tied!' : 'You Got Me...',
-                text: resultText
-              })
-              displayToast(won ? 'Victory sent! 🏆' : 'Result sent!')
-            } catch (err) {
-              if (err.name !== 'AbortError') {
-                // User didn't cancel, something went wrong - copy to clipboard
-                await navigator.clipboard.writeText(resultText)
-                displayToast('Copied to clipboard!')
-              }
-            }
-          } else {
-            // Fallback: copy to clipboard
-            await navigator.clipboard.writeText(resultText)
-            displayToast('Copied! Paste to send 📋')
-          }
-        }}
-      />
+        {/* Challenge Result Share Card Modal */}
+        {showChallengeResultShare && (
+          <ChallengeResultShareCard
+            userScore={scores.overall}
+            challengeScore={challengeScore}
+            userImage={uploadedImage}
+            onClose={() => setShowChallengeResultShare(false)}
+          />
+        )}
+      </>
     )
   }
 
