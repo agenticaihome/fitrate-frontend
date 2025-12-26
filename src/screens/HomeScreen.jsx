@@ -1407,137 +1407,137 @@ export default function HomeScreen({
                         </div>
 
                         {/* Mode Grid - 4 columns, 3 rows for 12 modes */}
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-4 gap-3">
                             {/* Nice */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'nice' ? 'ring-2 ring-cyan-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'nice' ? 'ring-3 ring-cyan-400' : ''}`}
                                 style={{ background: 'rgba(0,212,255,0.15)' }}
+                                aria-label="Nice mode - Supportive AI feedback"
                             >
-                                <span className="text-xl">😇</span>
-                                <span className="text-[9px] font-bold text-cyan-300">Nice</span>
-                                <span className="text-[7px] text-cyan-300/60">Hype friend</span>
+                                <span className="text-3xl mb-1">😇</span>
+                                <span className="text-[13px] font-bold text-cyan-200">Nice</span>
                             </button>
 
                             {/* Roast */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'roast' ? 'ring-2 ring-orange-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'roast' ? 'ring-3 ring-orange-400' : ''}`}
                                 style={{ background: 'rgba(255,68,68,0.15)' }}
+                                aria-label="Roast mode - Brutally honest AI"
                             >
-                                <span className="text-xl">🔥</span>
-                                <span className="text-[9px] font-bold text-orange-300">Roast</span>
-                                <span className="text-[7px] text-orange-300/60">Brutally honest</span>
+                                <span className="text-3xl mb-1">🔥</span>
+                                <span className="text-[13px] font-bold text-orange-200">Roast</span>
                             </button>
 
                             {/* Honest */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'honest' ? 'ring-2 ring-blue-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'honest' ? 'ring-3 ring-blue-400' : ''}`}
                                 style={{ background: 'rgba(59,130,246,0.15)' }}
+                                aria-label="Honest mode - Balanced analysis"
                             >
-                                <span className="text-xl">📊</span>
-                                <span className="text-[9px] font-bold text-blue-300">Honest</span>
-                                <span className="text-[7px] text-blue-300/60">Real talk</span>
+                                <span className="text-3xl mb-1">📊</span>
+                                <span className="text-[13px] font-bold text-blue-200">Honest</span>
                             </button>
 
                             {/* Savage */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'savage' ? 'ring-2 ring-purple-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'savage' ? 'ring-3 ring-purple-400' : ''}`}
                                 style={{ background: 'rgba(139,0,255,0.15)' }}
+                                aria-label="Savage mode - Maximum destruction"
                             >
-                                <span className="text-xl">💀</span>
-                                <span className="text-[9px] font-bold text-purple-300">Savage</span>
-                                <span className="text-[7px] text-purple-300/60">No mercy</span>
+                                <span className="text-3xl mb-1">💀</span>
+                                <span className="text-[13px] font-bold text-purple-200">Savage</span>
                             </button>
 
                             {/* Rizz */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'rizz' ? 'ring-2 ring-pink-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'rizz' ? 'ring-3 ring-pink-400' : ''}`}
                                 style={{ background: 'rgba(255,105,180,0.15)' }}
+                                aria-label="Rizz mode - Dating vibe check"
                             >
-                                <span className="text-xl">😏</span>
-                                <span className="text-[9px] font-bold text-pink-300">Rizz</span>
-                                <span className="text-[7px] text-pink-300/60">Dating vibes</span>
+                                <span className="text-3xl mb-1">😏</span>
+                                <span className="text-[13px] font-bold text-pink-200">Rizz</span>
                             </button>
 
                             {/* Celebrity */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'celeb' ? 'ring-2 ring-yellow-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'celeb' ? 'ring-3 ring-yellow-400' : ''}`}
                                 style={{ background: 'rgba(255,215,0,0.15)' }}
+                                aria-label="Celebrity mode - Celebrity judge"
                             >
-                                <span className="text-xl">⭐</span>
-                                <span className="text-[9px] font-bold text-yellow-300">Celebrity</span>
-                                <span className="text-[7px] text-yellow-300/60">Star judge</span>
+                                <span className="text-3xl mb-1">⭐</span>
+                                <span className="text-[13px] font-bold text-yellow-200">Celebrity</span>
                             </button>
 
                             {/* Aura */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'aura' ? 'ring-2 ring-violet-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'aura' ? 'ring-3 ring-violet-400' : ''}`}
                                 style={{ background: 'rgba(155,89,182,0.15)' }}
+                                aria-label="Aura mode - Mystical energy read"
                             >
-                                <span className="text-xl">🔮</span>
-                                <span className="text-[9px] font-bold text-violet-300">Aura</span>
-                                <span className="text-[7px] text-violet-300/60">Energy read</span>
+                                <span className="text-3xl mb-1">🔮</span>
+                                <span className="text-[13px] font-bold text-violet-200">Aura</span>
                             </button>
 
                             {/* Chaos */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'chaos' ? 'ring-2 ring-red-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'chaos' ? 'ring-3 ring-red-400' : ''}`}
                                 style={{ background: 'rgba(255,107,107,0.15)' }}
+                                aria-label="Chaos mode - Unhinged AI chaos"
                             >
-                                <span className="text-xl">🎪</span>
-                                <span className="text-[9px] font-bold text-red-300">Chaos</span>
-                                <span className="text-[7px] text-red-300/60">Unhinged AI</span>
+                                <span className="text-3xl mb-1">🎪</span>
+                                <span className="text-[13px] font-bold text-red-200">Chaos</span>
                             </button>
 
                             {/* Y2K */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('y2k'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'y2k' ? 'ring-2 ring-pink-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'y2k' ? 'ring-3 ring-pink-400' : ''}`}
                                 style={{ background: 'rgba(255,105,180,0.15)' }}
+                                aria-label="Y2K mode - That's hot"
                             >
-                                <span className="text-xl">💎</span>
-                                <span className="text-[9px] font-bold text-pink-300">Y2K</span>
-                                <span className="text-[7px] text-pink-300/60">That's hot</span>
+                                <span className="text-3xl mb-1">💎</span>
+                                <span className="text-[13px] font-bold text-pink-200">Y2K</span>
                             </button>
 
                             {/* Villain */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('villain'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'villain' ? 'ring-2 ring-indigo-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'villain' ? 'ring-3 ring-indigo-400' : ''}`}
                                 style={{ background: 'rgba(76,29,149,0.15)' }}
+                                aria-label="Villain mode - Main villain energy"
                             >
-                                <span className="text-xl">🖤</span>
-                                <span className="text-[9px] font-bold text-indigo-300">Villain</span>
-                                <span className="text-[7px] text-indigo-300/60">Main villain</span>
+                                <span className="text-3xl mb-1">🖤</span>
+                                <span className="text-[13px] font-bold text-indigo-200">Villain</span>
                             </button>
 
                             {/* Coquette */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('coquette'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'coquette' ? 'ring-2 ring-pink-300' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'coquette' ? 'ring-3 ring-pink-300' : ''}`}
                                 style={{ background: 'rgba(255,182,193,0.15)' }}
+                                aria-label="Coquette mode - Soft and romantic"
                             >
-                                <span className="text-xl">🎀</span>
-                                <span className="text-[9px] font-bold text-pink-200">Coquette</span>
-                                <span className="text-[7px] text-pink-200/60">Soft & dainty</span>
+                                <span className="text-3xl mb-1">🎀</span>
+                                <span className="text-[13px] font-bold text-pink-100">Coquette</span>
                             </button>
 
                             {/* Hypebeast */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); setMode('hypebeast'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-0.5 p-2.5 rounded-xl transition-all active:scale-95 ${mode === 'hypebeast' ? 'ring-2 ring-orange-400' : ''}`}
+                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'hypebeast' ? 'ring-3 ring-orange-400' : ''}`}
                                 style={{ background: 'rgba(249,115,22,0.15)' }}
+                                aria-label="Hypebeast mode - Certified drip check"
                             >
-                                <span className="text-xl">👟</span>
-                                <span className="text-[9px] font-bold text-orange-300">Hypebeast</span>
-                                <span className="text-[7px] text-orange-300/60">Drip check</span>
+                                <span className="text-3xl mb-1">👟</span>
+                                <span className="text-[13px] font-bold text-orange-200">Hypebeast</span>
                             </button>
                         </div>
 
