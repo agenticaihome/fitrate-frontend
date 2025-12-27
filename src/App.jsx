@@ -1958,7 +1958,7 @@ export default function App() {
               creatorScore: scores.overall,
               creatorId: userId,
               mode: mode,  // Send the mode so responder uses same mode
-              creatorThumb: lastAnalyzedThumb  // Send creator's outfit photo
+              creatorThumb: uploadedImage  // Send creator's outfit photo
             })
           })
           const data = await res.json()

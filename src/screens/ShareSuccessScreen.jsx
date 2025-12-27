@@ -108,70 +108,36 @@ export default function ShareSuccessScreen({
                 {mode === 'roast' ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
             </button>
 
-            {/* REFERRAL REWARD SECTION - Clear Value Prop */}
+            {/* SHARE WITH FRIENDS - Simple & Friendly */}
             {userId && (
                 <div className="w-full max-w-xs mt-2 rounded-2xl overflow-hidden" style={{
-                    background: 'linear-gradient(135deg, rgba(255,68,68,0.15) 0%, rgba(255,136,0,0.15) 100%)',
-                    border: '1px solid rgba(255,68,68,0.3)'
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)'
                 }}>
                     {/* Header */}
                     <div className="px-4 py-3 text-center" style={{
-                        background: 'rgba(0,0,0,0.3)',
+                        background: 'rgba(0,0,0,0.2)',
                         borderBottom: '1px solid rgba(255,255,255,0.1)'
                     }}>
-                        <p className="text-base font-black text-white">💀 3 Shares = 1 Savage Roast</p>
+                        <p className="text-base font-bold text-white">📲 Share FitRate</p>
                         <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                            GPT-4o powered brutal honesty
+                            Let your friends rate their fits too!
                         </p>
                     </div>
 
-                    {/* Progress Tracker */}
+                    {/* Copy Link Section */}
                     <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                                Progress to next Savage Roast
-                            </span>
-                            <span className="text-xs font-bold text-white">
-                                {currentProgress}/{sharesPerReward}
-                            </span>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="h-3 rounded-full overflow-hidden mb-3" style={{
-                            background: 'rgba(255,255,255,0.1)'
-                        }}>
-                            <div
-                                className="h-full rounded-full transition-all duration-500"
-                                style={{
-                                    width: `${(currentProgress / sharesPerReward) * 100}%`,
-                                    background: 'linear-gradient(90deg, #ff4444 0%, #ff8800 100%)'
-                                }}
-                            />
-                        </div>
-
-                        {/* Status */}
-                        {totalRoastsEarned > 0 && (
-                            <p className="text-center text-xs mb-3" style={{ color: '#00ff88' }}>
-                                🎁 {totalRoastsEarned} Savage Roast{totalRoastsEarned > 1 ? 's' : ''} earned!
-                            </p>
-                        )}
-
-                        {/* Copy Link Button */}
                         <button
                             onClick={copyReferralLink}
                             className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
                             style={{
-                                background: copied ? 'rgba(0,255,136,0.2)' : 'linear-gradient(135deg, #ff4444 0%, #ff8800 100%)',
-                                color: copied ? '#00ff88' : '#fff',
-                                boxShadow: copied ? 'none' : '0 4px 15px rgba(255,68,68,0.3)'
+                                background: copied ? 'rgba(0,255,136,0.2)' : 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                                color: copied ? '#00ff88' : '#000',
+                                boxShadow: copied ? 'none' : '0 4px 15px rgba(0,212,255,0.3)'
                             }}
                         >
-                            {copied ? '✅ Link Copied!' : '📋 Copy Your Referral Link'}
+                            {copied ? '✅ Link Copied!' : '🔗 Copy Link to Share'}
                         </button>
-
-                        <p className="text-[10px] text-center mt-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            {sharesUntilNext} more share{sharesUntilNext > 1 ? 's' : ''} to unlock!
-                        </p>
                     </div>
                 </div>
             )}
