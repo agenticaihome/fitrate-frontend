@@ -930,61 +930,15 @@ export default function ResultsScreen({
                 )}
 
                 {/* Percentile Context Line */}
-                <p className={`text-sm text-white/50 mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                <p className={`text-sm text-white/50 mt-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
                     {scores.overall >= 50
                         ? `Better than ${getPercentile(scores.overall)}% of fits today`
                         : `Worse than ${100 - getPercentile(scores.overall)}% of fits today`
                     }
                 </p>
-                {/* AI TIER BADGE - Shows for ALL users (eliminates dead space) */}
-                <div className={`mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                    {/* Mode-Themed Badge - Shows mode emoji, name, and description */}
-                    {(() => {
-                        const m = scores?.mode || mode
-                        const modeBadges = {
-                            nice: { emoji: '😇', name: 'Nice Mode', desc: 'Supportive AI', color: '#00d4ff', bg: 'rgba(0,212,255,0.12)' },
-                            roast: { emoji: '🔥', name: 'Roast Mode', desc: 'Brutally Honest', color: '#ff6b35', bg: 'rgba(255,107,53,0.12)' },
-                            honest: { emoji: '📊', name: 'Honest Mode', desc: 'Real Talk', color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-                            savage: { emoji: '💀', name: 'Savage Mode', desc: 'No Mercy', color: '#ff1493', bg: 'rgba(255,20,147,0.12)' },
-                            rizz: { emoji: '😏', name: 'Rizz Mode', desc: 'Dating Coach', color: '#ff69b4', bg: 'rgba(255,105,180,0.12)' },
-                            celeb: { emoji: '⭐', name: 'Celeb Mode', desc: 'Star Treatment', color: '#ffd700', bg: 'rgba(255,215,0,0.12)' },
-                            aura: { emoji: '🔮', name: 'Aura Mode', desc: 'Energy Reading', color: '#9b59b6', bg: 'rgba(155,89,182,0.12)' },
-                            chaos: { emoji: '🎪', name: 'Chaos Mode', desc: 'Unhinged AI', color: '#ff6b6b', bg: 'rgba(255,107,107,0.12)' },
-                            y2k: { emoji: '💎', name: 'Y2K Mode', desc: "That's Hot", color: '#ff69b4', bg: 'rgba(255,105,180,0.12)' },
-                            villain: { emoji: '🖤', name: 'Villain Mode', desc: 'Main Character', color: '#4c1d95', bg: 'rgba(76,29,149,0.12)' },
-                            coquette: { emoji: '🎀', name: 'Coquette Mode', desc: 'So Dainty', color: '#ffb6c1', bg: 'rgba(255,182,193,0.12)' },
-                            hypebeast: { emoji: '👟', name: 'Hypebeast Mode', desc: 'Certified Drip', color: '#f97316', bg: 'rgba(249,115,22,0.12)' }
-                        }
-                        const badge = modeBadges[m] || modeBadges.nice
-                        return (
-                            <div
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                                style={{
-                                    background: badge.bg,
-                                    border: `1px solid ${badge.color}40`,
-                                    boxShadow: `0 0 15px ${badge.color}20`
-                                }}
-                            >
-                                <span className="text-base">{badge.emoji}</span>
-                                <span
-                                    className="text-[10px] font-black uppercase tracking-widest"
-                                    style={{ color: badge.color }}
-                                >
-                                    {badge.name}
-                                </span>
-                                <span
-                                    className="text-[8px] font-bold uppercase"
-                                    style={{ color: `${badge.color}99` }}
-                                >
-                                    {badge.desc}
-                                </span>
-                            </div>
-                        )
-                    })()}
-                </div>
 
                 {/* ===== AESTHETIC & CELEB MATCH BADGES ===== */}
-                <div className={`flex flex-wrap items-center justify-center gap-2 mt-3 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                <div className={`flex flex-wrap items-center justify-center gap-2 mt-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
                     {/* Aesthetic Badge */}
                     {scores.aesthetic && (
                         <div
@@ -1112,13 +1066,6 @@ export default function ResultsScreen({
                         </span>
                     </div>
                 </div>
-
-                {/* Percentile line */}
-                <p className="text-xs text-white/40">
-                    {scores.overall >= 50
-                        ? `Better than ${getPercentile(scores.overall)}% of fits today`
-                        : `Keep styling — room to grow`}
-                </p>
             </div>
 
             {/* ===== CHALLENGE CARD - Weekly Event Entry ===== */}
