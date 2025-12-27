@@ -82,6 +82,29 @@ const getApiHeaders = () => ({
   'Content-Type': 'application/json',
   ...(API_KEY && { 'X-API-Key': API_KEY })
 })
+
+// Helper to normalize battle API response to component-expected format
+// API returns: { creator: { score, thumb }, opponent: { score, thumb } }
+// Component expects: { creatorScore, creatorThumb, responderScore, responderThumb }
+const normalizeBattleData = (data) => {
+  if (!data) return null
+
+  // If already in expected format (has creatorScore directly), return as-is
+  if (data.creatorScore !== undefined) return data
+
+  // Transform from nested format to flat format
+  return {
+    ...data,
+    challengeId: data.battleId || data.challengeId,
+    creatorScore: data.creator?.score ?? 0,
+    creatorId: data.creator?.userId || data.creatorId,
+    creatorThumb: data.creator?.thumb || null,
+    responderScore: data.opponent?.score ?? null,
+    responderId: data.opponent?.userId || null,
+    responderThumb: data.opponent?.thumb || null
+  }
+}
+
 // Aesthetics for mock scores
 const AESTHETICS = [
   'Clean Girl', 'Dark Academia', 'Quiet Luxury', 'Streetwear', 'Y2K',
@@ -964,7 +987,8 @@ export default function App() {
         })
         if (res.ok) {
           const data = await res.json()
-          setChallengePartyData(data)
+          const normalizedData = normalizeBattleData(data)
+          setChallengePartyData(normalizedData)
           // Check if current user created this challenge
           // PRIORITY 1: Compare userId with server-side creatorId (most reliable)
           // PRIORITY 2: Fall back to localStorage if creatorId not available
@@ -1002,7 +1026,8 @@ export default function App() {
         })
         if (res.ok) {
           const data = await res.json()
-          setChallengePartyData(data)
+          const normalizedData = normalizeBattleData(data)
+          setChallengePartyData(normalizedData)
           // If completed, trigger the dramatic cinematic reveal!
           if (data.status === 'completed' && challengePartyData?.status !== 'completed') {
             playSound('celebrate')
@@ -1030,7 +1055,7 @@ export default function App() {
       })
       if (res.ok) {
         const data = await res.json()
-        setChallengePartyData(data)
+        setChallengePartyData(normalizeBattleData(data))
       }
     } catch (err) {
       console.error('[Battle] Refresh error:', err)
@@ -2716,7 +2741,7 @@ export default function App() {
               })
               if (res.ok) {
                 const data = await res.json()
-                setChallengePartyData(data)
+                setChallengePartyData(normalizeBattleData(data))
                 // Set isCreator based on creatorId comparison
                 const isCreator = data.creatorId && userId
                   ? data.creatorId === userId
@@ -2891,7 +2916,7 @@ export default function App() {
                 })
                 if (partyRes.ok) {
                   const partyData = await partyRes.json()
-                  setChallengePartyData(partyData)
+                  setChallengePartyData(normalizeBattleData(partyData))
                   // Set isCreator based on creatorId comparison
                   const isCreator = partyData.creatorId && userId
                     ? partyData.creatorId === userId
