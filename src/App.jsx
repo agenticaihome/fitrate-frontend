@@ -2939,7 +2939,6 @@ export default function App() {
               }
               setPendingBattleId(null)  // Clear pending battle
             }}
-            onStartArena={startArenaFlow}
           />
           <BottomNav
             activeTab={null}
