@@ -482,7 +482,7 @@ export default function App() {
   const [scores, setScores] = useState(null)
   const [cardDNA, setCardDNA] = useState(null)  // Unique visual DNA for results card
   const [uploadedImage, setUploadedImage] = useState(null)
-  const [mode, setMode] = useState(() => localStorage.getItem('fitrate_mode') || 'roast') // Persist mode preference
+  const [mode, setMode] = useState(() => localStorage.getItem('fitrate_mode') || 'nice') // Persist mode preference
   const [timeUntilReset, setTimeUntilReset] = useState(null)
   const [shareData, setShareData] = useState(null)
   const [emailInput, setEmailInput] = useState('')
