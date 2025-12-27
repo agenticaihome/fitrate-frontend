@@ -952,6 +952,10 @@ export default function App() {
             ? data.creatorId === userId
             : JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]').includes(challengePartyId)
           setIsCreatorOfChallenge(isCreator)
+          // If battle is already completed, show the dramatic cinematic reveal immediately!
+          if (data.status === 'completed') {
+            setShowBattleReveal(true)
+          }
         } else {
           setChallengePartyData(null)
         }
@@ -979,10 +983,11 @@ export default function App() {
         if (res.ok) {
           const data = await res.json()
           setChallengePartyData(data)
-          // If completed, play celebration sound
+          // If completed, trigger the dramatic cinematic reveal!
           if (data.status === 'completed' && challengePartyData?.status !== 'completed') {
             playSound('celebrate')
             vibrate([100, 50, 100])
+            setShowBattleReveal(true)  // Show the cool cinematic reveal instead of BattleRoom
           }
         }
       } catch (err) {
@@ -2368,37 +2373,37 @@ export default function App() {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <>
-        {/* PWA Status Bar */}
-        <PWAStatusBar isStandalone={isStandalone} />
-        <ChallengesScreen
-          // Daily challenge props
-          dailyLeaderboard={dailyLeaderboard}
-          userDailyRank={userDailyRank}
-          // Weekly challenge props
-          currentEvent={currentEvent}
-          weeklyLeaderboard={leaderboard}
-          userEventStatus={userEventStatus}
-          userId={userId}
-          isPro={isPro}
-          freeEventEntryUsed={freeEventEntryUsed}
-          // Actions
-          onCompeteDaily={() => {
-            setDailyChallengeMode(true)
-            setEventMode(false)
-            setScreen('home')
-          }}
-          onCompeteWeekly={() => {
-            setDailyChallengeMode(false)
-            setEventMode(true)
-            setScreen('home')
-          }}
-          onShowPaywall={() => setShowPaywall(true)}
-          onShowFullLeaderboard={() => setShowLeaderboard(true)}
-          onBack={() => setScreen('home')}
-          // Data fetching
-          fetchDailyLeaderboard={fetchDailyLeaderboard}
-          fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
-        />
+          {/* PWA Status Bar */}
+          <PWAStatusBar isStandalone={isStandalone} />
+          <ChallengesScreen
+            // Daily challenge props
+            dailyLeaderboard={dailyLeaderboard}
+            userDailyRank={userDailyRank}
+            // Weekly challenge props
+            currentEvent={currentEvent}
+            weeklyLeaderboard={leaderboard}
+            userEventStatus={userEventStatus}
+            userId={userId}
+            isPro={isPro}
+            freeEventEntryUsed={freeEventEntryUsed}
+            // Actions
+            onCompeteDaily={() => {
+              setDailyChallengeMode(true)
+              setEventMode(false)
+              setScreen('home')
+            }}
+            onCompeteWeekly={() => {
+              setDailyChallengeMode(false)
+              setEventMode(true)
+              setScreen('home')
+            }}
+            onShowPaywall={() => setShowPaywall(true)}
+            onShowFullLeaderboard={() => setShowLeaderboard(true)}
+            onBack={() => setScreen('home')}
+            // Data fetching
+            fetchDailyLeaderboard={fetchDailyLeaderboard}
+            fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
+          />
         </>
       </Suspense>
     )
@@ -2483,8 +2488,9 @@ export default function App() {
   // BATTLE ROOM - Legendary 1v1 Outfit Battles (/b/:id or /c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // Skip if user is analyzing (so AnalyzingScreen can show)
+  // Skip if battle is completed (BattleResultsReveal handles completed battles)
   // ============================================
-  if (challengePartyId && (challengePartyData || challengePartyLoading) && screen !== 'analyzing') {
+  if (challengePartyId && (challengePartyData || challengePartyLoading) && screen !== 'analyzing' && challengePartyData?.status !== 'completed') {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <BattleRoom
