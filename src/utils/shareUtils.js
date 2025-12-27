@@ -273,7 +273,7 @@ export const generateShareCard = async ({
             })
 
             // ===== SUBSCORES ROW =====
-            const subscoreY = canvas.height - 220
+            const subscoreY = canvas.height - 280
             const subscores = [
                 { icon: '🎨', label: 'Color', value: scores.color || Math.round(score + (Math.random() * 6 - 3)) },
                 { icon: '👔', label: 'Fit', value: scores.fit || Math.round(score + (Math.random() * 6 - 3)) },
@@ -306,10 +306,40 @@ export const generateShareCard = async ({
                 ctx.fillText(sub.value.toString(), x + 60, subscoreY + 26)
             })
 
+            // ===== MODE-SPECIFIC DATE STAMP =====
+            const now = new Date()
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                               'July', 'August', 'September', 'October', 'November', 'December']
+            const dateStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+
+            // Fun mode-specific verbs
+            const modeVerbs = {
+                nice: 'Blessed',
+                roast: 'Roasted',
+                honest: 'Analyzed',
+                savage: 'Destroyed',
+                rizz: "Rizz'd",
+                celeb: 'Spotted',
+                aura: 'Vibed',
+                chaos: 'Randomized',
+                y2k: 'Sparkled',
+                villain: 'Slayed',
+                coquette: 'Bowed',
+                hypebeast: 'Dripped'
+            }
+            const modeVerb = modeVerbs[currentMode] || 'Rated'
+            const dateStamp = `${modeVerb} on ${dateStr}`
+
+            const dateY = canvas.height - 205
+            ctx.fillStyle = 'rgba(255,255,255,0.5)'
+            ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.fillText(dateStamp, canvas.width / 2, dateY)
+
             // ===== CTA BUTTON =====
-            const ctaY = canvas.height - 120
+            const ctaY = canvas.height - 155
             const ctaWidth = 620
-            const ctaHeight = 80
+            const ctaHeight = 72
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = 'Post yours → fitrate.app'
 
@@ -325,10 +355,26 @@ export const generateShareCard = async ({
 
             // CTA text
             ctx.fillStyle = '#000000'
-            ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
+
+            // ===== FITRATE LOGO =====
+            const logoY = canvas.height - 60
+            if (logoImg) {
+                const logoHeight = 45
+                const logoWidth = (logoImg.width / logoImg.height) * logoHeight
+                const logoX = (canvas.width - logoWidth) / 2
+                ctx.globalAlpha = 0.7
+                ctx.drawImage(logoImg, logoX, logoY - logoHeight / 2, logoWidth, logoHeight)
+                ctx.globalAlpha = 1.0
+            } else {
+                // Fallback text logo
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'
+                ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText('FitRate', canvas.width / 2, logoY)
+            }
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {
