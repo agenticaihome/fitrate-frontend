@@ -1,4 +1,42 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
+
+// Premium floating particles
+const FloatingParticles = ({ color }) => {
+    const particles = useMemo(() =>
+        Array.from({ length: 10 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 2,
+            delay: Math.random() * 8,
+            duration: 12 + Math.random() * 8,
+            opacity: 0.15 + Math.random() * 0.25,
+            drift: -20 + Math.random() * 40
+        })), []
+    )
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-5px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.id % 3 === 0 ? color : '#fff',
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.id % 3 === 0 ? color : '#fff'}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
 
 /**
  * OnboardingModal - 3-slide intro for first-time users
@@ -50,8 +88,25 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
     const isLastSlide = currentSlide === slides.length - 1
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm">
-            <div className="w-full max-w-sm mx-4 flex flex-col items-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
+            background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)'
+        }}>
+            {/* Background glow that changes with slide */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-[500px] h-[500px] rounded-full transition-all duration-700" style={{
+                    background: `radial-gradient(circle, ${slide.color}30 0%, transparent 70%)`,
+                    top: '30%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: 'glow-breathe 4s ease-in-out infinite'
+                }} />
+            </div>
+
+            <FloatingParticles color={slide.color} />
+
+            <div className="w-full max-w-sm mx-4 flex flex-col items-center relative z-10">
 
                 {!isLastSlide && (
                     <button
@@ -63,23 +118,38 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
                     </button>
                 )}
 
-                {/* Slide content */}
+                {/* Slide content with staggered animations */}
                 <div
-                    className="text-center transition-all duration-300"
+                    className="text-center"
                     key={currentSlide}
+                    style={{ animation: 'stagger-fade-up 0.5s ease-out forwards' }}
                 >
-                    {/* Emoji */}
+                    {/* Emoji with glow */}
                     <div
-                        className="text-8xl mb-6 animate-bounce"
-                        style={{ animationDuration: '2s' }}
+                        className="text-8xl mb-6 relative inline-block"
+                        style={{
+                            animation: 'float-gentle 3s ease-in-out infinite',
+                            filter: `drop-shadow(0 0 30px ${slide.color}60)`
+                        }}
                     >
                         {slide.emoji}
+                        {/* Breathing ring behind emoji */}
+                        <div className="absolute inset-0 rounded-full pointer-events-none" style={{
+                            background: `radial-gradient(circle, ${slide.color}20 0%, transparent 70%)`,
+                            animation: 'ring-breathe 2s ease-in-out infinite',
+                            transform: 'scale(1.5)'
+                        }} />
                     </div>
 
-                    {/* Title */}
+                    {/* Title with gradient */}
                     <h2
-                        className="text-2xl font-black text-white mb-3"
-                        style={{ textShadow: `0 0 30px ${slide.color}` }}
+                        className="text-2xl font-black mb-3"
+                        style={{
+                            background: `linear-gradient(135deg, #fff, ${slide.color})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            textShadow: 'none'
+                        }}
                     >
                         {slide.title}
                     </h2>
@@ -104,18 +174,18 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
                     ))}
                 </div>
 
-                {/* CTA Button */}
+                {/* CTA Button with premium shine */}
                 <button
                     onClick={handleNext}
                     aria-label={isLastSlide ? "Start using FitRate" : "Go to next onboarding slide"}
-                    className="w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.97]"
+                    className="w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.97] btn-premium-shine relative overflow-hidden"
                     style={{
                         background: `linear-gradient(135deg, ${slide.color} 0%, ${slide.color}cc 100%)`,
                         color: '#000',
-                        boxShadow: `0 8px 30px ${slide.color}50`
+                        boxShadow: `0 8px 30px ${slide.color}50, 0 0 0 1px ${slide.color}30`
                     }}
                 >
-                    {isLastSlide ? "Let's Go! 🚀" : 'Next'}
+                    {isLastSlide ? "Let's Go!" : 'Next'}
                 </button>
 
                 {/* Branding */}

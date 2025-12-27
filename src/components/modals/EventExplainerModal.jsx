@@ -1,5 +1,43 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { playSound, vibrate } from '../../utils/soundEffects'
+
+// Premium floating particles
+const FloatingParticles = () => {
+    const particles = useMemo(() =>
+        Array.from({ length: 10 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 2,
+            delay: Math.random() * 8,
+            duration: 12 + Math.random() * 8,
+            opacity: 0.15 + Math.random() * 0.2,
+            drift: -15 + Math.random() * 30
+        })), []
+    )
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-3xl">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-5px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.id % 2 === 0 ? '#10b981' : '#fff',
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.id % 2 === 0 ? '#10b981' : '#fff'}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
 
 /**
  * EventExplainerModal
@@ -50,16 +88,33 @@ export default function EventExplainerModal({
             aria-describedby="event-explainer-desc"
             style={{
                 background: 'rgba(0,0,0,0.9)',
-                backdropFilter: 'blur(10px)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
                 paddingTop: 'max(1rem, env(safe-area-inset-top))',
                 paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
             }}
         >
+            {/* Background glow */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-[400px] h-[400px] rounded-full" style={{
+                    background: 'radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)',
+                    top: '25%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: 'glow-breathe 4s ease-in-out infinite'
+                }} />
+            </div>
+
             <div
-                className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl max-w-sm w-full border border-emerald-500/30 relative flex flex-col max-h-[90vh]"
+                className="glass-premium rounded-3xl max-w-sm w-full border border-emerald-500/30 relative flex flex-col max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
-                style={{ boxShadow: '0 0 60px rgba(16,185,129,0.2)' }}
+                style={{
+                    background: 'linear-gradient(180deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.98) 100%)',
+                    boxShadow: '0 0 60px rgba(16,185,129,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                    animation: 'modal-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}
             >
+                <FloatingParticles />
                 {/* Close Button */}
                 <button
                     onClick={handleClose}
@@ -91,11 +146,12 @@ export default function EventExplainerModal({
                         </p>
                     </div>
 
-                    {/* Prize Banner */}
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-3 mb-4 text-center">
-                        <span className="text-2xl" aria-hidden="true">👑</span>
-                        <p className="text-yellow-300 font-black text-lg">WIN 1 YEAR FREE PRO</p>
-                        <p className="text-yellow-400/70 text-xs">#1 wins Pro • Top 5 featured!</p>
+                    {/* Prize Banner with shimmer */}
+                    <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-3 mb-4 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+                        <div className="absolute inset-0 shimmer-sweep" />
+                        <span className="text-2xl relative" aria-hidden="true">👑</span>
+                        <p className="text-yellow-300 font-black text-lg relative">WIN 1 YEAR FREE PRO</p>
+                        <p className="text-yellow-400/70 text-xs relative">#1 wins Pro • Top 5 featured!</p>
                     </div>
 
                     {/* How It Works */}
@@ -189,22 +245,22 @@ export default function EventExplainerModal({
 
                 {/* Fixed Footer with Action Buttons */}
                 <div className="p-6 pt-0 flex-shrink-0">
-                    {/* CTA Button */}
+                    {/* CTA Button with premium shine */}
                     <button
                         onClick={handleJoin}
                         aria-label={canJoin
                             ? `Join the ${event.theme} challenge`
                             : `Upgrade to Pro to get more entries`
                         }
-                        className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-2"
+                        className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-2 btn-premium-shine relative overflow-hidden"
                         style={{
                             background: canJoin
                                 ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
                                 : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                             color: canJoin ? 'white' : 'black',
                             boxShadow: canJoin
-                                ? '0 8px 30px rgba(16,185,129,0.4)'
-                                : '0 8px 30px rgba(251,191,36,0.4)'
+                                ? '0 8px 30px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)'
+                                : '0 8px 30px rgba(251,191,36,0.4), 0 0 0 1px rgba(251,191,36,0.3)'
                         }}
                     >
                         {canJoin ? (

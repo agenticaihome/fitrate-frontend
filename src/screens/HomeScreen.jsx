@@ -4,6 +4,47 @@ import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
 
+// ============================================
+// PREMIUM FLOATING PARTICLES
+// ============================================
+const FloatingParticles = ({ accentColor }) => {
+    const particles = useMemo(() =>
+        Array.from({ length: 25 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 3,
+            delay: Math.random() * 15,
+            duration: 15 + Math.random() * 20,
+            opacity: 0.15 + Math.random() * 0.25,
+            drift: -30 + Math.random() * 60,
+            color: i % 4 === 0 ? accentColor : i % 3 === 0 ? '#8b5cf6' : '#fff'
+        })), [accentColor]
+    )
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-10px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.color,
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
 // Daily Challenge: Rotating mode based on day of year (12 modes)
 const DAILY_MODES = [
     { id: 'nice', emoji: '😇', label: 'Nice' },
@@ -569,30 +610,46 @@ export default function HomeScreen({
             // Account for fixed BottomNav (64px) + safe area + extra breathing room
             paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'
         }}>
-            {/* Background Glow - Main accent */}
+            {/* Background Glow - Main accent with premium breathing effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-[600px] h-[600px] rounded-full opacity-30" style={{
+                {/* Primary glow orb */}
+                <div className="absolute w-[600px] h-[600px] rounded-full" style={{
                     background: `radial-gradient(circle, ${accentGlow} 0%, transparent 60%)`,
                     top: '30%', left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    animation: 'pulse 3s ease-in-out infinite'
+                    animation: 'glow-breathe 4s ease-in-out infinite',
+                    opacity: 0.35,
+                    '--glow-color': accentGlow
                 }} />
                 {/* Secondary glow for depth */}
-                <div className="absolute w-[400px] h-[400px] rounded-full opacity-15" style={{
+                <div className="absolute w-[400px] h-[400px] rounded-full" style={{
                     background: 'radial-gradient(circle, rgba(139,92,246,0.6) 0%, transparent 70%)',
                     bottom: '20%', left: '50%',
-                    transform: 'translateX(-50%)'
+                    transform: 'translateX(-50%)',
+                    animation: 'glow-breathe 5s ease-in-out infinite 1s',
+                    opacity: 0.2
                 }} />
-                {/* Sparkle particles */}
+                {/* Tertiary accent glow */}
+                <div className="absolute w-[300px] h-[300px] rounded-full" style={{
+                    background: `radial-gradient(circle, ${accent}40 0%, transparent 70%)`,
+                    top: '60%', right: '-10%',
+                    animation: 'float-gentle 6s ease-in-out infinite',
+                    opacity: 0.25
+                }} />
+                {/* Sparkle particles layer */}
                 <div className="absolute inset-0" style={{
-                    backgroundImage: `radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.4) 0%, transparent 100%),
-                                      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.3) 0%, transparent 100%),
-                                      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.5) 0%, transparent 100%),
-                                      radial-gradient(2px 2px at 130px 90px, rgba(255,255,255,0.2) 0%, transparent 100%),
-                                      radial-gradient(1px 1px at 160px 20px, rgba(255,255,255,0.4) 0%, transparent 100%)`,
+                    backgroundImage: `radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.5) 0%, transparent 100%),
+                                      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.4) 0%, transparent 100%),
+                                      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6) 0%, transparent 100%),
+                                      radial-gradient(2px 2px at 130px 90px, rgba(255,255,255,0.3) 0%, transparent 100%),
+                                      radial-gradient(1px 1px at 160px 20px, rgba(255,255,255,0.5) 0%, transparent 100%),
+                                      radial-gradient(1.5px 1.5px at 180px 100px, ${accent}80 0%, transparent 100%)`,
                     backgroundSize: '200px 150px',
-                    animation: 'sparkle 4s ease-in-out infinite'
+                    animation: 'particle-twinkle 3s ease-in-out infinite'
                 }} />
+
+                {/* Premium floating particles */}
+                <FloatingParticles accentColor={accent} />
             </div>
 
 
@@ -964,24 +1021,54 @@ export default function HomeScreen({
 
                     return (
                         <div className="flex flex-col items-center">
-                            {/* Main Circular Button */}
-                            <button
-                                id="main-scan-cta"
-                                onClick={handleStart}
-                                aria-label={isCompeting ? `Submit to ${currentEvent.theme}` : `Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
-                                className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
-                                style={{
-                                    background: `radial-gradient(circle, ${isCompeting ? 'rgba(16,185,129,0.4)' : isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
-                                    border: `4px solid ${isCompeting ? 'rgba(45,212,191,0.6)' : isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
-                                    boxShadow: `
-                                        var(--shadow-physical), 
-                                        0 0 60px ${buttonGlow}, 
-                                        0 0 120px ${isCompeting ? 'rgba(16,185,129,0.3)' : isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'}, 
-                                        inset 0 0 60px rgba(255,255,255,0.05)
-                                    `,
-                                    animation: isCompeting ? 'tealPulse 2s ease-in-out infinite' : undefined
-                                }}
-                            >
+                            {/* Main Circular Button with Premium Breathing Rings */}
+                            <div className="relative">
+                                {/* Outer breathing ring 1 */}
+                                <div
+                                    className="absolute inset-0 rounded-full pointer-events-none"
+                                    style={{
+                                        border: `2px solid ${buttonAccent}30`,
+                                        transform: 'scale(1.08)',
+                                        animation: 'ring-breathe 3s ease-in-out infinite'
+                                    }}
+                                />
+                                {/* Outer breathing ring 2 */}
+                                <div
+                                    className="absolute inset-0 rounded-full pointer-events-none"
+                                    style={{
+                                        border: `1px solid ${buttonAccent}20`,
+                                        transform: 'scale(1.15)',
+                                        animation: 'ring-breathe 3s ease-in-out infinite 0.5s'
+                                    }}
+                                />
+                                {/* Outer breathing ring 3 - largest */}
+                                <div
+                                    className="absolute inset-0 rounded-full pointer-events-none"
+                                    style={{
+                                        border: `1px solid ${buttonAccent}10`,
+                                        transform: 'scale(1.22)',
+                                        animation: 'ring-breathe 3s ease-in-out infinite 1s'
+                                    }}
+                                />
+
+                                <button
+                                    id="main-scan-cta"
+                                    onClick={handleStart}
+                                    aria-label={isCompeting ? `Submit to ${currentEvent.theme}` : `Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
+                                    className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
+                                    style={{
+                                        background: `radial-gradient(circle, ${isCompeting ? 'rgba(16,185,129,0.4)' : isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
+                                        border: `4px solid ${isCompeting ? 'rgba(45,212,191,0.6)' : isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
+                                        boxShadow: `
+                                            var(--shadow-physical),
+                                            0 0 60px ${buttonGlow},
+                                            0 0 120px ${isCompeting ? 'rgba(16,185,129,0.3)' : isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'},
+                                            inset 0 0 60px rgba(255,255,255,0.05)
+                                        `,
+                                        animation: isCompeting ? 'tealPulse 2s ease-in-out infinite' : 'glow-breathe 4s ease-in-out infinite',
+                                        '--glow-color': buttonGlow
+                                    }}
+                                >
                                 {/* Animated sparkles for competition mode */}
                                 {isCompeting && (
                                     <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
@@ -1113,6 +1200,7 @@ export default function HomeScreen({
                                     </button>
                                 )}
                             </button>
+                            </div> {/* Close breathing rings wrapper */}
                         </div>
                     )
                 })()}
@@ -1130,7 +1218,7 @@ export default function HomeScreen({
             {/* My Battles Section - Active 1v1 Battles */}
             {activeBattles.length > 0 && (
                 <div className="w-full max-w-sm mb-4">
-                    <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
                         <div className="flex items-center gap-2">
                             <span className="text-lg">⚔️</span>
                             <span className="text-white/60 text-sm font-semibold">My Battles</span>
@@ -1138,21 +1226,23 @@ export default function HomeScreen({
                         </div>
                     </div>
                     <div className="space-y-2">
-                        {activeBattles.map((battle) => {
+                        {activeBattles.map((battle, index) => {
                             const modeEmojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏' }
                             const statusText = battle.status === 'completed' ? 'Results ready!' : 'Waiting for opponent...'
                             const statusColor = battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'
                             return (
                                 <div
                                     key={battle.battleId}
-                                    className="w-full flex items-center justify-between p-4 rounded-2xl transition-all"
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl transition-all glass-premium animate-stagger-fade-up"
                                     style={{
                                         background: battle.status === 'completed'
                                             ? 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,212,255,0.1) 100%)'
                                             : 'linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,0,128,0.1) 100%)',
                                         border: battle.status === 'completed'
                                             ? '1px solid rgba(0,255,136,0.25)'
-                                            : '1px solid rgba(255,107,53,0.25)'
+                                            : '1px solid rgba(255,107,53,0.25)',
+                                        opacity: 0,
+                                        animationDelay: `${0.1 + index * 0.1}s`
                                     }}
                                 >
                                     <button
@@ -1200,7 +1290,7 @@ export default function HomeScreen({
             {/* My Shows Section - Active Fashion Shows */}
             {activeShows.length > 0 && (
                 <div className="w-full max-w-sm mb-4">
-                    <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
                         <div className="flex items-center gap-2">
                             <span className="text-lg">🎭</span>
                             <span className="text-white/60 text-sm font-semibold">My Shows</span>
@@ -1208,13 +1298,15 @@ export default function HomeScreen({
                         </div>
                     </div>
                     <div className="space-y-2">
-                        {activeShows.map((show) => (
+                        {activeShows.map((show, index) => (
                             <div
                                 key={show.showId}
-                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all"
+                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all glass-premium animate-stagger-fade-up"
                                 style={{
                                     background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.1) 100%)',
-                                    border: '1px solid rgba(139,92,246,0.25)'
+                                    border: '1px solid rgba(139,92,246,0.25)',
+                                    opacity: 0,
+                                    animationDelay: `${0.1 + index * 0.1}s`
                                 }}
                             >
                                 <button
@@ -1340,18 +1432,24 @@ export default function HomeScreen({
                 </button>
             )}
 
-            {/* Android Photo Picker Modal - dual buttons for camera vs gallery */}
+            {/* Android Photo Picker Modal - Premium Glassmorphism */}
             {showAndroidPhotoModal && (
                 <div
                     className="fixed inset-0 z-[60] flex items-end justify-center"
-                    style={{ background: 'rgba(0,0,0,0.8)' }}
+                    style={{
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        animation: 'backdrop-fade 0.3s ease-out forwards'
+                    }}
                     onClick={() => setShowAndroidPhotoModal(false)}
                 >
                     <div
-                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl glass-premium-strong"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
-                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                            background: 'linear-gradient(180deg, rgba(30,30,45,0.95) 0%, rgba(20,20,32,0.98) 100%)',
+                            boxShadow: '0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                            animation: 'modal-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
                         }}
                         onClick={e => e.stopPropagation()}
                     >
@@ -1401,18 +1499,24 @@ export default function HomeScreen({
             )
             }
 
-            {/* Mode Drawer - All 12 AI Modes */}
+            {/* Mode Drawer - All 12 AI Modes with Premium Glassmorphism */}
             {showModeDrawer && (
                 <div
                     className="fixed inset-0 z-[60] flex items-end justify-center"
-                    style={{ background: 'rgba(0,0,0,0.85)' }}
+                    style={{
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        animation: 'backdrop-fade 0.3s ease-out forwards'
+                    }}
                     onClick={() => setShowModeDrawer(false)}
                 >
                     <div
-                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl"
+                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl glass-premium-strong"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,40,0.98) 0%, rgba(20,20,28,0.99) 100%)',
-                            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)'
+                            background: 'linear-gradient(180deg, rgba(30,30,45,0.95) 0%, rgba(20,20,32,0.98) 100%)',
+                            boxShadow: '0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                            animation: 'modal-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
                         }}
                         onClick={e => e.stopPropagation()}
                     >
