@@ -2388,52 +2388,17 @@ export default function App() {
 
   // ============================================
   // GLOBAL ARENA ENTRY SCREEN
+  // Analysis now happens inside ArenaEntryScreen for better UX
   // ============================================
   if (arenaScreen === 'entry') {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <ArenaEntryScreen
           userId={userId}
-          onTakePhoto={async (dailyMode, photoDataUrl) => {
-            // Photo captured - now analyze it and enter queue
+          onAnalysisComplete={(score, photoDataUrl, dailyMode) => {
+            // Analysis complete - go directly to queue
             setArenaMode(dailyMode)
-            setArenaScreen(null)  // Close entry screen
-
-            // Show loading state on HomeScreen
-            setScreen('home')
-            setIsAnalyzing(true)
-
-            try {
-              // Call analyze API with photo and arena mode
-              const response = await fetch(`${API_BASE}/analyze`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  ...getApiHeaders()
-                },
-                body: JSON.stringify({
-                  image: photoDataUrl,
-                  mode: dailyMode,
-                  userId: userId
-                })
-              })
-
-              if (!response.ok) {
-                throw new Error('Analysis failed')
-              }
-
-              const result = await response.json()
-              const score = result.scores?.overall || result.score || 75
-
-              // Success! Enter arena queue with score
-              setIsAnalyzing(false)
-              startArenaQueue(score, photoDataUrl, dailyMode)
-
-            } catch (err) {
-              console.error('[Arena] Analysis failed:', err)
-              setIsAnalyzing(false)
-              displayToast('Failed to analyze photo. Try again!')
-            }
+            startArenaQueue(score, photoDataUrl, dailyMode)
           }}
           onBack={() => {
             setArenaScreen(null)
@@ -2457,6 +2422,8 @@ export default function App() {
           score={arenaData.score}
           thumb={arenaData.thumb}
           mode={arenaData.mode}
+          playSound={playSound}
+          vibrate={vibrate}
           onMatchFound={(battleId) => {
             // Add to active battles
             addToActiveBattles(battleId, arenaData.score, arenaData.mode, 'completed')
@@ -2472,9 +2439,9 @@ export default function App() {
             setArenaData(null)
           }}
           onTimeout={() => {
+            // Timeout handled in queue screen with retry option
             setArenaScreen(null)
             setArenaData(null)
-            displayToast('No opponents found. Try again later!')
           }}
           onError={(msg) => {
             setArenaScreen(null)
