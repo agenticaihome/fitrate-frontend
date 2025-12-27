@@ -1122,7 +1122,7 @@ export default function HomeScreen({
             <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 {eventMode
                     ? '🔒 Entry photo saved for leaderboard display'
-                    : '🔒 Analyzed instantly • Never stored'
+                    : '🔒 Your photos, your privacy • Auto-deleted'
                 }
             </p>
 
