@@ -429,9 +429,12 @@ export default function HomeScreen({
 
     // Handle camera opening after scan type is chosen (or directly if no choice needed)
     const proceedToCamera = () => {
-        if (isAndroid() || isIOS()) {
-            // Mobile: Show photo picker modal (Take Photo vs Upload)
+        if (isAndroid()) {
+            // Android: Show photo picker modal (Take Photo vs Upload)
             setShowAndroidPhotoModal(true)
+        } else if (isIOS()) {
+            // iOS: Open native camera directly (modal causes glitches on iOS)
+            document.getElementById('androidCameraInput')?.click()
         } else {
             // Desktop: Use getUserMedia for live camera preview
             startCamera()
@@ -1115,13 +1118,26 @@ export default function HomeScreen({
             </div>
 
 
-            {/* Privacy Assurance */}
-            <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {eventMode
-                    ? '🔒 Entry photo saved for leaderboard display'
-                    : '🔒 Analyzed instantly • Never stored'
-                }
-            </p>
+            {/* Privacy Assurance + Upload Option */}
+            <div className="text-center mb-4">
+                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    {eventMode
+                        ? '🔒 Entry photo saved for leaderboard display'
+                        : '🔒 Analyzed instantly • Never stored'
+                    }
+                </p>
+                <button
+                    onClick={() => {
+                        playSound('click')
+                        vibrate(10)
+                        document.getElementById('androidGalleryInput')?.click()
+                    }}
+                    className="text-[11px] mt-1 underline"
+                    style={{ color: 'rgba(255,255,255,0.4)' }}
+                >
+                    or upload from gallery
+                </button>
+            </div>
 
             {/* My Battles Section - Active 1v1 Battles */}
             {activeBattles.length > 0 && (
