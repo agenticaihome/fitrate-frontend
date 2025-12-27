@@ -116,7 +116,8 @@ export default function HomeScreen({
                 if (isAndroid()) {
                     setShowAndroidPhotoModal(true)
                 } else if (isIOS()) {
-                    document.getElementById('androidCameraInput')?.click()
+                    // iOS/iPad: Use gallery input (shows native picker with camera + gallery)
+                    document.getElementById('androidGalleryInput')?.click()
                 } else {
                     startCamera()
                 }
