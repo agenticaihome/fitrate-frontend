@@ -2426,11 +2426,12 @@ export default function App() {
           battleData={challengePartyData}
           isCreator={isCreatorOfChallenge}
           onViewScorecard={() => {
-            // Navigate to user's detailed scorecard (ResultsScreen)
+            // Update URL first to prevent routing conflicts
+            window.history.pushState({}, '', '/')
+            // Then batch all React state updates together
             setShowBattleReveal(false)
             setChallengePartyId(null)
             setChallengePartyData(null)
-            window.history.pushState({}, '', '/')
             // The scores are already set from the responder's analysis, just show results
             setScreen('results')
           }}
@@ -2448,18 +2449,21 @@ export default function App() {
             }
           }}
           onRematch={() => {
+            // Update URL first to prevent routing conflicts
+            window.history.pushState({}, '', '/')
+            // Then batch all React state updates together
             setShowBattleReveal(false)
-            // Start new battle - go to home to take new photo
             setChallengePartyId(null)
             setChallengePartyData(null)
-            window.history.pushState({}, '', '/')
             setScreen('home')
           }}
           onHome={() => {
+            // Update URL first to prevent routing conflicts
+            window.history.pushState({}, '', '/')
+            // Then batch all React state updates together
             setShowBattleReveal(false)
             setChallengePartyId(null)
             setChallengePartyData(null)
-            window.history.pushState({}, '', '/')
             setScreen('home')
           }}
         />
@@ -2503,10 +2507,12 @@ export default function App() {
             }
           }}
           onHome={() => {
+            // Update URL first to prevent routing conflicts
+            window.history.pushState({}, '', '/')
+            // Then batch all React state updates together
             setChallengePartyId(null)
             setChallengePartyData(null)
             setUseBattleRoom(false)
-            window.history.pushState({}, '', '/')
             setScreen('home')
           }}
         />
