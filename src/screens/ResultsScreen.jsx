@@ -46,14 +46,16 @@ const FloatingParticles = ({ accentColor }) => {
 // ============================================
 // LEGENDARY SCORE-TIER COLORS
 // Ring color reflects SCORE ACHIEVEMENT, not mode
+// HIGH CONTRAST gradients - start color and end color are VERY distinct
 // ============================================
 const getScoreTierColors = (score) => {
-    if (score >= 95) return { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.6)' }   // LEGENDARY: Gold → Orange
-    if (score >= 85) return { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.5)' }  // FIRE: Orange → Hot Pink
-    if (score >= 75) return { accent: '#00d4ff', end: '#a855f7', glow: 'rgba(0,212,255,0.5)' }   // GREAT: Cyan → Purple (distinct!)
-    if (score >= 60) return { accent: '#00ff88', end: '#06b6d4', glow: 'rgba(0,255,136,0.5)' }   // GOOD: Green → Teal
-    if (score >= 40) return { accent: '#fbbf24', end: '#f97316', glow: 'rgba(251,191,36,0.5)' }  // MID: Yellow → Orange
-    return { accent: '#ef4444', end: '#7c3aed', glow: 'rgba(239,68,68,0.5)' }                    // LOW: Red → Purple
+    // Colors chosen for MAXIMUM contrast between start and end of gradient
+    if (score >= 95) return { accent: '#ffd700', end: '#ff4500', glow: 'rgba(255,215,0,0.6)', track: 'rgba(255,215,0,0.15)' }   // LEGENDARY: Gold → OrangeRed
+    if (score >= 85) return { accent: '#ff6b35', end: '#ff0099', glow: 'rgba(255,107,53,0.5)', track: 'rgba(255,107,53,0.12)' }  // FIRE: Orange → Magenta
+    if (score >= 75) return { accent: '#00ffff', end: '#ff00ff', glow: 'rgba(0,255,255,0.5)', track: 'rgba(0,255,255,0.12)' }   // GREAT: Cyan → Magenta (VERY distinct!)
+    if (score >= 60) return { accent: '#00ff88', end: '#00b4ff', glow: 'rgba(0,255,136,0.5)', track: 'rgba(0,255,136,0.12)' }   // GOOD: Lime → Sky Blue
+    if (score >= 40) return { accent: '#ffee00', end: '#ff6600', glow: 'rgba(255,238,0,0.5)', track: 'rgba(255,238,0,0.12)' }  // MID: Yellow → Orange
+    return { accent: '#ff4444', end: '#aa00ff', glow: 'rgba(255,68,68,0.5)', track: 'rgba(255,68,68,0.12)' }                    // LOW: Red → Purple
 }
 
 // ============================================
@@ -975,51 +977,82 @@ export default function ResultsScreen({
                             <span className="text-xs font-bold text-white/40">/100</span>
                         </div>
 
-                        {/* Score ring progress - Premium dual-ring design */}
+                        {/* Score ring progress - Crystal clear progress visualization */}
                         <svg
                             className="absolute inset-0 w-full h-full -rotate-90"
                             viewBox="0 0 100 100"
                         >
-                            {/* Define gradient for progress ring */}
+                            {/* Define gradient for progress ring - flows from accent to end color */}
                             <defs>
-                                <linearGradient id={`scoreGradient-${scores?.overall || 0}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                                <linearGradient id={`scoreGradient-${scores?.overall || 0}`} x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stopColor={ringColors.accent} />
                                     <stop offset="100%" stopColor={ringColors.end} />
                                 </linearGradient>
                             </defs>
 
-                            {/* Background track - subtle dark ring */}
+                            {/* UNFILLED TRACK - Dark groove that's CLEARLY visible */}
+                            {/* This is the "empty" part users need to see */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
-                                stroke="rgba(255,255,255,0.08)"
-                                strokeWidth="4"
+                                stroke="rgba(30,30,40,0.9)"
+                                strokeWidth="6"
                             />
-
-                            {/* Secondary glow track - creates depth */}
+                            {/* Inner edge highlight for 3D depth */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
-                                stroke={`${ringColors.accent}15`}
-                                strokeWidth="4"
+                                stroke="rgba(255,255,255,0.06)"
+                                strokeWidth="5"
                             />
 
-                            {/* Progress ring with gradient */}
+                            {/* Subtle tier-colored glow on track */}
+                            <circle
+                                cx="50" cy="50" r="46"
+                                fill="none"
+                                stroke={ringColors.track || 'rgba(255,255,255,0.08)'}
+                                strokeWidth="5"
+                            />
+
+                            {/* Start indicator - small bright dot at 12 o'clock (right side when rotated -90) */}
+                            <circle
+                                cx="96" cy="50" r="2.5"
+                                fill={ringColors.accent}
+                                style={{
+                                    filter: `drop-shadow(0 0 4px ${ringColors.accent})`
+                                }}
+                            />
+
+                            {/* PROGRESS RING - Gradient fill showing actual score */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
                                 stroke={`url(#scoreGradient-${scores?.overall || 0})`}
-                                strokeWidth="4"
+                                strokeWidth="5"
                                 strokeLinecap="round"
                                 strokeDasharray="289"
                                 strokeDashoffset={289 - (displayedScore * 2.89)}
                                 style={{
                                     transition: 'stroke-dashoffset 0.1s ease-out',
                                     filter: animationComplete
-                                        ? `drop-shadow(0 0 6px ${ringColors.glow}) drop-shadow(0 0 12px ${ringColors.glow})`
-                                        : `drop-shadow(0 0 3px ${ringColors.glow})`
+                                        ? `drop-shadow(0 0 8px ${ringColors.glow}) drop-shadow(0 0 16px ${ringColors.glow})`
+                                        : `drop-shadow(0 0 4px ${ringColors.glow})`
                                 }}
                             />
+
+                            {/* Progress end cap glow - bright dot at current position */}
+                            {displayedScore > 0 && (
+                                <circle
+                                    cx={50 + 46 * Math.cos((displayedScore / 100) * 2 * Math.PI)}
+                                    cy={50 + 46 * Math.sin((displayedScore / 100) * 2 * Math.PI)}
+                                    r="3"
+                                    fill={ringColors.end}
+                                    style={{
+                                        filter: `drop-shadow(0 0 6px ${ringColors.end})`,
+                                        opacity: animationComplete ? 1 : 0.7
+                                    }}
+                                />
+                            )}
                         </svg>
                     </div>
                 </div>
