@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { playSound, vibrate } from '../utils/soundEffects'
+import { getTodayArenaMode } from './ArenaEntryScreen'
 
-// Floating particles for premium feel
-const FloatingParticles = () => {
+// ============================================
+// FLOATING PARTICLES
+// ============================================
+const FloatingParticles = ({ color }) => {
     const particles = useMemo(() =>
-        Array.from({ length: 20 }, (_, i) => ({
+        Array.from({ length: 25 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
             size: 1 + Math.random() * 2,
             delay: Math.random() * 10,
             duration: 10 + Math.random() * 15,
             opacity: 0.1 + Math.random() * 0.2,
-            color: i % 3 === 0 ? '#00d4ff' : i % 2 === 0 ? '#00ff88' : '#fff'
-        })), []
+            color: i % 3 === 0 ? color : i % 2 === 0 ? '#00ff88' : '#fff'
+        })), [color]
     )
 
     return (
@@ -29,7 +31,7 @@ const FloatingParticles = () => {
                         background: p.color,
                         opacity: p.opacity,
                         boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
-                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animation: `queue-float ${p.duration}s linear infinite`,
                         animationDelay: `${p.delay}s`
                     }}
                 />
@@ -38,66 +40,169 @@ const FloatingParticles = () => {
     )
 }
 
-// Pulsing search ring
-const SearchRing = ({ color }) => (
-    <div className="relative w-32 h-32 mx-auto">
-        <div className="absolute inset-0 rounded-full animate-ping"
-            style={{ background: `${color}20`, animationDuration: '2s' }} />
-        <div className="absolute inset-2 rounded-full animate-ping"
-            style={{ background: `${color}30`, animationDuration: '2s', animationDelay: '0.3s' }} />
-        <div className="absolute inset-4 rounded-full animate-ping"
-            style={{ background: `${color}40`, animationDuration: '2s', animationDelay: '0.6s' }} />
-        <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl">🌍</span>
+// ============================================
+// PROGRESS STEPS - Shared with ArenaEntryScreen
+// ============================================
+const ProgressSteps = ({ currentStep, modeColor }) => {
+    const steps = [
+        { icon: '📸', label: 'Photo' },
+        { icon: '⚡', label: 'Analyze' },
+        { icon: '🔍', label: 'Queue' },
+        { icon: '⚔️', label: 'Battle' }
+    ]
+
+    return (
+        <div className="flex items-center justify-center gap-2">
+            {steps.map((step, i) => (
+                <React.Fragment key={i}>
+                    <div className="flex flex-col items-center">
+                        <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all duration-500 ${
+                                i < currentStep ? 'scale-90' : i === currentStep ? 'scale-110 animate-pulse' : 'scale-90 opacity-40'
+                            }`}
+                            style={{
+                                background: i <= currentStep
+                                    ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
+                                    : 'rgba(255,255,255,0.1)',
+                                boxShadow: i === currentStep ? `0 0 20px ${modeColor}60` : 'none'
+                            }}
+                        >
+                            {i < currentStep ? '✓' : step.icon}
+                        </div>
+                        <span className={`text-[10px] mt-1 transition-all ${
+                            i <= currentStep ? 'text-white/80' : 'text-white/30'
+                        }`}>
+                            {step.label}
+                        </span>
+                    </div>
+                    {i < steps.length - 1 && (
+                        <div
+                            className="w-8 h-0.5 rounded-full transition-all duration-500 -mt-4"
+                            style={{
+                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.1)'
+                            }}
+                        />
+                    )}
+                </React.Fragment>
+            ))}
         </div>
+    )
+}
+
+// ============================================
+// PULSING SEARCH ANIMATION
+// ============================================
+const SearchAnimation = ({ color }) => (
+    <div className="relative w-40 h-40 mx-auto">
+        {/* Outer rings */}
+        {[0, 1, 2].map(i => (
+            <div
+                key={i}
+                className="absolute inset-0 rounded-full"
+                style={{
+                    border: `2px solid ${color}`,
+                    opacity: 0.2 - i * 0.05,
+                    animation: `search-ping 2s ease-out infinite`,
+                    animationDelay: `${i * 0.4}s`
+                }}
+            />
+        ))}
+
+        {/* Center globe */}
+        <div className="absolute inset-0 flex items-center justify-center">
+            <div
+                className="text-6xl"
+                style={{
+                    filter: `drop-shadow(0 0 20px ${color})`,
+                    animation: 'globe-spin 3s linear infinite'
+                }}
+            >
+                🌍
+            </div>
+        </div>
+
+        {/* Scanning line */}
+        <div
+            className="absolute left-1/2 top-0 w-0.5 h-full -translate-x-1/2"
+            style={{
+                background: `linear-gradient(180deg, transparent, ${color}, transparent)`,
+                animation: 'scan-rotate 2s linear infinite'
+            }}
+        />
     </div>
 )
 
-/**
- * ArenaQueueScreen - Global matchmaking queue experience
- * 
- * Shows searching animation while polling for matches.
- * Auto-polls every 2 seconds for match status.
- */
+// ============================================
+// OPPONENT SILHOUETTE
+// ============================================
+const OpponentSilhouette = ({ color }) => (
+    <div
+        className="w-20 h-20 rounded-2xl flex items-center justify-center relative overflow-hidden"
+        style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px dashed rgba(255,255,255,0.2)'
+        }}
+    >
+        <span className="text-3xl opacity-30">👤</span>
+        {/* Shimmer effect */}
+        <div
+            className="absolute inset-0"
+            style={{
+                background: `linear-gradient(90deg, transparent, ${color}20, transparent)`,
+                animation: 'shimmer 2s ease-in-out infinite'
+            }}
+        />
+    </div>
+)
+
+// ============================================
+// ARENA QUEUE SCREEN
+// ============================================
 export default function ArenaQueueScreen({
     userId,
     score,
     thumb,
     mode,
-    onMatchFound,   // Called with battleId when match is found
-    onCancel,       // Called when user cancels
-    onError,        // Called on error
-    onTimeout       // Called when queue times out
+    onMatchFound,
+    onCancel,
+    onError,
+    onTimeout,
+    playSound,
+    vibrate
 }) {
     const [waitTime, setWaitTime] = useState(0)
     const [onlineCount, setOnlineCount] = useState(null)
     const [status, setStatus] = useState('joining') // joining → queued → matched → timeout
+    const [searchMessage, setSearchMessage] = useState(0)
+
     const pollIntervalRef = useRef(null)
     const waitTimerRef = useRef(null)
     const hasJoinedRef = useRef(false)
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'https://api.fitrate.app'
-    const TIMEOUT_MS = 60000 // 60 second timeout
+    // Use consistent API_BASE
+    const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
+    const TIMEOUT_MS = 60000 // 60 seconds
 
-    // Mode color mapping
-    const getModeColor = () => {
-        const colors = {
-            nice: '#00ff88', roast: '#ff6b35', honest: '#00d4ff', savage: '#8b00ff',
-            rizz: '#ff1493', celeb: '#ffd700', aura: '#9b59b6', chaos: '#ee5a24',
-            y2k: '#ff69b4', villain: '#4b0082', coquette: '#ffb6c1', hypebeast: '#f97316'
-        }
-        return colors[mode] || '#00d4ff'
-    }
+    const todayMode = getTodayArenaMode()
+    const modeColor = todayMode.color
 
-    const getModeEmoji = () => {
-        const emojis = {
-            nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏', celeb: '⭐',
-            aura: '🔮', chaos: '🎪', y2k: '💎', villain: '🖤', coquette: '🎀', hypebeast: '👟'
-        }
-        return emojis[mode] || '🔥'
-    }
+    // Fun searching messages
+    const SEARCH_MESSAGES = [
+        "Scanning the globe...",
+        "Finding worthy opponents...",
+        "Matching style levels...",
+        "Connecting fashionistas...",
+        "Almost there..."
+    ]
 
-    const accentColor = getModeColor()
+    // Rotate messages
+    useEffect(() => {
+        if (status !== 'queued') return
+        const interval = setInterval(() => {
+            setSearchMessage(prev => (prev + 1) % SEARCH_MESSAGES.length)
+        }, 3000)
+        return () => clearInterval(interval)
+    }, [status])
 
     // Join queue on mount
     useEffect(() => {
@@ -106,6 +211,8 @@ export default function ArenaQueueScreen({
 
         const joinQueue = async () => {
             try {
+                playSound?.('whoosh')
+
                 const res = await fetch(`${API_BASE}/arena/join`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -116,16 +223,17 @@ export default function ArenaQueueScreen({
                 if (data.status === 'matched') {
                     // Instant match!
                     setStatus('matched')
-                    playSound('celebrate')
-                    vibrate([100, 50, 100])
-                    setTimeout(() => onMatchFound?.(data.battleId), 500)
+                    playSound?.('celebrate')
+                    vibrate?.([100, 50, 100, 50, 100])
+                    setTimeout(() => onMatchFound?.(data.battleId), 800)
                 } else {
                     setStatus('queued')
+                    vibrate?.(50)
                     startPolling()
                 }
             } catch (err) {
                 console.error('[Arena] Join error:', err)
-                onError?.('Failed to join arena')
+                onError?.('Failed to join arena. Check your connection!')
             }
         }
 
@@ -159,7 +267,7 @@ export default function ArenaQueueScreen({
         if (waitTime >= TIMEOUT_MS && status === 'queued') {
             setStatus('timeout')
             leaveQueue()
-            onTimeout?.()
+            vibrate?.([100, 100, 100])
         }
     }, [waitTime, status])
 
@@ -173,18 +281,17 @@ export default function ArenaQueueScreen({
                 if (data.status === 'matched') {
                     setStatus('matched')
                     clearInterval(pollIntervalRef.current)
-                    playSound('celebrate')
-                    vibrate([100, 50, 100])
-                    setTimeout(() => onMatchFound?.(data.battleId), 500)
+                    playSound?.('celebrate')
+                    vibrate?.([100, 50, 100, 50, 100])
+                    setTimeout(() => onMatchFound?.(data.battleId), 800)
                 } else if (data.status === 'expired') {
                     setStatus('timeout')
                     clearInterval(pollIntervalRef.current)
-                    onTimeout?.()
                 }
             } catch (err) {
                 console.warn('[Arena] Poll error:', err)
             }
-        }, 2000) // Poll every 2 seconds
+        }, 2000)
     }
 
     // Leave queue
@@ -202,8 +309,8 @@ export default function ArenaQueueScreen({
 
     // Handle cancel
     const handleCancel = () => {
-        playSound('click')
-        vibrate(20)
+        playSound?.('click')
+        vibrate?.(20)
         if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
         if (waitTimerRef.current) clearInterval(waitTimerRef.current)
         leaveQueue()
@@ -217,127 +324,321 @@ export default function ArenaQueueScreen({
         return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
     }
 
-    // Timeout screen
+    // Progress percentage for timeout
+    const timeoutProgress = Math.min(100, (waitTime / TIMEOUT_MS) * 100)
+
+    // ============================================
+    // TIMEOUT SCREEN
+    // ============================================
     if (status === 'timeout') {
         return (
-            <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-6 text-center"
-                style={{ background: 'linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%)' }}>
-                <div className="text-7xl mb-6">😔</div>
-                <h1 className="text-2xl font-black text-white mb-2">No Opponents Found</h1>
-                <p className="text-white/50 mb-8 max-w-xs">
-                    The arena is quiet right now. Try again later or challenge a friend directly!
-                </p>
-                <button
-                    onClick={onCancel}
-                    className="w-full max-w-xs py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97]"
-                    style={{ background: accentColor, color: '#000' }}
-                >
-                    Back to Home
-                </button>
+            <div
+                className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+                style={{ background: `linear-gradient(180deg, #0a0a1a 0%, ${modeColor}15 50%, #0a0a1a 100%)` }}
+            >
+                <FloatingParticles color={modeColor} />
+
+                <div className="relative z-10 flex flex-col items-center max-w-sm">
+                    <div className="text-8xl mb-6 animate-bounce">😔</div>
+
+                    <h1 className="text-3xl font-black text-white mb-3">
+                        No Opponents Found
+                    </h1>
+
+                    <p className="text-white/50 mb-8 text-lg">
+                        The arena is quiet right now. Try again or challenge a friend directly!
+                    </p>
+
+                    <div className="flex flex-col gap-3 w-full">
+                        <button
+                            onClick={() => {
+                                playSound?.('click')
+                                vibrate?.(30)
+                                // Reset and retry
+                                setWaitTime(0)
+                                setStatus('joining')
+                                hasJoinedRef.current = false
+                            }}
+                            className="w-full py-4 rounded-2xl font-bold text-lg text-black transition-all active:scale-[0.97]"
+                            style={{ background: modeColor }}
+                        >
+                            Try Again
+                        </button>
+
+                        <button
+                            onClick={handleCancel}
+                            className="w-full py-4 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
+                        >
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+
+                <style>{`
+                    @keyframes queue-float {
+                        0%, 100% { transform: translateY(0); opacity: 0; }
+                        10% { opacity: 0.3; }
+                        90% { opacity: 0.1; }
+                        100% { transform: translateY(-100vh); }
+                    }
+                `}</style>
             </div>
         )
     }
 
-    // Match found screen (brief flash before reveal)
+    // ============================================
+    // MATCH FOUND SCREEN
+    // ============================================
     if (status === 'matched') {
         return (
-            <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center"
-                style={{ background: 'linear-gradient(180deg, #0a1a0a 0%, #001a00 50%, #0a1a0a 100%)' }}>
-                <div className="text-8xl animate-bounce">⚔️</div>
-                <h1 className="text-3xl font-black mt-4" style={{ color: '#00ff88' }}>
-                    OPPONENT FOUND!
-                </h1>
+            <div
+                className="fixed inset-0 z-[60] flex flex-col items-center justify-center overflow-hidden"
+                style={{ background: `linear-gradient(180deg, #001a00 0%, ${modeColor}30 50%, #001a00 100%)` }}
+            >
+                {/* Victory burst */}
+                <div
+                    className="absolute w-96 h-96 rounded-full"
+                    style={{
+                        background: `radial-gradient(circle, ${modeColor}60, transparent)`,
+                        animation: 'victory-burst 0.5s ease-out forwards'
+                    }}
+                />
+
+                <div className="relative z-10 flex flex-col items-center">
+                    <div
+                        className="text-9xl mb-4"
+                        style={{
+                            filter: `drop-shadow(0 0 40px ${modeColor})`,
+                            animation: 'match-bounce 0.5s ease-out'
+                        }}
+                    >
+                        ⚔️
+                    </div>
+
+                    <h1
+                        className="text-4xl font-black mb-2"
+                        style={{
+                            color: '#00ff88',
+                            textShadow: '0 0 30px #00ff8860',
+                            animation: 'text-glow 1s ease-in-out infinite'
+                        }}
+                    >
+                        OPPONENT FOUND!
+                    </h1>
+
+                    <p className="text-white/60">Get ready to battle...</p>
+                </div>
+
+                <style>{`
+                    @keyframes victory-burst {
+                        0% { transform: scale(0); opacity: 1; }
+                        100% { transform: scale(3); opacity: 0; }
+                    }
+                    @keyframes match-bounce {
+                        0% { transform: scale(0) rotate(-180deg); }
+                        50% { transform: scale(1.2) rotate(10deg); }
+                        100% { transform: scale(1) rotate(0deg); }
+                    }
+                    @keyframes text-glow {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.8; }
+                    }
+                `}</style>
             </div>
         )
     }
 
-    // Main queue screen
+    // ============================================
+    // MAIN QUEUE SCREEN
+    // ============================================
     return (
-        <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-6 text-center relative overflow-hidden"
-            style={{ background: 'linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%)' }}>
+        <div
+            className="fixed inset-0 z-[60] flex flex-col items-center justify-center px-6 text-center relative overflow-hidden"
+            style={{ background: `linear-gradient(180deg, #0a0a1a 0%, ${modeColor}15 50%, #0a0a1a 100%)` }}
+        >
+            <FloatingParticles color={modeColor} />
 
-            <FloatingParticles />
-
-            {/* Background glow */}
-            <div className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
+            {/* Cancel Button */}
+            <button
+                onClick={handleCancel}
+                className="absolute top-6 left-6 w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 z-20"
                 style={{
-                    background: `radial-gradient(circle, ${accentColor}20 0%, transparent 60%)`,
-                    top: '30%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                }} />
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)'
+                }}
+            >
+                <span className="text-white text-lg">✕</span>
+            </button>
 
-            {/* Header */}
-            <div className="relative z-10 mb-8">
-                <h1 className="text-3xl font-black text-white mb-2">
-                    🌍 Global Arena
-                </h1>
-                {onlineCount !== null && (
-                    <p className="text-white/50 text-sm">
-                        <span style={{ color: '#00ff88' }}>{onlineCount}</span> players online
-                    </p>
-                )}
+            {/* Online count */}
+            {onlineCount !== null && (
+                <div
+                    className="absolute top-6 right-6 flex items-center gap-2 px-3 py-2 rounded-full z-10"
+                    style={{
+                        background: 'rgba(0,255,136,0.15)',
+                        border: '1px solid rgba(0,255,136,0.3)'
+                    }}
+                >
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-green-400 text-sm font-bold">{onlineCount} online</span>
+                </div>
+            )}
+
+            {/* Progress Steps */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                <ProgressSteps currentStep={2} modeColor={modeColor} />
             </div>
 
-            {/* Search animation */}
-            <div className="relative z-10 mb-8">
-                <SearchRing color={accentColor} />
-            </div>
+            {/* Main Content */}
+            <div className="relative z-10 flex flex-col items-center w-full max-w-md mt-12">
+                {/* Search Animation */}
+                <div className="mb-8">
+                    <SearchAnimation color={modeColor} />
+                </div>
 
-            {/* Status */}
-            <div className="relative z-10 mb-4">
-                <p className="text-xl font-bold text-white mb-2">
+                {/* Status Text */}
+                <h2 className="text-2xl font-black text-white mb-2">
                     {status === 'joining' ? 'Entering Arena...' : 'Finding Opponent...'}
+                </h2>
+                <p className="text-white/50 text-sm mb-8 h-5">
+                    {status === 'queued' ? SEARCH_MESSAGES[searchMessage] : 'Connecting to arena...'}
                 </p>
-                <p className="text-white/40 text-sm">
-                    {getModeEmoji()} {mode.charAt(0).toUpperCase() + mode.slice(1)} Mode
-                </p>
-            </div>
 
-            {/* Your score card */}
-            <div className="relative z-10 bg-white/5 rounded-2xl p-4 border border-white/10 mb-6 w-full max-w-xs">
-                <div className="flex items-center gap-4">
-                    {thumb ? (
-                        <img src={thumb} alt="Your fit" className="w-16 h-16 rounded-xl object-cover" />
-                    ) : (
-                        <div className="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center">
-                            <span className="text-2xl">👤</span>
+                {/* VS Card - Your photo vs silhouette */}
+                <div className="flex items-center justify-center gap-6 mb-8">
+                    {/* Your photo */}
+                    <div className="flex flex-col items-center">
+                        <div
+                            className="w-20 h-20 rounded-2xl overflow-hidden relative"
+                            style={{
+                                boxShadow: `0 0 30px ${modeColor}40`,
+                                border: `2px solid ${modeColor}`
+                            }}
+                        >
+                            {thumb ? (
+                                <img src={thumb} alt="You" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                    <span className="text-2xl">👤</span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    <div className="text-left">
-                        <p className="text-white/50 text-xs uppercase tracking-wider">Your Score</p>
-                        <p className="text-3xl font-black" style={{ color: accentColor }}>
+                        <p className="text-white/60 text-xs mt-2">You</p>
+                        <p className="font-black text-lg" style={{ color: modeColor }}>
                             {Math.round(score)}
                         </p>
                     </div>
-                </div>
-            </div>
 
-            {/* Timer + progress */}
-            <div className="relative z-10 w-full max-w-xs mb-8">
-                <div className="flex justify-between text-sm text-white/40 mb-2">
-                    <span>Searching</span>
-                    <span>{formatWait(waitTime)}</span>
-                </div>
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    {/* VS */}
                     <div
-                        className="h-full rounded-full transition-all duration-1000"
+                        className="text-2xl font-black"
                         style={{
-                            width: `${Math.min(100, (waitTime / TIMEOUT_MS) * 100)}%`,
-                            background: `linear-gradient(90deg, ${accentColor}, #00d4ff)`
+                            color: modeColor,
+                            textShadow: `0 0 20px ${modeColor}60`,
+                            animation: 'vs-pulse 1s ease-in-out infinite'
                         }}
-                    />
+                    >
+                        VS
+                    </div>
+
+                    {/* Opponent silhouette */}
+                    <div className="flex flex-col items-center">
+                        <OpponentSilhouette color={modeColor} />
+                        <p className="text-white/40 text-xs mt-2">???</p>
+                        <p className="font-black text-lg text-white/30">??</p>
+                    </div>
                 </div>
+
+                {/* Mode Badge */}
+                <div
+                    className="flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+                    style={{
+                        background: `${modeColor}20`,
+                        border: `1px solid ${modeColor}40`
+                    }}
+                >
+                    <span className="text-xl">{todayMode.emoji}</span>
+                    <span style={{ color: modeColor }} className="font-bold text-sm">
+                        {todayMode.name} Mode
+                    </span>
+                </div>
+
+                {/* Circular Timeout Progress */}
+                <div className="relative w-32 h-32 mb-6">
+                    <svg className="w-full h-full -rotate-90">
+                        {/* Background circle */}
+                        <circle
+                            cx="64"
+                            cy="64"
+                            r="58"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.1)"
+                            strokeWidth="8"
+                        />
+                        {/* Progress circle */}
+                        <circle
+                            cx="64"
+                            cy="64"
+                            r="58"
+                            fill="none"
+                            stroke={timeoutProgress > 75 ? '#ff6b6b' : modeColor}
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                            strokeDasharray={`${2 * Math.PI * 58}`}
+                            strokeDashoffset={`${2 * Math.PI * 58 * (1 - timeoutProgress / 100)}`}
+                            style={{ transition: 'stroke-dashoffset 1s linear' }}
+                        />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-black text-white">
+                            {formatWait(waitTime)}
+                        </span>
+                        <span className="text-white/40 text-xs">
+                            {timeoutProgress > 75 ? 'Almost giving up...' : 'Searching'}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Cancel Button */}
+                <button
+                    onClick={handleCancel}
+                    className="w-full max-w-xs py-4 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
+                >
+                    Cancel
+                </button>
             </div>
 
-            {/* Cancel button */}
-            <button
-                onClick={handleCancel}
-                className="relative z-10 w-full max-w-xs py-4 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
-            >
-                Cancel
-            </button>
+            {/* CSS Animations */}
+            <style>{`
+                @keyframes queue-float {
+                    0%, 100% { transform: translateY(0); opacity: 0; }
+                    10% { opacity: 0.3; }
+                    90% { opacity: 0.1; }
+                    100% { transform: translateY(-100vh); }
+                }
+                @keyframes search-ping {
+                    0% { transform: scale(1); opacity: 0.3; }
+                    100% { transform: scale(2); opacity: 0; }
+                }
+                @keyframes globe-spin {
+                    0% { transform: rotateY(0deg); }
+                    100% { transform: rotateY(360deg); }
+                }
+                @keyframes scan-rotate {
+                    0% { transform: translateX(-50%) rotate(0deg); }
+                    100% { transform: translateX(-50%) rotate(360deg); }
+                }
+                @keyframes vs-pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.8; }
+                }
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
+            `}</style>
         </div>
     )
 }
