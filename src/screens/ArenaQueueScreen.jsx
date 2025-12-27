@@ -41,7 +41,7 @@ const FloatingParticles = ({ color }) => {
 }
 
 // ============================================
-// PROGRESS STEPS - Shared with ArenaEntryScreen
+// PROGRESS STEPS - Compact for mobile
 // ============================================
 const ProgressSteps = ({ currentStep, modeColor }) => {
     const steps = [
@@ -52,24 +52,24 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
     ]
 
     return (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
             {steps.map((step, i) => (
                 <React.Fragment key={i}>
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all duration-500 ${
-                                i < currentStep ? 'scale-90' : i === currentStep ? 'scale-110 animate-pulse' : 'scale-90 opacity-40'
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${
+                                i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
                             }`}
                             style={{
                                 background: i <= currentStep
                                     ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
                                     : 'rgba(255,255,255,0.1)',
-                                boxShadow: i === currentStep ? `0 0 20px ${modeColor}60` : 'none'
+                                boxShadow: i === currentStep ? `0 0 15px ${modeColor}50` : 'none'
                             }}
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[10px] mt-1 transition-all ${
+                        <span className={`text-[9px] mt-0.5 transition-all ${
                             i <= currentStep ? 'text-white/80' : 'text-white/30'
                         }`}>
                             {step.label}
@@ -77,9 +77,9 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                     </div>
                     {i < steps.length - 1 && (
                         <div
-                            className="w-8 h-0.5 rounded-full transition-all duration-500 -mt-4"
+                            className="w-6 h-0.5 rounded-full transition-all duration-500 -mt-3"
                             style={{
-                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.1)'
+                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.15)'
                             }}
                         />
                     )}
@@ -93,7 +93,7 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
 // PULSING SEARCH ANIMATION
 // ============================================
 const SearchAnimation = ({ color }) => (
-    <div className="relative w-40 h-40 mx-auto">
+    <div className="relative w-32 h-32 mx-auto">
         {/* Outer rings */}
         {[0, 1, 2].map(i => (
             <div
@@ -111,9 +111,9 @@ const SearchAnimation = ({ color }) => (
         {/* Center globe */}
         <div className="absolute inset-0 flex items-center justify-center">
             <div
-                className="text-6xl"
+                className="text-5xl"
                 style={{
-                    filter: `drop-shadow(0 0 20px ${color})`,
+                    filter: `drop-shadow(0 0 15px ${color})`,
                     animation: 'globe-spin 3s linear infinite'
                 }}
             >
@@ -137,13 +137,13 @@ const SearchAnimation = ({ color }) => (
 // ============================================
 const OpponentSilhouette = ({ color }) => (
     <div
-        className="w-20 h-20 rounded-2xl flex items-center justify-center relative overflow-hidden"
+        className="w-16 h-16 rounded-xl flex items-center justify-center relative overflow-hidden"
         style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px dashed rgba(255,255,255,0.2)'
         }}
     >
-        <span className="text-3xl opacity-30">👤</span>
+        <span className="text-2xl opacity-30">👤</span>
         {/* Shimmer effect */}
         <div
             className="absolute inset-0"
@@ -485,34 +485,34 @@ export default function ArenaQueueScreen({
                 </div>
             )}
 
-            {/* Progress Steps */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                <ProgressSteps currentStep={2} modeColor={modeColor} />
-            </div>
-
             {/* Main Content */}
-            <div className="relative z-10 flex flex-col items-center w-full max-w-md mt-12">
+            <div className="relative z-10 flex flex-col items-center w-full max-w-md pt-14 pb-4">
+                {/* Progress Steps - In flow, not absolute */}
+                <div className="mb-4">
+                    <ProgressSteps currentStep={2} modeColor={modeColor} />
+                </div>
+
                 {/* Search Animation */}
-                <div className="mb-8">
+                <div className="mb-6">
                     <SearchAnimation color={modeColor} />
                 </div>
 
                 {/* Status Text */}
-                <h2 className="text-2xl font-black text-white mb-2">
+                <h2 className="text-xl font-black text-white mb-1">
                     {status === 'joining' ? 'Entering Arena...' : 'Finding Opponent...'}
                 </h2>
-                <p className="text-white/50 text-sm mb-8 h-5">
+                <p className="text-white/50 text-sm mb-4 h-5">
                     {status === 'queued' ? SEARCH_MESSAGES[searchMessage] : 'Connecting to arena...'}
                 </p>
 
                 {/* VS Card - Your photo vs silhouette */}
-                <div className="flex items-center justify-center gap-6 mb-8">
+                <div className="flex items-center justify-center gap-4 mb-4">
                     {/* Your photo */}
                     <div className="flex flex-col items-center">
                         <div
-                            className="w-20 h-20 rounded-2xl overflow-hidden relative"
+                            className="w-16 h-16 rounded-xl overflow-hidden relative"
                             style={{
-                                boxShadow: `0 0 30px ${modeColor}40`,
+                                boxShadow: `0 0 20px ${modeColor}40`,
                                 border: `2px solid ${modeColor}`
                             }}
                         >
@@ -520,22 +520,22 @@ export default function ArenaQueueScreen({
                                 <img src={thumb} alt="You" className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                    <span className="text-2xl">👤</span>
+                                    <span className="text-xl">👤</span>
                                 </div>
                             )}
                         </div>
-                        <p className="text-white/60 text-xs mt-2">You</p>
-                        <p className="font-black text-lg" style={{ color: modeColor }}>
+                        <p className="text-white/60 text-[10px] mt-1">You</p>
+                        <p className="font-black text-base" style={{ color: modeColor }}>
                             {Math.round(score)}
                         </p>
                     </div>
 
                     {/* VS */}
                     <div
-                        className="text-2xl font-black"
+                        className="text-xl font-black"
                         style={{
                             color: modeColor,
-                            textShadow: `0 0 20px ${modeColor}60`,
+                            textShadow: `0 0 15px ${modeColor}60`,
                             animation: 'vs-pulse 1s ease-in-out infinite'
                         }}
                     >
@@ -545,57 +545,57 @@ export default function ArenaQueueScreen({
                     {/* Opponent silhouette */}
                     <div className="flex flex-col items-center">
                         <OpponentSilhouette color={modeColor} />
-                        <p className="text-white/40 text-xs mt-2">???</p>
-                        <p className="font-black text-lg text-white/30">??</p>
+                        <p className="text-white/40 text-[10px] mt-1">???</p>
+                        <p className="font-black text-base text-white/30">??</p>
                     </div>
                 </div>
 
                 {/* Mode Badge */}
                 <div
-                    className="flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
                     style={{
                         background: `${modeColor}20`,
                         border: `1px solid ${modeColor}40`
                     }}
                 >
-                    <span className="text-xl">{todayMode.emoji}</span>
+                    <span className="text-lg">{todayMode.emoji}</span>
                     <span style={{ color: modeColor }} className="font-bold text-sm">
                         {todayMode.name} Mode
                     </span>
                 </div>
 
                 {/* Circular Timeout Progress */}
-                <div className="relative w-32 h-32 mb-6">
-                    <svg className="w-full h-full -rotate-90">
+                <div className="relative w-24 h-24 mb-4">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96">
                         {/* Background circle */}
                         <circle
-                            cx="64"
-                            cy="64"
-                            r="58"
+                            cx="48"
+                            cy="48"
+                            r="42"
                             fill="none"
                             stroke="rgba(255,255,255,0.1)"
-                            strokeWidth="8"
+                            strokeWidth="6"
                         />
                         {/* Progress circle */}
                         <circle
-                            cx="64"
-                            cy="64"
-                            r="58"
+                            cx="48"
+                            cy="48"
+                            r="42"
                             fill="none"
                             stroke={timeoutProgress > 75 ? '#ff6b6b' : modeColor}
-                            strokeWidth="8"
+                            strokeWidth="6"
                             strokeLinecap="round"
-                            strokeDasharray={`${2 * Math.PI * 58}`}
-                            strokeDashoffset={`${2 * Math.PI * 58 * (1 - timeoutProgress / 100)}`}
+                            strokeDasharray={`${2 * Math.PI * 42}`}
+                            strokeDashoffset={`${2 * Math.PI * 42 * (1 - timeoutProgress / 100)}`}
                             style={{ transition: 'stroke-dashoffset 1s linear' }}
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-2xl font-black text-white">
+                        <span className="text-xl font-black text-white">
                             {formatWait(waitTime)}
                         </span>
-                        <span className="text-white/40 text-xs">
-                            {timeoutProgress > 75 ? 'Almost giving up...' : 'Searching'}
+                        <span className="text-white/40 text-[10px]">
+                            {timeoutProgress > 75 ? 'Almost done...' : 'Searching'}
                         </span>
                     </div>
                 </div>
@@ -603,7 +603,7 @@ export default function ArenaQueueScreen({
                 {/* Cancel Button */}
                 <button
                     onClick={handleCancel}
-                    className="w-full max-w-xs py-4 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                    className="w-full max-w-xs py-3 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
                     style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
                 >
                     Cancel

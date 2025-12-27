@@ -69,24 +69,24 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
     ]
 
     return (
-        <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex items-center justify-center gap-1">
             {steps.map((step, i) => (
                 <React.Fragment key={i}>
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all duration-500 ${
-                                i < currentStep ? 'scale-90' : i === currentStep ? 'scale-110 animate-pulse' : 'scale-90 opacity-40'
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${
+                                i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
                             }`}
                             style={{
                                 background: i <= currentStep
                                     ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
                                     : 'rgba(255,255,255,0.1)',
-                                boxShadow: i === currentStep ? `0 0 20px ${modeColor}60` : 'none'
+                                boxShadow: i === currentStep ? `0 0 15px ${modeColor}50` : 'none'
                             }}
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[10px] mt-1 transition-all ${
+                        <span className={`text-[9px] mt-0.5 transition-all ${
                             i <= currentStep ? 'text-white/80' : 'text-white/30'
                         }`}>
                             {step.label}
@@ -94,9 +94,9 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                     </div>
                     {i < steps.length - 1 && (
                         <div
-                            className="w-8 h-0.5 rounded-full transition-all duration-500 -mt-4"
+                            className="w-6 h-0.5 rounded-full transition-all duration-500 -mt-3"
                             style={{
-                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.1)'
+                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.15)'
                             }}
                         />
                     )}
@@ -536,19 +536,19 @@ export default function ArenaEntryScreen({
                 </div>
             )}
 
-            {/* Progress Steps */}
-            <div className="absolute top-20 left-1/2 -translate-x-1/2 z-10">
-                <ProgressSteps currentStep={currentStep} modeColor={todayMode.color} />
-            </div>
+            {/* Main Content - Scrollable area */}
+            <div className="flex flex-col items-center text-center z-10 max-w-md w-full pt-16 pb-6">
+                {/* Progress Steps - Inside content flow, not absolute */}
+                <div className="mb-4">
+                    <ProgressSteps currentStep={currentStep} modeColor={todayMode.color} />
+                </div>
 
-            {/* Main Content */}
-            <div className="flex flex-col items-center text-center z-10 max-w-md mt-8">
                 {/* Globe Icon with glow */}
-                <div className="relative mb-4">
+                <div className="relative mb-3">
                     <div
-                        className="text-8xl"
+                        className="text-7xl"
                         style={{
-                            filter: `drop-shadow(0 0 40px ${todayMode.color}80)`,
+                            filter: `drop-shadow(0 0 30px ${todayMode.color}80)`,
                             animation: 'globe-pulse 3s ease-in-out infinite'
                         }}
                     >
