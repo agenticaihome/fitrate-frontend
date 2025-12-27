@@ -38,9 +38,9 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 z-50"
+            className="fixed bottom-0 left-0 right-0 z-50 pwa-bottom-nav"
             style={{
-                height: 'calc(52px + env(safe-area-inset-bottom, 0px))',
+                height: 'calc(56px + env(safe-area-inset-bottom, 0px))',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
         >
