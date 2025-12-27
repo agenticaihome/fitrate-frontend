@@ -361,16 +361,22 @@ export default function ArenaEntryScreen({
             >
                 <FloatingParticles color={todayMode.color} />
 
-                {/* Cancel Button */}
+                {/* Cancel Button - High z-index and larger touch target */}
                 <button
-                    onClick={handleCancel}
-                    className="absolute top-6 left-6 w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 z-20"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleCancel()
+                    }}
+                    className="absolute top-4 left-4 w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90"
                     style={{
-                        background: 'rgba(255,255,255,0.1)',
-                        border: '1px solid rgba(255,255,255,0.2)'
+                        background: 'rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        zIndex: 9999,
+                        touchAction: 'manipulation'
                     }}
                 >
-                    <span className="text-white text-lg">✕</span>
+                    <span className="text-white text-xl font-bold">✕</span>
                 </button>
 
                 {/* Progress Steps */}
@@ -496,30 +502,35 @@ export default function ArenaEntryScreen({
         >
             <FloatingParticles color={todayMode.color} />
 
-            {/* Hidden file input */}
+            {/* Hidden file input - positioned off-screen to avoid any interference */}
             <input
                 type="file"
                 accept="image/*"
                 capture="environment"
                 ref={fileInputRef}
                 onChange={handleFileSelect}
-                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+                className="sr-only"
+                aria-hidden="true"
             />
 
-            {/* Back Button */}
+            {/* Back Button - High z-index and larger touch target */}
             <button
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     playSound?.('click')
                     vibrate?.(10)
-                    onBack()
+                    onBack?.()
                 }}
-                className="absolute top-6 left-6 w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 z-10"
+                className="absolute top-4 left-4 w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90"
                 style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.2)'
+                    background: 'rgba(0,0,0,0.5)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    zIndex: 9999,
+                    touchAction: 'manipulation'
                 }}
             >
-                <span className="text-white text-lg">←</span>
+                <span className="text-white text-xl font-bold">←</span>
             </button>
 
             {/* Online Count Badge */}
