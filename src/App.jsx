@@ -942,8 +942,12 @@ export default function App() {
           const data = await res.json()
           setChallengePartyData(data)
           // Check if current user created this challenge
-          const createdChallenges = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
-          setIsCreatorOfChallenge(createdChallenges.includes(challengePartyId))
+          // PRIORITY 1: Compare userId with server-side creatorId (most reliable)
+          // PRIORITY 2: Fall back to localStorage if creatorId not available
+          const isCreator = data.creatorId && userId
+            ? data.creatorId === userId
+            : JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]').includes(challengePartyId)
+          setIsCreatorOfChallenge(isCreator)
         } else {
           setChallengePartyData(null)
         }
@@ -2602,6 +2606,11 @@ export default function App() {
               if (res.ok) {
                 const data = await res.json()
                 setChallengePartyData(data)
+                // Set isCreator based on creatorId comparison
+                const isCreator = data.creatorId && userId
+                  ? data.creatorId === userId
+                  : JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]').includes(battleId)
+                setIsCreatorOfChallenge(isCreator)
                 // If battle is completed, show the reveal animation
                 if (data.status === 'completed') {
                   setShowBattleReveal(true)
@@ -2769,6 +2778,11 @@ export default function App() {
                 if (partyRes.ok) {
                   const partyData = await partyRes.json()
                   setChallengePartyData(partyData)
+                  // Set isCreator based on creatorId comparison
+                  const isCreator = partyData.creatorId && userId
+                    ? partyData.creatorId === userId
+                    : JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]').includes(pendingBattleId)
+                  setIsCreatorOfChallenge(isCreator)
                   // Show the dramatic battle reveal animation!
                   setShowBattleReveal(true)
                   setScreen('home')  // Clear results screen
