@@ -2591,6 +2591,15 @@ export default function App() {
             setChallengePartyData(null)
             setScreen('home')
           }}
+          onPlayAgain={arenaData ? () => {
+            // Quick re-enter Arena with same photo
+            window.history.pushState({}, '', '/')
+            setShowBattleReveal(false)
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            // Go directly to queue with existing data
+            setArenaScreen('queue')
+          } : null}
         />
       </Suspense>
     )

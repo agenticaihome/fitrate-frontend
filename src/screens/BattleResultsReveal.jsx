@@ -401,7 +401,8 @@ export default function BattleResultsReveal({
     onShare,
     onRematch,
     onHome,
-    onViewScorecard
+    onViewScorecard,
+    onPlayAgain  // NEW: Quick re-enter arena with same photo
 }) {
     // Animation phases
     const [phase, setPhase] = useState(0)
@@ -524,13 +525,14 @@ export default function BattleResultsReveal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex flex-col overflow-hidden"
+            className="fixed inset-0 z-50 flex flex-col overflow-y-auto overflow-x-hidden"
             style={{
                 background: 'linear-gradient(180deg, #0a0a15 0%, #1a1a2e 50%, #0a0a15 100%)',
-                touchAction: 'none',
+                touchAction: 'pan-y',
                 transform: `scale(${cameraZoom})`,
                 transition: showShake ? 'none' : 'transform 0.15s ease-out',
-                animation: showShake ? 'screen-shake-intense 0.5s ease-out' : 'none'
+                animation: showShake ? 'screen-shake-intense 0.5s ease-out' : 'none',
+                paddingBottom: 'env(safe-area-inset-bottom, 20px)'
             }}
         >
             {/* ========== CINEMATIC OVERLAYS ========== */}
@@ -834,7 +836,7 @@ export default function BattleResultsReveal({
                                 className="relative"
                                 style={{
                                     animation: phase === 1 ? 'slide-in-left-3d 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' :
-                                              phase >= 3 && creatorWon ? 'card-winner-float 3s ease-in-out infinite' : 'none',
+                                        phase >= 3 && creatorWon ? 'card-winner-float 3s ease-in-out infinite' : 'none',
                                     opacity: phase === 1 ? 0 : 1,
                                     transform: phase >= 3 && responderWon ? 'scale(0.85) translateY(10px)' : 'scale(1)',
                                     transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -956,7 +958,7 @@ export default function BattleResultsReveal({
                                 className="relative"
                                 style={{
                                     animation: phase === 1 ? 'slide-in-right-3d 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' :
-                                              phase >= 3 && responderWon ? 'card-winner-float 3s ease-in-out infinite' : 'none',
+                                        phase >= 3 && responderWon ? 'card-winner-float 3s ease-in-out infinite' : 'none',
                                     opacity: phase === 1 ? 0 : 1,
                                     transform: phase >= 3 && creatorWon ? 'scale(0.85) translateY(10px)' : 'scale(1)',
                                     transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -1113,6 +1115,29 @@ export default function BattleResultsReveal({
                             />
                             <span className="relative z-10">📊 See My Full Scorecard</span>
                         </button>
+
+                        {/* Play Again Button - Arena quick re-entry */}
+                        {onPlayAgain && (
+                            <button
+                                onClick={() => {
+                                    playSound('whoosh')
+                                    vibrate([50, 30, 50])
+                                    onPlayAgain?.()
+                                }}
+                                className="w-full py-3.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97] flex items-center justify-center gap-2"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(0,212,255,0.2) 0%, rgba(139,92,246,0.2) 100%)',
+                                    backdropFilter: 'blur(10px)',
+                                    WebkitBackdropFilter: 'blur(10px)',
+                                    color: '#00d4ff',
+                                    border: '1px solid rgba(0,212,255,0.4)',
+                                    boxShadow: '0 0 20px rgba(0,212,255,0.2)'
+                                }}
+                            >
+                                <span className="text-lg">⚔️</span>
+                                <span>Play Again in Arena</span>
+                            </button>
+                        )}
 
                         {/* Secondary Row - Glassmorphism */}
                         <div className="flex gap-3">
