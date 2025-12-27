@@ -32,6 +32,116 @@ function ConfettiPiece({ delay, color, left }) {
     )
 }
 
+// Floating background particles for premium atmosphere
+function FloatingParticles() {
+    const particles = useMemo(() =>
+        Array.from({ length: 30 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 2 + Math.random() * 4,
+            delay: Math.random() * 5,
+            duration: 8 + Math.random() * 6,
+            opacity: 0.1 + Math.random() * 0.3
+        })), []
+    )
+    return (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    style={{
+                        position: 'absolute',
+                        left: `${p.left}%`,
+                        bottom: '-20px',
+                        width: p.size,
+                        height: p.size,
+                        background: `rgba(0,212,255,${p.opacity})`,
+                        borderRadius: '50%',
+                        boxShadow: `0 0 ${p.size * 2}px rgba(0,212,255,${p.opacity})`,
+                        animation: `float-up ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
+// Impact sparks for collision effect
+function ImpactSparks({ show }) {
+    const sparks = useMemo(() =>
+        Array.from({ length: 20 }, (_, i) => ({
+            id: i,
+            angle: (i / 20) * 360,
+            distance: 60 + Math.random() * 80,
+            size: 3 + Math.random() * 4,
+            color: ['#00d4ff', '#00ff88', '#fff', '#ffd700'][i % 4]
+        })), []
+    )
+
+    if (!show) return null
+
+    return (
+        <div className="fixed inset-0 pointer-events-none z-[90] flex items-center justify-center">
+            {sparks.map(s => (
+                <div
+                    key={s.id}
+                    style={{
+                        position: 'absolute',
+                        width: s.size,
+                        height: s.size,
+                        background: s.color,
+                        borderRadius: '50%',
+                        boxShadow: `0 0 8px ${s.color}`,
+                        animation: 'spark-burst 0.5s ease-out forwards',
+                        '--spark-angle': `${s.angle}deg`,
+                        '--spark-distance': `${s.distance}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
+// Animated score counter (drumroll effect)
+function AnimatedScore({ targetScore, color, delay = 0 }) {
+    const [displayScore, setDisplayScore] = useState(0)
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            const duration = 800 // ms
+            const steps = 20
+            const increment = targetScore / steps
+            let current = 0
+            let step = 0
+
+            const interval = setInterval(() => {
+                step++
+                current = Math.min(targetScore, Math.round(increment * step))
+                setDisplayScore(current)
+
+                if (step >= steps) {
+                    clearInterval(interval)
+                    setDisplayScore(targetScore)
+                }
+            }, duration / steps)
+
+            return () => clearInterval(interval)
+        }, delay)
+
+        return () => clearTimeout(timeout)
+    }, [targetScore, delay])
+
+    return (
+        <div
+            className="text-4xl font-black"
+            style={{ color }}
+        >
+            {Math.round(displayScore)}
+        </div>
+    )
+}
+
 export default function BattleResultsReveal({
     battleData,
     isCreator,
@@ -46,6 +156,7 @@ export default function BattleResultsReveal({
     const [showConfetti, setShowConfetti] = useState(false)
     const [showFlash, setShowFlash] = useState(false)
     const [showShake, setShowShake] = useState(false)
+    const [showSparks, setShowSparks] = useState(false)
 
     // Battle data
     const creatorScore = battleData?.creatorScore || 0
@@ -94,8 +205,10 @@ export default function BattleResultsReveal({
             // Trigger dramatic collision effects
             setShowFlash(true)
             setShowShake(true)
+            setShowSparks(true)
             setTimeout(() => setShowFlash(false), 200)
             setTimeout(() => setShowShake(false), 400)
+            setTimeout(() => setShowSparks(false), 600)
             setPhase(2)
         }, 1600)
 
@@ -148,6 +261,12 @@ export default function BattleResultsReveal({
                     }}
                 />
             )}
+
+            {/* Premium atmosphere - floating particles */}
+            <FloatingParticles />
+
+            {/* Impact sparks on collision */}
+            <ImpactSparks show={showSparks} />
             {/* CSS Animations */}
             <style>{`
                 @keyframes pulse-glow {
@@ -205,6 +324,32 @@ export default function BattleResultsReveal({
                     30% { opacity: 0.9; }
                     100% { opacity: 0; }
                 }
+                @keyframes float-up {
+                    0% { transform: translateY(0) scale(1); opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+                }
+                @keyframes spark-burst {
+                    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+                    100% { 
+                        transform: translate(
+                            calc(cos(var(--spark-angle)) * var(--spark-distance)),
+                            calc(sin(var(--spark-angle)) * var(--spark-distance))
+                        ) scale(0);
+                        opacity: 0;
+                    }
+                }
+                @keyframes neon-glow-ring {
+                    0%, 100% { 
+                        box-shadow: 0 0 20px var(--glow-color), 0 0 40px var(--glow-color), inset 0 0 20px var(--glow-color);
+                        opacity: 0.8;
+                    }
+                    50% { 
+                        box-shadow: 0 0 40px var(--glow-color), 0 0 80px var(--glow-color), inset 0 0 40px var(--glow-color);
+                        opacity: 1;
+                    }
+                }
             `}</style>
 
             {/* Confetti */}
@@ -252,18 +397,33 @@ export default function BattleResultsReveal({
                                 className="relative"
                                 style={{
                                     animation: phase === 1 ? 'slide-in-left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
-                                    opacity: phase === 1 ? 0 : 1
+                                    opacity: phase === 1 ? 0 : 1,
+                                    transform: phase >= 3 && responderWon ? 'scale(0.88)' : 'scale(1)',
+                                    transition: 'transform 0.4s ease-out'
                                 }}
                             >
                                 <div
                                     className="w-44 h-56 rounded-2xl overflow-hidden relative"
                                     style={{
                                         border: phase >= 3 && creatorWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
-                                        boxShadow: phase >= 3 && creatorWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
+                                        boxShadow: phase >= 3 && creatorWon
+                                            ? `0 0 30px ${winColor}, 0 0 60px ${winColor}50`
+                                            : '0 8px 32px rgba(0,0,0,0.4)',
                                         filter: phase >= 3 && responderWon ? 'grayscale(40%) brightness(0.7)' : 'none',
                                         transition: 'all 0.4s ease-out'
                                     }}
                                 >
+                                    {/* Neon glow ring for winner */}
+                                    {phase >= 3 && creatorWon && (
+                                        <div
+                                            className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+                                            style={{
+                                                '--glow-color': winColor,
+                                                border: `2px solid ${winColor}`,
+                                                animation: 'neon-glow-ring 1.5s ease-in-out infinite'
+                                            }}
+                                        />
+                                    )}
                                     {creatorThumb ? (
                                         <img
                                             src={creatorThumb}
@@ -301,12 +461,10 @@ export default function BattleResultsReveal({
                                         className="text-center mt-3"
                                         style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
                                     >
-                                        <div
-                                            className="text-4xl font-black"
-                                            style={{ color: creatorWon ? winColor : '#fff' }}
-                                        >
-                                            {Math.round(creatorScore)}
-                                        </div>
+                                        <AnimatedScore
+                                            targetScore={Math.round(creatorScore)}
+                                            color={creatorWon ? winColor : '#fff'}
+                                        />
                                         <div className="text-xs text-white/50">/100</div>
                                     </div>
                                 )}
@@ -337,18 +495,33 @@ export default function BattleResultsReveal({
                                 className="relative"
                                 style={{
                                     animation: phase === 1 ? 'slide-in-right 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
-                                    opacity: phase === 1 ? 0 : 1
+                                    opacity: phase === 1 ? 0 : 1,
+                                    transform: phase >= 3 && creatorWon ? 'scale(0.88)' : 'scale(1)',
+                                    transition: 'transform 0.4s ease-out'
                                 }}
                             >
                                 <div
                                     className="w-44 h-56 rounded-2xl overflow-hidden relative"
                                     style={{
                                         border: phase >= 3 && responderWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
-                                        boxShadow: phase >= 3 && responderWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
+                                        boxShadow: phase >= 3 && responderWon
+                                            ? `0 0 30px ${winColor}, 0 0 60px ${winColor}50`
+                                            : '0 8px 32px rgba(0,0,0,0.4)',
                                         filter: phase >= 3 && creatorWon ? 'grayscale(40%) brightness(0.7)' : 'none',
                                         transition: 'all 0.4s ease-out'
                                     }}
                                 >
+                                    {/* Neon glow ring for winner */}
+                                    {phase >= 3 && responderWon && (
+                                        <div
+                                            className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+                                            style={{
+                                                '--glow-color': winColor,
+                                                border: `2px solid ${winColor}`,
+                                                animation: 'neon-glow-ring 1.5s ease-in-out infinite'
+                                            }}
+                                        />
+                                    )}
                                     {responderThumb ? (
                                         <img
                                             src={responderThumb}
@@ -386,12 +559,11 @@ export default function BattleResultsReveal({
                                         className="text-center mt-3"
                                         style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards', opacity: 0 }}
                                     >
-                                        <div
-                                            className="text-4xl font-black"
-                                            style={{ color: responderWon ? winColor : '#fff' }}
-                                        >
-                                            {Math.round(responderScore)}
-                                        </div>
+                                        <AnimatedScore
+                                            targetScore={Math.round(responderScore)}
+                                            color={responderWon ? winColor : '#fff'}
+                                            delay={150}
+                                        />
                                         <div className="text-xs text-white/50">/100</div>
                                     </div>
                                 )}
