@@ -56,7 +56,8 @@ export default function BattleResultsReveal({
     onComplete,
     onShare,
     onRematch,
-    onHome
+    onHome,
+    onViewScorecard  // Navigate to detailed scorecard
 }) {
     // Animation phases
     const [phase, setPhase] = useState(0) // 0=tension, 1=collision, 2=scores, 3=winner, 4=final
@@ -493,12 +494,12 @@ export default function BattleResultsReveal({
                     style={{ animation: 'text-reveal 0.5s ease-out forwards' }}
                 >
                     <div className="flex flex-col gap-3 max-w-sm mx-auto">
-                        {/* Primary CTA */}
+                        {/* Primary CTA - See My Scorecard */}
                         <button
                             onClick={() => {
                                 playSound('click')
                                 vibrate(30)
-                                onShare?.()
+                                onViewScorecard?.()
                             }}
                             className="w-full py-4 rounded-2xl font-black text-lg transition-all active:scale-[0.97]"
                             style={{
@@ -509,7 +510,7 @@ export default function BattleResultsReveal({
                                 boxShadow: `0 8px 30px ${userWon ? winColor : '#8b5cf6'}50`
                             }}
                         >
-                            {userWon ? '🏆 Share Your Victory' : '⚔️ Demand Rematch'}
+                            📊 See My Scorecard
                         </button>
 
                         {/* Secondary CTAs */}
@@ -518,7 +519,7 @@ export default function BattleResultsReveal({
                                 onClick={() => {
                                     playSound('click')
                                     vibrate(20)
-                                    onRematch?.()
+                                    onShare?.()
                                 }}
                                 className="flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
                                 style={{
@@ -527,7 +528,7 @@ export default function BattleResultsReveal({
                                     border: '1px solid rgba(255,255,255,0.2)'
                                 }}
                             >
-                                🔄 New Battle
+                                {userWon ? '🏆 Share Win' : '📤 Share'}
                             </button>
                             <button
                                 onClick={() => {

@@ -1636,7 +1636,7 @@ export default function App() {
 
         // ============================================
         // BATTLE ROOM - Submit responder score if responding to a battle (FREE USERS)
-        // Show results card first, then let them see battle comparison
+        // Auto-trigger dramatic battle reveal animation after submission!
         // ============================================
         const respondingBattleId = localStorage.getItem('fitrate_responding_challenge')
         if (respondingBattleId) {
@@ -1656,10 +1656,20 @@ export default function App() {
             // Clear the pending battle flag
             localStorage.removeItem('fitrate_responding_challenge')
 
-            // Store battle ID so results screen can show "See Battle Results" CTA
-            setPendingBattleId(respondingBattleId)
+            // The backend returns the full updated battle with status: 'completed'
+            // Trigger the dramatic battle reveal animation immediately!
+            if (battleResult && battleResult.status === 'completed') {
+              setChallengePartyId(respondingBattleId)
+              setChallengePartyData(battleResult)
+              setIsCreatorOfChallenge(false) // We are the responder
+              setShowBattleReveal(true)
+              setIsAnalyzing(false)
+              setScreen('home') // Clear to home so reveal takes over
+              return
+            }
 
-            // Show results screen first - user can tap "See Battle Results" to see comparison
+            // Fallback: store battle ID so results screen can show "See Battle Results" CTA
+            setPendingBattleId(respondingBattleId)
             setIsAnalyzing(false)
             setScreen('results')
             return
@@ -1819,10 +1829,19 @@ export default function App() {
           // Clear the pending challenge
           localStorage.removeItem('fitrate_responding_challenge')
 
-          // Store battle ID so results screen can show "See Battle Results" CTA
-          setPendingBattleId(respondingChallengeId)
+          // The backend returns the full updated battle with status: 'completed'
+          // Trigger the dramatic battle reveal animation immediately!
+          if (challengeResult && challengeResult.status === 'completed') {
+            setChallengePartyId(respondingChallengeId)
+            setChallengePartyData(challengeResult)
+            setIsCreatorOfChallenge(false) // We are the responder
+            setShowBattleReveal(true)
+            setScreen('home') // Clear to home so reveal takes over
+            return
+          }
 
-          // Show results screen first - user can tap "See Battle Results" to see comparison
+          // Fallback: store battle ID so results screen can show "See Battle Results" CTA
+          setPendingBattleId(respondingChallengeId)
           setScreen('results')
           return
         } catch (err) {
@@ -2396,6 +2415,15 @@ export default function App() {
         <BattleResultsReveal
           battleData={challengePartyData}
           isCreator={isCreatorOfChallenge}
+          onViewScorecard={() => {
+            // Navigate to user's detailed scorecard (ResultsScreen)
+            setShowBattleReveal(false)
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            // The scores are already set from the responder's analysis, just show results
+            setScreen('results')
+          }}
           onShare={() => {
             setShowBattleReveal(false)
             // Share battle result
