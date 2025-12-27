@@ -1118,24 +1118,6 @@ export default function HomeScreen({
             </div>
 
 
-            {/* Status Pill - Directly below the main button */}
-            <div
-                className="mt-6 mb-2 px-5 py-2.5 rounded-full"
-                style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 0 20px rgba(255,255,255,0.03)'
-                }}
-            >
-                <p className="text-center text-white/60 text-sm">
-                    {purchasedScans > 0
-                        ? `💎 ${purchasedScans} bonus + ${scansRemaining} free scans`
-                        : `✨ ${scansRemaining} scan${scansRemaining !== 1 ? 's' : ''} left today`
-                    }
-                    {dailyStreak > 0 && <span className="ml-2">• 🔥 {dailyStreak}-day streak</span>}
-                </p>
-            </div>
-
             {/* Privacy Assurance */}
             <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 {eventMode
