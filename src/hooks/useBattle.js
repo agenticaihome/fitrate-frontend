@@ -114,6 +114,46 @@ export default function useBattle() {
         }
     }, [challengePartyId, fetchChallengeParty])
 
+    // Auto-refresh polling when waiting for opponent (creator perspective)
+    // Polls every 10 seconds to check if opponent has responded
+    useEffect(() => {
+        // Only poll if:
+        // 1. We have a battle ID
+        // 2. Battle is in 'waiting' status (not completed/expired)
+        // 3. User is the creator (waiting for opponent)
+        const shouldPoll = challengePartyId &&
+            challengePartyData?.status === 'waiting' &&
+            isCreatorOfChallenge
+
+        if (!shouldPoll) return
+
+        console.log('[Battle] Starting auto-refresh polling...')
+
+        const pollInterval = setInterval(async () => {
+            console.log('[Battle] Polling for updates...')
+            try {
+                const res = await fetch(`${API_BASE}/battle/${challengePartyId}`, {
+                    headers: getApiHeaders()
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    // Check if status changed from 'waiting'
+                    if (data.status !== 'waiting') {
+                        console.log('[Battle] Battle completed! Updating state...')
+                        setChallengePartyData(data)
+                    }
+                }
+            } catch (err) {
+                console.error('[Battle] Poll error:', err)
+            }
+        }, 10000) // Poll every 10 seconds
+
+        return () => {
+            console.log('[Battle] Stopping auto-refresh polling')
+            clearInterval(pollInterval)
+        }
+    }, [challengePartyId, challengePartyData?.status, isCreatorOfChallenge])
+
     return {
         // State
         challengePartyId,
