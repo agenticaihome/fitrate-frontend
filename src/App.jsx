@@ -39,7 +39,7 @@ const ErrorScreen = lazy(() => import('./screens/ErrorScreen'))
 const ProEmailPromptScreen = lazy(() => import('./screens/ProEmailPromptScreen'))
 const ProWelcomeScreen = lazy(() => import('./screens/ProWelcomeScreen'))
 const ShareSuccessScreen = lazy(() => import('./screens/ShareSuccessScreen'))
-const PaywallScreen = lazy(() => import('./screens/PaywallScreen'))
+// PaywallScreen removed - consolidated into PaywallModal
 const RulesScreen = lazy(() => import('./screens/RulesScreen'))
 const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
 const BattleScreen = lazy(() => import('./screens/BattleScreen'))
@@ -3079,20 +3079,48 @@ export default function App() {
   }
 
   // ============================================
-  // PAYWALL/LIMIT-REACHED SCREEN - Redirect to Sales Page Modal
-  // ============================================
-  // ============================================
-  // PAYWALL/LIMIT-REACHED SCREEN
+  // PAYWALL/LIMIT-REACHED SCREEN - Show PaywallModal over HomeScreen
+  // The PaywallModal is the new consolidated "Enjoy 2 Free Scans" experience
   // ============================================
   if (screen === 'paywall' || screen === 'limit-reached') {
+    // Redirect to home and show the modal overlay
+    // The PaywallModal will be rendered below as it checks showPaywall state
+    // Just ensure showPaywall is true and render HomeScreen
     return (
       <Suspense fallback={<LoadingFallback />}>
-        <PaywallScreen
-          screen={screen}
+        <HomeScreen
+          scansRemaining={scansRemaining}
+          purchasedScans={purchasedScans}
+          isPro={isPro}
           mode={mode}
-          timeUntilReset={timeUntilReset}
-          onShowPaywall={() => setShowPaywall(true)}
-          onClose={() => setScreen('home')}
+          setMode={setMode}
+          onSubmitImage={handleImageSubmission}
+          setScreen={setScreen}
+          userId={userId}
+          dailyStreak={dailyStreak}
+          fashionShowId={fashionShowId}
+          setFashionShowId={setFashionShowId}
+          eventMode={eventMode}
+          setEventMode={setEventMode}
+          currentEvent={currentEvent}
+          freeEventEntryUsed={freeEventEntryUsed}
+          dailyChallengeMode={dailyChallengeMode}
+          setDailyChallengeMode={setDailyChallengeMode}
+          challengePartyId={challengePartyId}
+          setChallengePartyId={setChallengePartyId}
+          playSound={playSound}
+          vibrate={vibrate}
+          activeBattles={activeBattles}
+          activeShows={activeShows}
+          onNavigateToBattle={navigateToBattle}
+          onNavigateToShow={navigateToShow}
+          totalReferrals={totalReferrals}
+          referralBonusScans={referralBonusScans}
+          setShowPaywall={setShowPaywall}
+          arenaData={arenaData}
+          setArenaData={setArenaData}
+          arenaScreen={arenaScreen}
+          setArenaScreen={setArenaScreen}
         />
       </Suspense>
     )
