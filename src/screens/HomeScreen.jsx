@@ -108,7 +108,8 @@ export default function HomeScreen({
     activeBattles = [],     // User's active 1v1 Battles
     onNavigateToBattle,     // Navigate to a specific Battle
     onRemoveBattle,         // Remove a battle from the list
-    onNavigate              // General navigation callback (for judges, etc.)
+    onNavigate,             // General navigation callback (for judges, etc.)
+    onStartArena            // Start Global Arena matchmaking flow
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -1069,137 +1070,96 @@ export default function HomeScreen({
                                         '--glow-color': buttonGlow
                                     }}
                                 >
-                                {/* Animated sparkles for competition mode */}
-                                {isCompeting && (
-                                    <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                                        <div className="absolute" style={{ top: '10%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite', fontSize: '1.5rem' }}>✨</div>
-                                        <div className="absolute" style={{ top: '15%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s', fontSize: '1.2rem' }}>⭐</div>
-                                        <div className="absolute" style={{ bottom: '15%', left: '15%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.5s', fontSize: '1.2rem' }}>⭐</div>
-                                        <div className="absolute" style={{ bottom: '20%', right: '20%', animation: 'sparkle 1.8s ease-in-out infinite 0.8s', fontSize: '1.5rem' }}>✨</div>
-                                    </div>
-                                )}
+                                    {/* Animated sparkles for competition mode */}
+                                    {isCompeting && (
+                                        <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                                            <div className="absolute" style={{ top: '10%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite', fontSize: '1.5rem' }}>✨</div>
+                                            <div className="absolute" style={{ top: '15%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s', fontSize: '1.2rem' }}>⭐</div>
+                                            <div className="absolute" style={{ bottom: '15%', left: '15%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.5s', fontSize: '1.2rem' }}>⭐</div>
+                                            <div className="absolute" style={{ bottom: '20%', right: '20%', animation: 'sparkle 1.8s ease-in-out infinite 0.8s', fontSize: '1.5rem' }}>✨</div>
+                                        </div>
+                                    )}
 
-                                {/* Inner gradient circle - more vibrant */}
-                                <div
-                                    className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
-                                    style={{
-                                        background: innerGradient,
-                                        boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${buttonGlow}`,
-                                        animation: 'pulse 2s ease-in-out infinite'
-                                    }}
-                                    aria-hidden="true"
-                                />
-
-                                {/* Emoji - uses mode-specific emoji for all 12 modes */}
-                                <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                    {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : getModeEmoji()}
-                                </span>
-
-                                {/* Main Text - mode-specific call to action */}
-                                <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
-                                    }`}>
-                                    {entryBlocked ? 'ENTRY USED'
-                                        : dailyChallengeMode ? 'DAILY CHALLENGE'
-                                            : isCompeting ? (currentEvent.theme || 'COMPETE')
-                                                : mode === 'nice' ? 'RATE MY FIT'
-                                                    : mode === 'roast' ? 'ROAST MY FIT'
-                                                        : mode === 'honest' ? 'HONEST RATE'
-                                                            : mode === 'savage' ? 'SAVAGE MODE'
-                                                                : mode === 'rizz' ? 'RIZZ CHECK'
-                                                                    : mode === 'celeb' ? 'CELEB JUDGE'
-                                                                        : mode === 'aura' ? 'AURA READ'
-                                                                            : mode === 'chaos' ? 'CHAOS MODE'
-                                                                                : mode === 'y2k' ? 'Y2K CHECK'
-                                                                                    : mode === 'villain' ? 'VILLAIN ERA'
-                                                                                        : mode === 'coquette' ? 'COQUETTE'
-                                                                                            : mode === 'hypebeast' ? 'DRIP CHECK'
-                                                                                                : 'RATE MY FIT'}
-                                </span>
-
-                                {/* Subtitle - mode-specific description */}
-                                <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                    {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
-                                        : entryBlocked ? 'Entry used today'
-                                            : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
-                                                : mode === 'nice' ? 'Supportive AI feedback'
-                                                    : mode === 'roast' ? 'Brutally honest AI'
-                                                        : mode === 'honest' ? 'Balanced analysis'
-                                                            : mode === 'savage' ? 'Maximum destruction'
-                                                                : mode === 'rizz' ? 'Dating vibe check'
-                                                                    : mode === 'celeb' ? 'Celebrity judge'
-                                                                        : mode === 'aura' ? 'Mystical energy read'
-                                                                            : mode === 'chaos' ? 'Unhinged chaos'
-                                                                                : mode === 'y2k' ? "That's hot 💎"
-                                                                                    : mode === 'villain' ? 'Main villain energy'
-                                                                                        : mode === 'coquette' ? 'Soft & romantic'
-                                                                                            : mode === 'hypebeast' ? 'Certified drip'
-                                                                                                : 'AI feedback'}
-                                </span>
-
-                                {/* Mode Selector - Compact pill that opens mode drawer */}
-                                {!dailyChallengeMode && !isCompeting && (
+                                    {/* Inner gradient circle - more vibrant */}
                                     <div
-                                        className={`relative mt-4 rounded-full flex items-center gap-2 cursor-pointer transition-all duration-300 ${showNudge ? 'animate-pulse' : ''}`}
+                                        className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
                                         style={{
-                                            background: 'rgba(0,0,0,0.5)',
-                                            backdropFilter: 'blur(10px)',
-                                            border: `2px solid ${getModeColor()}40`,
-                                            padding: '8px 16px',
-                                            boxShadow: `0 0 20px ${getModeGlow()}`
+                                            background: innerGradient,
+                                            boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${buttonGlow}`,
+                                            animation: 'pulse 2s ease-in-out infinite'
                                         }}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            playSound('click')
-                                            vibrate(15)
-                                            setShowModeDrawer(true)
-                                            // Clear nudge on interaction
-                                            if (showNudge) {
-                                                localStorage.setItem('fitrate_seen_mode_nudge', 'true')
-                                                setShowNudge(false)
-                                            }
-                                        }}
-                                    >
-                                        {/* Current mode indicator */}
-                                        <span className="text-xl">{getModeEmoji()}</span>
-                                        <span className="font-bold text-sm text-white">{getModeDisplayName()}</span>
+                                        aria-hidden="true"
+                                    />
 
-                                        {/* Separator + Mode count hint */}
-                                        <span className="text-white/30">•</span>
-                                        <span className="text-[11px] text-white/50">12 modes</span>
+                                    {/* Emoji - uses mode-specific emoji for all 12 modes */}
+                                    <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
+                                        {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : getModeEmoji()}
+                                    </span>
 
-                                        {/* Chevron indicator */}
-                                        <span className="text-white/40 text-xs ml-1">▼</span>
+                                    {/* Main Text - mode-specific call to action */}
+                                    <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
+                                        }`}>
+                                        {entryBlocked ? 'ENTRY USED'
+                                            : dailyChallengeMode ? 'DAILY CHALLENGE'
+                                                : isCompeting ? (currentEvent.theme || 'COMPETE')
+                                                    : mode === 'nice' ? 'RATE MY FIT'
+                                                        : mode === 'roast' ? 'ROAST MY FIT'
+                                                            : mode === 'honest' ? 'HONEST RATE'
+                                                                : mode === 'savage' ? 'SAVAGE MODE'
+                                                                    : mode === 'rizz' ? 'RIZZ CHECK'
+                                                                        : mode === 'celeb' ? 'CELEB JUDGE'
+                                                                            : mode === 'aura' ? 'AURA READ'
+                                                                                : mode === 'chaos' ? 'CHAOS MODE'
+                                                                                    : mode === 'y2k' ? 'Y2K CHECK'
+                                                                                        : mode === 'villain' ? 'VILLAIN ERA'
+                                                                                            : mode === 'coquette' ? 'COQUETTE'
+                                                                                                : mode === 'hypebeast' ? 'DRIP CHECK'
+                                                                                                    : 'RATE MY FIT'}
+                                    </span>
 
-                                        {/* Hint text for first-time users */}
-                                        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white/40 whitespace-nowrap">
-                                            tap to change
-                                        </span>
-                                    </div>
-                                )}
+                                    {/* Subtitle - mode-specific description */}
+                                    <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
+                                        {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
+                                            : entryBlocked ? 'Entry used today'
+                                                : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
+                                                    : mode === 'nice' ? 'Supportive AI feedback'
+                                                        : mode === 'roast' ? 'Brutally honest AI'
+                                                            : mode === 'honest' ? 'Balanced analysis'
+                                                                : mode === 'savage' ? 'Maximum destruction'
+                                                                    : mode === 'rizz' ? 'Dating vibe check'
+                                                                        : mode === 'celeb' ? 'Celebrity judge'
+                                                                            : mode === 'aura' ? 'Mystical energy read'
+                                                                                : mode === 'chaos' ? 'Unhinged chaos'
+                                                                                    : mode === 'y2k' ? "That's hot 💎"
+                                                                                        : mode === 'villain' ? 'Main villain energy'
+                                                                                            : mode === 'coquette' ? 'Soft & romantic'
+                                                                                                : mode === 'hypebeast' ? 'Certified drip'
+                                                                                                    : 'AI feedback'}
+                                    </span>
 
-                                {/* Exit Challenge Button - Simple version without redundant text */}
-                                {(dailyChallengeMode || (eventMode && currentEvent)) && (
-                                    <button
-                                        className="mt-3 px-4 py-2 rounded-lg transition-all active:scale-95"
-                                        style={{
-                                            background: 'rgba(255,255,255,0.08)',
-                                            border: '1px solid rgba(255,255,255,0.15)'
-                                        }}
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            playSound('click')
-                                            vibrate(15)
-                                            if (dailyChallengeMode) {
-                                                setDailyChallengeMode?.(false)
-                                            } else {
-                                                setEventMode(false)
-                                            }
-                                        }}
-                                    >
-                                        <span className="text-sm text-white/60">✕ Exit Challenge</span>
-                                    </button>
-                                )}
-                            </button>
+                                    {/* Exit Challenge Button - Simple version without redundant text */}
+                                    {(dailyChallengeMode || (eventMode && currentEvent)) && (
+                                        <button
+                                            className="mt-3 px-4 py-2 rounded-lg transition-all active:scale-95"
+                                            style={{
+                                                background: 'rgba(255,255,255,0.08)',
+                                                border: '1px solid rgba(255,255,255,0.15)'
+                                            }}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                playSound('click')
+                                                vibrate(15)
+                                                if (dailyChallengeMode) {
+                                                    setDailyChallengeMode?.(false)
+                                                } else {
+                                                    setEventMode(false)
+                                                }
+                                            }}
+                                        >
+                                            <span className="text-sm text-white/60">✕ Exit Challenge</span>
+                                        </button>
+                                    )}
+                                </button>
                             </div> {/* Close breathing rings wrapper */}
                         </div>
                     )
@@ -1214,6 +1174,58 @@ export default function HomeScreen({
                     : '🔒 Your photos, your privacy • Auto-deleted'
                 }
             </p>
+
+            {/* Mini-Dashboard: 2-Column Layout with Mode + Arena */}
+            {!eventMode && !dailyChallengeMode && (
+                <div className="flex gap-3 w-full max-w-sm mb-4">
+                    {/* Mode Selector Card */}
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(15)
+                            setShowModeDrawer(true)
+                            if (showNudge) {
+                                localStorage.setItem('fitrate_seen_mode_nudge', 'true')
+                                setShowNudge(false)
+                            }
+                        }}
+                        className={`flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97] ${showNudge ? 'animate-pulse' : ''}`}
+                        style={{
+                            background: `linear-gradient(135deg, ${getModeColor()}20 0%, ${getModeColor()}10 100%)`,
+                            border: `1px solid ${getModeColor()}40`,
+                            boxShadow: `0 0 20px ${getModeGlow()}`
+                        }}
+                    >
+                        <span className="text-2xl">{getModeEmoji()}</span>
+                        <span className="text-white font-bold text-sm">{getModeDisplayName()}</span>
+                        <span className="text-white/40 text-[10px]">12 modes ▼</span>
+                    </button>
+
+                    {/* Global Arena Card */}
+                    {onStartArena && (
+                        <button
+                            onClick={() => {
+                                playSound('click')
+                                vibrate(20)
+                                alert('To enter Global Arena:\n\n1. Take a photo of your outfit\n2. Get your score\n3. Tap "Battle Anyone" on your results\n\nComing soon: Direct arena entry!')
+                            }}
+                            className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97]"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.1) 100%)',
+                                border: '1px solid rgba(0,212,255,0.3)',
+                                boxShadow: '0 0 20px rgba(0,212,255,0.15)'
+                            }}
+                        >
+                            <span className="text-2xl">🌍</span>
+                            <span className="text-white font-bold text-sm">Arena</span>
+                            <div className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                <span className="text-cyan-400 text-[10px] font-medium">Live</span>
+                            </div>
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* My Battles Section - Active 1v1 Battles */}
             {activeBattles.length > 0 && (

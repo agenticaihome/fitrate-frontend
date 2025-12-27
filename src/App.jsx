@@ -50,6 +50,7 @@ const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
 const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
 const MeetTheJudges = lazy(() => import('./screens/MeetTheJudges'))
+const ArenaQueueScreen = lazy(() => import('./screens/ArenaQueueScreen'))  // Global Arena
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -420,6 +421,18 @@ export default function App() {
       localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
       return updated
     })
+  }
+
+  // ============================================
+  // GLOBAL ARENA STATE - Real-time matchmaking
+  // ============================================
+  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'queue'
+  const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode }
+
+  // Handler to start arena flow (called from HomeScreen)
+  const startArenaFlow = (score, thumb, mode) => {
+    setArenaData({ score, thumb, mode })
+    setArenaScreen('queue')
   }
 
   // Purchased scans (from scan packs)
@@ -2367,6 +2380,46 @@ export default function App() {
   }
 
   // ============================================
+  // GLOBAL ARENA QUEUE SCREEN
+  // ============================================
+  if (arenaScreen === 'queue' && arenaData) {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <ArenaQueueScreen
+          userId={userId}
+          score={arenaData.score}
+          thumb={arenaData.thumb}
+          mode={arenaData.mode}
+          onMatchFound={(battleId) => {
+            // Add to active battles
+            addToActiveBattles(battleId, arenaData.score, arenaData.mode, 'completed')
+            // Navigate to battle reveal
+            setChallengePartyId(battleId)
+            setShowBattleReveal(true)
+            setArenaScreen(null)
+            setArenaData(null)
+            window.history.pushState({}, '', `/b/${battleId}`)
+          }}
+          onCancel={() => {
+            setArenaScreen(null)
+            setArenaData(null)
+          }}
+          onTimeout={() => {
+            setArenaScreen(null)
+            setArenaData(null)
+            displayToast('No opponents found. Try again later!')
+          }}
+          onError={(msg) => {
+            setArenaScreen(null)
+            setArenaData(null)
+            displayToast(msg || 'Arena error')
+          }}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // CHALLENGES SCREEN (Daily + Weekly)
   // ============================================
   if (screen === 'challenges') {
@@ -2661,6 +2714,7 @@ export default function App() {
             // General navigation for mode drawer links (judges, etc.)
             setScreen(target)
           }}
+          onStartArena={startArenaFlow}
         />
         <BottomNav
           activeTab="home"
@@ -2818,6 +2872,7 @@ export default function App() {
               }
               setPendingBattleId(null)  // Clear pending battle
             }}
+            onStartArena={startArenaFlow}
           />
           <BottomNav
             activeTab={null}
