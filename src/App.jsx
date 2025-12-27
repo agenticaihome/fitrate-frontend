@@ -441,11 +441,45 @@ export default function App() {
   // Helper to update battle status
   const updateBattleStatus = (battleId, status) => {
     setActiveBattles(prev => {
-      const updated = prev.map(b => b.battleId === battleId ? { ...b, status } : b)
+      const updated = prev.map(b => {
+        if (b.battleId === battleId) {
+          // Record when battle was completed for auto-cleanup
+          return { ...b, status, completedAt: status === 'completed' ? Date.now() : b.completedAt }
+        }
+        return b
+      })
       localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
       return updated
     })
   }
+
+  // Auto-cleanup completed battles older than 1 hour
+  useEffect(() => {
+    const ONE_HOUR = 60 * 60 * 1000
+
+    const cleanupOldBattles = () => {
+      setActiveBattles(prev => {
+        const now = Date.now()
+        const filtered = prev.filter(b => {
+          // Keep waiting battles and recently completed battles
+          if (b.status !== 'completed') return true
+          if (!b.completedAt) return true // Legacy battles without timestamp
+          return (now - b.completedAt) < ONE_HOUR
+        })
+
+        if (filtered.length !== prev.length) {
+          console.log(`[Cleanup] Removed ${prev.length - filtered.length} old battles`)
+          localStorage.setItem('fitrate_active_battles', JSON.stringify(filtered))
+        }
+        return filtered
+      })
+    }
+
+    // Run on mount and every 5 minutes
+    cleanupOldBattles()
+    const interval = setInterval(cleanupOldBattles, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   // ============================================
   // GLOBAL ARENA STATE - Real-time matchmaking
