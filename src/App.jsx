@@ -998,6 +998,7 @@ export default function App() {
           setIsCreatorOfChallenge(isCreator)
           // If battle is already completed, show the dramatic cinematic reveal immediately!
           if (data.status === 'completed') {
+            updateBattleStatus(challengePartyId, 'completed') // Update "My Battles" on HomeScreen
             setShowBattleReveal(true)
           }
         } else {
@@ -1032,6 +1033,7 @@ export default function App() {
           // Check for completion BEFORE updating state (to avoid stale closure)
           if (data.status === 'completed') {
             setChallengePartyData(normalizedData)
+            updateBattleStatus(challengePartyId, 'completed') // Update "My Battles" on HomeScreen
             playSound('celebrate')
             vibrate([100, 50, 100])
             setShowBattleReveal(true)  // Show the cool cinematic reveal instead of BattleRoom
