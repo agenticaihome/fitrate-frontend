@@ -171,10 +171,10 @@ export const generateShareCard = async ({
             ctx.fillStyle = bottomGradient
             ctx.fillRect(0, canvas.height * 0.4, canvas.width, canvas.height * 0.6)
 
-            // ===== SCORE RING - Centered in middle-lower area =====
+            // ===== SCORE RING - Positioned closer to bottom content =====
             const badgeSize = 280
             const badgeX = canvas.width / 2
-            const badgeY = canvas.height * 0.48  // Positioned in upper-middle
+            const badgeY = canvas.height * 0.54  // Moved down to reduce gap with bottom content
 
             // Ring gradient
             const ringGradient = ctx.createLinearGradient(
