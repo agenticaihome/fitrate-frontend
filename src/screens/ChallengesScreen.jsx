@@ -88,9 +88,9 @@ export default function ChallengesScreen({
             // Check if day has changed (midnight passed)
             if (today !== currentDay) {
                 currentDay = today
-                // Reset leaderboard when new day starts
+                // Reset leaderboard when new day starts (bust cache to bypass service worker)
                 if (fetchDailyLeaderboard) {
-                    fetchDailyLeaderboard()
+                    fetchDailyLeaderboard(true)
                 }
             }
 
