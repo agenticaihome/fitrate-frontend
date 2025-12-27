@@ -64,6 +64,9 @@ export default function HomeScreen({
     activeShows = [],       // User's active Fashion Shows
     onNavigateToShow,       // Navigate to a specific Fashion Show
     onRemoveShow,           // Remove a show from the list
+    activeBattles = [],     // User's active 1v1 Battles
+    onNavigateToBattle,     // Navigate to a specific Battle
+    onRemoveBattle,         // Remove a battle from the list
     onNavigate              // General navigation callback (for judges, etc.)
 }) {
     // Local State
@@ -1157,6 +1160,76 @@ export default function HomeScreen({
                     : '🔒 Analyzed instantly • Never stored'
                 }
             </p>
+
+            {/* My Battles Section - Active 1v1 Battles */}
+            {activeBattles.length > 0 && (
+                <div className="w-full max-w-sm mb-6">
+                    <div className="flex items-center justify-between mb-3 px-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">⚔️</span>
+                            <span className="text-white/60 text-sm font-semibold">My Battles</span>
+                            <span className="text-white/30 text-xs">({activeBattles.length})</span>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        {activeBattles.map((battle) => {
+                            const modeEmojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏' }
+                            const statusText = battle.status === 'completed' ? 'Results ready!' : 'Waiting for opponent...'
+                            const statusColor = battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'
+                            return (
+                                <div
+                                    key={battle.battleId}
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl transition-all"
+                                    style={{
+                                        background: battle.status === 'completed'
+                                            ? 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,212,255,0.1) 100%)'
+                                            : 'linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,0,128,0.1) 100%)',
+                                        border: battle.status === 'completed'
+                                            ? '1px solid rgba(0,255,136,0.25)'
+                                            : '1px solid rgba(255,107,53,0.25)'
+                                    }}
+                                >
+                                    <button
+                                        onClick={() => {
+                                            playSound('click')
+                                            vibrate(15)
+                                            onNavigateToBattle?.(battle.battleId)
+                                        }}
+                                        className="flex items-center gap-3 flex-1 text-left"
+                                    >
+                                        <span className="text-2xl">{modeEmojis[battle.mode] || '⚔️'}</span>
+                                        <div>
+                                            <p className="text-white font-semibold text-sm">
+                                                You scored {Math.round(battle.myScore)}
+                                            </p>
+                                            <p className={`${statusColor} text-[10px] font-medium`}>
+                                                {statusText}
+                                            </p>
+                                        </div>
+                                    </button>
+                                    {/* Dismiss/Remove Button */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            playSound('click')
+                                            vibrate(10)
+                                            onRemoveBattle?.(battle.battleId)
+                                        }}
+                                        className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90"
+                                        style={{
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                        aria-label="Remove battle from list"
+                                    >
+                                        <span className="text-white/40 text-sm">✕</span>
+                                    </button>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* My Shows Section - Active Fashion Shows */}
             {activeShows.length > 0 && (

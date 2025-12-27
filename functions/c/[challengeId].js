@@ -51,10 +51,9 @@ export async function onRequest(context) {
     const challengeId = params.challengeId
 
     // Default OG values (used as fallback)
-    // Using main FitRate image with hanger logo (not fitness weight)
     let ogTitle = '1v1 Outfit Battle'
     let ogDescription = 'Think you can beat my fit? Scan yours and find out!'
-    let ogImage = 'https://fitrate.app/og/fitrate-main-v4.png'
+    let ogImage = 'https://fitrate.app/og/battle.png'
 
     // Try to fetch battle data for dynamic OG tags
     try {
@@ -84,8 +83,8 @@ export async function onRequest(context) {
                 ogTitle = `${modeEmoji} ${score}/100 — Can You Beat This?`
                 ogDescription = `I scored ${score} in ${modeLabel} Mode. Think you can do better? Accept the challenge!`
 
-                // Use battle-specific OG image if available, otherwise default (main logo)
-                ogImage = battle.ogImage || 'https://fitrate.app/og/fitrate-main-v4.png'
+                // Use battle-specific OG image if available, otherwise default
+                ogImage = battle.ogImage || 'https://fitrate.app/og/battle.png'
             }
         }
     } catch (error) {

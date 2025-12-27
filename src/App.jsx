@@ -42,6 +42,7 @@ const RulesScreen = lazy(() => import('./screens/RulesScreen'))
 const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
 const BattleScreen = lazy(() => import('./screens/BattleScreen'))
 const BattleRoom = lazy(() => import('./screens/BattleRoom'))
+const BattleResultsReveal = lazy(() => import('./screens/BattleResultsReveal'))
 const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
@@ -296,6 +297,9 @@ export default function App() {
   // Store pending battle ID when responder needs to see results before battle comparison
   const [pendingBattleId, setPendingBattleId] = useState(null)
 
+  // Show dramatic battle reveal animation
+  const [showBattleReveal, setShowBattleReveal] = useState(false)
+
   // ============================================
   // FASHION SHOW STATE
   // ============================================
@@ -364,6 +368,54 @@ export default function App() {
     setActiveShows(prev => {
       const updated = prev.filter(s => s.showId !== showId)
       localStorage.setItem('fitrate_active_shows', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // ============================================
+  // ACTIVE BATTLES - Track user's ongoing 1v1 battles
+  // ============================================
+  const [activeBattles, setActiveBattles] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fitrate_active_battles')
+      if (saved) {
+        const battles = JSON.parse(saved)
+        // Filter out expired battles (older than 24 hours)
+        const now = Date.now()
+        const maxAge = 24 * 60 * 60 * 1000 // 24 hours
+        return battles.filter(b => (now - b.createdAt) < maxAge)
+      }
+    } catch (e) {
+      console.error('[Battle] Failed to parse active battles:', e)
+    }
+    return []
+  })
+
+  // Helper to add a battle to active battles list
+  const addToActiveBattles = (battleId, myScore, mode = 'nice', status = 'waiting') => {
+    setActiveBattles(prev => {
+      // Don't add duplicates
+      if (prev.some(b => b.battleId === battleId)) return prev
+      const updated = [...prev, { battleId, myScore, mode, status, createdAt: Date.now() }]
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Helper to remove a battle from active battles
+  const removeFromActiveBattles = (battleId) => {
+    setActiveBattles(prev => {
+      const updated = prev.filter(b => b.battleId !== battleId)
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Helper to update battle status
+  const updateBattleStatus = (battleId, status) => {
+    setActiveBattles(prev => {
+      const updated = prev.map(b => b.battleId === battleId ? { ...b, status } : b)
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
       return updated
     })
   }
@@ -1893,6 +1945,8 @@ export default function App() {
             const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
             created.push(data.challengeId)
             localStorage.setItem('fitrate_created_challenges', JSON.stringify(created))
+            // Add to active battles list (shows in "My Battles" on home screen)
+            addToActiveBattles(data.challengeId, scores.overall, mode, 'waiting')
             console.log('[Battle] Created room:', data.challengeId)
           }
         } catch (err) {
@@ -2333,6 +2387,49 @@ export default function App() {
   }
 
   // ============================================
+  // BATTLE RESULTS REVEAL - Dramatic cinematic reveal animation
+  // Shows when battle is completed and user triggers "See Battle Results"
+  // ============================================
+  if (showBattleReveal && challengePartyData && challengePartyData.status === 'completed') {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <BattleResultsReveal
+          battleData={challengePartyData}
+          isCreator={isCreatorOfChallenge}
+          onShare={() => {
+            setShowBattleReveal(false)
+            // Share battle result
+            const shareUrl = `https://fitrate.app/b/${challengePartyId}`
+            const myScore = isCreatorOfChallenge ? challengePartyData.creatorScore : challengePartyData.responderScore
+            const shareText = `⚔️ I scored ${Math.round(myScore)} in a 1v1 battle!\n${shareUrl}`
+            if (navigator.share) {
+              navigator.share({ title: 'FitRate Battle', text: shareText })
+            } else {
+              navigator.clipboard.writeText(shareText)
+              displayToast('Battle result copied!')
+            }
+          }}
+          onRematch={() => {
+            setShowBattleReveal(false)
+            // Start new battle - go to home to take new photo
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+          }}
+          onHome={() => {
+            setShowBattleReveal(false)
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+          }}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // BATTLE ROOM - Legendary 1v1 Outfit Battles (/b/:id or /c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // ============================================
@@ -2456,6 +2553,41 @@ export default function App() {
           }}
           onRemoveShow={(showId) => {
             removeFromActiveShows(showId)
+          }}
+          activeBattles={activeBattles}
+          onNavigateToBattle={async (battleId) => {
+            // Navigate to a battle room
+            setChallengePartyId(battleId)
+            window.history.pushState({}, '', `/c/${battleId}`)
+            setChallengePartyLoading(true)
+            try {
+              const res = await fetch(`${API_BASE}/battle/${battleId}`, {
+                headers: getApiHeaders()
+              })
+              if (res.ok) {
+                const data = await res.json()
+                setChallengePartyData(data)
+                // If battle is completed, show the reveal animation
+                if (data.status === 'completed') {
+                  setShowBattleReveal(true)
+                }
+              } else {
+                // Battle not found - remove from list
+                removeFromActiveBattles(battleId)
+                setChallengePartyId(null)
+                window.history.pushState({}, '', '/')
+              }
+            } catch (err) {
+              console.error('[Battle] Failed to load:', err)
+              removeFromActiveBattles(battleId)
+              setChallengePartyId(null)
+              window.history.pushState({}, '', '/')
+            } finally {
+              setChallengePartyLoading(false)
+            }
+          }}
+          onRemoveBattle={(battleId) => {
+            removeFromActiveBattles(battleId)
           }}
           onNavigate={(target) => {
             // General navigation for mode drawer links (judges, etc.)
@@ -2591,7 +2723,7 @@ export default function App() {
             pendingBattleId={pendingBattleId}
             onSeeBattleResults={async () => {
               if (!pendingBattleId) return
-              // Navigate to battle room to see comparison
+              // Fetch battle data and show dramatic reveal
               setChallengePartyId(pendingBattleId)
               window.history.pushState({}, '', `/c/${pendingBattleId}`)
               setChallengePartyLoading(true)
@@ -2602,6 +2734,9 @@ export default function App() {
                 if (partyRes.ok) {
                   const partyData = await partyRes.json()
                   setChallengePartyData(partyData)
+                  // Show the dramatic battle reveal animation!
+                  setShowBattleReveal(true)
+                  setScreen('home')  // Clear results screen
                 }
               } finally {
                 setChallengePartyLoading(false)
