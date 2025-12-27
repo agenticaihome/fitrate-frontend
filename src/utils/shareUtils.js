@@ -174,7 +174,7 @@ export const generateShareCard = async ({
             // ===== SCORE RING - Positioned closer to bottom content =====
             const badgeSize = 280
             const badgeX = canvas.width / 2
-            const badgeY = canvas.height * 0.54  // Moved down to reduce gap with bottom content
+            const badgeY = canvas.height * 0.58  // Moved down further to minimize gap
 
             // Ring gradient
             const ringGradient = ctx.createLinearGradient(
@@ -306,7 +306,31 @@ export const generateShareCard = async ({
                 ctx.fillText(sub.value.toString(), x + 60, subscoreY + 26)
             })
 
-            // ===== MODE-SPECIFIC DATE STAMP =====
+            // ===== CTA BUTTON =====
+            const ctaY = canvas.height - 195
+            const ctaWidth = 620
+            const ctaHeight = 72
+            const ctaX = (canvas.width - ctaWidth) / 2
+            const ctaText = 'Post yours → fitrate.app'
+
+            // Green gradient for CTA
+            const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY)
+            ctaGradient.addColorStop(0, '#10b981')
+            ctaGradient.addColorStop(1, '#059669')
+
+            ctx.fillStyle = ctaGradient
+            ctx.beginPath()
+            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, 16)
+            ctx.fill()
+
+            // CTA text
+            ctx.fillStyle = '#000000'
+            ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
+
+            // ===== MODE-SPECIFIC DATE STAMP (between CTA and logo) =====
             const now = new Date()
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                                'July', 'August', 'September', 'October', 'November', 'December']
@@ -330,38 +354,14 @@ export const generateShareCard = async ({
             const modeVerb = modeVerbs[currentMode] || 'Rated'
             const dateStamp = `${modeVerb} on ${dateStr}`
 
-            const dateY = canvas.height - 205
+            const dateY = canvas.height - 95
             ctx.fillStyle = 'rgba(255,255,255,0.5)'
             ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.fillText(dateStamp, canvas.width / 2, dateY)
 
-            // ===== CTA BUTTON =====
-            const ctaY = canvas.height - 155
-            const ctaWidth = 620
-            const ctaHeight = 72
-            const ctaX = (canvas.width - ctaWidth) / 2
-            const ctaText = 'Post yours → fitrate.app'
-
-            // Green gradient for CTA
-            const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY)
-            ctaGradient.addColorStop(0, '#10b981')
-            ctaGradient.addColorStop(1, '#059669')
-
-            ctx.fillStyle = ctaGradient
-            ctx.beginPath()
-            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, 16)
-            ctx.fill()
-
-            // CTA text
-            ctx.fillStyle = '#000000'
-            ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
-
             // ===== FITRATE LOGO =====
-            const logoY = canvas.height - 60
+            const logoY = canvas.height - 55
             if (logoImg) {
                 const logoHeight = 45
                 const logoWidth = (logoImg.width / logoImg.height) * logoHeight
