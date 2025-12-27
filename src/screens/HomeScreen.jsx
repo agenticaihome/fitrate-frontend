@@ -797,17 +797,17 @@ export default function HomeScreen({
                             </p>
                         </div>
 
-                        {/* Primary CTA: Go Pro */}
+                        {/* Primary CTA: Get More Scans */}
                         <button
                             onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
                             className="px-8 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
                             style={{
-                                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                                 color: '#000',
-                                boxShadow: '0 4px 20px rgba(255,215,0,0.4)'
+                                boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
                             }}
                         >
-                            👑 Go Pro — Unlimited
+                            ✨ Get More Scans
                         </button>
 
                         {/* Alternative Actions */}
@@ -1031,7 +1031,7 @@ export default function HomeScreen({
                                 {/* Subtitle - mode-specific description */}
                                 <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
                                     {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
-                                        : entryBlocked ? 'Go Pro for daily entries!'
+                                        : entryBlocked ? 'Entry used today'
                                             : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
                                                 : mode === 'nice' ? 'Supportive AI feedback'
                                                     : mode === 'roast' ? 'Brutally honest AI'

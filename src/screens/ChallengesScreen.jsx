@@ -515,7 +515,7 @@ export default function ChallengesScreen({
                                             border: '1px solid rgba(251, 191, 36, 0.3)'
                                         }}>
                                             <p className="text-amber-400 text-sm font-medium">You've used your free entry this week</p>
-                                            <p className="text-white/40 text-xs">Go Pro for more tries!</p>
+                                            <p className="text-white/40 text-xs">Come back next week!</p>
                                         </div>
                                         <button
                                             onClick={() => { playSound('click'); vibrate(20); onShowPaywall?.(); }}
@@ -526,7 +526,7 @@ export default function ChallengesScreen({
                                                 color: '#000'
                                             }}
                                         >
-                                            👑 Go Pro — 1 Try/Day
+                                            ✨ Get More Scans
                                         </button>
                                     </div>
                                 )}
