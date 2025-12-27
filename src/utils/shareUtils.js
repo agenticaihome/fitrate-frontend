@@ -215,7 +215,7 @@ export const generateShareCard = async ({
             ctx.fillText('/100', badgeX, badgeY + 60)
 
             // ===== MODE BADGE - Below score ring =====
-            const modeBadgeY = badgeY + badgeSize / 2 + 35
+            const modeBadgeY = badgeY + badgeSize / 2 + 25  // Tightened from 35
             const modeBadgeHeight = 52
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
@@ -272,93 +272,80 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, insightY + (i * 38))
             })
 
-            // ===== SUBSCORES ROW =====
-            const subscoreY = canvas.height - 280
+            // ===== SUBSCORES ROW - Compact & Clean =====
+            const subscoreY = canvas.height - 270
             const subscores = [
                 { icon: '🎨', label: 'Color', value: scores.color || Math.round(score + (Math.random() * 6 - 3)) },
                 { icon: '👔', label: 'Fit', value: scores.fit || Math.round(score + (Math.random() * 6 - 3)) },
                 { icon: '✨', label: 'Style', value: scores.style || Math.round(score + (Math.random() * 6 - 3)) }
             ]
 
-            const subscoreWidth = 180
-            const subscoreGap = 30
-            const totalSubscoreWidth = (subscoreWidth * 3) + (subscoreGap * 2)
+            const subscoreItemWidth = 160
+            const subscoreGap = 20
+            const totalSubscoreWidth = (subscoreItemWidth * 3) + (subscoreGap * 2)
             const subscoreStartX = (canvas.width - totalSubscoreWidth) / 2
 
-            // Background pill for subscores
-            ctx.fillStyle = 'rgba(0,0,0,0.5)'
+            // Background pill for subscores - tighter
+            ctx.fillStyle = 'rgba(0,0,0,0.55)'
             ctx.beginPath()
-            ctx.roundRect(subscoreStartX - 20, subscoreY - 15, totalSubscoreWidth + 40, 70, 35)
+            ctx.roundRect(subscoreStartX - 15, subscoreY - 12, totalSubscoreWidth + 30, 62, 31)
             ctx.fill()
 
             subscores.forEach((sub, i) => {
-                const x = subscoreStartX + (i * (subscoreWidth + subscoreGap)) + subscoreWidth / 2
+                const x = subscoreStartX + (i * (subscoreItemWidth + subscoreGap)) + subscoreItemWidth / 2
 
-                // Icon and label
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'
-                ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.textAlign = 'center'
-                ctx.fillText(`${sub.icon} ${sub.label}`, x - 30, subscoreY + 25)
+                // Compact format: "🎨 Color  55"
+                ctx.fillStyle = 'rgba(255,255,255,0.55)'
+                ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'right'
+                ctx.fillText(`${sub.icon} ${sub.label}`, x - 8, subscoreY + 24)
 
-                // Value
+                // Value - bold, white
                 ctx.fillStyle = '#ffffff'
-                ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.fillText(sub.value.toString(), x + 60, subscoreY + 26)
+                ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'left'
+                ctx.fillText(sub.value.toString(), x + 8, subscoreY + 24)
             })
 
             // ===== CTA BUTTON =====
-            const ctaY = canvas.height - 195
-            const ctaWidth = 620
-            const ctaHeight = 72
+            const ctaY = canvas.height - 185  // Moved up slightly
+            const ctaWidth = 580  // Slightly narrower for elegance
+            const ctaHeight = 68
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = 'Post yours → fitrate.app'
 
-            // Green gradient for CTA
+            // Mode-specific gradient for CTA (matches the vibe!)
             const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY)
-            ctaGradient.addColorStop(0, '#10b981')
-            ctaGradient.addColorStop(1, '#059669')
+            if (modeGradientMatch && modeGradientMatch.length >= 2) {
+                ctaGradient.addColorStop(0, modeGradientMatch[0])
+                ctaGradient.addColorStop(1, modeGradientMatch[1])
+            } else {
+                ctaGradient.addColorStop(0, '#10b981')
+                ctaGradient.addColorStop(1, '#059669')
+            }
 
             ctx.fillStyle = ctaGradient
             ctx.beginPath()
             ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, 16)
             ctx.fill()
 
-            // CTA text
-            ctx.fillStyle = '#000000'
-            ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, sans-serif'
+            // CTA text - use mode-specific text color
+            ctx.fillStyle = modeConfig.textColor || '#000000'
+            ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
 
-            // ===== MODE-SPECIFIC DATE STAMP (between CTA and logo) =====
+            // ===== DATE STAMP - Compact format =====
             const now = new Date()
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                               'July', 'August', 'September', 'October', 'November', 'December']
-            const dateStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+            const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            const dateStr = `${shortMonths[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
 
-            // Fun mode-specific verbs
-            const modeVerbs = {
-                nice: 'Blessed',
-                roast: 'Roasted',
-                honest: 'Analyzed',
-                savage: 'Destroyed',
-                rizz: "Rizz'd",
-                celeb: 'Spotted',
-                aura: 'Vibed',
-                chaos: 'Randomized',
-                y2k: 'Sparkled',
-                villain: 'Slayed',
-                coquette: 'Bowed',
-                hypebeast: 'Dripped'
-            }
-            const modeVerb = modeVerbs[currentMode] || 'Rated'
-            const dateStamp = `${modeVerb} on ${dateStr}`
-
-            const dateY = canvas.height - 95
-            ctx.fillStyle = 'rgba(255,255,255,0.5)'
-            ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
+            const dateY = canvas.height - 100
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'
+            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(dateStamp, canvas.width / 2, dateY)
+            ctx.fillText(dateStr, canvas.width / 2, dateY)
 
             // ===== FITRATE LOGO =====
             const logoY = canvas.height - 55
