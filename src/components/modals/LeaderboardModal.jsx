@@ -134,12 +134,12 @@ export default function LeaderboardModal({
                     </div>
                 )}
 
-                {/* Prize Banner with shimmer */}
-                <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+                {/* Bragging Rights Banner */}
+                <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-2 mb-3 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
                     <div className="absolute inset-0 shimmer-sweep" />
-                    <span className="text-sm relative" aria-hidden="true">👑</span>
-                    <span className="text-yellow-300 font-bold text-sm ml-1 relative">1 YEAR FREE PRO</span>
-                    <span className="text-yellow-400/70 text-xs ml-2 relative">for #1 Winner</span>
+                    <span className="text-sm relative" aria-hidden="true">🏅</span>
+                    <span className="text-purple-300 font-bold text-sm ml-1 relative">BRAGGING RIGHTS</span>
+                    <span className="text-purple-400/70 text-xs ml-2 relative">Top the leaderboard!</span>
                 </div>
 
                 {/* Leaderboard List */}
@@ -215,17 +215,17 @@ export default function LeaderboardModal({
 
                 {/* User in Top 5 - Celebration + Share */}
                 {userEventStatus?.participating && userEventStatus.rank <= 5 && (
-                    <div className="bg-gradient-to-r from-yellow-500/20 to-emerald-500/20 border border-yellow-500/30 p-4 rounded-xl mb-4 text-center">
+                    <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 p-4 rounded-xl mb-4 text-center">
                         <span className="text-3xl">🎉</span>
-                        <p className="text-yellow-300 font-bold text-lg">You're #{userEventStatus.rank}!</p>
-                        <p className="text-[10px] text-yellow-400/70 mb-3">
-                            {userEventStatus.rank === 1 ? 'Keep #1 to win 1 Year FREE Pro!' : 'Keep your Top 5 spot!'}
+                        <p className="text-purple-300 font-bold text-lg">You're #{userEventStatus.rank}!</p>
+                        <p className="text-[10px] text-purple-400/70 mb-3">
+                            {userEventStatus.rank === 1 ? 'You\'re #1! Keep your spot!' : 'Keep your Top 5 spot!'}
                         </p>
                         <button
                             onClick={() => setShowWinnerCard(true)}
-                            className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-yellow-500 to-amber-500 text-black active:scale-[0.97] transition-transform"
+                            className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-500 to-blue-500 text-white active:scale-[0.97] transition-transform"
                         >
-                            📤 Share My Win
+                            📤 Share My Rank
                         </button>
                     </div>
                 )}

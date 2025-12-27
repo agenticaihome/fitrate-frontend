@@ -112,23 +112,23 @@ export default function RulesScreen({ onClose, currentEvent }) {
                     </ul>
                 </div>
 
-                {/* Prizes */}
-                <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 rounded-2xl p-4 border border-yellow-500/30">
-                    <h2 className="text-sm font-bold text-yellow-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <span>🏆</span> Prizes
+                {/* Bragging Rights */}
+                <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-4 border border-purple-500/30">
+                    <h2 className="text-sm font-bold text-purple-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <span>🏆</span> Bragging Rights
                     </h2>
                     <ul className="space-y-2 text-sm text-gray-300">
                         <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">👑</span>
-                            <span><strong className="text-yellow-300">#1 Winner</strong> gets 1 Year FREE Pro!</span>
+                            <span className="text-purple-400">👑</span>
+                            <span><strong className="text-purple-300">#1 Winner</strong> tops the leaderboard!</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">🔄</span>
-                            <span>Win again? You keep your Pro status!</span>
+                            <span className="text-purple-400">⭐</span>
+                            <span>Top 5 get featured on the leaderboard</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-yellow-400">🎉</span>
-                            <span>Pro granted automatically at week end</span>
+                            <span className="text-purple-400">📤</span>
+                            <span>Share your win with friends!</span>
                         </li>
                     </ul>
                 </div>
