@@ -429,9 +429,12 @@ export default function HomeScreen({
 
     // Handle camera opening after scan type is chosen (or directly if no choice needed)
     const proceedToCamera = () => {
-        if (isAndroid() || isIOS()) {
-            // Mobile: Show photo picker modal (Take Photo vs Upload)
+        if (isAndroid()) {
+            // Android: Show photo picker modal (Take Photo vs Upload)
             setShowAndroidPhotoModal(true)
+        } else if (isIOS()) {
+            // iOS: Open native camera app directly (has timer built-in)
+            document.getElementById('androidCameraInput')?.click()
         } else {
             // Desktop: Use getUserMedia for live camera preview
             startCamera()
