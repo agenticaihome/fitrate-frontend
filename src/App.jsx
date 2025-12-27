@@ -1647,7 +1647,7 @@ export default function App() {
               body: JSON.stringify({
                 responderScore: overall,
                 responderId: userId,
-                responderThumb: challengeThumb  // Use locally created thumbnail
+                responderThumb: imageData  // Use the actual photo from analyzeOutfit()
               })
             })
             const battleResult = await battleRes.json()
@@ -1823,7 +1823,7 @@ export default function App() {
             body: JSON.stringify({
               responderScore: overall,
               responderId: userId,
-              responderThumb: proChallengeThumb  // Use locally created thumbnail (not stale state)
+              responderThumb: imageData  // Use the actual photo from analyzeOutfit()
             })
           })
           const challengeResult = await res.json()

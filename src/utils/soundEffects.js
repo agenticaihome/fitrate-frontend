@@ -132,6 +132,60 @@ export const playSound = (type) => {
                     o.stop(now + i * 0.12 + 0.4);
                 });
                 break;
+
+            case 'whoosh':
+                // Swooshing slide-in sound for battle photos
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.3);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+                break;
+
+            case 'impact':
+                // Heavy collision/crash sound for battle photo smash
+                // Low thump + noise burst
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(80, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+                // Add noise burst
+                const impactBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.15, ctx.sampleRate);
+                const impactData = impactBuffer.getChannelData(0);
+                for (let i = 0; i < impactData.length; i++) {
+                    impactData[i] = (Math.random() * 2 - 1) * (1 - i / impactData.length);
+                }
+                const impactNoise = ctx.createBufferSource();
+                impactNoise.buffer = impactBuffer;
+                const impactGain = ctx.createGain();
+                impactGain.gain.setValueAtTime(0.5, now);
+                impactGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                impactNoise.connect(impactGain);
+                impactGain.connect(ctx.destination);
+                impactNoise.start(now);
+                break;
+
+            case 'celebrate':
+                // Victory fanfare with ascending triumphant chords
+                [392, 523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, now + i * 0.08);
+                    g.gain.setValueAtTime(0.35, now + i * 0.08);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.08 + 0.5);
+                    o.start(now + i * 0.08);
+                    o.stop(now + i * 0.08 + 0.5);
+                });
+                break;
         }
     } catch (e) {
         // Audio probably not allowed yet

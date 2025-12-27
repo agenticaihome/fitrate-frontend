@@ -44,6 +44,8 @@ export default function BattleResultsReveal({
     // Animation phases
     const [phase, setPhase] = useState(0) // 0=tension, 1=collision, 2=scores, 3=winner, 4=final
     const [showConfetti, setShowConfetti] = useState(false)
+    const [showFlash, setShowFlash] = useState(false)
+    const [showShake, setShowShake] = useState(false)
 
     // Battle data
     const creatorScore = battleData?.creatorScore || 0
@@ -89,6 +91,11 @@ export default function BattleResultsReveal({
         const t2 = setTimeout(() => {
             playSound('impact')
             vibrate([50, 30, 100])
+            // Trigger dramatic collision effects
+            setShowFlash(true)
+            setShowShake(true)
+            setTimeout(() => setShowFlash(false), 200)
+            setTimeout(() => setShowShake(false), 400)
             setPhase(2)
         }, 1600)
 
@@ -127,9 +134,20 @@ export default function BattleResultsReveal({
             className="fixed inset-0 z-50 flex flex-col"
             style={{
                 background: 'linear-gradient(180deg, #0a0a15 0%, #1a1a2e 50%, #0a0a15 100%)',
-                touchAction: 'none'
+                touchAction: 'none',
+                animation: showShake ? 'screen-shake 0.4s ease-out' : 'none'
             }}
         >
+            {/* Flash overlay for collision impact */}
+            {showFlash && (
+                <div
+                    className="fixed inset-0 z-[100] pointer-events-none"
+                    style={{
+                        background: 'white',
+                        animation: 'flash-white 0.2s ease-out forwards'
+                    }}
+                />
+            )}
             {/* CSS Animations */}
             <style>{`
                 @keyframes pulse-glow {
@@ -137,11 +155,15 @@ export default function BattleResultsReveal({
                     50% { opacity: 1; transform: scale(1.05); }
                 }
                 @keyframes slide-in-left {
-                    0% { transform: translateX(-120%); opacity: 0; }
+                    0% { transform: translateX(-150%); opacity: 0; }
+                    70% { transform: translateX(8%); opacity: 1; }
+                    85% { transform: translateX(-3%); }
                     100% { transform: translateX(0); opacity: 1; }
                 }
                 @keyframes slide-in-right {
-                    0% { transform: translateX(120%); opacity: 0; }
+                    0% { transform: translateX(150%); opacity: 0; }
+                    70% { transform: translateX(-8%); opacity: 1; }
+                    85% { transform: translateX(3%); }
                     100% { transform: translateX(0); opacity: 1; }
                 }
                 @keyframes score-pop {
@@ -163,8 +185,25 @@ export default function BattleResultsReveal({
                 }
                 @keyframes vs-pop {
                     0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-                    60% { transform: scale(1.3) rotate(5deg); }
+                    60% { transform: scale(1.5) rotate(5deg); }
+                    80% { transform: scale(0.9) rotate(-2deg); }
                     100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                }
+                @keyframes screen-shake {
+                    0%, 100% { transform: translateX(0) translateY(0); }
+                    10% { transform: translateX(-8px) translateY(-2px); }
+                    20% { transform: translateX(8px) translateY(2px); }
+                    30% { transform: translateX(-6px) translateY(-1px); }
+                    40% { transform: translateX(6px) translateY(1px); }
+                    50% { transform: translateX(-4px) translateY(0); }
+                    60% { transform: translateX(4px) translateY(0); }
+                    70% { transform: translateX(-2px) translateY(0); }
+                    80% { transform: translateX(2px) translateY(0); }
+                }
+                @keyframes flash-white {
+                    0% { opacity: 0; }
+                    30% { opacity: 0.9; }
+                    100% { opacity: 0; }
                 }
             `}</style>
 
@@ -217,7 +256,7 @@ export default function BattleResultsReveal({
                                 }}
                             >
                                 <div
-                                    className="w-36 h-48 rounded-2xl overflow-hidden relative"
+                                    className="w-44 h-56 rounded-2xl overflow-hidden relative"
                                     style={{
                                         border: phase >= 3 && creatorWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
                                         boxShadow: phase >= 3 && creatorWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
@@ -302,7 +341,7 @@ export default function BattleResultsReveal({
                                 }}
                             >
                                 <div
-                                    className="w-36 h-48 rounded-2xl overflow-hidden relative"
+                                    className="w-44 h-56 rounded-2xl overflow-hidden relative"
                                     style={{
                                         border: phase >= 3 && responderWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
                                         boxShadow: phase >= 3 && responderWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
