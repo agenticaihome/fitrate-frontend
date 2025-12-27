@@ -1,18 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { vibrate } from '../utils/soundEffects'
+import React, { useState, useMemo } from 'react'
+import { vibrate, playSound } from '../utils/soundEffects'
 import NotificationOptIn from '../components/common/NotificationOptIn'
-import { LIMITS } from '../config/constants'
 
-// Mini Confetti component
-const MiniConfetti = () => {
+// Celebration confetti - more elegant, larger pieces
+const CelebrationConfetti = ({ intensity = 'normal' }) => {
+    const count = intensity === 'legendary' ? 40 : intensity === 'high' ? 25 : 15
     const pieces = useMemo(() =>
-        Array.from({ length: 20 }, (_, i) => ({
+        Array.from({ length: count }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
-            delay: Math.random() * 1,
-            duration: 2 + Math.random() * 1.5,
-            color: ['#ffd700', '#00d4ff', '#ff6b9d', '#00ff88'][i % 4]
-        })), []
+            delay: Math.random() * 1.5,
+            duration: 2.5 + Math.random() * 2,
+            color: ['#ffd700', '#00d4ff', '#ff6b9d', '#00ff88', '#8b5cf6'][i % 5],
+            size: 6 + Math.random() * 8,
+            rotation: Math.random() * 360
+        })), [count]
     )
 
     return (
@@ -23,12 +25,13 @@ const MiniConfetti = () => {
                     className="confetti-piece"
                     style={{
                         left: `${p.left}%`,
-                        width: 8,
-                        height: 8,
+                        width: p.size,
+                        height: p.size,
                         background: p.color,
-                        borderRadius: p.id % 2 === 0 ? '50%' : '2px',
+                        borderRadius: p.id % 3 === 0 ? '50%' : '2px',
                         animationDelay: `${p.delay}s`,
                         animationDuration: `${p.duration}s`,
+                        transform: `rotate(${p.rotation}deg)`
                     }}
                 />
             ))}
@@ -36,126 +39,199 @@ const MiniConfetti = () => {
     )
 }
 
+// Get celebration message based on score
+const getCelebrationContent = (score) => {
+    if (!score || score < 40) {
+        return {
+            emoji: '💪',
+            headline: 'Shared & Proud!',
+            subtext: 'Real ones post their scores, no matter what',
+            vibe: 'brave',
+            intensity: 'normal'
+        }
+    }
+    if (score < 60) {
+        return {
+            emoji: '🎯',
+            headline: 'Out in the World!',
+            subtext: "That took confidence. We respect it.",
+            vibe: 'confident',
+            intensity: 'normal'
+        }
+    }
+    if (score < 75) {
+        return {
+            emoji: '✨',
+            headline: 'Looking Good!',
+            subtext: 'Your fit is making moves out there',
+            vibe: 'stylish',
+            intensity: 'normal'
+        }
+    }
+    if (score < 85) {
+        return {
+            emoji: '🔥',
+            headline: 'Fit Posted!',
+            subtext: "They're not ready for this",
+            vibe: 'fire',
+            intensity: 'high'
+        }
+    }
+    if (score < 95) {
+        return {
+            emoji: '👑',
+            headline: 'Royalty Detected',
+            subtext: 'The timeline just got better',
+            vibe: 'elite',
+            intensity: 'high'
+        }
+    }
+    return {
+        emoji: '💎',
+        headline: 'LEGENDARY',
+        subtext: 'History has been made',
+        vibe: 'legendary',
+        intensity: 'legendary'
+    }
+}
+
 export default function ShareSuccessScreen({
     mode,
     setMode,
     setScreen,
     userId,
-    score,
-    totalReferrals = 0
+    score
 }) {
-    const [copied, setCopied] = useState(false)
-    const referralLink = `https://fitrate.app/?ref=${userId}`
+    const [showNotifications, setShowNotifications] = useState(false)
+    const celebration = getCelebrationContent(score)
 
-    // Calculate progress toward next Savage Roast
-    const sharesPerReward = LIMITS.SHARES_PER_SAVAGE_ROAST || 3
-    const currentProgress = totalReferrals % sharesPerReward
-    const sharesUntilNext = sharesPerReward - currentProgress
-    const totalRoastsEarned = Math.floor(totalReferrals / sharesPerReward)
-
-    const copyReferralLink = async () => {
-        try {
-            await navigator.clipboard.writeText(referralLink)
-            setCopied(true)
-            vibrate(20)
-            setTimeout(() => setCopied(false), 2000)
-
-            // Track share for analytics
-            fetch(`${import.meta.env.VITE_API_URL || 'https://fitrate.app/api'}/referral/share`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId })
-            }).catch(err => console.warn('[Analytics] Share tracking failed:', err.message))
-        } catch (err) {
-            console.error('Failed to copy:', err)
-        }
-    }
+    // Play celebration sound on mount
+    React.useEffect(() => {
+        playSound('success')
+        vibrate([50, 30, 50])
+    }, [])
 
     return (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0f] text-white p-6" style={{
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
-            paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))',
-            paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
+            paddingTop: 'max(2rem, env(safe-area-inset-top, 2rem))',
+            paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))'
         }}>
-            <MiniConfetti />
+            <CelebrationConfetti intensity={celebration.intensity} />
 
-            <span className="text-6xl mb-4 animate-bounce">🎉</span>
-            <h2 className="text-2xl font-black mb-2">Your Fit is Out There!</h2>
-            <p className="text-sm mb-6 text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {score && score >= 85 ? "Flex mode: activated 💅" : "Let's see if your friends can beat it"}
-            </p>
+            {/* Main Celebration - Big Moment */}
+            <div className="flex flex-col items-center text-center mb-8 animate-fade-in">
+                <span
+                    className="text-7xl mb-6"
+                    style={{
+                        animation: 'bounce 0.6s ease-out',
+                        filter: celebration.intensity === 'legendary'
+                            ? 'drop-shadow(0 0 20px rgba(255,215,0,0.5))'
+                            : 'none'
+                    }}
+                >
+                    {celebration.emoji}
+                </span>
 
-            {/* Challenge Another Friend - Primary CTA */}
-            <button
-                onClick={() => {
-                    if (mode !== 'roast') {
-                        setMode('roast')
-                        setScreen('home')
-                    } else {
-                        setScreen('home')
-                    }
-                }}
-                className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
-                style={{
-                    background: mode === 'roast'
-                        ? 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)'
-                        : 'linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%)',
-                    boxShadow: mode === 'roast'
-                        ? '0 8px 30px rgba(0,212,255,0.3)'
-                        : '0 8px 30px rgba(255,68,68,0.3)'
-                }}
-            >
-                {mode === 'roast' ? '📸 Rate Another Fit' : '🔥 Roast It Harder'}
-            </button>
+                <h1
+                    className="text-3xl font-black mb-3"
+                    style={{
+                        background: celebration.intensity === 'legendary'
+                            ? 'linear-gradient(135deg, #ffd700, #fff, #ffd700)'
+                            : celebration.intensity === 'high'
+                                ? 'linear-gradient(135deg, #00d4ff, #00ff88)'
+                                : 'white',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: celebration.intensity !== 'normal' ? 'transparent' : 'white',
+                        textShadow: celebration.intensity === 'legendary'
+                            ? '0 0 30px rgba(255,215,0,0.3)'
+                            : 'none'
+                    }}
+                >
+                    {celebration.headline}
+                </h1>
 
-            {/* SHARE WITH FRIENDS - Simple & Friendly */}
-            {userId && (
-                <div className="w-full max-w-xs mt-2 rounded-2xl overflow-hidden" style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                }}>
-                    {/* Header */}
-                    <div className="px-4 py-3 text-center" style={{
-                        background: 'rgba(0,0,0,0.2)',
-                        borderBottom: '1px solid rgba(255,255,255,0.1)'
-                    }}>
-                        <p className="text-base font-bold text-white">📲 Share FitRate</p>
-                        <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                            Let your friends rate their fits too!
-                        </p>
-                    </div>
+                <p className="text-base" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    {celebration.subtext}
+                </p>
+            </div>
 
-                    {/* Copy Link Section */}
-                    <div className="p-4">
-                        <button
-                            onClick={copyReferralLink}
-                            className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95"
-                            style={{
-                                background: copied ? 'rgba(0,255,136,0.2)' : 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                                color: copied ? '#00ff88' : '#000',
-                                boxShadow: copied ? 'none' : '0 4px 15px rgba(0,212,255,0.3)'
-                            }}
-                        >
-                            {copied ? '✅ Link Copied!' : '🔗 Copy Link to Share'}
-                        </button>
-                    </div>
+            {/* Score Reminder - Smaller, elegant */}
+            {score && (
+                <div
+                    className="mb-8 px-6 py-3 rounded-full"
+                    style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                >
+                    <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Your score:
+                    </span>
+                    <span
+                        className="text-lg font-bold ml-2"
+                        style={{
+                            color: score >= 85 ? '#00ff88' : score >= 70 ? '#00d4ff' : score >= 50 ? '#ffd700' : '#ff6b6b'
+                        }}
+                    >
+                        {Math.round(score)}
+                    </span>
                 </div>
             )}
 
-            {/* Push Notification Opt-in */}
-            <div className="w-full max-w-xs mt-4">
-                <NotificationOptIn userId={userId} />
-            </div>
-
-            {/* Back to home */}
+            {/* Primary CTA - Rate Another (not pushy) */}
             <button
                 onClick={() => setScreen('home')}
-                className="mt-6 text-sm transition-all active:opacity-60"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
+                className="w-full max-w-xs py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-95 mb-4"
+                style={{
+                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                    boxShadow: '0 8px 30px rgba(0,212,255,0.3)'
+                }}
             >
-                ← Back to Home
+                📸 Rate Another Fit
+            </button>
+
+            {/* Secondary Option - Start a Battle */}
+            <button
+                onClick={() => {
+                    setScreen('battle')
+                }}
+                className="w-full max-w-xs py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all active:scale-95 mb-6"
+                style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: 'rgba(255,255,255,0.8)'
+                }}
+            >
+                ⚔️ Challenge a Friend
+            </button>
+
+            {/* Push Notification - Subtle, collapsible */}
+            {!showNotifications ? (
+                <button
+                    onClick={() => setShowNotifications(true)}
+                    className="text-xs transition-all"
+                    style={{ color: 'rgba(255,255,255,0.3)' }}
+                >
+                    🔔 Get notified when friends join
+                </button>
+            ) : (
+                <div className="w-full max-w-xs animate-fade-in">
+                    <NotificationOptIn userId={userId} />
+                </div>
+            )}
+
+            {/* Floating back button - very subtle */}
+            <button
+                onClick={() => setScreen('home')}
+                className="absolute top-6 left-6 p-2 rounded-full transition-all active:scale-90"
+                style={{
+                    color: 'rgba(255,255,255,0.3)',
+                    paddingTop: 'max(1.5rem, env(safe-area-inset-top))'
+                }}
+            >
+                ←
             </button>
         </div>
     )
 }
-
