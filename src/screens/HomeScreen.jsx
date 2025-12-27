@@ -711,7 +711,7 @@ export default function HomeScreen({
             </div>
 
             {/* Scans Status Badge */}
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-2">
                 <div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer transition-all active:scale-95"
                     style={{
@@ -1128,7 +1128,7 @@ export default function HomeScreen({
 
             {/* My Battles Section - Active 1v1 Battles */}
             {activeBattles.length > 0 && (
-                <div className="w-full max-w-sm mb-6">
+                <div className="w-full max-w-sm mb-4">
                     <div className="flex items-center justify-between mb-3 px-1">
                         <div className="flex items-center gap-2">
                             <span className="text-lg">⚔️</span>
@@ -1198,7 +1198,7 @@ export default function HomeScreen({
 
             {/* My Shows Section - Active Fashion Shows */}
             {activeShows.length > 0 && (
-                <div className="w-full max-w-sm mb-6">
+                <div className="w-full max-w-sm mb-4">
                     <div className="flex items-center justify-between mb-3 px-1">
                         <div className="flex items-center gap-2">
                             <span className="text-lg">🎭</span>
@@ -1256,12 +1256,12 @@ export default function HomeScreen({
             )}
 
             {/* Event Destination Cards - Side by side */}
-            <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
+            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-4">
                 {/* Fashion Show - Purple gradient with animated sparkles */}
                 {onStartFashionShow && (
                     <button
                         onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                        className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
+                        className="relative overflow-hidden rounded-2xl p-3 transition-all active:scale-[0.98]"
                         style={{
                             background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #4c1d95 100%)',
                             border: '2px solid rgba(167,139,250,0.5)',
@@ -1270,13 +1270,12 @@ export default function HomeScreen({
                     >
                         {/* Animated sparkle overlay */}
                         <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute" style={{ top: '12%', left: '15%', animation: 'sparkle 1.8s ease-in-out infinite' }}>✨</div>
-                            <div className="absolute" style={{ top: '30%', right: '20%', animation: 'sparkle 2.2s ease-in-out infinite 0.4s' }}>💜</div>
-                            <div className="absolute" style={{ bottom: '25%', left: '25%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.2s' }}>✨</div>
+                            <div className="absolute" style={{ top: '10%', left: '12%', animation: 'sparkle 1.8s ease-in-out infinite' }}>✨</div>
+                            <div className="absolute" style={{ bottom: '20%', right: '15%', animation: 'sparkle 2.2s ease-in-out infinite 0.4s' }}>💜</div>
                         </div>
-                        <span className="relative text-4xl block mb-2 drop-shadow-lg">🎭</span>
-                        <span className="relative text-white font-bold block">Fashion Show</span>
-                        <span className="relative text-purple-200/70 text-xs">Compete with friends</span>
+                        <span className="relative text-3xl block mb-1 drop-shadow-lg">🎭</span>
+                        <span className="relative text-white font-bold text-sm block">Fashion Show</span>
+                        <span className="relative text-purple-200/70 text-[11px]">Compete with friends</span>
                     </button>
                 )}
 
@@ -1288,7 +1287,7 @@ export default function HomeScreen({
                             vibrate(15);
                             onShowWeeklyChallenge?.();
                         }}
-                        className="relative overflow-hidden rounded-2xl p-4 transition-all active:scale-[0.98]"
+                        className="relative overflow-hidden rounded-2xl p-3 transition-all active:scale-[0.98]"
                         style={{
                             background: 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
                             border: '2px solid rgba(45,212,191,0.5)',
@@ -1297,9 +1296,8 @@ export default function HomeScreen({
                     >
                         {/* Animated sparkle overlay */}
                         <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute" style={{ top: '15%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite' }}>✨</div>
-                            <div className="absolute" style={{ top: '25%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s' }}>⭐</div>
-                            <div className="absolute" style={{ bottom: '20%', left: '30%', animation: 'sparkle 1.8s ease-in-out infinite 0.6s' }}>✨</div>
+                            <div className="absolute" style={{ top: '10%', left: '15%', animation: 'sparkle 1.5s ease-in-out infinite' }}>✨</div>
+                            <div className="absolute" style={{ bottom: '15%', right: '12%', animation: 'sparkle 2s ease-in-out infinite 0.3s' }}>⭐</div>
                         </div>
                         {/* Gold shimmer line */}
                         <div className="absolute inset-0 overflow-hidden rounded-2xl">
@@ -1309,28 +1307,12 @@ export default function HomeScreen({
                                 animation: 'shimmer 3s infinite'
                             }} />
                         </div>
-                        <span className="relative text-4xl block mb-2 drop-shadow-lg">🏆</span>
-                        <span className="relative text-white font-bold block">Challenges</span>
-                        <span className="relative text-teal-100/80 text-xs">Daily & Weekly prizes</span>
+                        <span className="relative text-3xl block mb-1 drop-shadow-lg">🏆</span>
+                        <span className="relative text-white font-bold text-sm block">Challenges</span>
+                        <span className="relative text-teal-100/80 text-[11px]">Daily & Weekly prizes</span>
                     </button>
                 )}
             </div>
-
-            {/* Pro CTA Button - Yellow, rounded, premium with pulsing glow */}
-            {!isPro && (
-                <button
-                    onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
-                    className="px-10 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
-                    style={{
-                        background: 'linear-gradient(135deg, #ffd700 0%, #ffb800 50%, #ff9500 100%)',
-                        color: '#000',
-                        boxShadow: '0 4px 30px rgba(255,215,0,0.4), 0 0 60px rgba(255,180,0,0.2)',
-                        animation: 'pulseGlow 2s ease-in-out infinite'
-                    }}
-                >
-                    👑 Get More Scans
-                </button>
-            )}
 
             {/* Subtle PWA Install Prompt - only show if not already installed */}
             {!window.matchMedia('(display-mode: standalone)').matches && (
@@ -1350,8 +1332,8 @@ export default function HomeScreen({
                             }
                         }
                     }}
-                    className="mt-6 mb-4 text-[11px] transition-all active:opacity-60"
-                    style={{ color: 'rgba(255,255,255,0.25)' }}
+                    className="mt-4 mb-4 text-xs transition-all active:opacity-60"
+                    style={{ color: 'rgba(255,255,255,0.45)' }}
                 >
                     📲 Add to Home Screen for quick access
                 </button>
