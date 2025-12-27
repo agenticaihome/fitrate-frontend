@@ -51,6 +51,7 @@ const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
 const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
 const MeetTheJudges = lazy(() => import('./screens/MeetTheJudges'))
 const ArenaQueueScreen = lazy(() => import('./screens/ArenaQueueScreen'))  // Global Arena
+const ArenaEntryScreen = lazy(() => import('./screens/ArenaEntryScreen'))  // Arena Entry
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -426,11 +427,17 @@ export default function App() {
   // ============================================
   // GLOBAL ARENA STATE - Real-time matchmaking
   // ============================================
-  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'queue'
+  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue'
   const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode }
+  const [arenaMode, setArenaMode] = useState(null)  // Mode for arena (from daily rotation)
 
-  // Handler to start arena flow (called from HomeScreen)
-  const startArenaFlow = (score, thumb, mode) => {
+  // Handler to open arena entry screen (from HomeScreen)
+  const openArenaEntry = () => {
+    setArenaScreen('entry')
+  }
+
+  // Handler to start arena queue (called after scan in arena mode)
+  const startArenaQueue = (score, thumb, mode) => {
     setArenaData({ score, thumb, mode })
     setArenaScreen('queue')
   }
@@ -2380,6 +2387,43 @@ export default function App() {
   }
 
   // ============================================
+  // GLOBAL ARENA ENTRY SCREEN
+  // ============================================
+  if (arenaScreen === 'entry') {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <ArenaEntryScreen
+          userId={userId}
+          onTakePhoto={(dailyMode) => {
+            // Store the arena mode and trigger camera
+            setArenaMode(dailyMode)
+            setArenaScreen(null)  // Exit entry screen
+            // Trigger camera flow - we'll auto-queue after scan completes
+            // For now, open Android photo modal or start camera
+            const isAndroid = /Android/i.test(navigator.userAgent)
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
+            if (isAndroid) {
+              // Android: Show camera capture
+              document.getElementById('androidCameraInput')?.click()
+            } else if (isIOS) {
+              document.getElementById('androidGalleryInput')?.click()
+            } else {
+              // Desktop: Just go home and let user use main button
+              setScreen('home')
+            }
+          }}
+          onBack={() => {
+            setArenaScreen(null)
+            setArenaMode(null)
+          }}
+          playSound={playSound}
+          vibrate={vibrate}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // GLOBAL ARENA QUEUE SCREEN
   // ============================================
   if (arenaScreen === 'queue' && arenaData) {
@@ -2714,7 +2758,7 @@ export default function App() {
             // General navigation for mode drawer links (judges, etc.)
             setScreen(target)
           }}
-          onStartArena={startArenaFlow}
+          onOpenArena={openArenaEntry}
         />
         <BottomNav
           activeTab="home"

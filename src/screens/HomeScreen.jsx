@@ -109,7 +109,7 @@ export default function HomeScreen({
     onNavigateToBattle,     // Navigate to a specific Battle
     onRemoveBattle,         // Remove a battle from the list
     onNavigate,             // General navigation callback (for judges, etc.)
-    onStartArena            // Start Global Arena matchmaking flow
+    onOpenArena             // Open Global Arena entry screen
 }) {
     // Local State
     const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
@@ -1202,14 +1202,13 @@ export default function HomeScreen({
                     </button>
 
                     {/* Global Arena Card */}
-                    {onStartArena && (
+                    {onOpenArena && (
                         <button
                             onClick={() => {
                                 playSound('click')
                                 vibrate(20)
-                                // Trigger camera flow - same as main CTA
-                                // After scan, user will see "Battle Anyone" button on results
-                                handleStart()
+                                // Open Arena entry screen
+                                onOpenArena()
                             }}
                             className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97]"
                             style={{

@@ -431,8 +431,7 @@ export default function ResultsScreen({
     dailyStreak = null,  // Daily streak data { current, max, emoji, message, tier, isMilestone, milestone }
     showToast = null,  // Toast function for streak celebration
     pendingBattleId = null,  // Battle ID if user just responded to a battle challenge
-    onSeeBattleResults = null,  // Callback to navigate to battle results
-    onStartArena = null  // Callback to start Global Arena matchmaking
+    onSeeBattleResults = null  // Callback to navigate to battle results
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
@@ -1565,34 +1564,6 @@ export default function ResultsScreen({
                         </span>
                     </button>
                 </div>
-
-                {/* Global Arena - Battle Anyone in the World */}
-                {onStartArena && (
-                    <button
-                        onClick={() => {
-                            playSound('click')
-                            vibrate(30)
-                            // Pass score, thumbnail, and mode to arena
-                            onStartArena(scores.overall, uploadedImage, mode)
-                        }}
-                        className="w-full py-4 mb-3 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.97]"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(0,212,255,0.2) 0%, rgba(0,255,136,0.15) 100%)',
-                            border: '1px solid rgba(0,212,255,0.4)',
-                            boxShadow: '0 0 30px rgba(0,212,255,0.2)'
-                        }}
-                    >
-                        <span className="text-2xl">🌍</span>
-                        <div className="text-left">
-                            <span className="text-white font-black">Battle Anyone</span>
-                            <span className="text-white/50 text-xs ml-2">in the world</span>
-                        </div>
-                        <span className="flex items-center gap-1 text-cyan-400 text-xs font-bold ml-auto">
-                            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                            Live
-                        </span>
-                    </button>
-                )}
 
                 {/* Try Again + Back to Runway (side-by-side when in Fashion Show) */}
                 <div className={`flex gap-2 ${fashionShowId && onReturnToRunway ? 'flex-row' : 'flex-col'}`}>
