@@ -48,12 +48,12 @@ const FloatingParticles = ({ accentColor }) => {
 // Ring color reflects SCORE ACHIEVEMENT, not mode
 // ============================================
 const getScoreTierColors = (score) => {
-    if (score >= 95) return { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.6)' }   // LEGENDARY GOLD
-    if (score >= 85) return { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.5)' }  // FIRE ORANGE→PINK
-    if (score >= 75) return { accent: '#00d4ff', end: '#0066ff', glow: 'rgba(0,212,255,0.5)' }   // GREAT CYAN
-    if (score >= 60) return { accent: '#00ff88', end: '#00d4ff', glow: 'rgba(0,255,136,0.5)' }   // GOOD GREEN
-    if (score >= 40) return { accent: '#ffaa00', end: '#ff6b00', glow: 'rgba(255,170,0,0.5)' }   // MID AMBER
-    return { accent: '#ff4444', end: '#cc0000', glow: 'rgba(255,68,68,0.5)' }                    // LOW RED
+    if (score >= 95) return { accent: '#ffd700', end: '#ff8c00', glow: 'rgba(255,215,0,0.6)' }   // LEGENDARY: Gold → Orange
+    if (score >= 85) return { accent: '#ff6b35', end: '#ff0080', glow: 'rgba(255,107,53,0.5)' }  // FIRE: Orange → Hot Pink
+    if (score >= 75) return { accent: '#00d4ff', end: '#a855f7', glow: 'rgba(0,212,255,0.5)' }   // GREAT: Cyan → Purple (distinct!)
+    if (score >= 60) return { accent: '#00ff88', end: '#06b6d4', glow: 'rgba(0,255,136,0.5)' }   // GOOD: Green → Teal
+    if (score >= 40) return { accent: '#fbbf24', end: '#f97316', glow: 'rgba(251,191,36,0.5)' }  // MID: Yellow → Orange
+    return { accent: '#ef4444', end: '#7c3aed', glow: 'rgba(239,68,68,0.5)' }                    // LOW: Red → Purple
 }
 
 // ============================================
@@ -927,11 +927,11 @@ export default function ResultsScreen({
                         className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
                         style={{ bottom: '-40px' }}
                     >
-                        {/* Breathing glow rings behind badge */}
+                        {/* Breathing glow rings behind badge - dual color */}
                         <div
                             className="absolute inset-0 rounded-full pointer-events-none"
                             style={{
-                                border: `2px solid ${theme.accent}30`,
+                                border: `2px solid ${ringColors.end}40`,
                                 transform: 'scale(1.15)',
                                 animation: animationComplete ? 'ring-breathe 2.5s ease-in-out infinite' : 'none'
                             }}
@@ -939,20 +939,22 @@ export default function ResultsScreen({
                         <div
                             className="absolute inset-0 rounded-full pointer-events-none"
                             style={{
-                                border: `1px solid ${theme.accent}20`,
+                                border: `1px solid ${ringColors.accent}25`,
                                 transform: 'scale(1.3)',
                                 animation: animationComplete ? 'ring-breathe 2.5s ease-in-out infinite 0.3s' : 'none'
                             }}
                         />
 
+                        {/* Main score badge with gradient border effect */}
                         <div
                             className="relative w-[100px] h-[100px] rounded-full flex flex-col items-center justify-center"
                             style={{
-                                background: '#0a0a15',
-                                border: `4px solid ${theme.accent}`,
+                                background: `linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)`,
+                                border: `3px solid transparent`,
+                                backgroundClip: 'padding-box',
                                 boxShadow: animationComplete
-                                    ? `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}50, 0 8px 24px rgba(0,0,0,0.5)`
-                                    : `0 0 30px ${theme.glow}, 0 8px 24px rgba(0,0,0,0.5)`,
+                                    ? `0 0 40px ${ringColors.glow}, 0 0 80px ${ringColors.glow}50, 0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 3px ${ringColors.accent}`
+                                    : `0 0 30px ${ringColors.glow}, 0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 3px ${ringColors.accent}`,
                                 animation: animationComplete ? 'score-complete-celebration 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                             }}
                         >
@@ -962,8 +964,8 @@ export default function ResultsScreen({
                                 style={{
                                     color: isLegendary ? undefined : '#fff',
                                     textShadow: animationComplete
-                                        ? `0 0 30px ${theme.glow}, 0 0 60px ${theme.glow}`
-                                        : `0 0 20px ${theme.glow}`,
+                                        ? `0 0 30px ${ringColors.glow}, 0 0 60px ${ringColors.glow}`
+                                        : `0 0 20px ${ringColors.glow}`,
                                     animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                                 }}
                             >
@@ -973,34 +975,49 @@ export default function ResultsScreen({
                             <span className="text-xs font-bold text-white/40">/100</span>
                         </div>
 
-                        {/* Score ring progress around badge with glow */}
+                        {/* Score ring progress - Premium dual-ring design */}
                         <svg
                             className="absolute inset-0 w-full h-full -rotate-90"
                             viewBox="0 0 100 100"
-                            style={{
-                                filter: animationComplete
-                                    ? `drop-shadow(0 0 8px ${theme.glow}) drop-shadow(0 0 16px ${theme.glow})`
-                                    : `drop-shadow(0 0 4px ${theme.glow})`
-                            }}
                         >
-                            {/* Background track */}
+                            {/* Define gradient for progress ring */}
+                            <defs>
+                                <linearGradient id={`scoreGradient-${scores?.overall || 0}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor={ringColors.accent} />
+                                    <stop offset="100%" stopColor={ringColors.end} />
+                                </linearGradient>
+                            </defs>
+
+                            {/* Background track - subtle dark ring */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
-                                stroke="rgba(255,255,255,0.1)"
-                                strokeWidth="3"
+                                stroke="rgba(255,255,255,0.08)"
+                                strokeWidth="4"
                             />
-                            {/* Progress ring */}
+
+                            {/* Secondary glow track - creates depth */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
-                                stroke={theme.accent}
-                                strokeWidth="3"
+                                stroke={`${ringColors.accent}15`}
+                                strokeWidth="4"
+                            />
+
+                            {/* Progress ring with gradient */}
+                            <circle
+                                cx="50" cy="50" r="46"
+                                fill="none"
+                                stroke={`url(#scoreGradient-${scores?.overall || 0})`}
+                                strokeWidth="4"
                                 strokeLinecap="round"
                                 strokeDasharray="289"
                                 strokeDashoffset={289 - (displayedScore * 2.89)}
                                 style={{
-                                    transition: 'stroke-dashoffset 0.1s ease-out'
+                                    transition: 'stroke-dashoffset 0.1s ease-out',
+                                    filter: animationComplete
+                                        ? `drop-shadow(0 0 6px ${ringColors.glow}) drop-shadow(0 0 12px ${ringColors.glow})`
+                                        : `drop-shadow(0 0 3px ${ringColors.glow})`
                                 }}
                             />
                         </svg>
