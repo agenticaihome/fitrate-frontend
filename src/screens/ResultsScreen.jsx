@@ -801,9 +801,9 @@ export default function ResultsScreen({
                     <div
                         className="relative w-full rounded-3xl overflow-hidden"
                         style={{
-                            height: '55vh',
-                            maxHeight: '500px',
-                            minHeight: '320px'
+                            height: '60vh',
+                            maxHeight: '550px',
+                            minHeight: '380px'
                         }}
                     >
                         {/* User Photo - DOMINANT */}
@@ -812,7 +812,7 @@ export default function ResultsScreen({
                             alt="Your outfit"
                             className="w-full h-full object-cover"
                             style={{
-                                objectPosition: 'center 20%'  // Face focus
+                                objectPosition: 'center 30%'  // Show more of the photo (was 20%)
                             }}
                         />
 
