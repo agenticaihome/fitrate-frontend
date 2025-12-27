@@ -2460,8 +2460,9 @@ export default function App() {
   // ============================================
   // BATTLE ROOM - Legendary 1v1 Outfit Battles (/b/:id or /c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
+  // Skip if user is analyzing (so AnalyzingScreen can show)
   // ============================================
-  if (challengePartyId && (challengePartyData || challengePartyLoading)) {
+  if (challengePartyId && (challengePartyData || challengePartyLoading) && screen !== 'analyzing') {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <BattleRoom

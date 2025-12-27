@@ -6,17 +6,16 @@ import { playSound, vibrate } from '../utils/soundEffects'
  *
  * Epic reveal sequence:
  * 1. Tension build - "BATTLE RESULTS" pulse
- * 2. Photo collision - Both outfits slam together from sides
- * 3. Score reveal - Numbers fade in over photos
+ * 2. Photo collision - Both outfits slide in and meet in middle
+ * 3. Score reveal - Numbers pop in under photos
  * 4. Winner announcement - Dramatic reveal with effects
- * 5. Final state - Settled comparison with CTAs
+ * 5. Final state - Clean CTAs at bottom
  */
 
 // Confetti piece for winner celebration
 function ConfettiPiece({ delay, color, left }) {
     return (
         <div
-            className="confetti-piece"
             style={{
                 position: 'absolute',
                 left: `${left}%`,
@@ -33,23 +32,6 @@ function ConfettiPiece({ delay, color, left }) {
     )
 }
 
-// Spark effect at collision point
-function CollisionSpark({ delay }) {
-    return (
-        <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{
-                width: '200px',
-                height: '200px',
-                background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(139,92,246,0.5) 30%, transparent 70%)',
-                borderRadius: '50%',
-                animation: `spark-burst 0.6s ease-out ${delay}s forwards`,
-                opacity: 0
-            }}
-        />
-    )
-}
-
 export default function BattleResultsReveal({
     battleData,
     isCreator,
@@ -57,7 +39,7 @@ export default function BattleResultsReveal({
     onShare,
     onRematch,
     onHome,
-    onViewScorecard  // Navigate to detailed scorecard
+    onViewScorecard
 }) {
     // Animation phases
     const [phase, setPhase] = useState(0) // 0=tension, 1=collision, 2=scores, 3=winner, 4=final
@@ -103,14 +85,14 @@ export default function BattleResultsReveal({
             setPhase(1)
         }, 800)
 
-        // Phase 1→2: Collision complete, show scores (1.5s after phase 1)
+        // Phase 1→2: Collision complete, show scores (0.8s after phase 1)
         const t2 = setTimeout(() => {
             playSound('impact')
             vibrate([50, 30, 100])
             setPhase(2)
-        }, 2300)
+        }, 1600)
 
-        // Phase 2→3: Winner reveal (1.2s after scores)
+        // Phase 2→3: Winner reveal (0.8s after scores)
         const t3 = setTimeout(() => {
             playSound('celebrate')
             vibrate([100, 50, 100, 50, 200])
@@ -119,12 +101,12 @@ export default function BattleResultsReveal({
                 setShowConfetti(true)
                 setTimeout(() => setShowConfetti(false), 4000)
             }
-        }, 3500)
+        }, 2400)
 
-        // Phase 3→4: Final state (1.5s after winner)
+        // Phase 3→4: Final state (1s after winner)
         const t4 = setTimeout(() => {
             setPhase(4)
-        }, 5000)
+        }, 3400)
 
         return () => {
             clearTimeout(t1)
@@ -142,9 +124,9 @@ export default function BattleResultsReveal({
 
     return (
         <div
-            className="fixed inset-0 z-50 overflow-hidden"
+            className="fixed inset-0 z-50 flex flex-col"
             style={{
-                background: '#000',
+                background: 'linear-gradient(180deg, #0a0a15 0%, #1a1a2e 50%, #0a0a15 100%)',
                 touchAction: 'none'
             }}
         >
@@ -154,57 +136,35 @@ export default function BattleResultsReveal({
                     0%, 100% { opacity: 0.5; transform: scale(1); }
                     50% { opacity: 1; transform: scale(1.05); }
                 }
-                @keyframes slide-left {
-                    from { transform: translateX(-100%); }
-                    to { transform: translateX(0); }
+                @keyframes slide-in-left {
+                    0% { transform: translateX(-120%); opacity: 0; }
+                    100% { transform: translateX(0); opacity: 1; }
                 }
-                @keyframes slide-right {
-                    from { transform: translateX(100%); }
-                    to { transform: translateX(0); }
-                }
-                @keyframes slam-left {
-                    0% { transform: translateX(-100%) scale(1.1); }
-                    70% { transform: translateX(5%) scale(1.02); }
-                    85% { transform: translateX(-2%) scale(1); }
-                    100% { transform: translateX(0) scale(1); }
-                }
-                @keyframes slam-right {
-                    0% { transform: translateX(100%) scale(1.1); }
-                    70% { transform: translateX(-5%) scale(1.02); }
-                    85% { transform: translateX(2%) scale(1); }
-                    100% { transform: translateX(0) scale(1); }
-                }
-                @keyframes spark-burst {
-                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-                    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
-                    100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+                @keyframes slide-in-right {
+                    0% { transform: translateX(120%); opacity: 0; }
+                    100% { transform: translateX(0); opacity: 1; }
                 }
                 @keyframes score-pop {
-                    0% { opacity: 0; transform: scale(0); }
-                    60% { transform: scale(1.2); }
-                    100% { opacity: 1; transform: scale(1); }
+                    0% { opacity: 0; transform: scale(0) translateY(20px); }
+                    60% { transform: scale(1.15) translateY(-5px); }
+                    100% { opacity: 1; transform: scale(1) translateY(0); }
                 }
-                @keyframes winner-glow {
-                    0%, 100% { box-shadow: 0 0 30px rgba(0,255,136,0.5); }
-                    50% { box-shadow: 0 0 60px rgba(0,255,136,0.8), 0 0 100px rgba(0,255,136,0.4); }
-                }
-                @keyframes loser-dim {
-                    to { filter: grayscale(50%) brightness(0.6); }
+                @keyframes winner-pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
                 }
                 @keyframes confetti-fall {
                     0% { transform: translateY(0) rotate(0deg); opacity: 1; }
                     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
                 }
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    20% { transform: translateX(-10px); }
-                    40% { transform: translateX(10px); }
-                    60% { transform: translateX(-5px); }
-                    80% { transform: translateX(5px); }
-                }
                 @keyframes text-reveal {
-                    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-                    100% { opacity: 1; transform: translateY(0) scale(1); }
+                    0% { opacity: 0; transform: translateY(20px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes vs-pop {
+                    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+                    60% { transform: scale(1.3) rotate(5deg); }
+                    100% { transform: scale(1) rotate(0deg); opacity: 1; }
                 }
             `}</style>
 
@@ -213,288 +173,224 @@ export default function BattleResultsReveal({
                 <ConfettiPiece key={piece.id} {...piece} />
             ))}
 
-            {/* Phase 0: Tension Build */}
-            {phase === 0 && (
-                <div className="absolute inset-0 flex items-center justify-center">
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4 pt-safe">
+
+                {/* Phase 0: Tension Build */}
+                {phase === 0 && (
                     <div
                         className="text-center"
                         style={{ animation: 'pulse-glow 1s ease-in-out infinite' }}
                     >
                         <div className="text-6xl mb-4">⚔️</div>
-                        <h1 className="text-4xl font-black text-white tracking-wider">
+                        <h1 className="text-3xl font-black text-white tracking-wider">
                             BATTLE RESULTS
                         </h1>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Phase 1+: Photo Collision */}
-            {phase >= 1 && (
-                <div
-                    className="absolute inset-0 flex"
-                    style={{ animation: phase === 2 ? 'shake 0.3s ease-out' : 'none' }}
-                >
-                    {/* Left side - Creator */}
-                    <div
-                        className="w-1/2 h-full relative overflow-hidden"
-                        style={{
-                            animation: phase === 1 ? 'slam-left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
-                            filter: phase >= 3 && responderWon ? 'grayscale(50%) brightness(0.6)' : 'none',
-                            transition: 'filter 0.5s ease-out'
-                        }}
-                    >
-                        {creatorThumb ? (
-                            <img
-                                src={creatorThumb}
-                                alt="Challenger"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-purple-900 to-purple-600 flex items-center justify-center">
-                                <span className="text-8xl">👤</span>
-                            </div>
-                        )}
-
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/50" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-
-                        {/* Label */}
-                        <div className="absolute top-safe left-4 mt-4">
-                            <span className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-black/50 text-white/80 backdrop-blur-sm">
-                                {isCreator ? 'You' : 'Challenger'}
-                            </span>
-                        </div>
-
-                        {/* Score overlay - Phase 2+ */}
-                        {phase >= 2 && (
-                            <div
-                                className="absolute inset-0 flex items-center justify-center"
-                                style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
-                            >
-                                <div className="text-center">
-                                    <div
-                                        className="text-8xl font-black mb-2"
-                                        style={{
-                                            color: creatorWon ? winColor : '#fff',
-                                            textShadow: `0 0 40px ${creatorWon ? winColor : 'rgba(0,0,0,0.8)'}`,
-                                            WebkitTextStroke: '2px rgba(0,0,0,0.3)'
-                                        }}
-                                    >
-                                        {Math.round(creatorScore)}
-                                    </div>
-                                    <div className="text-white/60 text-xl font-medium">/100</div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Winner/Loser badge - Phase 3+ */}
-                        {phase >= 3 && (
-                            <div
-                                className="absolute bottom-20 left-0 right-0 flex justify-center"
-                                style={{ animation: 'text-reveal 0.5s ease-out forwards' }}
-                            >
-                                {creatorWon && (
-                                    <div
-                                        className="px-6 py-3 rounded-full font-black text-lg"
-                                        style={{
-                                            background: `linear-gradient(135deg, ${winColor} 0%, #00d4ff 100%)`,
-                                            color: '#000',
-                                            boxShadow: `0 0 30px ${winColor}80`,
-                                            animation: 'winner-glow 1.5s ease-in-out infinite'
-                                        }}
-                                    >
-                                        👑 WINNER
-                                    </div>
-                                )}
-                                {responderWon && (
-                                    <div className="px-6 py-3 rounded-full font-bold text-sm bg-black/60 text-white/50 border border-white/20">
-                                        💀 DEFEATED
-                                    </div>
-                                )}
-                                {tied && (
-                                    <div
-                                        className="px-6 py-3 rounded-full font-black text-lg"
-                                        style={{
-                                            background: `linear-gradient(135deg, ${tieColor} 0%, #ff8c00 100%)`,
-                                            color: '#000'
-                                        }}
-                                    >
-                                        🤝 TIE
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Center divider / VS */}
-                    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-1 bg-white/20 z-20" />
-
-                    {/* Collision spark */}
-                    {phase === 2 && <CollisionSpark delay={0} />}
-
-                    {/* VS badge */}
-                    {phase >= 1 && (
-                        <div
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
-                            style={{
-                                opacity: phase >= 2 ? 1 : 0,
-                                transform: `translate(-50%, -50%) scale(${phase >= 2 ? 1 : 0})`,
-                                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                            }}
-                        >
-                            <div
-                                className="w-16 h-16 rounded-full flex items-center justify-center font-black text-xl"
+                {/* Phase 1+: Photo Cards */}
+                {phase >= 1 && (
+                    <div className="w-full max-w-md">
+                        {/* Mode badge at top */}
+                        <div className="text-center mb-4">
+                            <span
+                                className="inline-block px-4 py-2 rounded-full text-sm font-bold"
                                 style={{
-                                    background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
-                                    boxShadow: '0 0 40px rgba(139,92,246,0.6)',
-                                    border: '3px solid rgba(255,255,255,0.3)'
+                                    background: 'rgba(139,92,246,0.2)',
+                                    border: '1px solid rgba(139,92,246,0.4)',
+                                    color: '#a78bfa'
                                 }}
                             >
-                                VS
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Right side - Responder */}
-                    <div
-                        className="w-1/2 h-full relative overflow-hidden"
-                        style={{
-                            animation: phase === 1 ? 'slam-right 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
-                            filter: phase >= 3 && creatorWon ? 'grayscale(50%) brightness(0.6)' : 'none',
-                            transition: 'filter 0.5s ease-out'
-                        }}
-                    >
-                        {responderThumb ? (
-                            <img
-                                src={responderThumb}
-                                alt="Opponent"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full bg-gradient-to-bl from-pink-900 to-pink-600 flex items-center justify-center">
-                                <span className="text-8xl">👤</span>
-                            </div>
-                        )}
-
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-black/50" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-
-                        {/* Label */}
-                        <div className="absolute top-safe right-4 mt-4">
-                            <span className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-black/50 text-white/80 backdrop-blur-sm">
-                                {isCreator ? 'Opponent' : 'You'}
+                                {getModeEmoji(battleMode)} {battleMode.toUpperCase()} BATTLE
                             </span>
                         </div>
 
-                        {/* Score overlay - Phase 2+ */}
-                        {phase >= 2 && (
+                        {/* Two Photo Cards Side by Side */}
+                        <div className="flex items-center justify-center gap-3 mb-6">
+                            {/* Left Card - Creator */}
                             <div
-                                className="absolute inset-0 flex items-center justify-center"
-                                style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards', opacity: 0 }}
+                                className="relative"
+                                style={{
+                                    animation: phase === 1 ? 'slide-in-left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
+                                    opacity: phase === 1 ? 0 : 1
+                                }}
                             >
-                                <div className="text-center">
-                                    <div
-                                        className="text-8xl font-black mb-2"
-                                        style={{
-                                            color: responderWon ? winColor : '#fff',
-                                            textShadow: `0 0 40px ${responderWon ? winColor : 'rgba(0,0,0,0.8)'}`,
-                                            WebkitTextStroke: '2px rgba(0,0,0,0.3)'
-                                        }}
-                                    >
-                                        {Math.round(responderScore)}
+                                <div
+                                    className="w-36 h-48 rounded-2xl overflow-hidden relative"
+                                    style={{
+                                        border: phase >= 3 && creatorWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
+                                        boxShadow: phase >= 3 && creatorWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
+                                        filter: phase >= 3 && responderWon ? 'grayscale(40%) brightness(0.7)' : 'none',
+                                        transition: 'all 0.4s ease-out'
+                                    }}
+                                >
+                                    {creatorThumb ? (
+                                        <img
+                                            src={creatorThumb}
+                                            alt="Challenger"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-purple-900 to-purple-600 flex items-center justify-center">
+                                            <span className="text-5xl">👤</span>
+                                        </div>
+                                    )}
+                                    {/* Label */}
+                                    <div className="absolute top-2 left-2">
+                                        <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-black/60 text-white/80 backdrop-blur-sm">
+                                            {isCreator ? 'You' : 'Challenger'}
+                                        </span>
                                     </div>
-                                    <div className="text-white/60 text-xl font-medium">/100</div>
+                                    {/* Winner badge */}
+                                    {phase >= 3 && creatorWon && (
+                                        <div
+                                            className="absolute -top-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                                            style={{
+                                                background: `linear-gradient(135deg, ${winColor}, #00d4ff)`,
+                                                boxShadow: `0 0 20px ${winColor}`,
+                                                animation: 'winner-pulse 1s ease-in-out infinite'
+                                            }}
+                                        >
+                                            👑
+                                        </div>
+                                    )}
+                                </div>
+                                {/* Score below card */}
+                                {phase >= 2 && (
+                                    <div
+                                        className="text-center mt-3"
+                                        style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
+                                    >
+                                        <div
+                                            className="text-4xl font-black"
+                                            style={{ color: creatorWon ? winColor : '#fff' }}
+                                        >
+                                            {Math.round(creatorScore)}
+                                        </div>
+                                        <div className="text-xs text-white/50">/100</div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* VS Badge in center */}
+                            <div
+                                className="flex items-center justify-center"
+                                style={{
+                                    opacity: phase >= 2 ? 1 : 0,
+                                    animation: phase === 2 ? 'vs-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none'
+                                }}
+                            >
+                                <div
+                                    className="w-12 h-12 rounded-full flex items-center justify-center font-black text-sm"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                                        boxShadow: '0 0 30px rgba(139,92,246,0.5)',
+                                        border: '2px solid rgba(255,255,255,0.3)'
+                                    }}
+                                >
+                                    VS
                                 </div>
                             </div>
-                        )}
 
-                        {/* Winner/Loser badge - Phase 3+ */}
-                        {phase >= 3 && (
+                            {/* Right Card - Responder */}
                             <div
-                                className="absolute bottom-20 left-0 right-0 flex justify-center"
-                                style={{ animation: 'text-reveal 0.5s ease-out 0.2s forwards', opacity: 0 }}
+                                className="relative"
+                                style={{
+                                    animation: phase === 1 ? 'slide-in-right 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none',
+                                    opacity: phase === 1 ? 0 : 1
+                                }}
                             >
-                                {responderWon && (
-                                    <div
-                                        className="px-6 py-3 rounded-full font-black text-lg"
-                                        style={{
-                                            background: `linear-gradient(135deg, ${winColor} 0%, #00d4ff 100%)`,
-                                            color: '#000',
-                                            boxShadow: `0 0 30px ${winColor}80`,
-                                            animation: 'winner-glow 1.5s ease-in-out infinite'
-                                        }}
-                                    >
-                                        👑 WINNER
+                                <div
+                                    className="w-36 h-48 rounded-2xl overflow-hidden relative"
+                                    style={{
+                                        border: phase >= 3 && responderWon ? `3px solid ${winColor}` : '3px solid rgba(255,255,255,0.2)',
+                                        boxShadow: phase >= 3 && responderWon ? `0 0 30px ${winColor}50` : '0 8px 32px rgba(0,0,0,0.4)',
+                                        filter: phase >= 3 && creatorWon ? 'grayscale(40%) brightness(0.7)' : 'none',
+                                        transition: 'all 0.4s ease-out'
+                                    }}
+                                >
+                                    {responderThumb ? (
+                                        <img
+                                            src={responderThumb}
+                                            alt="Opponent"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-bl from-pink-900 to-pink-600 flex items-center justify-center">
+                                            <span className="text-5xl">👤</span>
+                                        </div>
+                                    )}
+                                    {/* Label */}
+                                    <div className="absolute top-2 right-2">
+                                        <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase bg-black/60 text-white/80 backdrop-blur-sm">
+                                            {isCreator ? 'Opponent' : 'You'}
+                                        </span>
                                     </div>
-                                )}
-                                {creatorWon && (
-                                    <div className="px-6 py-3 rounded-full font-bold text-sm bg-black/60 text-white/50 border border-white/20">
-                                        💀 DEFEATED
-                                    </div>
-                                )}
-                                {tied && (
+                                    {/* Winner badge */}
+                                    {phase >= 3 && responderWon && (
+                                        <div
+                                            className="absolute -top-2 -left-2 w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                                            style={{
+                                                background: `linear-gradient(135deg, ${winColor}, #00d4ff)`,
+                                                boxShadow: `0 0 20px ${winColor}`,
+                                                animation: 'winner-pulse 1s ease-in-out infinite'
+                                            }}
+                                        >
+                                            👑
+                                        </div>
+                                    )}
+                                </div>
+                                {/* Score below card */}
+                                {phase >= 2 && (
                                     <div
-                                        className="px-6 py-3 rounded-full font-black text-lg"
-                                        style={{
-                                            background: `linear-gradient(135deg, ${tieColor} 0%, #ff8c00 100%)`,
-                                            color: '#000'
-                                        }}
+                                        className="text-center mt-3"
+                                        style={{ animation: 'score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards', opacity: 0 }}
                                     >
-                                        🤝 TIE
+                                        <div
+                                            className="text-4xl font-black"
+                                            style={{ color: responderWon ? winColor : '#fff' }}
+                                        >
+                                            {Math.round(responderScore)}
+                                        </div>
+                                        <div className="text-xs text-white/50">/100</div>
                                     </div>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Result Text */}
+                        {phase >= 3 && (
+                            <div
+                                className="text-center"
+                                style={{ animation: 'text-reveal 0.5s ease-out forwards' }}
+                            >
+                                <h1
+                                    className="text-4xl font-black mb-2"
+                                    style={{
+                                        color: accentColor,
+                                        textShadow: `0 0 30px ${accentColor}60`
+                                    }}
+                                >
+                                    {userWon ? '🏆 VICTORY!' : userLost ? '💀 DEFEATED' : '🤝 TIE!'}
+                                </h1>
+                                <p className="text-white/60 text-lg">
+                                    {tied ? 'Exactly matched!' : `Won by ${Math.round(diff)} points`}
+                                </p>
+                            </div>
                         )}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
-            {/* Phase 3+: Winner Announcement Overlay */}
-            {phase >= 3 && (
-                <div
-                    className="absolute top-safe left-0 right-0 flex flex-col items-center pt-20 z-40"
-                    style={{ animation: 'text-reveal 0.6s ease-out forwards' }}
-                >
-                    {/* Mode badge */}
-                    <div
-                        className="px-4 py-2 rounded-full text-sm font-bold mb-4"
-                        style={{
-                            background: 'rgba(0,0,0,0.6)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255,255,255,0.2)'
-                        }}
-                    >
-                        {getModeEmoji(battleMode)} {battleMode.toUpperCase()} MODE
-                    </div>
-
-                    {/* Result text */}
-                    <h1
-                        className="text-5xl font-black mb-2"
-                        style={{
-                            color: accentColor,
-                            textShadow: `0 0 40px ${accentColor}80`
-                        }}
-                    >
-                        {userWon ? 'VICTORY!' : userLost ? 'DEFEATED' : 'TIE GAME!'}
-                    </h1>
-
-                    {/* Point difference */}
-                    <p className="text-white/70 text-lg">
-                        {tied ? 'Exactly matched!' : `Won by ${Math.round(diff)} points`}
-                    </p>
-                </div>
-            )}
-
-            {/* Phase 4: Final CTAs */}
+            {/* Bottom CTAs - Fixed at bottom for mobile */}
             {phase >= 4 && (
                 <div
-                    className="absolute bottom-safe left-0 right-0 px-6 pb-8 z-40"
+                    className="w-full px-6 pb-safe mb-6"
                     style={{ animation: 'text-reveal 0.5s ease-out forwards' }}
                 >
-                    <div className="flex flex-col gap-3 max-w-sm mx-auto">
-                        {/* Primary CTA - See My Scorecard */}
+                    <div className="max-w-sm mx-auto space-y-3">
+                        {/* Primary CTA */}
                         <button
                             onClick={() => {
                                 playSound('click')
@@ -510,10 +406,10 @@ export default function BattleResultsReveal({
                                 boxShadow: `0 8px 30px ${userWon ? winColor : '#8b5cf6'}50`
                             }}
                         >
-                            📊 See My Scorecard
+                            📊 See My Full Scorecard
                         </button>
 
-                        {/* Secondary CTAs */}
+                        {/* Secondary Row */}
                         <div className="flex gap-3">
                             <button
                                 onClick={() => {
@@ -524,7 +420,7 @@ export default function BattleResultsReveal({
                                 className="flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
                                 style={{
                                     background: 'rgba(255,255,255,0.1)',
-                                    color: 'rgba(255,255,255,0.8)',
+                                    color: '#fff',
                                     border: '1px solid rgba(255,255,255,0.2)'
                                 }}
                             >
@@ -539,7 +435,7 @@ export default function BattleResultsReveal({
                                 className="flex-1 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
                                 style={{
                                     background: 'rgba(255,255,255,0.05)',
-                                    color: 'rgba(255,255,255,0.5)',
+                                    color: 'rgba(255,255,255,0.6)',
                                     border: '1px solid rgba(255,255,255,0.1)'
                                 }}
                             >
@@ -550,11 +446,11 @@ export default function BattleResultsReveal({
                 </div>
             )}
 
-            {/* Skip button (visible during animation) */}
+            {/* Skip button during animation */}
             {phase < 4 && phase > 0 && (
                 <button
                     onClick={() => setPhase(4)}
-                    className="absolute bottom-safe right-4 mb-4 px-4 py-2 rounded-full text-xs text-white/40 bg-white/5 border border-white/10 z-50"
+                    className="absolute bottom-safe right-4 mb-4 px-4 py-2 rounded-full text-xs text-white/40 bg-white/5 border border-white/10"
                 >
                     Skip →
                 </button>
