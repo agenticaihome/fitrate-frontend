@@ -472,14 +472,25 @@ export default function ResultsScreen({
         setDisplayedScore(0)
         setAnimationComplete(false)
 
-        const sound = scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
+        const isJackpot = scores.jackpotWin || scores.overall === 100
+        const sound = isJackpot ? 'legendary' : scores.isLegendary ? 'legendary' : (scores.roastMode ? 'roast' : 'success')
 
         const timers = [
             setTimeout(() => {
                 if (!isMounted.current) return
                 playSound(sound)
-                vibrate(scores.isLegendary ? [100, 50, 100, 50, 200] : (scores.roastMode ? [50, 50, 200] : [50, 50, 50]))
+                // Jackpot gets MEGA vibration pattern
+                const vibPattern = isJackpot
+                    ? [200, 100, 200, 100, 200, 100, 300] // MEGA vibration for 100!
+                    : scores.isLegendary
+                        ? [100, 50, 100, 50, 200]
+                        : (scores.roastMode ? [50, 50, 200] : [50, 50, 50])
+                vibrate(vibPattern)
                 setRevealStage(1)
+                // Extra sound for jackpot
+                if (isJackpot) {
+                    setTimeout(() => playSound('legendary'), 300)
+                }
             }, 100),
             setTimeout(() => {
                 if (!isMounted.current) return
