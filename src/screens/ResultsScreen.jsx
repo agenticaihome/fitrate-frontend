@@ -3,6 +3,47 @@ import Footer from '../components/common/Footer'
 import { getScoreColor, getPercentile } from '../utils/scoreUtils'
 
 // ============================================
+// PREMIUM FLOATING PARTICLES
+// ============================================
+const FloatingParticles = ({ accentColor }) => {
+    const particles = useMemo(() =>
+        Array.from({ length: 20 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 2.5,
+            delay: Math.random() * 12,
+            duration: 15 + Math.random() * 15,
+            opacity: 0.15 + Math.random() * 0.25,
+            drift: -25 + Math.random() * 50,
+            color: i % 4 === 0 ? accentColor : i % 3 === 0 ? '#8b5cf6' : '#fff'
+        })), [accentColor]
+    )
+
+    return (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-10px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.color,
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
+
+// ============================================
 // LEGENDARY SCORE-TIER COLORS
 // Ring color reflects SCORE ACHIEVEMENT, not mode
 // ============================================
@@ -682,6 +723,42 @@ export default function ResultsScreen({
                 paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
             }}
         >
+            {/* Premium floating particles */}
+            <FloatingParticles accentColor={ringColors.accent} />
+
+            {/* Cinematic vignette overlay */}
+            <div
+                className="fixed inset-0 pointer-events-none z-[1]"
+                style={{
+                    background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%)'
+                }}
+            />
+
+            {/* Breathing background glow orbs */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                <div
+                    className="absolute w-[500px] h-[500px] rounded-full"
+                    style={{
+                        background: `radial-gradient(circle, ${ringColors.glow} 0%, transparent 70%)`,
+                        top: '20%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        animation: 'glow-breathe 5s ease-in-out infinite',
+                        opacity: 0.3
+                    }}
+                />
+                <div
+                    className="absolute w-[300px] h-[300px] rounded-full"
+                    style={{
+                        background: `radial-gradient(circle, ${modeColors.glow} 0%, transparent 70%)`,
+                        bottom: '10%',
+                        right: '-5%',
+                        animation: 'float-gentle 6s ease-in-out infinite',
+                        opacity: 0.2
+                    }}
+                />
+            </div>
+
             {/* DNA Pattern Overlay */}
             {dnaPatternStyle && (
                 <div
@@ -850,12 +927,33 @@ export default function ResultsScreen({
                         className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
                         style={{ bottom: '-40px' }}
                     >
+                        {/* Breathing glow rings behind badge */}
+                        <div
+                            className="absolute inset-0 rounded-full pointer-events-none"
+                            style={{
+                                border: `2px solid ${theme.accent}30`,
+                                transform: 'scale(1.15)',
+                                animation: animationComplete ? 'ring-breathe 2.5s ease-in-out infinite' : 'none'
+                            }}
+                        />
+                        <div
+                            className="absolute inset-0 rounded-full pointer-events-none"
+                            style={{
+                                border: `1px solid ${theme.accent}20`,
+                                transform: 'scale(1.3)',
+                                animation: animationComplete ? 'ring-breathe 2.5s ease-in-out infinite 0.3s' : 'none'
+                            }}
+                        />
+
                         <div
                             className="relative w-[100px] h-[100px] rounded-full flex flex-col items-center justify-center"
                             style={{
                                 background: '#0a0a15',
                                 border: `4px solid ${theme.accent}`,
-                                boxShadow: `0 0 30px ${theme.glow}, 0 8px 24px rgba(0,0,0,0.5)`
+                                boxShadow: animationComplete
+                                    ? `0 0 40px ${theme.glow}, 0 0 80px ${theme.glow}50, 0 8px 24px rgba(0,0,0,0.5)`
+                                    : `0 0 30px ${theme.glow}, 0 8px 24px rgba(0,0,0,0.5)`,
+                                animation: animationComplete ? 'score-complete-celebration 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                             }}
                         >
                             {/* Score Number */}
@@ -863,7 +961,9 @@ export default function ResultsScreen({
                                 className={`text-4xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
                                 style={{
                                     color: isLegendary ? undefined : '#fff',
-                                    textShadow: `0 0 20px ${theme.glow}`,
+                                    textShadow: animationComplete
+                                        ? `0 0 30px ${theme.glow}, 0 0 60px ${theme.glow}`
+                                        : `0 0 20px ${theme.glow}`,
                                     animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                                 }}
                             >
@@ -873,11 +973,24 @@ export default function ResultsScreen({
                             <span className="text-xs font-bold text-white/40">/100</span>
                         </div>
 
-                        {/* Score ring progress around badge */}
+                        {/* Score ring progress around badge with glow */}
                         <svg
                             className="absolute inset-0 w-full h-full -rotate-90"
                             viewBox="0 0 100 100"
+                            style={{
+                                filter: animationComplete
+                                    ? `drop-shadow(0 0 8px ${theme.glow}) drop-shadow(0 0 16px ${theme.glow})`
+                                    : `drop-shadow(0 0 4px ${theme.glow})`
+                            }}
                         >
+                            {/* Background track */}
+                            <circle
+                                cx="50" cy="50" r="46"
+                                fill="none"
+                                stroke="rgba(255,255,255,0.1)"
+                                strokeWidth="3"
+                            />
+                            {/* Progress ring */}
                             <circle
                                 cx="50" cy="50" r="46"
                                 fill="none"
@@ -886,7 +999,9 @@ export default function ResultsScreen({
                                 strokeLinecap="round"
                                 strokeDasharray="289"
                                 strokeDashoffset={289 - (displayedScore * 2.89)}
-                                style={{ filter: `drop-shadow(0 0 4px ${theme.glow})` }}
+                                style={{
+                                    transition: 'stroke-dashoffset 0.1s ease-out'
+                                }}
                             />
                         </svg>
                     </div>

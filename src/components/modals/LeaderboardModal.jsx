@@ -1,8 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import ModalHeader from '../common/ModalHeader'
 import { vibrate } from '../../utils/soundEffects'
 import EventCountdown from '../common/EventCountdown'
 import WinnerShareCard from './WinnerShareCard'
+
+// Premium floating particles for leaderboard
+const FloatingParticles = () => {
+    const particles = useMemo(() =>
+        Array.from({ length: 8 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 2,
+            delay: Math.random() * 8,
+            duration: 12 + Math.random() * 8,
+            opacity: 0.15 + Math.random() * 0.2,
+            drift: -15 + Math.random() * 30
+        })), []
+    )
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-3xl">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-5px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.id % 2 === 0 ? '#ffd700' : '#fff',
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.id % 2 === 0 ? '#ffd700' : '#fff'}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
 
 export default function LeaderboardModal({
     showLeaderboard,
@@ -61,13 +99,27 @@ export default function LeaderboardModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
             background: 'rgba(0,0,0,0.9)',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)'
         }}>
-            <div className="w-full max-w-sm rounded-3xl p-6 relative" style={{
-                background: 'linear-gradient(180deg, #12121f 0%, #0a0a0f 100%)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+            {/* Background glow */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-[400px] h-[400px] rounded-full" style={{
+                    background: 'radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%)',
+                    top: '20%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: 'glow-breathe 4s ease-in-out infinite'
+                }} />
+            </div>
+
+            <div className="w-full max-w-sm rounded-3xl p-6 relative glass-premium overflow-hidden" style={{
+                background: 'linear-gradient(180deg, rgba(18,18,31,0.95) 0%, rgba(10,10,15,0.98) 100%)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                animation: 'modal-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
             }}>
+                <FloatingParticles />
                 <ModalHeader
                     title="Leaderboard"
                     subtitle={currentEvent?.theme}
@@ -82,11 +134,12 @@ export default function LeaderboardModal({
                     </div>
                 )}
 
-                {/* Prize Banner */}
-                <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center">
-                    <span className="text-sm" aria-hidden="true">👑</span>
-                    <span className="text-yellow-300 font-bold text-sm ml-1">1 YEAR FREE PRO</span>
-                    <span className="text-yellow-400/70 text-xs ml-2">for #1 Winner</span>
+                {/* Prize Banner with shimmer */}
+                <div className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 rounded-xl p-2 mb-3 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+                    <div className="absolute inset-0 shimmer-sweep" />
+                    <span className="text-sm relative" aria-hidden="true">👑</span>
+                    <span className="text-yellow-300 font-bold text-sm ml-1 relative">1 YEAR FREE PRO</span>
+                    <span className="text-yellow-400/70 text-xs ml-2 relative">for #1 Winner</span>
                 </div>
 
                 {/* Leaderboard List */}

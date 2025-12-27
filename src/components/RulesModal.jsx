@@ -1,14 +1,69 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import ModalHeader from './common/ModalHeader';
+
+// Premium floating particles
+const FloatingParticles = () => {
+    const particles = useMemo(() =>
+        Array.from({ length: 6 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 1 + Math.random() * 2,
+            delay: Math.random() * 8,
+            duration: 12 + Math.random() * 8,
+            opacity: 0.15 + Math.random() * 0.2,
+            drift: -15 + Math.random() * 30
+        })), []
+    )
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-3xl">
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-5px',
+                        width: p.size,
+                        height: p.size,
+                        background: p.id % 2 === 0 ? '#10b981' : '#fff',
+                        opacity: p.opacity,
+                        boxShadow: `0 0 ${p.size * 2}px ${p.id % 2 === 0 ? '#10b981' : '#fff'}`,
+                        animation: `particle-float ${p.duration}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+        </div>
+    )
+}
 
 export default function RulesModal({ onClose, event }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{
             background: 'rgba(0,0,0,0.95)',
-            backdropFilter: 'blur(5px)',
-            zIndex: 60 // Ensure it's above other modals if needed
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            zIndex: 60
         }}>
-            <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-white/10 overflow-hidden shadow-2xl">
+            {/* Background glow */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-[350px] h-[350px] rounded-full" style={{
+                    background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)',
+                    top: '25%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: 'glow-breathe 4s ease-in-out infinite'
+                }} />
+            </div>
+
+            <div className="w-full max-w-sm rounded-3xl glass-premium border border-white/10 overflow-hidden relative" style={{
+                background: 'linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(10,15,25,0.98) 100%)',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+                animation: 'modal-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}>
+                <FloatingParticles />
                 <div className="p-6 pb-0">
                     <ModalHeader
                         title="Event Rules"
@@ -59,9 +114,13 @@ export default function RulesModal({ onClose, event }) {
                 <div className="p-6 pt-0">
                     <button
                         onClick={onClose}
-                        className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all active:scale-95 shadow-lg shadow-emerald-900/20"
+                        className="w-full py-3.5 rounded-xl text-white font-bold transition-all active:scale-95 btn-premium-shine relative overflow-hidden"
+                        style={{
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            boxShadow: '0 8px 30px rgba(16,185,129,0.4), 0 0 0 1px rgba(16,185,129,0.3)'
+                        }}
                     >
-                        I Understand ✓
+                        I Understand
                     </button>
                 </div>
             </div>
