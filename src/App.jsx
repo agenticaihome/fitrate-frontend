@@ -873,9 +873,11 @@ export default function App() {
   }
 
   // Fetch daily challenge leaderboard
-  const fetchDailyLeaderboard = async () => {
+  // bustCache: add timestamp to bypass service worker cache (used on day reset)
+  const fetchDailyLeaderboard = async (bustCache = false) => {
     try {
-      const res = await fetch(`${API_BASE}/leaderboard/today?userId=${encodeURIComponent(userId)}`, { headers: getApiHeaders() })
+      const cacheParam = bustCache ? `&_t=${Date.now()}` : ''
+      const res = await fetch(`${API_BASE}/leaderboard/today?userId=${encodeURIComponent(userId)}${cacheParam}`, { headers: getApiHeaders() })
       const data = await res.json()
       if (data.success) {
         setDailyLeaderboard(data.leaderboard || [])
