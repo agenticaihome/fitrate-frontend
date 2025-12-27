@@ -3,6 +3,8 @@ import { playSound, vibrate } from './utils/soundEffects'
 import RulesModal from './components/RulesModal'
 import Footer from './components/common/Footer'
 import BottomNav from './components/common/BottomNav'
+import PWAUpdateBanner from './components/common/PWAUpdateBanner'
+import PWAStatusBar from './components/common/PWAStatusBar'
 import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants'
 import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
@@ -2363,6 +2365,9 @@ export default function App() {
   if (screen === 'challenges') {
     return (
       <Suspense fallback={<LoadingFallback />}>
+        <>
+        {/* PWA Status Bar */}
+        <PWAStatusBar isStandalone={isStandalone} />
         <ChallengesScreen
           // Daily challenge props
           dailyLeaderboard={dailyLeaderboard}
@@ -2392,6 +2397,7 @@ export default function App() {
           fetchDailyLeaderboard={fetchDailyLeaderboard}
           fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
         />
+        </>
       </Suspense>
     )
   }
@@ -2527,6 +2533,10 @@ export default function App() {
   if (screen === 'home' && !showPaywall && !showLeaderboard && !showRules) {
     return (
       <>
+        {/* PWA Status Bar - Premium glass effect at top */}
+        <PWAStatusBar isStandalone={isStandalone} />
+        {/* PWA Update Button - Shows in standalone mode */}
+        <PWAUpdateBanner isStandalone={isStandalone} />
         <HomeScreen
           mode={mode}
           setMode={setMode}
@@ -2745,6 +2755,8 @@ export default function App() {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <>
+          {/* PWA Status Bar */}
+          <PWAStatusBar isStandalone={isStandalone} />
           <ResultsScreen
             scores={scores}
             cardDNA={cardDNA}
