@@ -27,6 +27,10 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 5 // 5 minutes
+              },
+              // Only cache successful responses (200), not redirects (3xx)
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }
