@@ -212,17 +212,17 @@ export default function ChallengesScreen({
                                     </div>
                                 </div>
 
-                                {/* Prize + Timer Card */}
+                                {/* Timer Card */}
                                 <div className="rounded-2xl p-4" style={{
                                     background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
                                     border: '1px solid rgba(59, 130, 246, 0.3)'
                                 }}>
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-2xl">🎁</span>
+                                            <span className="text-2xl">🏅</span>
                                             <div>
-                                                <p className="text-blue-300 font-bold">5 FREE PRO SCANS</p>
-                                                <p className="text-white/50 text-xs">Prize for #1</p>
+                                                <p className="text-blue-300 font-bold">BRAGGING RIGHTS</p>
+                                                <p className="text-white/50 text-xs">Top the leaderboard!</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -365,17 +365,17 @@ export default function ChallengesScreen({
                                     <p className="text-white/60 text-sm">This week's theme</p>
                                 </div>
 
-                                {/* Prize + Timer Card */}
+                                {/* Timer Card */}
                                 <div className="rounded-2xl p-4" style={{
                                     background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)',
                                     border: '1px solid rgba(16, 185, 129, 0.3)'
                                 }}>
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-2xl">👑</span>
+                                            <span className="text-2xl">🏅</span>
                                             <div>
-                                                <p className="text-yellow-300 font-bold">1 YEAR FREE PRO</p>
-                                                <p className="text-white/50 text-xs">Prize for #1</p>
+                                                <p className="text-emerald-300 font-bold">BRAGGING RIGHTS</p>
+                                                <p className="text-white/50 text-xs">Top the leaderboard!</p>
                                             </div>
                                         </div>
                                         {currentEvent.endDate && (

@@ -13,10 +13,6 @@ export const LIMITS = {
     // Weekly Event
     FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
     PRO_EVENT_ENTRIES_DAILY: 5,    // Pro users can submit up to 5/day
-    WINNER_COOLDOWN_WEEKS: 4,      // Previous winners sit out 4 weeks
-
-    // Referral Rewards: 3 shares = 1 Savage Roast
-    SHARES_PER_SAVAGE_ROAST: 3,
 };
 
 export const PRICES = {

@@ -835,7 +835,7 @@ export default function HomeScreen({
                         Get the highest score today!
                     </p>
                     <p className="text-xs text-blue-300/70">
-                        #1 wins 5 free Pro scans 🎁
+                        Compete for bragging rights!
                     </p>
                 </div>
             )}
@@ -1119,7 +1119,7 @@ export default function HomeScreen({
 
                                     {/* Subtitle - mode-specific description */}
                                     <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                        {dailyChallengeMode ? `${getDailyMode().label} mode • Win 5 Pro scans!`
+                                        {dailyChallengeMode ? `${getDailyMode().label} mode • Bragging rights!`
                                             : entryBlocked ? 'Entry used today'
                                                 : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
                                                     : mode === 'nice' ? 'Supportive AI feedback'
@@ -1415,7 +1415,7 @@ export default function HomeScreen({
                         </div>
                         <span className="relative text-3xl block mb-1 drop-shadow-lg">🏆</span>
                         <span className="relative text-white font-bold text-sm block">Challenges</span>
-                        <span className="relative text-teal-100/80 text-[11px]">Daily & Weekly prizes</span>
+                        <span className="relative text-teal-100/80 text-[11px]">Daily & Weekly challenges</span>
                     </button>
                 )}
             </div>
