@@ -386,7 +386,9 @@ export default function ResultsScreen({
     fashionShowName = null,
     onReturnToRunway = null,
     dailyStreak = null,  // Daily streak data { current, max, emoji, message, tier, isMilestone, milestone }
-    showToast = null  // Toast function for streak celebration
+    showToast = null,  // Toast function for streak celebration
+    pendingBattleId = null,  // Battle ID if user just responded to a battle challenge
+    onSeeBattleResults = null  // Callback to navigate to battle results
 }) {
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
@@ -1375,6 +1377,28 @@ export default function ResultsScreen({
 
             {/* ===== CTAs - Simplified ===== */}
             <div className={`w-full max-w-sm px-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+                {/* Battle Results CTA - Show when user just responded to a battle */}
+                {pendingBattleId && onSeeBattleResults && (
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(50)
+                            onSeeBattleResults()
+                        }}
+                        className="w-full py-5 mb-4 rounded-2xl font-black text-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]"
+                        style={{
+                            background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%)',
+                            boxShadow: '0 8px 32px rgba(139,92,246,0.5)',
+                            color: '#fff',
+                            animation: 'pulse 2s ease-in-out infinite'
+                        }}
+                    >
+                        <span className="text-2xl">⚔️</span>
+                        <span>See Battle Results!</span>
+                        <span className="text-2xl">🏆</span>
+                    </button>
+                )}
+
                 {/* Two share options in a row */}
                 <div className="flex gap-3 mb-3">
                     {/* Challenge - Competitive share */}

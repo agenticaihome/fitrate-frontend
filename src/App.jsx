@@ -293,6 +293,9 @@ export default function App() {
   // Store last analyzed image thumbnail for battle photo display
   const [lastAnalyzedThumb, setLastAnalyzedThumb] = useState(null)
 
+  // Store pending battle ID when responder needs to see results before battle comparison
+  const [pendingBattleId, setPendingBattleId] = useState(null)
+
   // ============================================
   // FASHION SHOW STATE
   // ============================================
@@ -1581,6 +1584,7 @@ export default function App() {
 
         // ============================================
         // BATTLE ROOM - Submit responder score if responding to a battle (FREE USERS)
+        // Show results card first, then let them see battle comparison
         // ============================================
         const respondingBattleId = localStorage.getItem('fitrate_responding_challenge')
         if (respondingBattleId) {
@@ -1600,24 +1604,13 @@ export default function App() {
             // Clear the pending battle flag
             localStorage.removeItem('fitrate_responding_challenge')
 
-            // Navigate to battle room to see results
-            setChallengePartyId(respondingBattleId)
-            window.history.pushState({}, '', `/c/${respondingBattleId}`)
-            // Fetch the updated battle data
-            setChallengePartyLoading(true)
-            try {
-              const partyRes = await fetch(`${API_BASE}/battle/${respondingBattleId}`, {
-                headers: getApiHeaders()
-              })
-              if (partyRes.ok) {
-                const partyData = await partyRes.json()
-                setChallengePartyData(partyData)
-              }
-            } finally {
-              setChallengePartyLoading(false)
-            }
+            // Store battle ID so results screen can show "See Battle Results" CTA
+            setPendingBattleId(respondingBattleId)
+
+            // Show results screen first - user can tap "See Battle Results" to see comparison
             setIsAnalyzing(false)
-            return // Don't navigate to normal results, let BattleRoom render
+            setScreen('results')
+            return
           } catch (err) {
             console.error('[Battle] Failed to submit free user response:', err)
             localStorage.removeItem('fitrate_responding_challenge')
@@ -1774,23 +1767,12 @@ export default function App() {
           // Clear the pending challenge
           localStorage.removeItem('fitrate_responding_challenge')
 
-          // Navigate to challenge party screen to see results
-          setChallengePartyId(respondingChallengeId)
-          window.history.pushState({}, '', `/c/${respondingChallengeId}`)
-          // Fetch the updated challenge data
-          setChallengePartyLoading(true)
-          try {
-            const partyRes = await fetch(`${API_BASE}/battle/${respondingChallengeId}`, {
-              headers: getApiHeaders()
-            })
-            if (partyRes.ok) {
-              const partyData = await partyRes.json()
-              setChallengePartyData(partyData)
-            }
-          } finally {
-            setChallengePartyLoading(false)
-          }
-          return // Don't navigate to normal results, let ChallengePartyScreen render
+          // Store battle ID so results screen can show "See Battle Results" CTA
+          setPendingBattleId(respondingChallengeId)
+
+          // Show results screen first - user can tap "See Battle Results" to see comparison
+          setScreen('results')
+          return
         } catch (err) {
           console.error('[Challenge] Failed to submit response:', err)
           localStorage.removeItem('fitrate_responding_challenge')
@@ -2605,6 +2587,26 @@ export default function App() {
               setFashionShowScreen('runway')
               setScores(null)
               setScreen('home')
+            }}
+            pendingBattleId={pendingBattleId}
+            onSeeBattleResults={async () => {
+              if (!pendingBattleId) return
+              // Navigate to battle room to see comparison
+              setChallengePartyId(pendingBattleId)
+              window.history.pushState({}, '', `/c/${pendingBattleId}`)
+              setChallengePartyLoading(true)
+              try {
+                const partyRes = await fetch(`${API_BASE}/battle/${pendingBattleId}`, {
+                  headers: getApiHeaders()
+                })
+                if (partyRes.ok) {
+                  const partyData = await partyRes.json()
+                  setChallengePartyData(partyData)
+                }
+              } finally {
+                setChallengePartyLoading(false)
+              }
+              setPendingBattleId(null)  // Clear pending battle
             }}
           />
           <BottomNav
