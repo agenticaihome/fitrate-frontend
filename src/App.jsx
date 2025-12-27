@@ -372,6 +372,54 @@ export default function App() {
     })
   }
 
+  // ============================================
+  // ACTIVE BATTLES - Track user's ongoing 1v1 battles
+  // ============================================
+  const [activeBattles, setActiveBattles] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fitrate_active_battles')
+      if (saved) {
+        const battles = JSON.parse(saved)
+        // Filter out expired battles (older than 24 hours)
+        const now = Date.now()
+        const maxAge = 24 * 60 * 60 * 1000 // 24 hours
+        return battles.filter(b => (now - b.createdAt) < maxAge)
+      }
+    } catch (e) {
+      console.error('[Battle] Failed to parse active battles:', e)
+    }
+    return []
+  })
+
+  // Helper to add a battle to active battles list
+  const addToActiveBattles = (battleId, myScore, mode = 'nice', status = 'waiting') => {
+    setActiveBattles(prev => {
+      // Don't add duplicates
+      if (prev.some(b => b.battleId === battleId)) return prev
+      const updated = [...prev, { battleId, myScore, mode, status, createdAt: Date.now() }]
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Helper to remove a battle from active battles
+  const removeFromActiveBattles = (battleId) => {
+    setActiveBattles(prev => {
+      const updated = prev.filter(b => b.battleId !== battleId)
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Helper to update battle status
+  const updateBattleStatus = (battleId, status) => {
+    setActiveBattles(prev => {
+      const updated = prev.map(b => b.battleId === battleId ? { ...b, status } : b)
+      localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Purchased scans (from scan packs)
   const [purchasedScans, setPurchasedScans] = useState(0)
 
@@ -1897,6 +1945,8 @@ export default function App() {
             const created = JSON.parse(localStorage.getItem('fitrate_created_challenges') || '[]')
             created.push(data.challengeId)
             localStorage.setItem('fitrate_created_challenges', JSON.stringify(created))
+            // Add to active battles list (shows in "My Battles" on home screen)
+            addToActiveBattles(data.challengeId, scores.overall, mode, 'waiting')
             console.log('[Battle] Created room:', data.challengeId)
           }
         } catch (err) {
@@ -2503,6 +2553,41 @@ export default function App() {
           }}
           onRemoveShow={(showId) => {
             removeFromActiveShows(showId)
+          }}
+          activeBattles={activeBattles}
+          onNavigateToBattle={async (battleId) => {
+            // Navigate to a battle room
+            setChallengePartyId(battleId)
+            window.history.pushState({}, '', `/c/${battleId}`)
+            setChallengePartyLoading(true)
+            try {
+              const res = await fetch(`${API_BASE}/battle/${battleId}`, {
+                headers: getApiHeaders()
+              })
+              if (res.ok) {
+                const data = await res.json()
+                setChallengePartyData(data)
+                // If battle is completed, show the reveal animation
+                if (data.status === 'completed') {
+                  setShowBattleReveal(true)
+                }
+              } else {
+                // Battle not found - remove from list
+                removeFromActiveBattles(battleId)
+                setChallengePartyId(null)
+                window.history.pushState({}, '', '/')
+              }
+            } catch (err) {
+              console.error('[Battle] Failed to load:', err)
+              removeFromActiveBattles(battleId)
+              setChallengePartyId(null)
+              window.history.pushState({}, '', '/')
+            } finally {
+              setChallengePartyLoading(false)
+            }
+          }}
+          onRemoveBattle={(battleId) => {
+            removeFromActiveBattles(battleId)
           }}
           onNavigate={(target) => {
             // General navigation for mode drawer links (judges, etc.)
