@@ -429,12 +429,9 @@ export default function HomeScreen({
 
     // Handle camera opening after scan type is chosen (or directly if no choice needed)
     const proceedToCamera = () => {
-        if (isAndroid()) {
-            // Android: Show dual-button picker modal
+        if (isAndroid() || isIOS()) {
+            // Mobile: Show photo picker modal (Take Photo vs Upload)
             setShowAndroidPhotoModal(true)
-        } else if (isIOS()) {
-            // iOS: Open native Camera app directly (not our custom camera view)
-            document.getElementById('androidCameraInput')?.click()
         } else {
             // Desktop: Use getUserMedia for live camera preview
             startCamera()
@@ -1111,23 +1108,6 @@ export default function HomeScreen({
                                         <span className="text-sm text-white/60">✕ Exit Challenge</span>
                                     </button>
                                 )}
-                            </button>
-
-                            {/* Upload from Gallery option */}
-                            <button
-                                onClick={() => {
-                                    playSound('click')
-                                    vibrate(10)
-                                    document.getElementById('androidGalleryInput')?.click()
-                                }}
-                                className="mt-4 px-4 py-2 rounded-full text-sm font-medium transition-all active:scale-95"
-                                style={{
-                                    background: 'rgba(255,255,255,0.08)',
-                                    border: '1px solid rgba(255,255,255,0.15)',
-                                    color: 'rgba(255,255,255,0.6)'
-                                }}
-                            >
-                                📁 Or upload from gallery
                             </button>
                         </div>
                     )
