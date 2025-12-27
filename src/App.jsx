@@ -1659,6 +1659,9 @@ export default function App() {
             // The backend returns the full updated battle with status: 'completed'
             // Trigger the dramatic battle reveal animation immediately!
             if (battleResult && battleResult.status === 'completed') {
+              // Add this battle to responder's active battles list (so it shows in "My Battles")
+              addToActiveBattles(respondingBattleId, overall, battleResult.mode || 'nice', 'completed')
+
               setChallengePartyId(respondingBattleId)
               setChallengePartyData(battleResult)
               setIsCreatorOfChallenge(false) // We are the responder
@@ -1832,6 +1835,9 @@ export default function App() {
           // The backend returns the full updated battle with status: 'completed'
           // Trigger the dramatic battle reveal animation immediately!
           if (challengeResult && challengeResult.status === 'completed') {
+            // Add this battle to responder's active battles list (so it shows in "My Battles")
+            addToActiveBattles(respondingChallengeId, overall, challengeResult.mode || 'nice', 'completed')
+
             setChallengePartyId(respondingChallengeId)
             setChallengePartyData(challengeResult)
             setIsCreatorOfChallenge(false) // We are the responder
