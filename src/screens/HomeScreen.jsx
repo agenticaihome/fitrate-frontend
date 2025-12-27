@@ -1207,7 +1207,9 @@ export default function HomeScreen({
                             onClick={() => {
                                 playSound('click')
                                 vibrate(20)
-                                alert('To enter Global Arena:\n\n1. Take a photo of your outfit\n2. Get your score\n3. Tap "Battle Anyone" on your results\n\nComing soon: Direct arena entry!')
+                                // Trigger camera flow - same as main CTA
+                                // After scan, user will see "Battle Anyone" button on results
+                                handleStart()
                             }}
                             className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97]"
                             style={{
