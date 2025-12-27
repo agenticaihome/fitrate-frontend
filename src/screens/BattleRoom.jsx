@@ -206,7 +206,8 @@ export default function BattleRoom({
         if (isAndroid()) {
             setShowAndroidPhotoModal(true)
         } else if (isIOS()) {
-            document.getElementById('battleCameraInput')?.click()
+            // iOS: Use gallery input - shows native picker with camera + gallery options
+            document.getElementById('battleGalleryInput')?.click()
         } else {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
