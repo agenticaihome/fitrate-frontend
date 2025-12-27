@@ -76,9 +76,24 @@ export default function ChallengesScreen({
     const [dailyTimeRemaining, setDailyTimeRemaining] = useState('')
 
     // Calculate time until midnight for daily reset
+    // Also reset leaderboard when day changes
     useEffect(() => {
+        // Track the current day to detect when it changes
+        let currentDay = new Date().toDateString()
+
         const updateDailyCountdown = () => {
             const now = new Date()
+            const today = now.toDateString()
+
+            // Check if day has changed (midnight passed)
+            if (today !== currentDay) {
+                currentDay = today
+                // Reset leaderboard when new day starts
+                if (fetchDailyLeaderboard) {
+                    fetchDailyLeaderboard()
+                }
+            }
+
             const midnight = new Date(now)
             midnight.setHours(24, 0, 0, 0)
             const diff = midnight - now
@@ -91,7 +106,7 @@ export default function ChallengesScreen({
         updateDailyCountdown()
         const interval = setInterval(updateDailyCountdown, 60000)
         return () => clearInterval(interval)
-    }, [])
+    }, [fetchDailyLeaderboard])
 
     // Fetch data when tab changes
     useEffect(() => {
