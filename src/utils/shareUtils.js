@@ -118,171 +118,113 @@ export const generateShareCard = async ({
                 })
             ])
 
-            // ===== SCORE-BASED COLOR SYSTEM (HARD-SPEC ranges) =====
+            // ===== SCORE-BASED COLOR SYSTEM =====
             const score = Math.round(scores.overall)
-            const getScoreBadgeColors = () => {
-                // HARD-SPEC: exact color tiers
-                if (score >= 90) return { from: '#ffd700', to: '#fff8dc' }      // 90+ → Gold → soft white
-                if (score >= 80) return { from: '#50C878', to: '#98FB98' }      // 80-89 → Green → mint
-                if (score >= 70) return { from: '#20B2AA', to: '#50C878' }      // 70-79 → Teal → green
-                if (score >= 50) return { from: '#DAA520', to: '#20B2AA' }      // 50-69 → Amber → teal
-                return { from: '#CD853F', to: '#DAA520' }                        // 0-49 → Muted amber / tired orange
-            }
-            const badgeColors = getScoreBadgeColors()
-
-            // ===== DARK PREMIUM BACKGROUND =====
-            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
-            bgGradient.addColorStop(0, '#0a0a12')
-            bgGradient.addColorStop(0.5, '#0f0f18')
-            bgGradient.addColorStop(1, '#0a0a12')
-            ctx.fillStyle = bgGradient
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-            // Subtle warm accent glow (right side) - restrained
-            const accentGlow = ctx.createRadialGradient(canvas.width, canvas.height * 0.4, 0, canvas.width, canvas.height * 0.4, 400)
-            accentGlow.addColorStop(0, `${badgeColors.from}15`)
-            accentGlow.addColorStop(1, 'transparent')
-            ctx.fillStyle = accentGlow
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-            // ===== SECTION 1: HERO IMAGE (60-65% of height) =====
-            const imageMargin = 40
-            const imageWidth = canvas.width - (imageMargin * 2)
-            const imageHeight = Math.floor(canvas.height * 0.62)  // 62% of canvas
-            const imageY = 60
-            const imageRadius = 24
-
-            // Draw image with rounded corners
-            ctx.save()
-            ctx.beginPath()
-            ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
-            ctx.clip()
-
-            // Cover scaling for image (TIGHTER CROP - 8% more zoom, face in upper third)
-            const imgAspect = img.width / img.height
-            const targetAspect = imageWidth / imageHeight
-            let drawWidth, drawHeight, drawX, drawY
-            const cropTightness = 1.08  // 8% tighter crop
-
-            if (imgAspect > targetAspect) {
-                drawHeight = imageHeight * cropTightness
-                drawWidth = drawHeight * imgAspect
-                drawX = imageMargin + (imageWidth - drawWidth) / 2
-                drawY = imageY - (drawHeight - imageHeight) * 0.3  // Shift up for face focus
-            } else {
-                drawWidth = imageWidth * cropTightness
-                drawHeight = drawWidth / imgAspect
-                drawX = imageMargin - (drawWidth - imageWidth) / 2
-                drawY = imageY - (drawHeight - imageHeight) * 0.3  // Shift up for face focus
-            }
-            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-
-            // Vignette fade at bottom for text legibility
-            const vignette = ctx.createLinearGradient(0, imageY + imageHeight - 200, 0, imageY + imageHeight)
-            vignette.addColorStop(0, 'transparent')
-            vignette.addColorStop(1, 'rgba(0,0,0,0.6)')
-            ctx.fillStyle = vignette
-            ctx.fillRect(imageMargin, imageY, imageWidth, imageHeight)
-
-            // MODE-COLORED OVERLAY - subtle tint matching mode energy
             const currentMode = scores.mode || 'honest'
             const modeConfig = MODE_CONFIG[currentMode] || MODE_CONFIG.honest
             const modeGradientMatch = modeConfig.gradient.match(/#[a-fA-F0-9]{6}/g)
             const modeColor = modeGradientMatch ? modeGradientMatch[0] : '#3b82f6'
 
-            // Subtle color wash from top
-            const colorWash = ctx.createLinearGradient(0, imageY, 0, imageY + imageHeight * 0.4)
-            colorWash.addColorStop(0, `${modeColor}25`)  // 15% opacity at top
-            colorWash.addColorStop(1, 'transparent')
-            ctx.fillStyle = colorWash
-            ctx.fillRect(imageMargin, imageY, imageWidth, imageHeight)
+            // Get score ring color based on score tier
+            const getScoreRingColor = () => {
+                if (score >= 90) return { from: '#ffd700', to: '#ff8c00' }  // Gold
+                if (score >= 75) return { from: '#00ff88', to: '#00d4ff' }  // Green-Cyan
+                if (score >= 60) return { from: '#00d4ff', to: '#3b82f6' }  // Blue
+                if (score >= 40) return { from: '#f59e0b', to: '#ef4444' }  // Amber-Red
+                return { from: '#ef4444', to: '#dc2626' }  // Red
+            }
+            const ringColors = getScoreRingColor()
 
-            ctx.restore()
+            // ===== FULL-BLEED PHOTO BACKGROUND =====
+            // Photo fills entire canvas - this is the key to the clean look
+            const imgAspect = img.width / img.height
+            const canvasAspect = canvas.width / canvas.height
+            let drawWidth, drawHeight, drawX, drawY
 
-            // GLOWING border around image - THICK and bold
-            ctx.shadowColor = modeColor
-            ctx.shadowBlur = 60
-            ctx.strokeStyle = modeColor
-            ctx.lineWidth = 8  // WIDER border
-            ctx.beginPath()
-            ctx.roundRect(imageMargin, imageY, imageWidth, imageHeight, imageRadius)
-            ctx.stroke()
-            ctx.shadowBlur = 0
+            // Cover scaling - fill entire canvas, crop as needed
+            if (imgAspect > canvasAspect) {
+                drawHeight = canvas.height
+                drawWidth = drawHeight * imgAspect
+                drawX = (canvas.width - drawWidth) / 2
+                drawY = 0
+            } else {
+                drawWidth = canvas.width
+                drawHeight = drawWidth / imgAspect
+                drawX = 0
+                drawY = (canvas.height - drawHeight) / 3  // Bias upward for face
+            }
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight)
 
-            // Inner subtle white border for polish
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            ctx.roundRect(imageMargin + 4, imageY + 4, imageWidth - 8, imageHeight - 8, imageRadius - 4)
-            ctx.stroke()
+            // ===== GRADIENT OVERLAYS FOR TEXT LEGIBILITY =====
+            // Top gradient for mode badge area
+            const topGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.25)
+            topGradient.addColorStop(0, 'rgba(0,0,0,0.5)')
+            topGradient.addColorStop(1, 'transparent')
+            ctx.fillStyle = topGradient
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.3)
 
-            // ===== SECTION 2: SCORE BADGE - DOUBLED SIZE =====
-            const badgeSize = 240  // DOUBLED from 170
+            // Bottom gradient for text content
+            const bottomGradient = ctx.createLinearGradient(0, canvas.height * 0.45, 0, canvas.height)
+            bottomGradient.addColorStop(0, 'transparent')
+            bottomGradient.addColorStop(0.3, 'rgba(0,0,0,0.4)')
+            bottomGradient.addColorStop(1, 'rgba(0,0,0,0.85)')
+            ctx.fillStyle = bottomGradient
+            ctx.fillRect(0, canvas.height * 0.4, canvas.width, canvas.height * 0.6)
+
+            // ===== SCORE RING - Centered in middle-lower area =====
+            const badgeSize = 280
             const badgeX = canvas.width / 2
-            const badgeY = imageY + imageHeight - badgeSize * 0.30  // More overlap
+            const badgeY = canvas.height * 0.48  // Positioned in upper-middle
 
-            // Badge outer glow - MODE color
-            ctx.shadowColor = modeColor
-            ctx.shadowBlur = 60
-
-            // Badge ring gradient - MODE colors
-            const badgeGradient = ctx.createLinearGradient(
+            // Ring gradient
+            const ringGradient = ctx.createLinearGradient(
                 badgeX - badgeSize / 2, badgeY - badgeSize / 2,
                 badgeX + badgeSize / 2, badgeY + badgeSize / 2
             )
-            if (modeGradientMatch && modeGradientMatch.length >= 2) {
-                badgeGradient.addColorStop(0, modeGradientMatch[0])
-                badgeGradient.addColorStop(1, modeGradientMatch[1])
-            } else {
-                badgeGradient.addColorStop(0, '#3b82f6')
-                badgeGradient.addColorStop(1, '#06b6d4')
-            }
+            ringGradient.addColorStop(0, ringColors.from)
+            ringGradient.addColorStop(1, ringColors.to)
 
-            // Draw ring - THICKER
+            // Outer glow
+            ctx.shadowColor = ringColors.from
+            ctx.shadowBlur = 40
+
+            // Draw ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
-            ctx.strokeStyle = badgeGradient
-            ctx.lineWidth = 16  // Thicker ring
+            ctx.strokeStyle = ringGradient
+            ctx.lineWidth = 14
             ctx.stroke()
             ctx.shadowBlur = 0
 
-            // Badge inner dark fill
+            // Semi-transparent dark fill inside ring
             ctx.beginPath()
-            ctx.arc(badgeX, badgeY, badgeSize / 2 - 14, 0, Math.PI * 2)
-            ctx.fillStyle = '#0f0f18'
+            ctx.arc(badgeX, badgeY, badgeSize / 2 - 12, 0, Math.PI * 2)
+            ctx.fillStyle = 'rgba(0,0,0,0.65)'
             ctx.fill()
 
-            // Score number - DOUBLED
+            // Score number
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 130px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 140px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(score.toString(), badgeX, badgeY - 16)
+            ctx.fillText(score.toString(), badgeX, badgeY - 15)
 
-            // /100 below score - bigger
-            ctx.fillStyle = 'rgba(255,255,255,0.6)'
-            ctx.font = '36px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText('/100', badgeX, badgeY + 58)
+            // /100 label
+            ctx.fillStyle = 'rgba(255,255,255,0.7)'
+            ctx.font = '38px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillText('/100', badgeX, badgeY + 60)
 
-            // ===== SECTION 3: MODE BADGE - adjust for larger score badge =====
-            const modeBadgeY = imageY + imageHeight + 100  // More space for bigger badge
-            const modeBadgeHeight = 56
+            // ===== MODE BADGE - Below score ring =====
+            const modeBadgeY = badgeY + badgeSize / 2 + 35
+            const modeBadgeHeight = 52
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
-            // Measure mode badge width - BIGGER font
-            ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
             const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
-            const modeBadgeWidth = modeBadgeTextWidth + 48
+            const modeBadgeWidth = modeBadgeTextWidth + 40
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
 
-            // Use mode color for glow
-            const modeGlowColor = modeColor
-
-            // Mode badge glow
-            ctx.shadowColor = modeGlowColor
-            ctx.shadowBlur = 20
-
-            // Mode badge gradient background
+            // Mode badge background
             const modeBadgeGradient = ctx.createLinearGradient(modeBadgeX, modeBadgeY, modeBadgeX + modeBadgeWidth, modeBadgeY)
             if (modeGradientMatch && modeGradientMatch.length >= 2) {
                 modeBadgeGradient.addColorStop(0, modeGradientMatch[0])
@@ -296,88 +238,97 @@ export const generateShareCard = async ({
             ctx.beginPath()
             ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
             ctx.fill()
-            ctx.shadowBlur = 0
 
-            // Mode badge text - MASSIVE
+            // Mode badge text
             ctx.fillStyle = modeConfig.textColor
-            ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
 
-            // ===== SECTION 4: VERDICT HEADLINE - HUGE for mobile =====
-            const verdictY = modeBadgeY + modeBadgeHeight + 70  // More space after mode badge
+            // ===== VERDICT HEADLINE =====
+            const verdictY = modeBadgeY + modeBadgeHeight + 55
             const verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
             ctx.fillStyle = '#ffffff'
-            ctx.font = '800 64px -apple-system, BlinkMacSystemFont, sans-serif'  // MASSIVE - grandma can read it
+            ctx.font = '800 56px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'alphabetic'
 
-            // Wrap to multiple lines - that's fine, makes it readable
-            const verdictLines = wrapText(ctx, verdict, canvas.width - 100)
-            verdictLines.slice(0, 3).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, verdictY + (i * 72))
+            const verdictLines = wrapText(ctx, verdict, canvas.width - 80)
+            verdictLines.slice(0, 2).forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, verdictY + (i * 64))
             })
 
-            // ===== SECTION 5: CTA BUTTON - matches MODE color =====
-            const ctaY = verdictY + (verdictLines.length * 72) + 50
-            const ctaWidth = 580
-            const ctaHeight = 88
-            const ctaX = (canvas.width - ctaWidth) / 2
-            const ctaText = pickRandom(CTA_VARIANTS)
-            const ctaRadius = 22
+            // ===== AI INSIGHT (subtitle) =====
+            const insightY = verdictY + (Math.min(verdictLines.length, 2) * 64) + 25
+            const insightPool = score >= 75 ? AI_INSIGHT_POOLS.high : score >= 50 ? AI_INSIGHT_POOLS.mid : AI_INSIGHT_POOLS.low
+            const insight = scores.insight || pickRandom(insightPool)
 
-            // CTA gradient matches mode color
+            ctx.fillStyle = 'rgba(255,255,255,0.7)'
+            ctx.font = '32px -apple-system, BlinkMacSystemFont, sans-serif'
+            const insightLines = wrapText(ctx, insight, canvas.width - 100)
+            insightLines.slice(0, 2).forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, insightY + (i * 38))
+            })
+
+            // ===== SUBSCORES ROW =====
+            const subscoreY = canvas.height - 220
+            const subscores = [
+                { icon: '🎨', label: 'Color', value: scores.color || Math.round(score + (Math.random() * 6 - 3)) },
+                { icon: '👔', label: 'Fit', value: scores.fit || Math.round(score + (Math.random() * 6 - 3)) },
+                { icon: '✨', label: 'Style', value: scores.style || Math.round(score + (Math.random() * 6 - 3)) }
+            ]
+
+            const subscoreWidth = 180
+            const subscoreGap = 30
+            const totalSubscoreWidth = (subscoreWidth * 3) + (subscoreGap * 2)
+            const subscoreStartX = (canvas.width - totalSubscoreWidth) / 2
+
+            // Background pill for subscores
+            ctx.fillStyle = 'rgba(0,0,0,0.5)'
+            ctx.beginPath()
+            ctx.roundRect(subscoreStartX - 20, subscoreY - 15, totalSubscoreWidth + 40, 70, 35)
+            ctx.fill()
+
+            subscores.forEach((sub, i) => {
+                const x = subscoreStartX + (i * (subscoreWidth + subscoreGap)) + subscoreWidth / 2
+
+                // Icon and label
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'
+                ctx.font = '26px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'center'
+                ctx.fillText(`${sub.icon} ${sub.label}`, x - 30, subscoreY + 25)
+
+                // Value
+                ctx.fillStyle = '#ffffff'
+                ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText(sub.value.toString(), x + 60, subscoreY + 26)
+            })
+
+            // ===== CTA BUTTON =====
+            const ctaY = canvas.height - 120
+            const ctaWidth = 620
+            const ctaHeight = 80
+            const ctaX = (canvas.width - ctaWidth) / 2
+            const ctaText = 'Post yours → fitrate.app'
+
+            // Green gradient for CTA
             const ctaGradient = ctx.createLinearGradient(ctaX, ctaY, ctaX + ctaWidth, ctaY)
-            if (modeGradientMatch && modeGradientMatch.length >= 2) {
-                ctaGradient.addColorStop(0, modeGradientMatch[0])
-                ctaGradient.addColorStop(1, modeGradientMatch[1])
-            } else {
-                ctaGradient.addColorStop(0, '#10b981')
-                ctaGradient.addColorStop(1, '#06b6d4')
-            }
+            ctaGradient.addColorStop(0, '#10b981')
+            ctaGradient.addColorStop(1, '#059669')
 
             ctx.fillStyle = ctaGradient
             ctx.beginPath()
-            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, ctaRadius)
+            ctx.roundRect(ctaX, ctaY, ctaWidth, ctaHeight, 16)
             ctx.fill()
 
-            // Button text
-            ctx.fillStyle = modeConfig.textColor
-            ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
+            // CTA text
+            ctx.fillStyle = '#000000'
+            ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(ctaText, canvas.width / 2, ctaY + ctaHeight / 2)
-
-            // ===== SECTION 6: TIMESTAMP - adds authenticity =====
-            const now = new Date()
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            const modeVerb = currentMode === 'roast' ? 'Roasted' : currentMode === 'nice' ? 'Rated' : 'Scored'
-            const timestamp = `${modeVerb} ${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
-
-            ctx.fillStyle = 'rgba(255,255,255,0.4)'
-            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.textAlign = 'center'
-            ctx.fillText(timestamp, canvas.width / 2, ctaY + ctaHeight + 35)  // Tight to button
-
-            // ===== SECTION 7: FITRATE LOGO WATERMARK =====
-            const logoHeight = 80  // Size that fits well
-            const logoY = canvas.height - logoHeight - 20  // 20px from bottom edge
-            if (logoImg) {
-                // Draw actual logo
-                const logoWidth = (logoImg.width / logoImg.height) * logoHeight
-                const logoX = (canvas.width - logoWidth) / 2
-                ctx.globalAlpha = 0.6
-                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight)
-                ctx.globalAlpha = 1.0
-            } else {
-                // Fallback to text - bigger
-                ctx.fillStyle = 'rgba(255,255,255,0.5)'
-                ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, sans-serif'
-                ctx.textAlign = 'center'
-                ctx.fillText('FitRate.app', canvas.width / 2, logoY + 60)
-            }
 
             // ===== GENERATE SHARE TEXT =====
             const getShareText = () => {

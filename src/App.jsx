@@ -42,6 +42,7 @@ const RulesScreen = lazy(() => import('./screens/RulesScreen'))
 const ChallengeResultScreen = lazy(() => import('./screens/ChallengeResultScreen'))
 const BattleScreen = lazy(() => import('./screens/BattleScreen'))
 const BattleRoom = lazy(() => import('./screens/BattleRoom'))
+const BattleResultsReveal = lazy(() => import('./screens/BattleResultsReveal'))
 const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
@@ -295,6 +296,9 @@ export default function App() {
 
   // Store pending battle ID when responder needs to see results before battle comparison
   const [pendingBattleId, setPendingBattleId] = useState(null)
+
+  // Show dramatic battle reveal animation
+  const [showBattleReveal, setShowBattleReveal] = useState(false)
 
   // ============================================
   // FASHION SHOW STATE
@@ -2333,6 +2337,49 @@ export default function App() {
   }
 
   // ============================================
+  // BATTLE RESULTS REVEAL - Dramatic cinematic reveal animation
+  // Shows when battle is completed and user triggers "See Battle Results"
+  // ============================================
+  if (showBattleReveal && challengePartyData && challengePartyData.status === 'completed') {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <BattleResultsReveal
+          battleData={challengePartyData}
+          isCreator={isCreatorOfChallenge}
+          onShare={() => {
+            setShowBattleReveal(false)
+            // Share battle result
+            const shareUrl = `https://fitrate.app/b/${challengePartyId}`
+            const myScore = isCreatorOfChallenge ? challengePartyData.creatorScore : challengePartyData.responderScore
+            const shareText = `⚔️ I scored ${Math.round(myScore)} in a 1v1 battle!\n${shareUrl}`
+            if (navigator.share) {
+              navigator.share({ title: 'FitRate Battle', text: shareText })
+            } else {
+              navigator.clipboard.writeText(shareText)
+              displayToast('Battle result copied!')
+            }
+          }}
+          onRematch={() => {
+            setShowBattleReveal(false)
+            // Start new battle - go to home to take new photo
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+          }}
+          onHome={() => {
+            setShowBattleReveal(false)
+            setChallengePartyId(null)
+            setChallengePartyData(null)
+            window.history.pushState({}, '', '/')
+            setScreen('home')
+          }}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // BATTLE ROOM - Legendary 1v1 Outfit Battles (/b/:id or /c/:id)
   // MUST be checked BEFORE HomeScreen to take priority
   // ============================================
@@ -2591,7 +2638,7 @@ export default function App() {
             pendingBattleId={pendingBattleId}
             onSeeBattleResults={async () => {
               if (!pendingBattleId) return
-              // Navigate to battle room to see comparison
+              // Fetch battle data and show dramatic reveal
               setChallengePartyId(pendingBattleId)
               window.history.pushState({}, '', `/c/${pendingBattleId}`)
               setChallengePartyLoading(true)
@@ -2602,6 +2649,9 @@ export default function App() {
                 if (partyRes.ok) {
                   const partyData = await partyRes.json()
                   setChallengePartyData(partyData)
+                  // Show the dramatic battle reveal animation!
+                  setShowBattleReveal(true)
+                  setScreen('home')  // Clear results screen
                 }
               } finally {
                 setChallengePartyLoading(false)
