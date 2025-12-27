@@ -2394,22 +2394,45 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         <ArenaEntryScreen
           userId={userId}
-          onTakePhoto={(dailyMode) => {
-            // Store the arena mode and trigger camera
+          onTakePhoto={async (dailyMode, photoDataUrl) => {
+            // Photo captured - now analyze it and enter queue
             setArenaMode(dailyMode)
-            setArenaScreen(null)  // Exit entry screen
-            // Trigger camera flow - we'll auto-queue after scan completes
-            // For now, open Android photo modal or start camera
-            const isAndroid = /Android/i.test(navigator.userAgent)
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
-            if (isAndroid) {
-              // Android: Show camera capture
-              document.getElementById('androidCameraInput')?.click()
-            } else if (isIOS) {
-              document.getElementById('androidGalleryInput')?.click()
-            } else {
-              // Desktop: Just go home and let user use main button
-              setScreen('home')
+            setArenaScreen(null)  // Close entry screen
+
+            // Show loading state on HomeScreen
+            setScreen('home')
+            setIsAnalyzing(true)
+
+            try {
+              // Call analyze API with photo and arena mode
+              const response = await fetch(`${API_BASE}/analyze`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...getApiHeaders()
+                },
+                body: JSON.stringify({
+                  image: photoDataUrl,
+                  mode: dailyMode,
+                  userId: userId
+                })
+              })
+
+              if (!response.ok) {
+                throw new Error('Analysis failed')
+              }
+
+              const result = await response.json()
+              const score = result.scores?.overall || result.score || 75
+
+              // Success! Enter arena queue with score
+              setIsAnalyzing(false)
+              startArenaQueue(score, photoDataUrl, dailyMode)
+
+            } catch (err) {
+              console.error('[Arena] Analysis failed:', err)
+              setIsAnalyzing(false)
+              displayToast('Failed to analyze photo. Try again!')
             }
           }}
           onBack={() => {

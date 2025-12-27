@@ -58,12 +58,17 @@ export default function ArenaEntryScreen({
     const [onlineCount, setOnlineCount] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const todayMode = getTodayArenaMode()
+    const fileInputRef = useRef(null)
+
+    // Platform detection
+    const isAndroid = () => /Android/i.test(navigator.userAgent)
+    const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
 
     // Fetch online count
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const API_URL = import.meta.env.VITE_API_URL || ''
+                const API_URL = import.meta.env.VITE_API_URL?.replace('/api/analyze', '') || 'https://fitrate-production.up.railway.app'
                 const res = await fetch(`${API_URL}/api/arena/stats`)
                 if (res.ok) {
                     const data = await res.json()
@@ -78,11 +83,32 @@ export default function ArenaEntryScreen({
         return () => clearInterval(interval)
     }, [])
 
+    // Handle file selection
+    const handleFileSelect = async (e) => {
+        const file = e.target.files?.[0]
+        if (!file) {
+            setIsLoading(false)
+            return
+        }
+
+        // Convert to data URL and pass to parent with mode
+        const reader = new FileReader()
+        reader.onload = () => {
+            onTakePhoto(todayMode.mode, reader.result)
+        }
+        reader.onerror = () => {
+            setIsLoading(false)
+            console.error('[Arena] Failed to read file')
+        }
+        reader.readAsDataURL(file)
+    }
+
     const handleEnter = () => {
         playSound?.('click')
         vibrate?.(30)
         setIsLoading(true)
-        onTakePhoto(todayMode.mode)
+        // Trigger file input
+        fileInputRef.current?.click()
     }
 
     return (
@@ -93,6 +119,16 @@ export default function ArenaEntryScreen({
             }}
         >
             <FloatingParticles />
+
+            {/* Hidden file inputs for camera/gallery */}
+            <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
+            />
 
             {/* Back Button */}
             <button
