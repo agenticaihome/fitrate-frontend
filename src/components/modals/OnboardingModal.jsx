@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 
 // Premium floating particles
 const FloatingParticles = ({ color }) => {
@@ -41,9 +41,12 @@ const FloatingParticles = ({ color }) => {
 /**
  * OnboardingModal - 3-slide intro for first-time users
  * Shows: Camera → Rate → Share flow
+ * Supports swipe gestures for mobile navigation
  */
 export default function OnboardingModal({ onComplete, playSound, vibrate }) {
     const [currentSlide, setCurrentSlide] = useState(0)
+    const touchStartX = useRef(null)
+    const touchEndX = useRef(null)
 
     const slides = [
         {
@@ -146,15 +149,55 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
         onComplete()
     }
 
+    // Swipe gesture handlers
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX
+    }
+
+    const handleTouchMove = (e) => {
+        touchEndX.current = e.touches[0].clientX
+    }
+
+    const handleTouchEnd = () => {
+        if (!touchStartX.current || !touchEndX.current) return
+
+        const swipeDistance = touchStartX.current - touchEndX.current
+        const minSwipeDistance = 50 // Minimum distance to trigger swipe
+
+        if (Math.abs(swipeDistance) > minSwipeDistance) {
+            if (swipeDistance > 0 && currentSlide < slides.length - 1) {
+                // Swiped left → next slide
+                playSound?.('click')
+                vibrate?.(15)
+                setCurrentSlide(currentSlide + 1)
+            } else if (swipeDistance < 0 && currentSlide > 0) {
+                // Swiped right → previous slide
+                playSound?.('click')
+                vibrate?.(15)
+                setCurrentSlide(currentSlide - 1)
+            }
+        }
+
+        // Reset
+        touchStartX.current = null
+        touchEndX.current = null
+    }
+
     const slide = slides[currentSlide]
     const isLastSlide = currentSlide === slides.length - 1
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{
-            background: 'radial-gradient(ellipse at center, rgba(10,10,20,0.95) 0%, rgba(5,5,10,0.98) 100%)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)'
-        }}>
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            style={{
+                background: 'radial-gradient(ellipse at center, rgba(10,10,20,0.95) 0%, rgba(5,5,10,0.98) 100%)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
             {/* Skip button - FIXED to top-right of viewport */}
             {!isLastSlide && (
                 <button
