@@ -1593,8 +1593,8 @@ export default function ResultsScreen({
                     )}
                 </div>
 
-                {/* Scans remaining or Inline Paywall */}
-                {!isPro && (
+                {/* Scans remaining or Inline Paywall - Hide during battle flow */}
+                {!isPro && !pendingBattleId && (
                     scansRemaining > 0 ? (
                         <div className="mt-4 space-y-3">
                             {/* Scans counter */}

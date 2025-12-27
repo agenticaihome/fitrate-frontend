@@ -1017,7 +1017,8 @@ export default function App() {
   // Auto-refresh battle data every 10 seconds (while waiting for responder)
   useEffect(() => {
     if (!challengePartyId) return
-    if (challengePartyData?.status === 'completed') return // Don't poll if completed
+    if (challengePartyData?.status === 'completed') return // Don't poll if already completed
+    if (showBattleReveal) return // Already showing reveal, don't poll
 
     const pollBattle = async () => {
       try {
@@ -1027,12 +1028,16 @@ export default function App() {
         if (res.ok) {
           const data = await res.json()
           const normalizedData = normalizeBattleData(data)
-          setChallengePartyData(normalizedData)
-          // If completed, trigger the dramatic cinematic reveal!
-          if (data.status === 'completed' && challengePartyData?.status !== 'completed') {
+
+          // Check for completion BEFORE updating state (to avoid stale closure)
+          if (data.status === 'completed') {
+            setChallengePartyData(normalizedData)
             playSound('celebrate')
             vibrate([100, 50, 100])
             setShowBattleReveal(true)  // Show the cool cinematic reveal instead of BattleRoom
+            console.log('[Battle] Opponent completed! Showing reveal.')
+          } else {
+            setChallengePartyData(normalizedData)
           }
         }
       } catch (err) {
@@ -1043,7 +1048,7 @@ export default function App() {
     // Poll every 10 seconds
     const interval = setInterval(pollBattle, 10000)
     return () => clearInterval(interval)
-  }, [challengePartyId, challengePartyData?.status])
+  }, [challengePartyId, challengePartyData?.status, showBattleReveal])
 
   // Refresh battle data (manual)
   const refreshChallengeParty = async () => {
@@ -1511,6 +1516,14 @@ export default function App() {
       effectiveMode = getDailyMode()
       console.log(`[DailyChallenge] Mode overridden: ${mode} → ${effectiveMode} (today's rotating mode)`)
     }
+    // Battle Response: Use the battle's mode (must match creator)
+    else {
+      const respondingBattleMode = localStorage.getItem('fitrate_responding_battle_mode')
+      if (respondingBattleMode) {
+        effectiveMode = respondingBattleMode
+        console.log(`[Battle] Mode overridden: ${mode} → ${effectiveMode} (creator's battle mode)`)
+      }
+    }
 
     // Free users: call backend (routes to Gemini for real AI analysis)
     if (!isPro) {
@@ -1711,8 +1724,9 @@ export default function App() {
             const battleResult = await battleRes.json()
             console.log('[Battle] Free user submitted response:', battleResult)
 
-            // Clear the pending battle flag
+            // Clear the pending battle flags
             localStorage.removeItem('fitrate_responding_challenge')
+            localStorage.removeItem('fitrate_responding_battle_mode')
 
             // The backend returns the full updated battle with status: 'completed'
             // Trigger the dramatic battle reveal animation immediately!
@@ -1737,6 +1751,7 @@ export default function App() {
           } catch (err) {
             console.error('[Battle] Failed to submit free user response:', err)
             localStorage.removeItem('fitrate_responding_challenge')
+            localStorage.removeItem('fitrate_responding_battle_mode')
             // Fall through to normal results
           }
         }
@@ -2623,6 +2638,10 @@ export default function App() {
           onImageSelected={async (imageData, scanType) => {
             // Responder took a photo directly in BattleRoom - analyze and submit
             localStorage.setItem('fitrate_responding_challenge', challengePartyId)
+            // Store battle mode so responder uses SAME mode as creator
+            if (challengePartyData?.mode) {
+              localStorage.setItem('fitrate_responding_battle_mode', challengePartyData.mode)
+            }
             setUploadedImage(imageData)
             setScreen('analyzing')
             analyzeOutfit(imageData, scanType)
