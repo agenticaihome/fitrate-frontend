@@ -1254,7 +1254,7 @@ export default function HomeScreen({
                         <span className="text-white/40 text-[10px]">12 modes ▼</span>
                     </button>
 
-                    {/* Global Arena Card */}
+                    {/* Global Arena Card - Enhanced for Discovery */}
                     {onOpenArena && (
                         <button
                             onClick={() => {
@@ -1263,13 +1263,25 @@ export default function HomeScreen({
                                 // Open Arena entry screen
                                 onOpenArena()
                             }}
-                            className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97]"
+                            className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97] relative overflow-hidden"
                             style={{
                                 background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.1) 100%)',
                                 border: '1px solid rgba(0,212,255,0.3)',
-                                boxShadow: '0 0 20px rgba(0,212,255,0.15)'
+                                boxShadow: '0 0 25px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.05)',
+                                animation: 'arena-glow 2s ease-in-out infinite'
                             }}
                         >
+                            {/* HOT Badge - Drives discovery */}
+                            <div
+                                className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[9px] font-black"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)',
+                                    color: '#fff',
+                                    boxShadow: '0 2px 8px rgba(255,107,53,0.5)'
+                                }}
+                            >
+                                HOT
+                            </div>
                             <span className="text-2xl">🌍</span>
                             <span className="text-white font-bold text-sm">Arena</span>
                             <div className="flex items-center gap-1">
