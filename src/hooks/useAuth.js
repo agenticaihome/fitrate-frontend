@@ -1,9 +1,10 @@
 /**
  * useAuth Hook
- * Manages user authentication, Pro status, and identity
+ * Manages user authentication, Pro status, identity, and display name
  * Extracted from App.jsx for maintainability
  */
 import { useState, useEffect, useCallback } from 'react'
+import { getDisplayName, setDisplayName as saveDisplayName, hasDisplayName } from '../utils/displayNameStorage'
 
 // API config
 const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
@@ -101,9 +102,22 @@ export default function useAuth() {
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Display name state
+    const [displayName, setDisplayNameState] = useState(() => getDisplayName())
+
+    const updateDisplayName = useCallback((name) => {
+        saveDisplayName(name)
+        setDisplayNameState(name)
+    }, [])
+
     return {
         // User identity
         userId,
+
+        // Display name
+        displayName,
+        hasDisplayName: hasDisplayName,
+        updateDisplayName,
 
         // Pro status
         isPro,

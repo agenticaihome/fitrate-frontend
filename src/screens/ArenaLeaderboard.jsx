@@ -9,6 +9,7 @@ import {
     SEASON_TIERS,
     MILESTONES
 } from '../utils/arenaStorage'
+import { getDisplayName } from '../utils/displayNameStorage'
 
 // ============================================
 // ANIMATED BACKGROUND
@@ -255,12 +256,16 @@ export default function ArenaLeaderboard({
     onClose,
     modeColor = '#00d4ff',
     playSound,
-    vibrate
+    vibrate,
+    userId
 }) {
     const [activeTab, setActiveTab] = useState('leaderboard') // leaderboard | achievements | rewards
+    const [leaderboardData, setLeaderboardData] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [apiUserRank, setApiUserRank] = useState(null)
 
-    // Mock leaderboard data (in production, fetch from backend)
-    const [leaderboardData] = useState([
+    // Fallback mock data (used if API fails)
+    const MOCK_LEADERBOARD = [
         { id: 1, name: 'StyleKing👑', points: 2450, tier: SEASON_TIERS[4] },
         { id: 2, name: 'FashionQueen', points: 2180, tier: SEASON_TIERS[4] },
         { id: 3, name: 'DripMaster', points: 1920, tier: SEASON_TIERS[4] },
@@ -271,7 +276,50 @@ export default function ArenaLeaderboard({
         { id: 8, name: 'Fashionista', points: 580, tier: SEASON_TIERS[3] },
         { id: 9, name: 'CleanFits', points: 340, tier: SEASON_TIERS[2] },
         { id: 10, name: 'NewPlayer', points: 120, tier: SEASON_TIERS[1] }
-    ])
+    ]
+
+    const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
+
+    // Fetch leaderboard from API
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            try {
+                setLoading(true)
+                const url = userId
+                    ? `${API_BASE}/arena/leaderboard?userId=${userId}`
+                    : `${API_BASE}/arena/leaderboard`
+                const res = await fetch(url)
+
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.success && data.entries?.length > 0) {
+                        // Transform API data to match component format
+                        const entries = data.entries.map(entry => ({
+                            id: entry.rank,
+                            name: entry.displayName,
+                            points: entry.points,
+                            tier: entry.tier ? SEASON_TIERS.find(t => t.name === entry.tier.name) || SEASON_TIERS[0] : SEASON_TIERS[0],
+                            isCurrentUser: entry.isCurrentUser
+                        }))
+                        setLeaderboardData(entries)
+                        if (data.userRank) setApiUserRank(data.userRank)
+                    } else {
+                        // No entries yet, use mock
+                        setLeaderboardData(MOCK_LEADERBOARD)
+                    }
+                } else {
+                    setLeaderboardData(MOCK_LEADERBOARD)
+                }
+            } catch (err) {
+                console.log('[ArenaLeaderboard] API fetch failed, using mock data:', err.message)
+                setLeaderboardData(MOCK_LEADERBOARD)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchLeaderboard()
+    }, [userId, API_BASE])
 
     const seasonData = getSeasonData()
     const tierData = getCurrentTier()
@@ -280,9 +328,12 @@ export default function ArenaLeaderboard({
     const winRate = getWinRate()
     const unlockedMilestones = getUnlockedMilestones()
 
-    // Find user's position (mock - place them in middle)
-    const userRank = 6
-    const userData = { id: 'user', name: 'You', points: seasonData.points, tier: tierData.tier }
+    // Get display name or fallback to "You"
+    const displayName = getDisplayName() || 'You'
+
+    // Find user's position - use API rank if available, else estimate
+    const userRank = apiUserRank || 6
+    const userData = { id: 'user', name: displayName, points: seasonData.points, tier: tierData.tier }
 
     const handleTabChange = (tab) => {
         playSound?.('click')
@@ -409,7 +460,7 @@ export default function ArenaLeaderboard({
                                     <div className="text-center text-white/20 py-2">• • •</div>
                                     <LeaderboardRow
                                         rank={userRank}
-                                        name="You"
+                                        name={displayName}
                                         points={seasonData.points}
                                         tier={tierData.tier}
                                         isCurrentUser={true}

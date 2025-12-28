@@ -14,6 +14,8 @@ import {
     STREAK_REWARDS,
     SEASON_TIERS
 } from '../utils/arenaStorage'
+import DisplayNameModal from '../components/modals/DisplayNameModal'
+import { hasDisplayName, getDisplayName, setDisplayName } from '../utils/displayNameStorage'
 
 // ============================================
 // ARENA MODE OF THE DAY
@@ -445,6 +447,8 @@ export default function ArenaEntryScreen({
     const [error, setError] = useState(null)
     const [analysisTip, setAnalysisTip] = useState(0)
     const [showStatsExpanded, setShowStatsExpanded] = useState(false)
+    const [showDisplayNameModal, setShowDisplayNameModal] = useState(false)
+    const [displayName, setDisplayNameState] = useState(() => getDisplayName())
 
     const todayMode = getTodayArenaMode()
     const fileInputRef = useRef(null)
@@ -596,6 +600,24 @@ export default function ArenaEntryScreen({
     const handleEnterArena = () => {
         playSound?.('click')
         vibrate?.([30, 20, 30])
+
+        // Check if display name is set before entering
+        if (!hasDisplayName()) {
+            setShowDisplayNameModal(true)
+            return
+        }
+
+        fileInputRef.current?.click()
+    }
+
+    // Handle display name submission from modal
+    const handleDisplayNameSubmit = (name) => {
+        setDisplayName(name)
+        setDisplayNameState(name)
+        setShowDisplayNameModal(false)
+        // Proceed to arena after setting name
+        playSound?.('success')
+        vibrate?.([50, 30, 50])
         fileInputRef.current?.click()
     }
 
@@ -1032,6 +1054,15 @@ export default function ArenaEntryScreen({
                     50%, 100% { transform: translateX(200%); }
                 }
             `}</style>
+
+            {/* Display Name Modal */}
+            {showDisplayNameModal && (
+                <DisplayNameModal
+                    userId={userId}
+                    onSubmit={handleDisplayNameSubmit}
+                    onClose={() => setShowDisplayNameModal(false)}
+                />
+            )}
         </div>
     )
 }
