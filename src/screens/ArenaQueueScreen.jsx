@@ -57,9 +57,8 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                 <React.Fragment key={i}>
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${
-                                i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
-                            }`}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
+                                }`}
                             style={{
                                 background: i <= currentStep
                                     ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
@@ -69,9 +68,8 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[9px] mt-0.5 transition-all ${
-                            i <= currentStep ? 'text-white/80' : 'text-white/30'
-                        }`}>
+                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
+                            }`}>
                             {step.label}
                         </span>
                     </div>
@@ -283,7 +281,8 @@ export default function ArenaQueueScreen({
                     clearInterval(pollIntervalRef.current)
                     playSound?.('celebrate')
                     vibrate?.([100, 50, 100, 50, 100])
-                    setTimeout(() => onMatchFound?.(data.battleId), 800)
+                    // Pass battleId and battle result data for record tracking
+                    setTimeout(() => onMatchFound?.(data.battleId, data.battle || data), 800)
                 } else if (data.status === 'expired') {
                     setStatus('timeout')
                     clearInterval(pollIntervalRef.current)

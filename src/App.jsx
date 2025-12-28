@@ -2501,7 +2501,15 @@ export default function App() {
           mode={arenaData.mode}
           playSound={playSound}
           vibrate={vibrate}
-          onMatchFound={(battleId) => {
+          onMatchFound={(battleId, battleResult) => {
+            // Record Arena result for daily tracking
+            if (battleResult && battleResult.myScore !== undefined) {
+              const myScore = battleResult.myScore
+              const opponentScore = battleResult.opponentScore
+              const result = myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie'
+              recordArenaResult(result)
+              console.log(`[Arena] Recorded daily result: ${result} (${Math.round(myScore)} vs ${Math.round(opponentScore)})`)
+            }
             // Add to active battles
             addToActiveBattles(battleId, arenaData.score, arenaData.mode, 'completed')
             // Navigate to battle reveal
@@ -2594,19 +2602,9 @@ export default function App() {
   // ============================================
   // BATTLE RESULTS REVEAL - Dramatic cinematic reveal animation
   // Shows when battle is completed and user triggers "See Battle Results"
+  // Arena results are recorded in onMatchFound callback from ArenaQueueScreen
   // ============================================
   if (showBattleReveal && challengePartyData && challengePartyData.status === 'completed') {
-    // Record Arena result for daily tracking (only once per battle)
-    const arenaResultKey = `arena_result_${challengePartyData._id || challengePartyData.id || 'unknown'}`
-    if (arenaData && !sessionStorage.getItem(arenaResultKey)) {
-      const myScore = isCreatorOfChallenge ? challengePartyData.creatorScore : challengePartyData.responderScore
-      const opponentScore = isCreatorOfChallenge ? challengePartyData.responderScore : challengePartyData.creatorScore
-      const result = myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie'
-      recordArenaResult(result)
-      sessionStorage.setItem(arenaResultKey, 'recorded') // Prevent double-recording
-      console.log(`[Arena] Recorded result: ${result}`)
-    }
-
     return (
       <Suspense fallback={<LoadingFallback />}>
         <BattleResultsReveal
