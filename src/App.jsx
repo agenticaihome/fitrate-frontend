@@ -87,8 +87,8 @@ const getApiHeaders = () => ({
 })
 
 // Helper to normalize battle API response to component-expected format
-// API returns: { creator: { score, thumb }, opponent: { score, thumb } }
-// Component expects: { creatorScore, creatorThumb, responderScore, responderThumb }
+// API returns: { creator: { score, thumb, verdict }, opponent: { score, thumb, verdict } }
+// Component expects: { creatorScore, creatorThumb, responderScore, responderThumb, winner, etc. }
 const normalizeBattleData = (data) => {
   if (!data) return null
 
@@ -96,6 +96,7 @@ const normalizeBattleData = (data) => {
   if (data.creatorScore !== undefined) return data
 
   // Transform from nested format to flat format
+  // Includes new fields from head-to-head AI comparison system
   return {
     ...data,
     challengeId: data.battleId || data.challengeId,
@@ -104,7 +105,15 @@ const normalizeBattleData = (data) => {
     creatorThumb: data.creator?.thumb || null,
     responderScore: data.opponent?.score ?? null,
     responderId: data.opponent?.userId || null,
-    responderThumb: data.opponent?.thumb || null
+    responderThumb: data.opponent?.thumb || null,
+    // NEW: AI head-to-head comparison fields
+    winner: data.winner || null, // 'creator' | 'opponent' | 'tie' | null
+    battleCommentary: data.battleCommentary || null,
+    winningFactor: data.winningFactor || null,
+    marginOfVictory: data.marginOfVictory ?? null,
+    // Outfit verdicts from nested structure or direct fields
+    outfit1Verdict: data.creator?.verdict || data.outfit1Verdict || null,
+    outfit2Verdict: data.opponent?.verdict || data.outfit2Verdict || null
   }
 }
 
@@ -2523,12 +2532,15 @@ export default function App() {
           vibrate={vibrate}
           onMatchFound={(battleId, battleResult) => {
             // Record Arena result for daily tracking
+            // NEW: Use result field from API (AI head-to-head comparison) when available
+            // Falls back to score comparison for legacy responses
             if (battleResult && battleResult.myScore !== undefined) {
               const myScore = battleResult.myScore
               const opponentScore = battleResult.opponentScore
-              const result = myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie'
+              // Use API result field ('win'|'loss'|'tie') if available, otherwise calculate from scores
+              const result = battleResult.result || (myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie')
               recordArenaResult(result)
-              console.log(`[Arena] Recorded daily result: ${result} (${Math.round(myScore)} vs ${Math.round(opponentScore)})`)
+              console.log(`[Arena] Recorded daily result: ${result} (${Math.round(myScore)} vs ${Math.round(opponentScore)})${battleResult.result ? ' [from API]' : ' [calculated]'}`)
             }
             // Add to active battles
             addToActiveBattles(battleId, arenaData.score, arenaData.mode, 'completed')
