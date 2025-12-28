@@ -31,6 +31,9 @@ const ARENA_DAILY_MODES = [
     { mode: 'celeb', emoji: '✨', name: 'Celeb', tagline: 'Star Saturday', color: '#ffd700' }
 ]
 
+// Daily battle limit
+const ARENA_DAILY_LIMIT = 10
+
 export const getTodayArenaMode = () => {
     const dayIndex = new Date().getDay() // 0=Sunday, 1=Monday, etc.
     return ARENA_DAILY_MODES[dayIndex]
@@ -553,7 +556,8 @@ export default function ArenaEntryScreen({
                 body: JSON.stringify({
                     image: imageData,
                     mode: todayMode.mode,
-                    userId: userId
+                    userId: userId,
+                    arenaMode: true  // Arena is free - bypass scan limits
                 }),
                 signal: abortControllerRef.current.signal
             })
@@ -600,6 +604,12 @@ export default function ArenaEntryScreen({
     const handleEnterArena = () => {
         playSound?.('click')
         vibrate?.([30, 20, 30])
+
+        // Check daily battle limit (10 per day)
+        if (totalBattlesToday >= ARENA_DAILY_LIMIT) {
+            setError(`You've reached today's limit of ${ARENA_DAILY_LIMIT} battles. Come back tomorrow!`)
+            return
+        }
 
         // Check if display name is set before entering
         if (!hasDisplayName()) {
@@ -967,7 +977,7 @@ export default function ArenaEntryScreen({
                             border: '1px solid rgba(255,255,255,0.08)'
                         }}
                     >
-                        <span className="text-white/40 text-xs uppercase tracking-wider">Today</span>
+                        <span className="text-white/40 text-xs uppercase tracking-wider">Today ({totalBattlesToday}/{ARENA_DAILY_LIMIT})</span>
                         <div className="flex items-center gap-3 text-lg font-black">
                             <span className="text-green-400">{dailyRecord.wins}W</span>
                             <span className="text-white/20">·</span>
@@ -989,30 +999,44 @@ export default function ArenaEntryScreen({
                 {/* BATTLE BUTTON */}
                 <button
                     onClick={handleEnterArena}
-                    className="w-full max-w-md py-5 rounded-2xl font-black text-xl text-white transition-all active:scale-[0.97] relative overflow-hidden group"
+                    disabled={totalBattlesToday >= ARENA_DAILY_LIMIT}
+                    className={`w-full max-w-md py-5 rounded-2xl font-black text-xl text-white transition-all relative overflow-hidden group ${totalBattlesToday >= ARENA_DAILY_LIMIT ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.97]'
+                        }`}
                     style={{
-                        background: `linear-gradient(135deg, ${todayMode.color}, #00ff88)`,
-                        boxShadow: `0 0 60px ${todayMode.color}50, 0 8px 40px rgba(0,0,0,0.4)`
+                        background: totalBattlesToday >= ARENA_DAILY_LIMIT
+                            ? 'linear-gradient(135deg, #666, #444)'
+                            : `linear-gradient(135deg, ${todayMode.color}, #00ff88)`,
+                        boxShadow: totalBattlesToday >= ARENA_DAILY_LIMIT
+                            ? 'none'
+                            : `0 0 60px ${todayMode.color}50, 0 8px 40px rgba(0,0,0,0.4)`
                     }}
                 >
-                    {/* Animated shine */}
-                    <div
-                        className="absolute inset-0"
-                        style={{
-                            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-                            animation: 'button-shine 3s ease-in-out infinite'
-                        }}
-                    />
+                    {/* Animated shine (only when active) */}
+                    {totalBattlesToday < ARENA_DAILY_LIMIT && (
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                                animation: 'button-shine 3s ease-in-out infinite'
+                            }}
+                        />
+                    )}
                     {/* Content */}
                     <span className="flex items-center justify-center gap-3 relative z-10">
-                        <span className="text-3xl">⚔️</span>
-                        <span className="tracking-wide">ENTER BATTLE</span>
+                        <span className="text-3xl">{totalBattlesToday >= ARENA_DAILY_LIMIT ? '😴' : '⚔️'}</span>
+                        <span className="tracking-wide">
+                            {totalBattlesToday >= ARENA_DAILY_LIMIT
+                                ? 'DAILY LIMIT REACHED'
+                                : `ENTER BATTLE (${ARENA_DAILY_LIMIT - totalBattlesToday} left)`}
+                        </span>
                     </span>
-                    {/* Pulsing glow */}
-                    <div
-                        className="absolute inset-0 rounded-2xl animate-pulse opacity-40"
-                        style={{ boxShadow: `inset 0 0 30px ${todayMode.color}` }}
-                    />
+                    {/* Pulsing glow (only when active) */}
+                    {totalBattlesToday < ARENA_DAILY_LIMIT && (
+                        <div
+                            className="absolute inset-0 rounded-2xl animate-pulse opacity-40"
+                            style={{ boxShadow: `inset 0 0 30px ${todayMode.color}` }}
+                        />
+                    )}
                 </button>
 
                 {/* Privacy */}
