@@ -425,13 +425,17 @@ export default function BattleResultsReveal({
     const responderThumb = battleData?.responderThumb
     const battleMode = battleData?.mode || 'nice'
 
-    // Determine winner
-    const creatorWon = creatorScore > responderScore
-    const responderWon = responderScore > creatorScore
-    const tied = creatorScore === responderScore
+    // Determine winner - USE API winner field (AI head-to-head comparison)
+    // Falls back to score comparison for legacy battles without winner field
+    const apiWinner = battleData?.winner // 'creator' | 'opponent' | 'tie' | null
+    const creatorWon = apiWinner ? apiWinner === 'creator' : creatorScore > responderScore
+    const responderWon = apiWinner ? apiWinner === 'opponent' : responderScore > creatorScore
+    const tied = apiWinner ? apiWinner === 'tie' : creatorScore === responderScore
     const userWon = isCreator ? creatorWon : responderWon
     const userLost = isCreator ? responderWon : creatorWon
-    const diff = Math.abs(creatorScore - responderScore)
+
+    // Use marginOfVictory from API if available, otherwise calculate from scores
+    const diff = battleData?.marginOfVictory ?? Math.abs(creatorScore - responderScore)
 
     // Colors
     const winColor = '#00ff88'

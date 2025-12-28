@@ -125,11 +125,17 @@ export default function BattleRoom({
         }
     }
 
-    // Determine winner
-    const creatorWon = creatorScore > responderScore
-    const responderWon = responderScore > creatorScore
-    const tied = creatorScore === responderScore && isCompleted
-    const diff = Math.round(Math.abs(creatorScore - responderScore) * 10) / 10
+    // Determine winner - USE API winner field (AI head-to-head comparison)
+    // Falls back to score comparison for legacy battles without winner field
+    const apiWinner = battleData?.winner // 'creator' | 'opponent' | 'tie' | null
+    const creatorWon = apiWinner ? apiWinner === 'creator' : creatorScore > responderScore
+    const responderWon = apiWinner ? apiWinner === 'opponent' : responderScore > creatorScore
+    const tied = apiWinner ? apiWinner === 'tie' : (creatorScore === responderScore && isCompleted)
+
+    // Use marginOfVictory from API if available, otherwise calculate from scores
+    const diff = battleData?.marginOfVictory != null
+        ? Math.round(battleData.marginOfVictory * 10) / 10
+        : Math.round(Math.abs(creatorScore - responderScore) * 10) / 10
 
     // Colors
     const winColor = '#00ff88'
