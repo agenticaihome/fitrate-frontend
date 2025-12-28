@@ -71,7 +71,7 @@ const LiveActivityTicker = () => {
                 setCurrentIndex(prev => (prev + 1) % ACTIVITY_MESSAGES.length)
                 setIsVisible(true)
             }, 300)
-        }, 4000)
+        }, 10000) // 10 seconds - realistic pacing
         return () => clearInterval(interval)
     }, [])
 
