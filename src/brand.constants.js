@@ -51,31 +51,32 @@ export const VOICE = {
 
 // ============================================
 // STANDARDIZED ERROR MESSAGES
+// 2025 conversational, friendly tone
 // ============================================
 export const ERRORS = {
-    generic: 'Something went wrong — try again!',
-    connection: 'Connection issue — try again in a moment.',
-    imageTooLarge: 'Image is too large. Please try a smaller photo.',
-    analysisTimeout: 'Analysis took too long. Please try again.',
-    invalidImage: 'We need to see some clothing for a proper rating!',
-    serviceUnavailable: 'Our AI is taking a quick break. Try again in a moment.',
+    generic: 'Oops, our AI blinked. One more time? 🔄',
+    connection: 'Lost you for a sec. Reconnecting... 🔌',
+    imageTooLarge: 'That pic is TOO fire (literally too big). Try a smaller one?',
+    analysisTimeout: 'AI is thinking extra hard... maybe too hard. Try again?',
+    invalidImage: 'Need to see some fabric to rate! Show us the fit 👕',
+    serviceUnavailable: 'AI is touching up its makeup. Back in a sec! 💄',
 };
 
 // ============================================
-// BUTTON LABELS (Approved)
+// BUTTON LABELS (Approved - Action-oriented)
 // ============================================
 export const BUTTONS = {
     primary: {
         rateOutfit: 'Rate My Outfit',
-        seeVerdict: 'See My Verdict',
-        shareResult: 'Share Result',
+        seeVerdict: 'Reveal My Score 🎯',
+        shareResult: 'Flex This Fit 💪',
         unlockPro: 'Unlock Unlimited',
-        tryAgain: 'Try Again',
+        tryAgain: 'Go Again 🔄',
     },
     secondary: {
-        notNow: 'Not now',
+        notNow: 'Maybe later',
         goBack: '← Back',
-        rateAnother: 'Rate Another Fit',
+        rateAnother: 'New Fit',
     },
 };
 
@@ -83,14 +84,14 @@ export const BUTTONS = {
 // PAYWALL COPY (Scan Packs - Clash of Clans style)
 // ============================================
 export const PAYWALL = {
-    headline: 'Get More Scans',
-    subheadline: 'All 12 AI modes included free!',
+    headline: 'Unlock Unlimited Scans',
+    subheadline: 'All 12 AI judges included!',
     benefits: [
-        '2 free scans every day',
-        'All 12 AI modes unlocked',
-        'Purchased scans never expire',
-        'Instant access after purchase',
+        '2 free scans daily',
+        'All 12 AI personalities',
+        'Scans never expire',
+        'Instant access',
     ],
-    reassurance: '🔐 Secure checkout · Instant access',
-    outOfScans: 'You\'ve used your free scans for today. Get more to keep rating!',
+    reassurance: '🔐 Secure · Instant access',
+    outOfScans: 'You\'ve been busy! Get more scans to keep the fits coming 🔥',
 };

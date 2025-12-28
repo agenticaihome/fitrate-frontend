@@ -1,47 +1,48 @@
 import React from 'react'
 
 // Map backend error codes to user-friendly messages
+// 2025 conversational, friendly, Gen Z approved
 const ERROR_CONFIG = {
     LIMIT_REACHED: {
-        emoji: '⏰',
-        title: 'Daily Limit Reached',
-        message: 'Come back tomorrow for 2 more free scans, or upgrade to Pro for 25/day!',
+        emoji: '😅',
+        title: 'You\'ve Been Busy!',
+        message: 'Fresh scans drop at midnight, or unlock unlimited now ✨',
         showUpgrade: true
     },
     PROVIDER_ERROR: {
-        emoji: '🤖',
-        title: 'AI Taking a Break',
-        message: 'Our style AI is busy right now. Try again in a moment!',
+        emoji: '💄',
+        title: 'AI is Getting Ready',
+        message: 'Our style AI is touching up its look. Back in a sec!',
         showUpgrade: false
     },
     UPLOAD_ERROR: {
         emoji: '📸',
-        title: 'Image Issue',
-        message: 'Try a clearer outfit photo (JPEG, PNG, or WebP under 10MB)',
+        title: 'Photo Didn\'t Load',
+        message: 'Try a clearer pic (JPEG, PNG under 10MB works best)',
         showUpgrade: false
     },
     INVALID_OUTFIT: {
-        emoji: '👕',
-        title: 'Can\'t See Your Outfit',
-        message: 'Make sure your photo shows clothing clearly! Try a full-body or mirror selfie.',
+        emoji: '👀',
+        title: 'Where\'s the Fit?',
+        message: 'We need to see some fabric! Try a mirror selfie or full-body shot',
         showUpgrade: false
     },
     INVALID_SPAM_BLOCKED: {
-        emoji: '🚫',
-        title: 'Too Many Attempts',
-        message: 'Please wait a bit and try again with a valid outfit photo.',
+        emoji: '🐌',
+        title: 'Slow Down!',
+        message: 'Too many attempts. Take a breath and try again in a min',
         showUpgrade: false
     },
     BOT_DETECTED: {
         emoji: '🤖',
-        title: 'Access Blocked',
-        message: 'Please use a regular web browser to access FitRate.',
+        title: 'Beep Boop?',
+        message: 'Use a regular browser to rate your fits!',
         showUpgrade: false
     },
     SERVER_ERROR: {
-        emoji: '⚡',
-        title: 'Something Went Wrong',
-        message: 'Our servers hiccuped. Please try again!',
+        emoji: '🙈',
+        title: 'Oops, Our Bad',
+        message: 'Servers had a moment. One more try?',
         showUpgrade: false
     }
 };
