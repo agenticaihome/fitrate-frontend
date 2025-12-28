@@ -5,19 +5,129 @@ import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
 
 // ============================================
-// PREMIUM FLOATING PARTICLES
+// FIRST-TIME ONBOARDING MODAL
+// Simple 3-step explainer for new users
+// ============================================
+const OnboardingOverlay = ({ onComplete }) => {
+    const [step, setStep] = useState(0)
+
+    const steps = [
+        {
+            emoji: '📸',
+            title: 'Snap Your Outfit',
+            desc: 'Take a photo of what you\'re wearing'
+        },
+        {
+            emoji: '🤖',
+            title: 'AI Rates Your Style',
+            desc: 'Get a score from 1-100 with honest feedback'
+        },
+        {
+            emoji: '🔥',
+            title: 'Level Up Your Look',
+            desc: 'Get tips to improve & compete with friends'
+        }
+    ]
+
+    const handleNext = () => {
+        playSound('click')
+        vibrate(15)
+        if (step < steps.length - 1) {
+            setStep(step + 1)
+        } else {
+            localStorage.setItem('fitrate_onboarded', 'true')
+            onComplete()
+        }
+    }
+
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-6"
+            style={{
+                background: 'rgba(0,0,0,0.9)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)'
+            }}
+        >
+            <div className="w-full max-w-sm text-center">
+                {/* Progress dots */}
+                <div className="flex justify-center gap-2 mb-8">
+                    {steps.map((_, i) => (
+                        <div
+                            key={i}
+                            className="w-2 h-2 rounded-full transition-all duration-300"
+                            style={{
+                                background: i === step ? '#00d4ff' : 'rgba(255,255,255,0.2)',
+                                transform: i === step ? 'scale(1.3)' : 'scale(1)'
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Step content */}
+                <div
+                    key={step}
+                    className="animate-fade-in"
+                    style={{ animation: 'fadeSlideUp 0.4s ease-out' }}
+                >
+                    <span className="text-7xl block mb-6">{steps[step].emoji}</span>
+                    <h2 className="text-white text-2xl font-bold mb-3">
+                        {steps[step].title}
+                    </h2>
+                    <p className="text-white/60 text-lg mb-8">
+                        {steps[step].desc}
+                    </p>
+                </div>
+
+                {/* CTA Button */}
+                <button
+                    onClick={handleNext}
+                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98]"
+                    style={{
+                        background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                        color: '#000',
+                        boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+                    }}
+                >
+                    {step < steps.length - 1 ? 'Next' : 'Let\'s Go! 🚀'}
+                </button>
+
+                {/* Skip option */}
+                <button
+                    onClick={() => {
+                        localStorage.setItem('fitrate_onboarded', 'true')
+                        onComplete()
+                    }}
+                    className="mt-4 text-white/40 text-sm"
+                >
+                    Skip intro
+                </button>
+            </div>
+
+            <style>{`
+                @keyframes fadeSlideUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+        </div>
+    )
+}
+
+// ============================================
+// SIMPLIFIED FLOATING PARTICLES (reduced count)
 // ============================================
 const FloatingParticles = ({ accentColor }) => {
     const particles = useMemo(() =>
-        Array.from({ length: 25 }, (_, i) => ({
+        Array.from({ length: 12 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
-            size: 1 + Math.random() * 3,
+            size: 1 + Math.random() * 2,
             delay: Math.random() * 15,
-            duration: 15 + Math.random() * 20,
-            opacity: 0.15 + Math.random() * 0.25,
-            drift: -30 + Math.random() * 60,
-            color: i % 4 === 0 ? accentColor : i % 3 === 0 ? '#8b5cf6' : '#fff'
+            duration: 20 + Math.random() * 15,
+            opacity: 0.1 + Math.random() * 0.15,
+            drift: -20 + Math.random() * 40,
+            color: i % 3 === 0 ? accentColor : '#fff'
         })), [accentColor]
     )
 
@@ -46,169 +156,113 @@ const FloatingParticles = ({ accentColor }) => {
 }
 
 // ============================================
-// LIVE ACTIVITY TICKER - Social Proof
-// Shows simulated recent activity to make app feel alive
+// MODE DATA - All 12 AI Judges
 // ============================================
-const ACTIVITY_MESSAGES = [
-    { emoji: '🔥', text: 'Someone scored 94 in Roast mode!' },
-    { emoji: '⚔️', text: 'Arena battle just finished!' },
-    { emoji: '🎯', text: 'New player joined the Arena' },
-    { emoji: '✨', text: 'Someone got a 98 score!' },
-    { emoji: '😇', text: '3 scans in Nice mode just now' },
-    { emoji: '🏆', text: 'New high score in Arena!' },
-    { emoji: '📸', text: '12 outfits rated this minute' },
-    { emoji: '💀', text: 'Brutal roast delivered!' },
+const MODES = [
+    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive vibes', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)' },
+    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)' },
+    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'Balanced take', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)' },
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Date check', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star rating', color: '#ffd700', glow: 'rgba(255,215,0,0.4)' },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Energy read', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)' },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: "That's hot", color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Evil era', color: '#4c1d95', glow: 'rgba(76,29,149,0.4)' },
+    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft & cute', color: '#ffb6c1', glow: 'rgba(255,182,193,0.4)' },
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Drip check', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
 ]
 
-const LiveActivityTicker = () => {
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [isVisible, setIsVisible] = useState(true)
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setIsVisible(false)
-            setTimeout(() => {
-                setCurrentIndex(prev => (prev + 1) % ACTIVITY_MESSAGES.length)
-                setIsVisible(true)
-            }, 300)
-        }, 10000) // 10 seconds - realistic pacing
-        return () => clearInterval(interval)
-    }, [])
-
-    const activity = ACTIVITY_MESSAGES[currentIndex]
-
-    return (
-        <div
-            className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full mb-3 transition-all duration-300"
-            style={{
-                background: 'rgba(139,92,246,0.15)',
-                border: '1px solid rgba(139,92,246,0.2)',
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateY(0)' : 'translateY(-5px)'
-            }}
-        >
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-white/60">
-                {activity.emoji} {activity.text}
-            </span>
-        </div>
-    )
-}
-
-// Daily Challenge: Rotating mode based on day of year (12 modes)
-const DAILY_MODES = [
-    { id: 'nice', emoji: '😇', label: 'Nice' },
-    { id: 'roast', emoji: '🔥', label: 'Roast' },
-    { id: 'honest', emoji: '📊', label: 'Honest' },
-    { id: 'savage', emoji: '💀', label: 'Savage' },
-    { id: 'rizz', emoji: '😏', label: 'Rizz' },
-    { id: 'celeb', emoji: '⭐', label: 'Celebrity' },
-    { id: 'aura', emoji: '🔮', label: 'Aura' },
-    { id: 'chaos', emoji: '🎪', label: 'Chaos' },
-    { id: 'y2k', emoji: '💎', label: 'Y2K' },
-    { id: 'villain', emoji: '🖤', label: 'Villain' },
-    { id: 'coquette', emoji: '🎀', label: 'Coquette' },
-    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast' }
-]
-
+// Daily Challenge: Rotating mode based on day of year
 const getDailyMode = () => {
     const now = new Date()
     const start = new Date(now.getFullYear(), 0, 0)
     const diff = now - start
     const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24))
-    return DAILY_MODES[dayOfYear % DAILY_MODES.length]
+    return MODES[dayOfYear % MODES.length]
 }
+
+// Get mode data by ID
+const getModeData = (modeId) => MODES.find(m => m.id === modeId) || MODES[0]
 
 export default function HomeScreen({
     mode,
     setMode,
     isPro,
     scansRemaining,
-    // proPreviewAvailable removed - now just 2 free Gemini scans/day
     dailyStreak,
     currentEvent,
     eventMode,
-    dailyChallengeMode,  // Daily challenge mode flag
-    setDailyChallengeMode,  // Setter for daily challenge mode
+    dailyChallengeMode,
+    setDailyChallengeMode,
     setEventMode,
     purchasedScans,
     challengeScore,
     showToast,
     toastMessage,
     showInstallBanner,
-    onShowInstallBanner, // To set false
+    onShowInstallBanner,
     hasSeenEventExplainer,
     onShowEventExplainer,
-    freeEventEntryUsed,  // Track if free user has used their weekly entry
+    freeEventEntryUsed,
     onImageSelected,
     onShowPaywall,
     onShowRules,
-    onShowRestore,          // Show restore Pro modal
+    onShowRestore,
     onError,
-    onStartFashionShow,     // Start Fashion Show flow
-    onShowWeeklyChallenge,  // Navigate to Weekly Challenge page
-    pendingFashionShowWalk, // Auto-trigger camera for Fashion Show walk
-    onClearPendingWalk,     // Clear the pending walk flag
-    fashionShowName,        // Name of current Fashion Show (for display)
-    fashionShowVibe,        // Vibe/mode of current Fashion Show
-    fashionShowVibeLabel,   // Human-readable vibe label
-    activeShows = [],       // User's active Fashion Shows
-    onNavigateToShow,       // Navigate to a specific Fashion Show
-    onRemoveShow,           // Remove a show from the list
-    activeBattles = [],     // User's active 1v1 Battles
-    onNavigateToBattle,     // Navigate to a specific Battle
-    onRemoveBattle,         // Remove a battle from the list
-    onNavigate,             // General navigation callback (for judges, etc.)
-    onOpenArena             // Open Global Arena entry screen
+    onStartFashionShow,
+    onShowWeeklyChallenge,
+    pendingFashionShowWalk,
+    onClearPendingWalk,
+    fashionShowName,
+    fashionShowVibe,
+    fashionShowVibeLabel,
+    activeShows = [],
+    onNavigateToShow,
+    onRemoveShow,
+    activeBattles = [],
+    onNavigateToBattle,
+    onRemoveBattle,
+    onNavigate,
+    onOpenArena
 }) {
+    // ==========================================
     // Local State
-    const [view, setView] = useState('dashboard') // 'dashboard' or 'camera'
+    // ==========================================
+    const [view, setView] = useState('dashboard')
     const [cameraStream, setCameraStream] = useState(null)
     const [facingMode, setFacingMode] = useState('environment')
     const [countdown, setCountdown] = useState(null)
     const [cameraError, setCameraError] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
-    const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false) // Android dual-button picker
-    const [showModeDrawer, setShowModeDrawer] = useState(false) // Pro mode drawer
+    const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false)
+    const [showModeDrawer, setShowModeDrawer] = useState(false)
+    const [showMoreFeatures, setShowMoreFeatures] = useState(false)
+    const [showOnboarding, setShowOnboarding] = useState(() => {
+        return localStorage.getItem('fitrate_onboarded') !== 'true'
+    })
 
-    // One-time discoverability nudge for Nice/Roast toggle
-    const [hasSeenNudge] = useState(() => localStorage.getItem('fitrate_seen_mode_nudge') === 'true')
-    const [showNudge, setShowNudge] = useState(!hasSeenNudge)
-    const [nudgePhase, setNudgePhase] = useState(0) // 0=pulse, 1=crossfade to nice, 2=crossfade back
+    // Refs
+    const videoRef = useRef(null)
+    const canvasRef = useRef(null)
+    const fileInputRef = useRef(null)
 
-    // Run one-time nudge animation on first load
-    useEffect(() => {
-        if (!showNudge) return
-
-        // Phase 1: Show Nice for 400ms
-        const t1 = setTimeout(() => setNudgePhase(1), 400)
-        // Phase 2: Back to Roast at 800ms
-        const t2 = setTimeout(() => setNudgePhase(2), 800)
-        // Phase 3: End nudge at 1200ms
-        const t3 = setTimeout(() => {
-            localStorage.setItem('fitrate_seen_mode_nudge', 'true')
-            setShowNudge(false)
-            setNudgePhase(0)
-        }, 1200)
-
-        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-    }, [showNudge])
-
-    // Platform Detection Helpers
+    // Platform Detection
     const isAndroid = () => /Android/i.test(navigator.userAgent)
     const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
 
-    // Auto-trigger camera when walking Fashion Show runway
+    // Current mode data
+    const currentMode = getModeData(mode)
+
+    // Auto-trigger camera for Fashion Show walk
     useEffect(() => {
         if (pendingFashionShowWalk) {
             console.log('[FashionShow] Auto-triggering camera for walk')
             onClearPendingWalk?.()
-            // Small delay to let component mount
             setTimeout(() => {
                 if (isAndroid()) {
                     setShowAndroidPhotoModal(true)
                 } else if (isIOS()) {
-                    // iOS/iPad: Use gallery input (shows native picker with camera + gallery)
                     document.getElementById('androidGalleryInput')?.click()
                 } else {
                     startCamera()
@@ -217,17 +271,11 @@ export default function HomeScreen({
         }
     }, [pendingFashionShowWalk])
 
-    // Refs
-    const videoRef = useRef(null)
-    const canvasRef = useRef(null)
-    const fileInputRef = useRef(null)
-
     // ==========================================
     // Camera Handlers
     // ==========================================
     const startCamera = useCallback(async (facing = facingMode) => {
         setCameraError(null)
-        // Stop existing
         if (cameraStream) {
             cameraStream.getTracks().forEach(track => track.stop())
         }
@@ -241,7 +289,6 @@ export default function HomeScreen({
             setFacingMode(facing)
             setView('camera')
 
-            // Connect stream
             setTimeout(() => {
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream
@@ -250,11 +297,7 @@ export default function HomeScreen({
             }, 100)
         } catch (err) {
             console.error('Camera error:', err)
-            // Fallback
             setCameraError(err.message)
-            // If camera access fails, trigger file input directly? 
-            // Or show error in dashboard?
-            // Let's trigger file input 
             fileInputRef.current?.click()
         }
     }, [facingMode, cameraStream])
@@ -269,11 +312,9 @@ export default function HomeScreen({
     }, [cameraStream])
 
     // iOS Safari: Restart camera when returning from background
-    // Camera stream can die silently when app is backgrounded
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible' && view === 'camera' && cameraStream) {
-                // Check if stream is still active
                 const tracks = cameraStream.getTracks()
                 const isActive = tracks.some(track => track.readyState === 'live')
                 if (!isActive) {
@@ -293,14 +334,13 @@ export default function HomeScreen({
     }, [facingMode, startCamera])
 
     const capturePhoto = useCallback(() => {
-        // GUARD: Prevent double-capture from rapid taps
         if (isProcessing) return
         if (!videoRef.current || !canvasRef.current) return
 
         const video = videoRef.current
         if (video.readyState < 2) return
 
-        setIsProcessing(true) // Lock to prevent double-tap
+        setIsProcessing(true)
         playSound('shutter')
         vibrate(50)
 
@@ -310,7 +350,6 @@ export default function HomeScreen({
         canvas.width = video.videoWidth
         canvas.height = video.videoHeight
 
-        // Flip if user facing
         if (facingMode === 'user') {
             ctx.translate(canvas.width, 0)
             ctx.scale(-1, 1)
@@ -320,8 +359,6 @@ export default function HomeScreen({
         const imageData = canvas.toDataURL('image/jpeg', 0.8)
         stopCamera()
         onImageSelected(imageData)
-        // Note: Don't reset isProcessing - screen navigation will unmount component
-
     }, [facingMode, stopCamera, onImageSelected, isProcessing])
 
     const timerCapture = useCallback(() => {
@@ -369,7 +406,7 @@ export default function HomeScreen({
         const file = e.target.files?.[0]
         if (!file || isProcessing) return
 
-        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        if (file.size > 10 * 1024 * 1024) {
             onError('Image is too large. Please try a smaller photo.')
             return
         }
@@ -390,8 +427,7 @@ export default function HomeScreen({
                     reader.readAsDataURL(file)
                 })
             }
-            // Pass the scan type choice (if any) to the parent
-            onImageSelected(imageData, null) // scanType removed - always null now
+            onImageSelected(imageData, null)
         } catch (err) {
             console.error('Image processing error:', err)
             onError('Something went wrong — try again!')
@@ -401,145 +437,43 @@ export default function HomeScreen({
         }
     }, [isProcessing, onError, onImageSelected])
 
-
     // ==========================================
-    // Helpers
+    // Main Action Handler
     // ==========================================
-
-    // Samsung Galaxy devices have issues with capture="environment" silently failing
-    // Detect Samsung devices to conditionally omit the capture attribute
-    const isSamsungDevice = () => {
-        const ua = navigator.userAgent.toLowerCase();
-        return ua.includes('samsung') || ua.includes('sm-') || ua.includes('galaxy');
-    }
-
-    const getModeColor = () => {
-        const colors = {
-            nice: '#00ff88',
-            roast: '#ff6b35',
-            honest: '#3b82f6',
-            savage: '#ff1493',
-            rizz: '#ff69b4',
-            celeb: '#ffd700',
-            aura: '#9b59b6',
-            chaos: '#ff4444',
-            y2k: '#00CED1',
-            villain: '#4c1d95',
-            coquette: '#ffb6c1',
-            hypebeast: '#f97316'
-        }
-        return colors[mode] || '#00d4ff'
-    }
-    const getModeGlow = () => {
-        const glows = {
-            nice: 'rgba(0,255,136,0.4)',
-            roast: 'rgba(255,107,53,0.4)',
-            honest: 'rgba(59,130,246,0.4)',
-            savage: 'rgba(255,20,147,0.4)',
-            rizz: 'rgba(255,105,180,0.4)',
-            celeb: 'rgba(255,215,0,0.4)',
-            aura: 'rgba(155,89,182,0.4)',
-            chaos: 'rgba(255,68,68,0.4)',
-            y2k: 'rgba(0,206,209,0.4)',
-            villain: 'rgba(76,29,149,0.4)',
-            coquette: 'rgba(255,182,193,0.4)',
-            hypebeast: 'rgba(249,115,22,0.4)'
-        }
-        return glows[mode] || 'rgba(0,212,255,0.4)'
-    }
-
-    // Get emoji for current mode
-    const getModeEmoji = () => {
-        switch (mode) {
-            case 'nice': return '😇'
-            case 'roast': return '🔥'
-            case 'honest': return '📊'
-            case 'savage': return '💀'
-            case 'rizz': return '😏'
-            case 'celeb': return '⭐'
-            case 'aura': return '🔮'
-            case 'chaos': return '🎪'
-            case 'y2k': return '💎'
-            case 'villain': return '🖤'
-            case 'coquette': return '🎀'
-            case 'hypebeast': return '👟'
-            default: return '🔥'
-        }
-    }
-
-    // Get display name for current mode
-    const getModeDisplayName = () => {
-        switch (mode) {
-            case 'nice': return 'Nice'
-            case 'roast': return 'Roast'
-            case 'honest': return 'Honest'
-            case 'savage': return 'Savage'
-            case 'rizz': return 'Rizz'
-            case 'celeb': return 'Celebrity'
-            case 'aura': return 'Aura'
-            case 'chaos': return 'Chaos'
-            case 'y2k': return 'Y2K'
-            case 'villain': return 'Villain'
-            case 'coquette': return 'Coquette'
-            case 'hypebeast': return 'Hypebeast'
-            default: return 'Roast'
-        }
-    }
-
-    // Derived Styles
-    const accent = getModeColor()
-    const accentGlow = getModeGlow()
-    const accentEnd = {
-        savage: '#ff0044', roast: '#ff8800', honest: '#00d4ff',
-        rizz: '#ff1493', celeb: '#ff8c00', aura: '#8e44ad', chaos: '#ee5a24'
-    }[mode] || '#00ff88'
-
     const handleStart = () => {
-        // GUARD: Prevent rapid double-taps
         if (isProcessing) return
 
         playSound('click')
         vibrate(20)
 
-        // GUARD: Block free users in event mode who've used their weekly entry
+        // Block free users in event mode who've used their weekly entry
         if (eventMode && !isPro && freeEventEntryUsed) {
-            // Exit event mode and show paywall with context
             setEventMode(false)
             onShowPaywall()
             return
         }
 
         if (scansRemaining > 0 || isPro || purchasedScans > 0) {
-            // PLATFORM-SPECIFIC CAMERA HANDLING:
-            // - Android: Show dual-button modal (Take Photo / Upload) due to Chrome 14/15 bug
-            // - iOS: Use native camera app via file input with capture attribute
-            // - Desktop: getUserMedia for live camera preview
             proceedToCamera()
         } else {
             onShowPaywall()
         }
     }
 
-    // Handle camera opening after scan type is chosen (or directly if no choice needed)
     const proceedToCamera = () => {
         if (isAndroid()) {
-            // Android: Show photo picker modal (Take Photo vs Upload)
             setShowAndroidPhotoModal(true)
         } else if (isIOS()) {
-            // iOS: Use gallery input (no capture attr) - shows native picker with BOTH camera and gallery options!
             document.getElementById('androidGalleryInput')?.click()
         } else {
-            // Desktop: Use getUserMedia for live camera preview
             startCamera()
         }
     }
 
-    // Android-specific handlers for dual-button modal
     const handleAndroidTakePhoto = () => {
         setShowAndroidPhotoModal(false)
         playSound('click')
         vibrate(15)
-        // Directly click camera input with capture attribute (forces native camera)
         document.getElementById('androidCameraInput')?.click()
     }
 
@@ -547,8 +481,34 @@ export default function HomeScreen({
         setShowAndroidPhotoModal(false)
         playSound('click')
         vibrate(15)
-        // Click gallery input without capture attribute
         document.getElementById('androidGalleryInput')?.click()
+    }
+
+    // ==========================================
+    // Compute scan status text
+    // ==========================================
+    const getScanStatusText = () => {
+        if (isPro) return '∞ Unlimited Scans'
+        if (purchasedScans > 0) return `${purchasedScans} Bonus Scans`
+        return `${scansRemaining} Free Scans`
+    }
+
+    const getScanStatusIcon = () => {
+        if (isPro) return '👑'
+        if (purchasedScans > 0) return '💎'
+        return '⚡'
+    }
+
+    // ==========================================
+    // Count active items for badge
+    // ==========================================
+    const activeItemsCount = activeBattles.length + activeShows.length
+
+    // ==========================================
+    // RENDER: Onboarding
+    // ==========================================
+    if (showOnboarding) {
+        return <OnboardingOverlay onComplete={() => setShowOnboarding(false)} />
     }
 
     // ==========================================
@@ -560,7 +520,6 @@ export default function HomeScreen({
                 paddingTop: 'env(safe-area-inset-top)',
                 paddingBottom: 'env(safe-area-inset-bottom)'
             }}>
-                {/* Live camera preview */}
                 <video
                     ref={videoRef}
                     autoPlay
@@ -574,21 +533,18 @@ export default function HomeScreen({
                 <div className="relative z-10 flex items-center justify-between px-4 pt-4">
                     <div className="px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
                         <span className="text-white text-sm font-medium">
-                            {mode === 'roast' ? '🔥 Roast' : mode === 'honest' ? '📊 Honest' : '✨ Nice'}
+                            {currentMode.emoji} {currentMode.label}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => { playSound('click'); vibrate(10); flipCamera(); }}
-                            className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-95"
-                            aria-label="Flip camera to front or back"
-                        >
-                            <span className="text-xl" aria-hidden="true">🔄</span>
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => { playSound('click'); vibrate(10); flipCamera(); }}
+                        className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center active:scale-95"
+                        aria-label="Flip camera"
+                    >
+                        <span className="text-xl">🔄</span>
+                    </button>
                 </div>
 
-                {/* Spacer */}
                 <div className="flex-1" />
 
                 {/* Bottom controls */}
@@ -596,38 +552,35 @@ export default function HomeScreen({
                     <div className="flex items-center justify-center gap-6 py-4" style={{
                         background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)'
                     }}>
-                        {/* Cancel */}
                         <button
                             onClick={() => { playSound('click'); vibrate(15); stopCamera(); }}
-                            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95"
-                            aria-label="Cancel and return to home"
+                            className="w-14 h-14 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95"
+                            aria-label="Cancel"
                         >
-                            <span className="text-white text-xl" aria-hidden="true">✕</span>
+                            <span className="text-white text-2xl">✕</span>
                         </button>
 
-                        {/* Capture */}
                         <button
                             onClick={() => { playSound('click'); vibrate(30); capturePhoto(); }}
                             disabled={countdown !== null}
                             className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
                             aria-label="Take photo"
                             style={{
-                                background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                                boxShadow: '0 0 30px rgba(0,212,255,0.5)',
+                                background: `linear-gradient(135deg, ${currentMode.color} 0%, #00ff88 100%)`,
+                                boxShadow: `0 0 30px ${currentMode.glow}`,
                                 border: '4px solid white'
                             }}
                         >
-                            <span className="text-3xl" aria-hidden="true">📸</span>
+                            <span className="text-3xl">📸</span>
                         </button>
 
-                        {/* Timer */}
                         <button
                             onClick={() => { playSound('click'); vibrate(20); timerCapture(); }}
                             disabled={countdown !== null}
-                            className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
-                            aria-label="Start 3 second countdown timer"
+                            className="w-14 h-14 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-sm active:scale-95 disabled:opacity-50"
+                            aria-label="3 second timer"
                         >
-                            <span className="text-white text-lg" aria-hidden="true">⏱️</span>
+                            <span className="text-white text-xl">⏱️</span>
                         </button>
                     </div>
                 </div>
@@ -636,7 +589,7 @@ export default function HomeScreen({
                 {countdown !== null && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                         <div className="text-8xl font-black text-white" style={{
-                            textShadow: '0 0 40px rgba(0,212,255,0.8), 0 0 80px rgba(0,212,255,0.5)',
+                            textShadow: `0 0 40px ${currentMode.glow}, 0 0 80px ${currentMode.glow}`,
                             animation: 'pulse 0.5s ease-in-out'
                         }}>
                             {countdown}
@@ -644,79 +597,34 @@ export default function HomeScreen({
                     </div>
                 )}
 
-                {/* Canvas hidden */}
                 <canvas ref={canvasRef} className="hidden" />
             </div>
         )
     }
 
     // ==========================================
-    // RENDER: Dashboard View (Default)
+    // RENDER: Dashboard View (Simplified & Clean)
     // ==========================================
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-hidden relative" style={{
-            background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 25%, #12091f 60%, #0a0610 100%)',
+        <div className="min-h-screen flex flex-col items-center p-6 overflow-hidden relative" style={{
+            background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 30%, #12091f 70%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-            // Account for fixed BottomNav (64px) + safe area + extra breathing room
             paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'
         }}>
-            {/* Background Glow - Main accent with premium breathing effect */}
+            {/* Subtle Background - Only ONE animated glow */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* Primary glow orb */}
-                <div className="absolute w-[600px] h-[600px] rounded-full" style={{
-                    background: `radial-gradient(circle, ${accentGlow} 0%, transparent 60%)`,
-                    top: '30%', left: '50%',
+                <div className="absolute w-[500px] h-[500px] rounded-full" style={{
+                    background: `radial-gradient(circle, ${currentMode.glow} 0%, transparent 60%)`,
+                    top: '35%', left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    animation: 'glow-breathe 4s ease-in-out infinite',
-                    opacity: 0.35,
-                    '--glow-color': accentGlow
+                    animation: 'glow-breathe 6s ease-in-out infinite',
+                    opacity: 0.3
                 }} />
-                {/* Secondary glow for depth */}
-                <div className="absolute w-[400px] h-[400px] rounded-full" style={{
-                    background: 'radial-gradient(circle, rgba(139,92,246,0.6) 0%, transparent 70%)',
-                    bottom: '20%', left: '50%',
-                    transform: 'translateX(-50%)',
-                    animation: 'glow-breathe 5s ease-in-out infinite 1s',
-                    opacity: 0.2
-                }} />
-                {/* Tertiary accent glow */}
-                <div className="absolute w-[300px] h-[300px] rounded-full" style={{
-                    background: `radial-gradient(circle, ${accent}40 0%, transparent 70%)`,
-                    top: '60%', right: '-10%',
-                    animation: 'float-gentle 6s ease-in-out infinite',
-                    opacity: 0.25
-                }} />
-                {/* Sparkle particles layer */}
-                <div className="absolute inset-0" style={{
-                    backgroundImage: `radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.5) 0%, transparent 100%),
-                                      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.4) 0%, transparent 100%),
-                                      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6) 0%, transparent 100%),
-                                      radial-gradient(2px 2px at 130px 90px, rgba(255,255,255,0.3) 0%, transparent 100%),
-                                      radial-gradient(1px 1px at 160px 20px, rgba(255,255,255,0.5) 0%, transparent 100%),
-                                      radial-gradient(1.5px 1.5px at 180px 100px, ${accent}80 0%, transparent 100%)`,
-                    backgroundSize: '200px 150px',
-                    animation: 'particle-twinkle 3s ease-in-out infinite'
-                }} />
-
-                {/* Premium floating particles */}
-                <FloatingParticles accentColor={accent} />
+                <FloatingParticles accentColor={currentMode.color} />
             </div>
 
-
-            {/* Toast */}
-            {showToast && (
-                <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60 animate-bounce" style={{
-                    background: 'rgba(0,255,136,0.9)',
-                    boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
-                }}>
-                    <span className="text-black font-bold text-sm">{toastMessage}</span>
-                </div>
-            )}
-
-            {/* Visually Hidden Inputs - Android needs separate camera vs gallery inputs
-                Using visibility technique instead of display:none for Android compatibility */}
-            {/* Android Camera Input - with capture attribute to force native camera */}
+            {/* Hidden Inputs */}
             <input
                 type="file"
                 accept="image/*"
@@ -725,7 +633,6 @@ export default function HomeScreen({
                 onChange={handleFileUpload}
                 style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
             />
-            {/* Android Gallery Input - no capture, opens gallery picker */}
             <input
                 type="file"
                 accept="image/*"
@@ -733,7 +640,6 @@ export default function HomeScreen({
                 onChange={handleFileUpload}
                 style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1 }}
             />
-            {/* Fallback input for iOS/desktop when getUserMedia fails */}
             <input
                 type="file"
                 accept="image/*"
@@ -743,39 +649,42 @@ export default function HomeScreen({
             />
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* Header with Logo and Profile */}
-            <div className="w-full flex items-center justify-between px-4 mb-2">
-                {/* Streak Badge - Left side */}
-                <div
-                    className="relative w-10 h-10 flex items-center justify-center rounded-full cursor-pointer transition-all active:scale-90"
+            {/* Toast */}
+            {showToast && (
+                <div className="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-60" style={{
+                    background: 'rgba(0,255,136,0.9)',
+                    boxShadow: '0 4px 20px rgba(0,255,136,0.4)'
+                }}>
+                    <span className="text-black font-bold text-sm">{toastMessage}</span>
+                </div>
+            )}
+
+            {/* ============================================ */}
+            {/* HEADER - Clean & Minimal */}
+            {/* ============================================ */}
+            <div className="w-full flex items-center justify-between mb-4">
+                {/* Streak Badge - 48px touch target */}
+                <button
+                    className="relative w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90"
                     style={{
                         background: dailyStreak?.current > 0
                             ? 'rgba(255,107,0,0.15)'
                             : 'rgba(255,255,255,0.05)',
                         border: dailyStreak?.current > 0
                             ? '1px solid rgba(255,107,0,0.3)'
-                            : '1px solid rgba(255,255,255,0.1)',
-                        boxShadow: dailyStreak?.current >= 7
-                            ? '0 0 15px rgba(255,107,0,0.4)'
-                            : 'none'
+                            : '1px solid rgba(255,255,255,0.1)'
                     }}
                     onClick={() => {
-                        vibrate(10);
+                        vibrate(10)
                         const msg = dailyStreak?.current > 0
-                            ? dailyStreak.message || `${dailyStreak.current} day streak! 🔥`
-                            : 'Start your streak today! 💪';
-                        showToast?.(msg);
+                            ? `${dailyStreak.current} day streak! 🔥`
+                            : 'Start your streak today! 💪'
+                        showToast?.(msg)
                     }}
-                    title={dailyStreak?.current > 0 ? `${dailyStreak.current} day streak` : 'No active streak'}
+                    aria-label={`${dailyStreak?.current || 0} day streak`}
                 >
-                    <span className="text-lg" style={{
-                        filter: dailyStreak?.current >= 7 ? 'drop-shadow(0 0 4px rgba(255,107,0,0.8))' : 'none'
-                    }}>
-                        {dailyStreak?.current >= 30 ? '🏆' :
-                            dailyStreak?.current >= 14 ? '👑' :
-                                dailyStreak?.current >= 7 ? '✨' :
-                                    dailyStreak?.current >= 3 ? '🔥' :
-                                        dailyStreak?.current >= 1 ? '🔥' : '💤'}
+                    <span className="text-xl">
+                        {dailyStreak?.current >= 7 ? '🔥' : dailyStreak?.current >= 1 ? '🔥' : '💤'}
                     </span>
                     {dailyStreak?.current > 0 && (
                         <span
@@ -784,773 +693,418 @@ export default function HomeScreen({
                                 background: 'linear-gradient(135deg, #ff6b00, #ff9500)',
                                 color: '#fff',
                                 minWidth: '18px',
-                                textAlign: 'center',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                textAlign: 'center'
                             }}
                         >
                             {dailyStreak.current}
                         </span>
                     )}
-                </div>
+                </button>
 
-                {/* Logo - centered */}
+                {/* Logo */}
                 <img
                     src="/logo.svg"
                     alt="FitRate"
-                    className="h-12"
+                    className="h-10"
                     style={{
-                        filter: isPro || purchasedScans > 0
-                            ? 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.4))'
-                            : 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))'
+                        filter: 'drop-shadow(0 0 15px rgba(0, 212, 255, 0.3))'
                     }}
                 />
 
-                {/* Profile/Settings Icon */}
+                {/* Settings - 48px touch target */}
                 <button
                     onClick={() => { playSound('click'); vibrate(10); onShowRestore?.(); }}
-                    aria-label="Settings and Restore Purchase"
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90"
+                    aria-label="Settings"
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90"
                     style={{
                         background: 'rgba(255,255,255,0.05)',
                         border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
-                    <span className="text-white/60 text-lg">⚙️</span>
+                    <span className="text-xl">⚙️</span>
                 </button>
             </div>
 
-            {/* Scans Status Badge */}
-            <div className="flex justify-center mb-2">
-                <div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full cursor-pointer transition-all active:scale-95"
-                    style={{
-                        background: purchasedScans > 0
+            {/* ============================================ */}
+            {/* SCAN STATUS - Clear & Tappable */}
+            {/* ============================================ */}
+            <button
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full mb-6 transition-all active:scale-95"
+                style={{
+                    background: isPro
+                        ? 'linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,180,0,0.15) 100%)'
+                        : purchasedScans > 0
                             ? 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,180,0,0.1) 100%)'
-                            : 'rgba(0,212,255,0.08)',
-                        border: purchasedScans > 0
-                            ? '1px solid rgba(255,215,0,0.4)'
-                            : '1px solid rgba(0,212,255,0.25)',
-                    }}
-                    onClick={() => { playSound('click'); vibrate(10); onShowPaywall(); }}
-                >
-                    <span className="text-sm">{purchasedScans > 0 ? '💎' : '⚡'}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest ${purchasedScans > 0 ? 'text-yellow-400' : 'text-cyan-400'}`}>
-                        {purchasedScans > 0 ? `${purchasedScans} Bonus Scans` : `${scansRemaining} Free Scans`}
-                    </span>
-                    <span className="text-[10px] text-white/40">+ Get More</span>
-                </div>
-            </div>
+                            : 'rgba(0,212,255,0.1)',
+                    border: isPro || purchasedScans > 0
+                        ? '1px solid rgba(255,215,0,0.4)'
+                        : '1px solid rgba(0,212,255,0.3)'
+                }}
+                onClick={() => { playSound('click'); vibrate(10); onShowPaywall(); }}
+            >
+                <span className="text-base">{getScanStatusIcon()}</span>
+                <span className={`text-sm font-bold ${isPro || purchasedScans > 0 ? 'text-yellow-400' : 'text-cyan-400'}`}>
+                    {getScanStatusText()}
+                </span>
+                {!isPro && (
+                    <span className="text-white/50 text-xs">• Get More</span>
+                )}
+            </button>
 
-            {/* Install Banner moved to footer - not above-fold */}
-
-            {/* Challenge Banner */}
+            {/* ============================================ */}
+            {/* CONTEXT BANNERS (Only when relevant) */}
+            {/* ============================================ */}
             {challengeScore && (
-                <div className="mb-8 px-6 py-4 rounded-2xl text-center" style={{
-                    background: 'linear-gradient(135deg, rgba(255,68,68,0.2) 0%, rgba(255,136,0,0.2) 100%)',
-                    border: '1px solid rgba(255,136,0,0.4)'
+                <div className="w-full max-w-sm mb-4 p-4 rounded-2xl text-center" style={{
+                    background: 'linear-gradient(135deg, rgba(255,68,68,0.15) 0%, rgba(255,136,0,0.15) 100%)',
+                    border: '1px solid rgba(255,136,0,0.3)'
                 }}>
-                    <p className="text-2xl font-black text-white mb-1">👊 Beat {challengeScore}?</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        Your friend scored {challengeScore}/100 — can you do better?
-                    </p>
+                    <p className="text-xl font-bold text-white">👊 Beat {challengeScore}?</p>
+                    <p className="text-white/60 text-sm">Your friend scored {challengeScore}/100</p>
                 </div>
             )}
 
-            {/* Fashion Show Walk Context Banner - shows active mode */}
             {fashionShowName && (
-                <div className="w-full max-w-sm p-4 rounded-2xl text-center mb-4" style={{
+                <div className="w-full max-w-sm mb-4 p-4 rounded-2xl text-center" style={{
                     background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.15) 100%)',
-                    border: '1px solid rgba(139,92,246,0.4)'
+                    border: '1px solid rgba(139,92,246,0.3)'
                 }}>
-                    <p className="text-lg font-bold text-white mb-1">🎭 Walking in "{fashionShowName}"</p>
-                    {fashionShowVibe && (
-                        <p className="text-sm text-purple-400 font-semibold mb-1">
-                            ⚡ {fashionShowVibeLabel || fashionShowVibe.charAt(0).toUpperCase() + fashionShowVibe.slice(1)} Mode Active
-                        </p>
-                    )}
-                    <p className="text-xs text-purple-300/70">
-                        Take a photo to submit your fit!
-                    </p>
+                    <p className="text-lg font-bold text-white">🎭 Walking in "{fashionShowName}"</p>
+                    <p className="text-purple-300 text-sm">Take a photo to submit your fit!</p>
                 </div>
             )}
 
-            {/* Daily Challenge Context Banner */}
-            {dailyChallengeMode && !fashionShowName && (
-                <div className="w-full max-w-sm p-4 rounded-2xl text-center mb-4" style={{
-                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.15) 100%)',
-                    border: '1px solid rgba(59,130,246,0.4)'
-                }}>
-                    <p className="text-lg font-bold text-white mb-1">⚡ Daily Challenge</p>
-                    <p className="text-sm text-blue-400 font-semibold mb-1">
-                        Get the highest score today!
-                    </p>
-                    <p className="text-xs text-blue-300/70">
-                        Compete for bragging rights!
-                    </p>
-                </div>
-            )}
-
-            {/* Streak moved to bottom area - cleaner above-fold */}
-
-            {/* MAIN ACTION CTA */}
-            <div className="flex-1 flex flex-col items-center justify-center">
-                {/* Out of scans state */}
+            {/* ============================================ */}
+            {/* MAIN CTA - Unified & Clear */}
+            {/* ============================================ */}
+            <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
                 {scansRemaining === 0 && !isPro && purchasedScans === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-6 py-8">
-                        {/* Out of Scans Message */}
+                    /* Out of Scans State - Clean & Clear */
+                    <div className="flex flex-col items-center gap-6 py-8">
                         <div className="text-center">
-                            <span className="text-5xl mb-3 block">⏳</span>
+                            <span className="text-5xl block mb-3">⏳</span>
                             <h2 className="text-white text-xl font-bold mb-1">Out of Scans</h2>
-                            <p className="text-white/50 text-sm">
-                                {timeUntilReset ? `Resets in ${timeUntilReset}` : 'Resets at midnight'}
-                            </p>
+                            <p className="text-white/60 text-sm">Resets at midnight</p>
                         </div>
 
-                        {/* Primary CTA: Get More Scans */}
                         <button
                             onClick={() => { playSound('click'); vibrate(20); onShowPaywall(); }}
-                            className="px-8 py-4 rounded-full font-bold text-lg transition-all active:scale-95"
+                            className="px-8 py-4 rounded-2xl font-bold text-lg transition-all active:scale-95"
                             style={{
                                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                                 color: '#000',
-                                boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+                                boxShadow: '0 4px 25px rgba(0,212,255,0.4)'
                             }}
                         >
                             ✨ Get More Scans
                         </button>
 
-                        {/* Alternative Actions */}
-                        <div className="flex flex-col items-center gap-3 w-full max-w-xs">
-                            <p className="text-white/40 text-xs uppercase tracking-wide">or keep playing</p>
+                        <div className="text-white/50 text-sm">or keep playing free:</div>
 
-                            {/* Fashion Show - Free! */}
+                        <div className="flex gap-3">
                             {onStartFashionShow && (
                                 <button
                                     onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all active:scale-95"
+                                    className="px-5 py-3 rounded-xl transition-all active:scale-95"
                                     style={{
                                         background: 'rgba(139,92,246,0.2)',
                                         border: '1px solid rgba(139,92,246,0.3)'
                                     }}
                                 >
-                                    <span>🎭</span>
-                                    <span className="text-purple-300 font-medium">Fashion Show with Friends</span>
-                                    <span className="text-[10px] bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded-full">FREE</span>
+                                    <span className="text-purple-300 font-medium">🎭 Fashion Show</span>
                                 </button>
                             )}
-
-                            {/* Weekly Challenge */}
-                            {currentEvent && onShowWeeklyChallenge && (
+                            {onOpenArena && (
                                 <button
-                                    onClick={() => { playSound('click'); vibrate(10); onShowWeeklyChallenge(); }}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl transition-all active:scale-95"
+                                    onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
+                                    className="px-5 py-3 rounded-xl transition-all active:scale-95"
                                     style={{
-                                        background: 'rgba(16, 185, 129, 0.15)',
-                                        border: '1px solid rgba(16, 185, 129, 0.3)'
+                                        background: 'rgba(0,212,255,0.15)',
+                                        border: '1px solid rgba(0,212,255,0.3)'
                                     }}
                                 >
-                                    <span>🏆</span>
-                                    <span className="text-emerald-300 font-medium">Weekly Challenge</span>
+                                    <span className="text-cyan-300 font-medium">🌍 Arena</span>
                                 </button>
                             )}
                         </div>
-
-                        {/* Escape Hatch */}
-                        <p className="text-white/30 text-xs">or wait for daily reset</p>
                     </div>
-                ) : (() => {
-                    // Compute visual mode based on nudge animation
-                    const visualMode = showNudge && nudgePhase === 1 ? 'nice' : mode
-                    const isRoast = visualMode === 'roast'
+                ) : (
+                    /* Main CTA - Simplified */
+                    <div className="flex flex-col items-center w-full">
+                        {/* Single breathing ring */}
+                        <div className="relative mb-6">
+                            <div
+                                className="absolute inset-0 rounded-full pointer-events-none"
+                                style={{
+                                    border: `2px solid ${currentMode.color}30`,
+                                    transform: 'scale(1.1)',
+                                    animation: 'ring-breathe 3s ease-in-out infinite'
+                                }}
+                            />
 
-                    // EVENT MODE: Special styling when competing in Weekly Challenge
-                    const isCompeting = eventMode && currentEvent;
-                    // ENTRY BLOCKED: Free user has used their weekly entry
-                    const entryBlocked = isCompeting && !isPro && freeEventEntryUsed;
-
-                    // Pro Flow: User has Pro subscription OR purchased scans
-                    const isProFlow = isPro || purchasedScans > 0;
-
-                    // Choose colors based on mode - each of 12 modes has unique styling
-                    let buttonAccent, buttonAccentEnd, buttonGlow, innerGradient;
-                    if (entryBlocked) {
-                        // Amber/gray for blocked state
-                        buttonAccent = '#f59e0b';
-                        buttonAccentEnd = '#b45309';
-                        buttonGlow = 'rgba(245,158,11,0.3)';
-                        innerGradient = 'linear-gradient(135deg, #78716c 0%, #57534e 50%, #44403c 100%)';
-                    } else if (dailyChallengeMode) {
-                        // Blue for Daily Challenge mode
-                        buttonAccent = '#3b82f6';
-                        buttonAccentEnd = '#1d4ed8';
-                        buttonGlow = 'rgba(59,130,246,0.5)';
-                        innerGradient = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
-                    } else if (isCompeting) {
-                        // Teal/emerald for competition mode
-                        buttonAccent = '#10b981';
-                        buttonAccentEnd = '#0d9488';
-                        buttonGlow = 'rgba(16,185,129,0.5)';
-                        innerGradient = 'linear-gradient(135deg, #10b981 0%, #0d9488 50%, #047857 100%)';
-                    } else {
-                        // Mode-specific colors for all 12 AI modes
-                        switch (mode) {
-                            case 'roast':
-                                buttonAccent = '#ff6b35';
-                                buttonAccentEnd = '#ff4444';
-                                buttonGlow = 'rgba(255,68,68,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ff6b35 0%, #ff4444 50%, #cc2200 100%)';
-                                break;
-                            case 'honest':
-                                buttonAccent = '#3b82f6';
-                                buttonAccentEnd = '#1d4ed8';
-                                buttonGlow = 'rgba(59,130,246,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
-                                break;
-                            case 'savage':
-                                buttonAccent = '#8b00ff';
-                                buttonAccentEnd = '#6b21a8';
-                                buttonGlow = 'rgba(139,0,255,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #8b00ff 0%, #7c3aed 50%, #6b21a8 100%)';
-                                break;
-                            case 'rizz':
-                                buttonAccent = '#ff69b4';
-                                buttonAccentEnd = '#ec4899';
-                                buttonGlow = 'rgba(255,105,180,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ff69b4 0%, #ec4899 50%, #db2777 100%)';
-                                break;
-                            case 'celeb':
-                                buttonAccent = '#ffd700';
-                                buttonAccentEnd = '#f59e0b';
-                                buttonGlow = 'rgba(255,215,0,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ffd700 0%, #f59e0b 50%, #d97706 100%)';
-                                break;
-                            case 'aura':
-                                buttonAccent = '#9b59b6';
-                                buttonAccentEnd = '#8e44ad';
-                                buttonGlow = 'rgba(155,89,182,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #7c3aed 100%)';
-                                break;
-                            case 'chaos':
-                                buttonAccent = '#ff6b6b';
-                                buttonAccentEnd = '#ef4444';
-                                buttonGlow = 'rgba(255,107,107,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ff6b6b 0%, #ef4444 50%, #dc2626 100%)';
-                                break;
-                            case 'y2k':
-                                buttonAccent = '#ff69b4';
-                                buttonAccentEnd = '#da70d6';
-                                buttonGlow = 'rgba(255,105,180,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ff69b4 0%, #da70d6 50%, #ba55d3 100%)';
-                                break;
-                            case 'villain':
-                                buttonAccent = '#2d1b4e';
-                                buttonAccentEnd = '#4c1d95';
-                                buttonGlow = 'rgba(76,29,149,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #4c1d95 100%)';
-                                break;
-                            case 'coquette':
-                                buttonAccent = '#ffb6c1';
-                                buttonAccentEnd = '#ffc0cb';
-                                buttonGlow = 'rgba(255,182,193,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 50%, #ff69b4 100%)';
-                                break;
-                            case 'hypebeast':
-                                buttonAccent = '#f97316';
-                                buttonAccentEnd = '#ea580c';
-                                buttonGlow = 'rgba(249,115,22,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)';
-                                break;
-                            case 'nice':
-                            default:
-                                buttonAccent = '#00d4ff';
-                                buttonAccentEnd = '#00a8cc';
-                                buttonGlow = 'rgba(0,212,255,0.4)';
-                                innerGradient = 'linear-gradient(135deg, #00d4ff 0%, #00a8cc 50%, #0077aa 100%)';
-                                break;
-                        }
-                    }
-
-                    return (
-                        <div className="flex flex-col items-center">
-                            {/* Main Circular Button with Premium Breathing Rings */}
-                            <div className="relative">
-                                {/* Outer breathing ring 1 */}
+                            <button
+                                onClick={handleStart}
+                                aria-label="Take a photo to rate your outfit"
+                                className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all active:scale-[0.97]"
+                                style={{
+                                    background: `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
+                                    border: `3px solid ${currentMode.color}60`,
+                                    boxShadow: `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
+                                }}
+                            >
+                                {/* Inner gradient */}
                                 <div
-                                    className="absolute inset-0 rounded-full pointer-events-none"
+                                    className="absolute inset-4 rounded-full"
                                     style={{
-                                        border: `2px solid ${buttonAccent}30`,
-                                        transform: 'scale(1.08)',
-                                        animation: 'ring-breathe 3s ease-in-out infinite'
-                                    }}
-                                />
-                                {/* Outer breathing ring 2 */}
-                                <div
-                                    className="absolute inset-0 rounded-full pointer-events-none"
-                                    style={{
-                                        border: `1px solid ${buttonAccent}20`,
-                                        transform: 'scale(1.15)',
-                                        animation: 'ring-breathe 3s ease-in-out infinite 0.5s'
-                                    }}
-                                />
-                                {/* Outer breathing ring 3 - largest */}
-                                <div
-                                    className="absolute inset-0 rounded-full pointer-events-none"
-                                    style={{
-                                        border: `1px solid ${buttonAccent}10`,
-                                        transform: 'scale(1.22)',
-                                        animation: 'ring-breathe 3s ease-in-out infinite 1s'
+                                        background: `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
+                                        boxShadow: `0 0 60px ${currentMode.glow}`
                                     }}
                                 />
 
-                                <button
-                                    id="main-scan-cta"
-                                    onClick={handleStart}
-                                    aria-label={isCompeting ? `Submit to ${currentEvent.theme}` : `Take a photo to ${isRoast ? 'roast' : 'rate'} your outfit`}
-                                    className="btn-physical relative w-72 h-72 rounded-full flex flex-col items-center justify-center group"
-                                    style={{
-                                        background: `radial-gradient(circle, ${isCompeting ? 'rgba(16,185,129,0.4)' : isRoast ? 'rgba(255,100,50,0.4)' : 'rgba(0,212,255,0.3)'} 0%, transparent 65%)`,
-                                        border: `4px solid ${isCompeting ? 'rgba(45,212,191,0.6)' : isRoast ? 'rgba(255,100,50,0.5)' : 'rgba(0,212,255,0.4)'}`,
-                                        boxShadow: `
-                                            var(--shadow-physical),
-                                            0 0 60px ${buttonGlow},
-                                            0 0 120px ${isCompeting ? 'rgba(16,185,129,0.3)' : isRoast ? 'rgba(255,68,68,0.3)' : 'rgba(0,212,255,0.3)'},
-                                            inset 0 0 60px rgba(255,255,255,0.05)
-                                        `,
-                                        animation: isCompeting ? 'tealPulse 2s ease-in-out infinite' : 'glow-breathe 4s ease-in-out infinite',
-                                        '--glow-color': buttonGlow
-                                    }}
-                                >
-                                    {/* Animated sparkles for competition mode */}
-                                    {isCompeting && (
-                                        <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
-                                            <div className="absolute" style={{ top: '10%', left: '20%', animation: 'sparkle 1.5s ease-in-out infinite', fontSize: '1.5rem' }}>✨</div>
-                                            <div className="absolute" style={{ top: '15%', right: '15%', animation: 'sparkle 2s ease-in-out infinite 0.3s', fontSize: '1.2rem' }}>⭐</div>
-                                            <div className="absolute" style={{ bottom: '15%', left: '15%', animation: 'sparkleFloat 2.5s ease-in-out infinite 0.5s', fontSize: '1.2rem' }}>⭐</div>
-                                            <div className="absolute" style={{ bottom: '20%', right: '20%', animation: 'sparkle 1.8s ease-in-out infinite 0.8s', fontSize: '1.5rem' }}>✨</div>
-                                        </div>
-                                    )}
+                                {/* Icon */}
+                                <span className="relative text-6xl mb-2">📸</span>
 
-                                    {/* Inner gradient circle - more vibrant */}
-                                    <div
-                                        className="absolute inset-4 rounded-full transition-all duration-500 group-hover:scale-[1.02] group-active:scale-95"
-                                        style={{
-                                            background: innerGradient,
-                                            boxShadow: `0 0 80px ${buttonGlow}, 0 0 40px ${buttonGlow}`,
-                                            animation: 'pulse 2s ease-in-out infinite'
-                                        }}
-                                        aria-hidden="true"
-                                    />
+                                {/* Main Text - Always the same */}
+                                <span className="relative text-white font-black text-2xl tracking-wide">
+                                    RATE MY OUTFIT
+                                </span>
 
-                                    {/* Emoji - uses mode-specific emoji for all 12 modes */}
-                                    <span className="relative text-7xl mb-2 drop-shadow-2xl transition-all duration-300" aria-hidden="true">
-                                        {entryBlocked ? '🔒' : dailyChallengeMode ? getDailyMode().emoji : isCompeting ? '🏆' : getModeEmoji()}
-                                    </span>
-
-                                    {/* Main Text - mode-specific call to action */}
-                                    <span className={`relative text-white font-black tracking-wide uppercase text-center transition-all duration-300 px-2 ${isCompeting && currentEvent?.theme?.length > 12 ? 'text-lg' : 'text-2xl'
-                                        }`}>
-                                        {entryBlocked ? 'ENTRY USED'
-                                            : dailyChallengeMode ? 'DAILY CHALLENGE'
-                                                : isCompeting ? (currentEvent.theme || 'COMPETE')
-                                                    : mode === 'nice' ? 'RATE MY FIT'
-                                                        : mode === 'roast' ? 'ROAST MY FIT'
-                                                            : mode === 'honest' ? 'HONEST RATE'
-                                                                : mode === 'savage' ? 'SAVAGE MODE'
-                                                                    : mode === 'rizz' ? 'RIZZ CHECK'
-                                                                        : mode === 'celeb' ? 'CELEB JUDGE'
-                                                                            : mode === 'aura' ? 'AURA READ'
-                                                                                : mode === 'chaos' ? 'CHAOS MODE'
-                                                                                    : mode === 'y2k' ? 'Y2K CHECK'
-                                                                                        : mode === 'villain' ? 'VILLAIN ERA'
-                                                                                            : mode === 'coquette' ? 'COQUETTE'
-                                                                                                : mode === 'hypebeast' ? 'DRIP CHECK'
-                                                                                                    : 'RATE MY FIT'}
-                                    </span>
-
-                                    {/* Subtitle - mode-specific description */}
-                                    <span className="relative text-white/50 text-sm font-medium mt-1 transition-all duration-300">
-                                        {dailyChallengeMode ? `${getDailyMode().label} mode • Bragging rights!`
-                                            : entryBlocked ? 'Entry used today'
-                                                : isCompeting ? `${currentEvent?.theme || 'Weekly Challenge'}`
-                                                    : mode === 'nice' ? 'Supportive AI feedback'
-                                                        : mode === 'roast' ? 'Brutally honest AI'
-                                                            : mode === 'honest' ? 'Balanced analysis'
-                                                                : mode === 'savage' ? 'Maximum destruction'
-                                                                    : mode === 'rizz' ? 'Dating vibe check'
-                                                                        : mode === 'celeb' ? 'Celebrity judge'
-                                                                            : mode === 'aura' ? 'Mystical energy read'
-                                                                                : mode === 'chaos' ? 'Unhinged chaos'
-                                                                                    : mode === 'y2k' ? "That's hot 💎"
-                                                                                        : mode === 'villain' ? 'Main villain energy'
-                                                                                            : mode === 'coquette' ? 'Soft & romantic'
-                                                                                                : mode === 'hypebeast' ? 'Certified drip'
-                                                                                                    : 'AI feedback'}
-                                    </span>
-
-                                    {/* Exit Challenge Button - Simple version without redundant text */}
-                                    {(dailyChallengeMode || (eventMode && currentEvent)) && (
-                                        <button
-                                            className="mt-3 px-4 py-2 rounded-lg transition-all active:scale-95"
-                                            style={{
-                                                background: 'rgba(255,255,255,0.08)',
-                                                border: '1px solid rgba(255,255,255,0.15)'
-                                            }}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                playSound('click')
-                                                vibrate(15)
-                                                if (dailyChallengeMode) {
-                                                    setDailyChallengeMode?.(false)
-                                                } else {
-                                                    setEventMode(false)
-                                                }
-                                            }}
-                                        >
-                                            <span className="text-sm text-white/60">✕ Exit Challenge</span>
-                                        </button>
-                                    )}
-                                </button>
-                            </div> {/* Close breathing rings wrapper */}
+                                {/* Mode indicator - Subtle */}
+                                <span className="relative text-white/70 text-sm font-medium mt-1">
+                                    {currentMode.emoji} {currentMode.label} Mode
+                                </span>
+                            </button>
                         </div>
-                    )
-                })()}
-            </div>
 
-
-            {/* Live Activity Ticker - Social Proof */}
-            {!eventMode && !dailyChallengeMode && <LiveActivityTicker />}
-
-            {/* Privacy Assurance */}
-            <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {eventMode
-                    ? '🔒 Entry photo saved for leaderboard display'
-                    : '🔒 Your photos, your privacy • Auto-deleted'
-                }
-            </p>
-
-            {/* Mini-Dashboard: 2-Column Layout with Mode + Arena */}
-            {!eventMode && !dailyChallengeMode && (
-                <div className="flex gap-3 w-full max-w-sm mb-4">
-                    {/* Mode Selector Card */}
-                    <button
-                        onClick={() => {
-                            playSound('click')
-                            vibrate(15)
-                            setShowModeDrawer(true)
-                            if (showNudge) {
-                                localStorage.setItem('fitrate_seen_mode_nudge', 'true')
-                                setShowNudge(false)
-                            }
-                        }}
-                        className={`flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97] ${showNudge ? 'animate-pulse' : ''}`}
-                        style={{
-                            background: `linear-gradient(135deg, ${getModeColor()}20 0%, ${getModeColor()}10 100%)`,
-                            border: `1px solid ${getModeColor()}40`,
-                            boxShadow: `0 0 20px ${getModeGlow()}`
-                        }}
-                    >
-                        <span className="text-2xl">{getModeEmoji()}</span>
-                        <span className="text-white font-bold text-sm">{getModeDisplayName()}</span>
-                        <span className="text-white/40 text-[10px]">12 modes ▼</span>
-                    </button>
-
-                    {/* Global Arena Card - Enhanced for Discovery */}
-                    {onOpenArena && (
+                        {/* Mode Selector - Clean pill button */}
                         <button
                             onClick={() => {
                                 playSound('click')
-                                vibrate(20)
-                                // Open Arena entry screen
-                                onOpenArena()
+                                vibrate(15)
+                                setShowModeDrawer(true)
                             }}
-                            className="flex-1 py-4 px-4 rounded-2xl flex flex-col items-center gap-1 transition-all active:scale-[0.97] relative overflow-hidden"
+                            className="flex items-center gap-2 px-5 py-3 rounded-full transition-all active:scale-95 mb-4"
                             style={{
-                                background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.1) 100%)',
-                                border: '1px solid rgba(0,212,255,0.3)',
-                                boxShadow: '0 0 25px rgba(0,212,255,0.2), inset 0 0 20px rgba(0,212,255,0.05)',
-                                animation: 'arena-glow 2s ease-in-out infinite'
+                                background: `${currentMode.color}20`,
+                                border: `1px solid ${currentMode.color}40`
                             }}
                         >
-                            {/* HOT Badge - Drives discovery */}
-                            <div
-                                className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[9px] font-black"
-                                style={{
-                                    background: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)',
-                                    color: '#fff',
-                                    boxShadow: '0 2px 8px rgba(255,107,53,0.5)'
-                                }}
-                            >
-                                HOT
-                            </div>
-                            <span className="text-2xl">🌍</span>
-                            <span className="text-white font-bold text-sm">Arena</span>
-                            <div className="flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                                <span className="text-cyan-400 text-[10px] font-medium">Live</span>
-                            </div>
+                            <span className="text-xl">{currentMode.emoji}</span>
+                            <span className="text-white font-semibold">{currentMode.label}</span>
+                            <span className="text-white/50 text-sm">• Change ▼</span>
                         </button>
-                    )}
-                </div>
-            )}
 
-            {/* My Battles Section - Active 1v1 Battles */}
-            <div className="w-full max-w-sm mb-4">
-                <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg">⚔️</span>
-                        <span className="text-white/60 text-sm font-semibold">My Battles</span>
-                        {activeBattles.length > 0 && (
-                            <span className="text-white/30 text-xs">({activeBattles.length})</span>
-                        )}
-                    </div>
-                </div>
-
-                {activeBattles.length === 0 ? (
-                    /* Empty State - Engaging CTA */
-                    <button
-                        onClick={() => {
-                            playSound('click')
-                            vibrate(15)
-                            // Navigate to Arena for a battle
-                            setArenaScreen?.('entry')
-                        }}
-                        className="w-full p-5 rounded-2xl transition-all active:scale-[0.98] animate-stagger-fade-up"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(0,212,255,0.05) 100%)',
-                            border: '1px dashed rgba(139,92,246,0.3)',
-                            opacity: 0,
-                            animationDelay: '0.1s'
-                        }}
-                    >
-                        <div className="text-center">
-                            <span className="text-3xl mb-2 block">🎯</span>
-                            <p className="text-white/70 font-semibold text-sm mb-1">No battles yet!</p>
-                            <p className="text-purple-400 text-xs">Tap to enter the Arena →</p>
-                        </div>
-                    </button>
-                ) : (
-                    <div className="space-y-2">
-                        {activeBattles.map((battle, index) => {
-                            const modeEmojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏' }
-                            const statusText = battle.status === 'completed' ? 'Results ready!' : 'Waiting for opponent...'
-                            const statusColor = battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'
-                            return (
-                                <div
-                                    key={battle.battleId}
-                                    className="w-full flex items-center justify-between p-4 rounded-2xl transition-all glass-premium animate-stagger-fade-up"
-                                    style={{
-                                        background: battle.status === 'completed'
-                                            ? 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,212,255,0.1) 100%)'
-                                            : 'linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,0,128,0.1) 100%)',
-                                        border: battle.status === 'completed'
-                                            ? '1px solid rgba(0,255,136,0.25)'
-                                            : '1px solid rgba(255,107,53,0.25)',
-                                        opacity: 0,
-                                        animationDelay: `${0.1 + index * 0.1}s`
-                                    }}
-                                >
-                                    <button
-                                        onClick={() => {
-                                            playSound('click')
-                                            vibrate(15)
-                                            onNavigateToBattle?.(battle.battleId)
-                                        }}
-                                        className="flex items-center gap-3 flex-1 text-left"
-                                    >
-                                        <span className="text-2xl">{modeEmojis[battle.mode] || '⚔️'}</span>
-                                        <div>
-                                            <p className="text-white font-bold text-sm">
-                                                {battle.mode?.charAt(0).toUpperCase() + battle.mode?.slice(1) || 'Battle'} Mode
-                                            </p>
-                                            <p className={`text-xs ${statusColor}`}>{statusText}</p>
-                                        </div>
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
-                                            playSound('click')
-                                            vibrate(10)
-                                            onRemoveBattle?.(battle.battleId)
-                                        }}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90"
-                                        style={{
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                        aria-label="Remove battle from list"
-                                    >
-                                        <span className="text-white/40 text-sm">✕</span>
-                                    </button>
-                                </div>
-                            )
-                        })}
+                        {/* Privacy - minimal */}
+                        <p className="text-white/40 text-xs mb-4">
+                            🔒 Photos auto-deleted • Your privacy protected
+                        </p>
                     </div>
                 )}
             </div>
 
-            {/* My Shows Section - Active Fashion Shows */}
-            {activeShows.length > 0 && (
-                <div className="w-full max-w-sm mb-4">
-                    <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg">🎭</span>
-                            <span className="text-white/60 text-sm font-semibold">My Shows</span>
-                            <span className="text-white/30 text-xs">({activeShows.length})</span>
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        {activeShows.map((show, index) => (
-                            <div
-                                key={show.showId}
-                                className="w-full flex items-center justify-between p-4 rounded-2xl transition-all glass-premium animate-stagger-fade-up"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.1) 100%)',
-                                    border: '1px solid rgba(139,92,246,0.25)',
-                                    opacity: 0,
-                                    animationDelay: `${0.1 + index * 0.1}s`
-                                }}
-                            >
-                                <button
-                                    onClick={() => {
-                                        playSound('click')
-                                        vibrate(15)
-                                        onNavigateToShow?.(show.showId)
-                                    }}
-                                    className="flex items-center gap-3 flex-1 text-left"
-                                >
-                                    <span className="text-2xl">🎭</span>
-                                    <div>
-                                        <p className="text-white font-semibold text-sm">{show.name}</p>
-                                        <p className="text-purple-300/60 text-[10px]">
-                                            {show.vibeLabel || 'Nice 😌'} • Tap to rejoin
-                                        </p>
-                                    </div>
-                                </button>
-                                {/* Dismiss/Remove Button */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        playSound('click')
-                                        vibrate(10)
-                                        onRemoveShow?.(show.showId)
-                                    }}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90"
-                                    style={{
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(255,255,255,0.1)'
-                                    }}
-                                    aria-label="Remove show from list"
-                                >
-                                    <span className="text-white/40 text-sm">✕</span>
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Event Destination Cards - Side by side */}
-            <div className="grid grid-cols-2 gap-3 w-full max-w-sm mb-4">
-                {/* Fashion Show - Purple gradient with animated sparkles */}
-                {onStartFashionShow && (
-                    <button
-                        onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                        className="relative overflow-hidden rounded-2xl p-3 transition-all active:scale-[0.98]"
-                        style={{
-                            background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #4c1d95 100%)',
-                            border: '2px solid rgba(167,139,250,0.5)',
-                            boxShadow: '0 4px 20px rgba(139,92,246,0.4), 0 0 40px rgba(167,139,250,0.2)'
-                        }}
-                    >
-                        {/* Animated sparkle overlay */}
-                        <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute" style={{ top: '10%', left: '12%', animation: 'sparkle 1.8s ease-in-out infinite' }}>✨</div>
-                            <div className="absolute" style={{ bottom: '20%', right: '15%', animation: 'sparkle 2.2s ease-in-out infinite 0.4s' }}>💜</div>
-                        </div>
-                        <span className="relative text-3xl block mb-1 drop-shadow-lg">🎭</span>
-                        <span className="relative text-white font-bold text-sm block">Fashion Show</span>
-                        <span className="relative text-purple-200/70 text-[11px]">Compete with friends</span>
-                    </button>
-                )}
-
-                {/* Challenges - Navigate to Challenges screen */}
-                {(currentEvent || true) && (
-                    <button
-                        onClick={() => {
-                            playSound('click');
-                            vibrate(15);
-                            onShowWeeklyChallenge?.();
-                        }}
-                        className="relative overflow-hidden rounded-2xl p-3 transition-all active:scale-[0.98]"
-                        style={{
-                            background: 'linear-gradient(135deg, #047857 0%, #10b981 40%, #0d9488 70%, #115e59 100%)',
-                            border: '2px solid rgba(45,212,191,0.5)',
-                            boxShadow: '0 4px 20px rgba(16,185,129,0.4), 0 0 40px rgba(45,212,191,0.2)',
-                        }}
-                    >
-                        {/* Animated sparkle overlay */}
-                        <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute" style={{ top: '10%', left: '15%', animation: 'sparkle 1.5s ease-in-out infinite' }}>✨</div>
-                            <div className="absolute" style={{ bottom: '15%', right: '12%', animation: 'sparkle 2s ease-in-out infinite 0.3s' }}>⭐</div>
-                        </div>
-                        {/* Gold shimmer line */}
-                        <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                            <div className="absolute top-0 left-0 w-full h-full" style={{
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.3) 50%, transparent 100%)',
-                                transform: 'translateX(-100%)',
-                                animation: 'shimmer 3s infinite'
-                            }} />
-                        </div>
-                        <span className="relative text-3xl block mb-1 drop-shadow-lg">🏆</span>
-                        <span className="relative text-white font-bold text-sm block">Challenges</span>
-                        <span className="relative text-teal-100/80 text-[11px]">Daily & Weekly challenges</span>
-                    </button>
-                )}
-            </div>
-
-            {/* Subtle PWA Install Prompt - only show if not already installed */}
-            {!window.matchMedia('(display-mode: standalone)').matches && (
+            {/* ============================================ */}
+            {/* MORE FEATURES - Collapsible Section */}
+            {/* ============================================ */}
+            <div className="w-full max-w-sm">
                 <button
                     onClick={() => {
                         playSound('click')
-                        // Show iOS instructions or trigger beforeinstallprompt
-                        if (window.deferredInstallPrompt) {
-                            window.deferredInstallPrompt.prompt()
-                        } else {
-                            // iOS fallback - show toast with instructions
-                            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
-                            if (isIOS) {
-                                alert('Tap the Share button (□↑) then "Add to Home Screen"')
-                            } else {
-                                alert('Tap the menu (⋮) then "Add to Home Screen" or "Install App"')
-                            }
-                        }
+                        vibrate(10)
+                        setShowMoreFeatures(!showMoreFeatures)
                     }}
-                    className="mt-4 mb-4 text-xs transition-all active:opacity-60"
-                    style={{ color: 'rgba(255,255,255,0.45)' }}
+                    className="w-full flex items-center justify-center gap-2 py-3 text-white/60 text-sm font-medium transition-all"
                 >
-                    📲 Add to Home Screen for quick access
+                    <span>{showMoreFeatures ? '▲' : '▼'}</span>
+                    <span>More Features</span>
+                    {activeItemsCount > 0 && (
+                        <span className="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            {activeItemsCount}
+                        </span>
+                    )}
                 </button>
-            )}
 
-            {/* Android Photo Picker Modal - Premium Glassmorphism */}
+                {showMoreFeatures && (
+                    <div className="space-y-3 mt-2 animate-fade-in" style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
+                        {/* Quick Actions Grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                            {/* Arena */}
+                            {onOpenArena && (
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
+                                    className="p-4 rounded-2xl transition-all active:scale-[0.97] relative"
+                                    style={{
+                                        background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.1) 100%)',
+                                        border: '1px solid rgba(0,212,255,0.3)'
+                                    }}
+                                >
+                                    <span className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                                        style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
+                                        LIVE
+                                    </span>
+                                    <span className="text-2xl block mb-1">🌍</span>
+                                    <span className="text-white font-bold text-sm block">Arena</span>
+                                    <span className="text-cyan-300/70 text-xs">1v1 Battles</span>
+                                </button>
+                            )}
+
+                            {/* Fashion Show */}
+                            {onStartFashionShow && (
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
+                                    className="p-4 rounded-2xl transition-all active:scale-[0.97]"
+                                    style={{
+                                        background: 'linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(168,85,247,0.15) 100%)',
+                                        border: '1px solid rgba(139,92,246,0.3)'
+                                    }}
+                                >
+                                    <span className="text-2xl block mb-1">🎭</span>
+                                    <span className="text-white font-bold text-sm block">Fashion Show</span>
+                                    <span className="text-purple-300/70 text-xs">With Friends</span>
+                                </button>
+                            )}
+
+                            {/* Challenges */}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
+                                className="p-4 rounded-2xl transition-all active:scale-[0.97]"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(45,212,191,0.1) 100%)',
+                                    border: '1px solid rgba(16,185,129,0.3)'
+                                }}
+                            >
+                                <span className="text-2xl block mb-1">🏆</span>
+                                <span className="text-white font-bold text-sm block">Challenges</span>
+                                <span className="text-emerald-300/70 text-xs">Win Free Scans</span>
+                            </button>
+
+                            {/* Daily Challenge */}
+                            <button
+                                onClick={() => {
+                                    playSound('click')
+                                    vibrate(15)
+                                    const dailyMode = getDailyMode()
+                                    setMode(dailyMode.id)
+                                    setDailyChallengeMode?.(true)
+                                    setShowMoreFeatures(false)
+                                }}
+                                className="p-4 rounded-2xl transition-all active:scale-[0.97]"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.1) 100%)',
+                                    border: '1px solid rgba(59,130,246,0.3)'
+                                }}
+                            >
+                                <span className="text-2xl block mb-1">⚡</span>
+                                <span className="text-white font-bold text-sm block">Daily Challenge</span>
+                                <span className="text-blue-300/70 text-xs">{getDailyMode().label} Mode</span>
+                            </button>
+                        </div>
+
+                        {/* Active Battles */}
+                        {activeBattles.length > 0 && (
+                            <div className="mt-4">
+                                <div className="flex items-center gap-2 mb-2 px-1">
+                                    <span>⚔️</span>
+                                    <span className="text-white/70 text-sm font-semibold">Your Battles</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {activeBattles.map((battle) => (
+                                        <button
+                                            key={battle.battleId}
+                                            onClick={() => {
+                                                playSound('click')
+                                                vibrate(15)
+                                                onNavigateToBattle?.(battle.battleId)
+                                            }}
+                                            className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
+                                            style={{
+                                                background: battle.status === 'completed'
+                                                    ? 'rgba(0,255,136,0.1)'
+                                                    : 'rgba(255,107,53,0.1)',
+                                                border: battle.status === 'completed'
+                                                    ? '1px solid rgba(0,255,136,0.2)'
+                                                    : '1px solid rgba(255,107,53,0.2)'
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xl">
+                                                    {getModeData(battle.mode)?.emoji || '⚔️'}
+                                                </span>
+                                                <div className="text-left">
+                                                    <p className="text-white font-semibold text-sm">
+                                                        {getModeData(battle.mode)?.label || 'Battle'}
+                                                    </p>
+                                                    <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
+                                                        {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="text-white/40">→</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Active Shows */}
+                        {activeShows.length > 0 && (
+                            <div className="mt-4">
+                                <div className="flex items-center gap-2 mb-2 px-1">
+                                    <span>🎭</span>
+                                    <span className="text-white/70 text-sm font-semibold">Your Shows</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {activeShows.map((show) => (
+                                        <button
+                                            key={show.showId}
+                                            onClick={() => {
+                                                playSound('click')
+                                                vibrate(15)
+                                                onNavigateToShow?.(show.showId)
+                                            }}
+                                            className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
+                                            style={{
+                                                background: 'rgba(139,92,246,0.1)',
+                                                border: '1px solid rgba(139,92,246,0.2)'
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xl">🎭</span>
+                                                <div className="text-left">
+                                                    <p className="text-white font-semibold text-sm">{show.name}</p>
+                                                    <p className="text-purple-300/70 text-xs">
+                                                        {show.vibeLabel || 'Tap to rejoin'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="text-white/40">→</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* ============================================ */}
+            {/* MODALS */}
+            {/* ============================================ */}
+
+            {/* Android Photo Picker */}
             {showAndroidPhotoModal && (
                 <div
                     className="fixed inset-0 z-[60] flex items-end justify-center"
                     style={{
                         background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        animation: 'backdrop-fade 0.3s ease-out forwards'
+                        backdropFilter: 'blur(8px)'
                     }}
                     onClick={() => setShowAndroidPhotoModal(false)}
                 >
                     <div
-                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl glass-premium-strong"
+                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,45,0.95) 0%, rgba(20,20,32,0.98) 100%)',
-                            boxShadow: '0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                            animation: 'modal-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                            background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)',
+                            animation: 'slideUp 0.3s ease-out'
                         }}
                         onClick={e => e.stopPropagation()}
                     >
@@ -1559,21 +1113,18 @@ export default function HomeScreen({
                             Choose Photo Source
                         </h3>
                         <div className="flex flex-col gap-3">
-                            {/* Take Photo Button */}
                             <button
                                 onClick={handleAndroidTakePhoto}
                                 className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
                                 style={{
-                                    background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                                    color: '#000',
-                                    boxShadow: '0 4px 20px rgba(0,212,255,0.3)'
+                                    background: `linear-gradient(135deg, ${currentMode.color} 0%, #00ff88 100%)`,
+                                    color: '#000'
                                 }}
                             >
                                 <span className="text-2xl">📷</span>
                                 Take Photo
                             </button>
-                            {/* Upload Photo Button - HIDDEN for Events/Fashion Shows (camera only!) */}
-                            {!eventMode && !fashionShowId && (
+                            {!eventMode && !fashionShowName && (
                                 <button
                                     onClick={handleAndroidUploadPhoto}
                                     className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
@@ -1587,7 +1138,6 @@ export default function HomeScreen({
                                     Upload Photo
                                 </button>
                             )}
-                            {/* Cancel Button */}
                             <button
                                 onClick={() => setShowAndroidPhotoModal(false)}
                                 className="w-full py-3 text-white/50 text-sm font-medium mt-2"
@@ -1597,200 +1147,93 @@ export default function HomeScreen({
                         </div>
                     </div>
                 </div>
-            )
-            }
+            )}
 
-            {/* Mode Drawer - All 12 AI Modes with Premium Glassmorphism */}
+            {/* Mode Drawer - Clean Grid */}
             {showModeDrawer && (
                 <div
                     className="fixed inset-0 z-[60] flex items-end justify-center"
                     style={{
                         background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        animation: 'backdrop-fade 0.3s ease-out forwards'
+                        backdropFilter: 'blur(8px)'
                     }}
                     onClick={() => setShowModeDrawer(false)}
                 >
                     <div
-                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl glass-premium-strong"
+                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,45,0.95) 0%, rgba(20,20,32,0.98) 100%)',
-                            boxShadow: '0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-                            animation: 'modal-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                            background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)',
+                            animation: 'slideUp 0.3s ease-out'
                         }}
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* Drag handle */}
                         <div className="w-10 h-1 bg-white/30 rounded-full mx-auto mb-4" />
 
-                        {/* Header */}
                         <div className="text-center mb-5">
-                            <h3 className="text-white text-lg font-bold mb-1">
-                                Choose AI Mode
-                            </h3>
-                            <p className="text-white/40 text-xs">Pick how you want your fit rated</p>
+                            <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
+                            <p className="text-white/50 text-sm">How should we rate your fit?</p>
                         </div>
 
-                        {/* Mode Grid - 4 columns, 3 rows for 12 modes */}
-                        <div className="grid grid-cols-4 gap-3">
-                            {/* Nice */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('nice'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'nice' ? 'ring-3 ring-cyan-400' : ''}`}
-                                style={{ background: 'rgba(0,212,255,0.15)' }}
-                                aria-label="Nice mode - Supportive AI feedback"
-                            >
-                                <span className="text-3xl mb-1">😇</span>
-                                <span className="text-[13px] font-bold text-cyan-200">Nice</span>
-                            </button>
-
-                            {/* Roast */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('roast'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'roast' ? 'ring-3 ring-orange-400' : ''}`}
-                                style={{ background: 'rgba(255,68,68,0.15)' }}
-                                aria-label="Roast mode - Brutally honest AI"
-                            >
-                                <span className="text-3xl mb-1">🔥</span>
-                                <span className="text-[13px] font-bold text-orange-200">Roast</span>
-                            </button>
-
-                            {/* Honest */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('honest'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'honest' ? 'ring-3 ring-blue-400' : ''}`}
-                                style={{ background: 'rgba(59,130,246,0.15)' }}
-                                aria-label="Honest mode - Balanced analysis"
-                            >
-                                <span className="text-3xl mb-1">📊</span>
-                                <span className="text-[13px] font-bold text-blue-200">Honest</span>
-                            </button>
-
-                            {/* Savage */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('savage'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'savage' ? 'ring-3 ring-purple-400' : ''}`}
-                                style={{ background: 'rgba(139,0,255,0.15)' }}
-                                aria-label="Savage mode - Maximum destruction"
-                            >
-                                <span className="text-3xl mb-1">💀</span>
-                                <span className="text-[13px] font-bold text-purple-200">Savage</span>
-                            </button>
-
-                            {/* Rizz */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('rizz'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'rizz' ? 'ring-3 ring-pink-400' : ''}`}
-                                style={{ background: 'rgba(255,105,180,0.15)' }}
-                                aria-label="Rizz mode - Dating vibe check"
-                            >
-                                <span className="text-3xl mb-1">😏</span>
-                                <span className="text-[13px] font-bold text-pink-200">Rizz</span>
-                            </button>
-
-                            {/* Celebrity */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('celeb'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'celeb' ? 'ring-3 ring-yellow-400' : ''}`}
-                                style={{ background: 'rgba(255,215,0,0.15)' }}
-                                aria-label="Celebrity mode - Celebrity judge"
-                            >
-                                <span className="text-3xl mb-1">⭐</span>
-                                <span className="text-[13px] font-bold text-yellow-200">Celebrity</span>
-                            </button>
-
-                            {/* Aura */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('aura'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'aura' ? 'ring-3 ring-violet-400' : ''}`}
-                                style={{ background: 'rgba(155,89,182,0.15)' }}
-                                aria-label="Aura mode - Mystical energy read"
-                            >
-                                <span className="text-3xl mb-1">🔮</span>
-                                <span className="text-[13px] font-bold text-violet-200">Aura</span>
-                            </button>
-
-                            {/* Chaos */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('chaos'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'chaos' ? 'ring-3 ring-red-400' : ''}`}
-                                style={{ background: 'rgba(255,107,107,0.15)' }}
-                                aria-label="Chaos mode - Unhinged AI chaos"
-                            >
-                                <span className="text-3xl mb-1">🎪</span>
-                                <span className="text-[13px] font-bold text-red-200">Chaos</span>
-                            </button>
-
-                            {/* Y2K */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('y2k'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'y2k' ? 'ring-3 ring-pink-400' : ''}`}
-                                style={{ background: 'rgba(255,105,180,0.15)' }}
-                                aria-label="Y2K mode - That's hot"
-                            >
-                                <span className="text-3xl mb-1">💎</span>
-                                <span className="text-[13px] font-bold text-pink-200">Y2K</span>
-                            </button>
-
-                            {/* Villain */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('villain'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'villain' ? 'ring-3 ring-indigo-400' : ''}`}
-                                style={{ background: 'rgba(76,29,149,0.15)' }}
-                                aria-label="Villain mode - Main villain energy"
-                            >
-                                <span className="text-3xl mb-1">🖤</span>
-                                <span className="text-[13px] font-bold text-indigo-200">Villain</span>
-                            </button>
-
-                            {/* Coquette */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('coquette'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'coquette' ? 'ring-3 ring-pink-300' : ''}`}
-                                style={{ background: 'rgba(255,182,193,0.15)' }}
-                                aria-label="Coquette mode - Soft and romantic"
-                            >
-                                <span className="text-3xl mb-1">🎀</span>
-                                <span className="text-[13px] font-bold text-pink-100">Coquette</span>
-                            </button>
-
-                            {/* Hypebeast */}
-                            <button
-                                onClick={() => { playSound('click'); vibrate(15); setMode('hypebeast'); setEventMode(false); setShowModeDrawer(false); }}
-                                className={`flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl transition-all active:scale-95 min-h-[56px] ${mode === 'hypebeast' ? 'ring-3 ring-orange-400' : ''}`}
-                                style={{ background: 'rgba(249,115,22,0.15)' }}
-                                aria-label="Hypebeast mode - Certified drip check"
-                            >
-                                <span className="text-3xl mb-1">👟</span>
-                                <span className="text-[13px] font-bold text-orange-200">Hypebeast</span>
-                            </button>
+                        {/* Mode Grid - 4 columns */}
+                        <div className="grid grid-cols-4 gap-2">
+                            {MODES.map((m) => (
+                                <button
+                                    key={m.id}
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(15)
+                                        setMode(m.id)
+                                        setEventMode(false)
+                                        setDailyChallengeMode?.(false)
+                                        setShowModeDrawer(false)
+                                    }}
+                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all active:scale-95 ${mode === m.id ? 'ring-2' : ''}`}
+                                    style={{
+                                        background: `${m.color}15`,
+                                        ringColor: m.color
+                                    }}
+                                    aria-label={`${m.label} mode - ${m.desc}`}
+                                >
+                                    <span className="text-2xl">{m.emoji}</span>
+                                    <span className="text-[11px] font-bold text-white/90">{m.label}</span>
+                                </button>
+                            ))}
                         </div>
 
-                        {/* Meet The Judges link */}
+                        {/* Meet The Judges */}
                         <button
                             onClick={() => {
                                 setShowModeDrawer(false)
                                 onNavigate?.('judges')
                             }}
-                            className="w-full py-2.5 text-cyan-400 text-sm font-bold mt-4 transition-all active:text-cyan-300 flex items-center justify-center gap-2"
+                            className="w-full py-3 text-cyan-400 text-sm font-bold mt-4 flex items-center justify-center gap-2"
                         >
                             <span>👥</span>
                             <span>Meet Your AI Judges</span>
                             <span className="text-cyan-400/50">→</span>
                         </button>
 
-                        {/* Cancel */}
                         <button
                             onClick={() => setShowModeDrawer(false)}
-                            aria-label="Close mode selector"
-                            className="w-full py-2.5 text-white/40 text-sm font-medium transition-all active:text-white/60"
+                            className="w-full py-2 text-white/40 text-sm font-medium"
                         >
                             Cancel
                         </button>
                     </div>
                 </div>
             )}
-        </div >
+
+            {/* Inline Styles */}
+            <style>{`
+                @keyframes slideUp {
+                    from { transform: translateY(100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes fadeSlideUp {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+        </div>
     )
 }

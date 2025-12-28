@@ -68,6 +68,7 @@ export default function ChallengesScreen({
     onShowPaywall,
     onShowFullLeaderboard,
     onBack,
+    onOpenArena,
     // Data fetching
     fetchDailyLeaderboard,
     fetchWeeklyLeaderboard
@@ -560,6 +561,7 @@ export default function ChallengesScreen({
                         onBack();
                     }
                 }}
+                onOpenArena={onOpenArena}
                 onScan={() => {
                     onCompeteDaily?.();
                 }}

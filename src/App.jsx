@@ -2572,6 +2572,7 @@ export default function App() {
             onShowPaywall={() => setShowPaywall(true)}
             onShowFullLeaderboard={() => setShowLeaderboard(true)}
             onBack={() => setScreen('home')}
+            onOpenArena={openArenaEntry}
             // Data fetching
             fetchDailyLeaderboard={fetchDailyLeaderboard}
             fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
@@ -2860,6 +2861,7 @@ export default function App() {
             }
             // 'home' tab is already current, no action needed
           }}
+          onOpenArena={openArenaEntry}
           onScan={() => {
             // Trigger the main scan button on HomeScreen
             const mainCta = document.getElementById('main-scan-cta');
@@ -3021,6 +3023,7 @@ export default function App() {
                 setScreen('challenges');
               }
             }}
+            onOpenArena={openArenaEntry}
             onScan={() => {
               // Go home to scan again
               resetApp();
