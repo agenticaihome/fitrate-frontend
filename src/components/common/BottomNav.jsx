@@ -3,29 +3,31 @@ import { playSound, vibrate } from '../../utils/soundEffects'
 
 /**
  * Premium Bottom Navigation Bar
- * Ultra-minimal, sleek design with icons only
- * Enhanced with animated indicators and glow effects
+ * Clean, purposeful design with 4 clear destinations
+ * No redundant scan button - main CTA is on HomeScreen
  */
-export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) {
+export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, onOpenArena }) {
     const handleTap = (tabId) => {
         playSound('click')
         vibrate(15)
 
         if (tabId === 'scan') {
             onScan?.()
+        } else if (tabId === 'arena') {
+            onOpenArena?.()
         } else {
             onNavigate?.(tabId)
         }
     }
 
-    // Clean icon components (SVG-like using simple shapes)
+    // Clean icon components
     const HomeIcon = ({ active }) => (
         <svg
-            width="22"
-            height="22"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke={active ? '#fff' : 'rgba(255,255,255,0.4)'}
+            stroke={active ? '#fff' : 'rgba(255,255,255,0.5)'}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -39,13 +41,34 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
         </svg>
     )
 
-    const TrophyIcon = ({ active, eventMode }) => (
+    const ArenaIcon = ({ active }) => (
         <svg
-            width="22"
-            height="22"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke={eventMode ? '#ffd700' : active ? '#fff' : 'rgba(255,255,255,0.4)'}
+            stroke={active ? '#00d4ff' : 'rgba(255,255,255,0.5)'}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+                filter: active ? 'drop-shadow(0 0 8px rgba(0,212,255,0.6))' : 'none',
+                transition: 'all 0.3s ease-out'
+            }}
+        >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+    )
+
+    const TrophyIcon = ({ active, eventMode }) => (
+        <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={eventMode ? '#ffd700' : active ? '#fff' : 'rgba(255,255,255,0.5)'}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -67,16 +90,16 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
         </svg>
     )
 
-    // Active indicator with pop animation
-    const ActiveIndicator = ({ color = '#fff', glow = false }) => (
+    // Active indicator with subtle animation
+    const ActiveIndicator = ({ color = '#fff' }) => (
         <span
             className="absolute -bottom-1"
             style={{
-                width: 6,
-                height: 6,
+                width: 4,
+                height: 4,
                 borderRadius: '50%',
                 background: color,
-                boxShadow: glow ? `0 0 10px ${color}, 0 0 20px ${color}` : `0 0 8px ${color}80`,
+                boxShadow: `0 0 8px ${color}`,
                 animation: 'nav-indicator-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}
         />
@@ -86,18 +109,18 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
         <nav
             className="fixed bottom-0 left-0 right-0 z-50 pwa-bottom-nav"
             style={{
-                height: 'calc(56px + env(safe-area-inset-bottom, 0px))',
+                height: 'calc(64px + env(safe-area-inset-bottom, 0px))',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
             }}
         >
-            {/* Premium frosted glass with gradient */}
+            {/* Premium frosted glass background */}
             <div
                 className="absolute inset-0"
                 style={{
-                    background: 'linear-gradient(180deg, rgba(15,15,20,0.85) 0%, rgba(10,10,15,0.98) 100%)',
+                    background: 'linear-gradient(180deg, rgba(15,15,20,0.9) 0%, rgba(10,10,15,0.98) 100%)',
                     backdropFilter: 'blur(24px) saturate(1.3)',
                     WebkitBackdropFilter: 'blur(24px) saturate(1.3)',
-                    borderTop: '0.5px solid rgba(255,255,255,0.08)',
+                    borderTop: '0.5px solid rgba(255,255,255,0.1)',
                 }}
             />
 
@@ -105,92 +128,69 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan }) 
             <div
                 className="absolute top-0 left-0 right-0 h-px"
                 style={{
-                    background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.1) 50%, transparent 90%)'
+                    background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.15) 50%, transparent 90%)'
                 }}
             />
 
-            {/* Nav items */}
-            <div className="relative h-full flex items-center justify-around px-4">
+            {/* Nav items - 3 clear destinations */}
+            <div className="relative h-full flex items-center justify-around px-8">
                 {/* Home */}
                 <button
                     onClick={() => handleTap('home')}
-                    aria-label="Go to home"
-                    className="relative flex flex-col items-center justify-center w-14 h-12 transition-all active:scale-90"
+                    aria-label="Home"
+                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
                     style={{
                         transform: activeTab === 'home' ? 'translateY(-2px)' : 'translateY(0)',
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
                     <HomeIcon active={activeTab === 'home'} />
+                    <span className={`text-[10px] mt-1 font-medium ${activeTab === 'home' ? 'text-white' : 'text-white/50'}`}>
+                        Home
+                    </span>
                     {activeTab === 'home' && <ActiveIndicator />}
                 </button>
 
-                {/* Scan - Elegant floating button with breathing glow */}
-                <div className="relative">
-                    {/* Breathing glow rings */}
-                    <div
-                        className="absolute inset-0 rounded-2xl pointer-events-none"
-                        style={{
-                            marginTop: -16,
-                            width: 44,
-                            height: 44,
-                            background: eventMode
-                                ? 'rgba(255,215,0,0.2)'
-                                : 'rgba(255,255,255,0.1)',
-                            animation: 'ring-breathe 2s ease-in-out infinite',
-                            transform: 'scale(1.2)',
-                            borderRadius: 14
-                        }}
-                    />
-                    <button
-                        onClick={() => handleTap('scan')}
-                        aria-label="Take a photo to rate your outfit"
-                        className="relative flex items-center justify-center transition-all active:scale-95"
-                        style={{
-                            width: 44,
-                            height: 44,
-                            marginTop: -16,
-                            borderRadius: 14,
-                            background: eventMode
-                                ? 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)'
-                                : 'linear-gradient(135deg, #fff 0%, #e8e8e8 100%)',
-                            boxShadow: eventMode
-                                ? '0 4px 20px rgba(255,215,0,0.5), 0 0 0 1px rgba(255,215,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)'
-                                : '0 4px 20px rgba(255,255,255,0.2), 0 0 0 1px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.5)',
-                        }}
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="#000"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                            <circle cx="12" cy="13" r="4" />
-                        </svg>
-                    </button>
-                </div>
+                {/* Arena - Center emphasis */}
+                <button
+                    onClick={() => handleTap('arena')}
+                    aria-label="Arena - 1v1 Battles"
+                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
+                    style={{
+                        transform: activeTab === 'arena' ? 'translateY(-2px)' : 'translateY(0)',
+                        transition: 'transform 0.2s ease-out'
+                    }}
+                >
+                    {/* Live indicator */}
+                    <div className="absolute -top-1 right-1 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    </div>
+                    <ArenaIcon active={activeTab === 'arena'} />
+                    <span className={`text-[10px] mt-1 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-white/50'}`}>
+                        Arena
+                    </span>
+                    {activeTab === 'arena' && <ActiveIndicator color="#00d4ff" />}
+                </button>
 
                 {/* Challenges */}
                 <button
                     onClick={() => handleTap('challenges')}
-                    aria-label="View challenges"
-                    className="relative flex flex-col items-center justify-center w-14 h-12 transition-all active:scale-90"
+                    aria-label="Challenges"
+                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
                     style={{
                         transform: (activeTab === 'challenges' || eventMode) ? 'translateY(-2px)' : 'translateY(0)',
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
                     <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />
+                    <span className={`text-[10px] mt-1 font-medium ${
+                        eventMode ? 'text-yellow-400' :
+                        activeTab === 'challenges' ? 'text-white' : 'text-white/50'
+                    }`}>
+                        Challenges
+                    </span>
                     {(activeTab === 'challenges' || eventMode) && (
-                        <ActiveIndicator
-                            color={eventMode ? '#ffd700' : '#fff'}
-                            glow={eventMode}
-                        />
+                        <ActiveIndicator color={eventMode ? '#ffd700' : '#fff'} />
                     )}
                 </button>
             </div>
