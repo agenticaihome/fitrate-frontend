@@ -1,4 +1,19 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
+import {
+    getStreakData,
+    updateDailyStreak,
+    getNextStreakReward,
+    getWinStreakData,
+    getAllTimeStats,
+    getWinRate,
+    getCurrentTier,
+    getSeasonTimeRemaining,
+    getDailyArenaRecord,
+    getUnlockedMilestones,
+    getNextMilestone,
+    STREAK_REWARDS,
+    SEASON_TIERS
+} from '../utils/arenaStorage'
 
 // ============================================
 // ARENA MODE OF THE DAY
@@ -19,70 +34,64 @@ export const getTodayArenaMode = () => {
     return ARENA_DAILY_MODES[dayIndex]
 }
 
-// ============================================
-// DAILY ARENA RECORD (Client-side tracking)
-// Resets each day at midnight
-// ============================================
-const getTodayKey = () => new Date().toISOString().split('T')[0] // YYYY-MM-DD
-
-export const getDailyArenaRecord = () => {
-    try {
-        const todayKey = getTodayKey()
-        const stored = localStorage.getItem('fitrate_arena_daily')
-        if (stored) {
-            const data = JSON.parse(stored)
-            if (data.date === todayKey) {
-                return data
-            }
-        }
-        return { date: todayKey, wins: 0, losses: 0, ties: 0 }
-    } catch (e) {
-        return { date: getTodayKey(), wins: 0, losses: 0, ties: 0 }
-    }
-}
-
-export const recordArenaResult = (result) => { // 'win' | 'loss' | 'tie'
-    const record = getDailyArenaRecord()
-
-    if (result === 'win') record.wins++
-    else if (result === 'loss') record.losses++
-    else record.ties++
-
-    localStorage.setItem('fitrate_arena_daily', JSON.stringify(record))
-    return record
-}
+// Re-export for external use
+export { getDailyArenaRecord } from '../utils/arenaStorage'
+export { recordArenaResult } from '../utils/arenaStorage'
 
 // ============================================
-// FLOATING PARTICLES - Mode-themed
+// ANIMATED BACKGROUND - Premium particles
 // ============================================
-const FloatingParticles = ({ color = '#00d4ff' }) => {
+const AnimatedBackground = ({ color }) => {
     const particles = useMemo(() =>
-        Array.from({ length: 20 }, (_, i) => ({
+        Array.from({ length: 30 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
-            size: 2 + Math.random() * 3,
-            delay: Math.random() * 10,
-            duration: 15 + Math.random() * 20,
-            opacity: 0.15 + Math.random() * 0.25
+            size: 1 + Math.random() * 4,
+            delay: Math.random() * 15,
+            duration: 20 + Math.random() * 30,
+            opacity: 0.1 + Math.random() * 0.3,
+            type: i % 5 === 0 ? 'star' : 'particle'
         })), []
     )
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Gradient orbs */}
+            <div
+                className="absolute w-96 h-96 rounded-full blur-3xl opacity-20"
+                style={{
+                    background: `radial-gradient(circle, ${color}, transparent)`,
+                    top: '-10%',
+                    right: '-20%',
+                    animation: 'orb-float 8s ease-in-out infinite'
+                }}
+            />
+            <div
+                className="absolute w-64 h-64 rounded-full blur-3xl opacity-15"
+                style={{
+                    background: `radial-gradient(circle, #00ff88, transparent)`,
+                    bottom: '-5%',
+                    left: '-10%',
+                    animation: 'orb-float 12s ease-in-out infinite reverse'
+                }}
+            />
+            {/* Particles */}
             {particles.map(p => (
                 <div
                     key={p.id}
-                    className="absolute rounded-full"
+                    className={`absolute ${p.type === 'star' ? 'animate-pulse' : ''}`}
                     style={{
                         left: `${p.left}%`,
                         bottom: '-10px',
                         width: p.size,
                         height: p.size,
+                        borderRadius: p.type === 'star' ? '2px' : '50%',
                         background: p.id % 3 === 0 ? color : p.id % 2 === 0 ? '#00ff88' : '#fff',
                         opacity: p.opacity,
-                        boxShadow: `0 0 ${p.size * 4}px ${color}`,
+                        boxShadow: `0 0 ${p.size * 6}px ${color}`,
                         animation: `arena-float ${p.duration}s linear infinite`,
-                        animationDelay: `${p.delay}s`
+                        animationDelay: `${p.delay}s`,
+                        transform: p.type === 'star' ? 'rotate(45deg)' : 'none'
                     }}
                 />
             ))}
@@ -91,48 +100,219 @@ const FloatingParticles = ({ color = '#00d4ff' }) => {
 }
 
 // ============================================
-// PROGRESS STEPS INDICATOR
+// STREAK FIRE ANIMATION
 // ============================================
-const ProgressSteps = ({ currentStep, modeColor }) => {
-    const steps = [
-        { icon: '📸', label: 'Photo' },
-        { icon: '⚡', label: 'Analyze' },
-        { icon: '🔍', label: 'Queue' },
-        { icon: '⚔️', label: 'Battle' }
-    ]
+const StreakFire = ({ streak, color }) => {
+    if (streak < 1) return null
+    const intensity = Math.min(streak, 7)
 
     return (
-        <div className="flex items-center justify-center gap-1">
-            {steps.map((step, i) => (
-                <React.Fragment key={i}>
-                    <div className="flex flex-col items-center">
-                        <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
-                                }`}
-                            style={{
-                                background: i <= currentStep
-                                    ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
-                                    : 'rgba(255,255,255,0.1)',
-                                boxShadow: i === currentStep ? `0 0 15px ${modeColor}50` : 'none'
-                            }}
-                        >
-                            {i < currentStep ? '✓' : step.icon}
-                        </div>
-                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
-                            }`}>
-                            {step.label}
-                        </span>
-                    </div>
-                    {i < steps.length - 1 && (
-                        <div
-                            className="w-6 h-0.5 rounded-full transition-all duration-500 -mt-3"
-                            style={{
-                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.15)'
-                            }}
-                        />
-                    )}
-                </React.Fragment>
+        <div className="relative">
+            {Array.from({ length: intensity }).map((_, i) => (
+                <div
+                    key={i}
+                    className="absolute"
+                    style={{
+                        left: `${50 + (i - intensity / 2) * 8}%`,
+                        bottom: 0,
+                        width: 8 + i * 2,
+                        height: 20 + i * 5,
+                        background: `linear-gradient(to top, ${color}, #ff6b35, #ffd700)`,
+                        borderRadius: '50% 50% 20% 20%',
+                        filter: 'blur(2px)',
+                        animation: `fire-dance ${0.3 + i * 0.1}s ease-in-out infinite alternate`,
+                        animationDelay: `${i * 0.05}s`,
+                        opacity: 0.7
+                    }}
+                />
             ))}
+        </div>
+    )
+}
+
+// ============================================
+// TIER BADGE COMPONENT
+// ============================================
+const TierBadge = ({ tier, progress, pointsToNext, compact = false }) => {
+    return (
+        <div className={`flex items-center gap-2 ${compact ? 'scale-90' : ''}`}>
+            <div
+                className="relative"
+                style={{
+                    filter: `drop-shadow(0 0 10px ${tier.color})`
+                }}
+            >
+                <span className={`${compact ? 'text-2xl' : 'text-3xl'}`}>{tier.emoji}</span>
+                {/* Tier glow ring */}
+                <div
+                    className="absolute inset-0 rounded-full animate-ping opacity-30"
+                    style={{ background: tier.color }}
+                />
+            </div>
+            <div className="text-left">
+                <div className="flex items-center gap-2">
+                    <span className="font-black text-white" style={{ color: tier.color }}>
+                        {tier.name}
+                    </span>
+                </div>
+                {pointsToNext > 0 && (
+                    <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                    width: `${progress}%`,
+                                    background: `linear-gradient(90deg, ${tier.color}, #00ff88)`
+                                }}
+                            />
+                        </div>
+                        <span className="text-[10px] text-white/40">{pointsToNext} to next</span>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+// ============================================
+// STATS DASHBOARD CARD
+// ============================================
+const StatsDashboard = ({ stats, winRate, winStreak, modeColor }) => {
+    return (
+        <div
+            className="w-full p-4 rounded-2xl relative overflow-hidden"
+            style={{
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.08)'
+            }}
+        >
+            {/* Glass shine effect */}
+            <div
+                className="absolute top-0 left-0 right-0 h-px"
+                style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)'
+                }}
+            />
+
+            <div className="flex items-center justify-between mb-3">
+                <span className="text-white/50 text-xs uppercase tracking-widest">Your Stats</span>
+                {winStreak.currentWinStreak > 0 && (
+                    <div
+                        className="flex items-center gap-1 px-2 py-1 rounded-full"
+                        style={{
+                            background: 'linear-gradient(135deg, #ff6b35, #ffd700)',
+                            animation: 'pulse 2s ease-in-out infinite'
+                        }}
+                    >
+                        <span className="text-xs">🔥</span>
+                        <span className="text-xs font-black text-white">{winStreak.currentWinStreak}</span>
+                    </div>
+                )}
+            </div>
+
+            <div className="grid grid-cols-4 gap-3">
+                <div className="text-center">
+                    <div className="text-2xl font-black text-white">{stats.totalWins}</div>
+                    <div className="text-[10px] text-white/40 uppercase">Wins</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-2xl font-black" style={{ color: modeColor }}>{winRate}%</div>
+                    <div className="text-[10px] text-white/40 uppercase">Win Rate</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-2xl font-black text-amber-400">{winStreak.bestWinStreak}</div>
+                    <div className="text-[10px] text-white/40 uppercase">Best Streak</div>
+                </div>
+                <div className="text-center">
+                    <div className="text-2xl font-black text-purple-400">{stats.totalBattles}</div>
+                    <div className="text-[10px] text-white/40 uppercase">Battles</div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ============================================
+// DAILY STREAK CARD
+// ============================================
+const StreakCard = ({ streakData, nextReward, modeColor, onClaim }) => {
+    const streak = streakData.currentStreak
+
+    return (
+        <div
+            className="w-full p-4 rounded-2xl relative overflow-hidden"
+            style={{
+                background: streak > 0
+                    ? `linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,215,0,0.1))`
+                    : 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(20px)',
+                border: streak > 0
+                    ? '1px solid rgba(255,107,53,0.3)'
+                    : '1px solid rgba(255,255,255,0.08)'
+            }}
+        >
+            {/* Fire effect for active streaks */}
+            {streak >= 3 && (
+                <div className="absolute bottom-0 left-0 right-0 h-8 overflow-hidden opacity-30">
+                    <StreakFire streak={streak} color="#ff6b35" />
+                </div>
+            )}
+
+            <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <span className="text-4xl" style={{ filter: streak > 0 ? 'drop-shadow(0 0 10px #ff6b35)' : 'none' }}>
+                            {streak > 0 ? '🔥' : '❄️'}
+                        </span>
+                        {streak > 0 && (
+                            <div
+                                className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
+                                style={{ background: 'linear-gradient(135deg, #ff6b35, #ffd700)' }}
+                            >
+                                {streak}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <div className="text-white font-bold">
+                            {streak > 0 ? `${streak} Day Streak!` : 'Start Your Streak'}
+                        </div>
+                        <div className="text-white/50 text-xs">
+                            {nextReward?.claimable
+                                ? `Claim: ${nextReward.label}`
+                                : nextReward?.daysUntil
+                                    ? `${nextReward.daysUntil} days to ${nextReward.label}`
+                                    : 'Play daily for rewards'}
+                        </div>
+                    </div>
+                </div>
+
+                {nextReward?.claimable && (
+                    <button
+                        onClick={onClaim}
+                        className="px-4 py-2 rounded-xl font-bold text-sm text-black transition-all active:scale-95"
+                        style={{
+                            background: 'linear-gradient(135deg, #ffd700, #ff6b35)',
+                            boxShadow: '0 0 20px rgba(255,215,0,0.5)'
+                        }}
+                    >
+                        Claim!
+                    </button>
+                )}
+            </div>
+        </div>
+    )
+}
+
+// ============================================
+// SEASON COUNTDOWN
+// ============================================
+const SeasonCountdown = ({ timeRemaining, tier }) => {
+    return (
+        <div className="flex items-center gap-2 text-xs text-white/40">
+            <span>⏱️</span>
+            <span>Season ends in {timeRemaining.days}d {timeRemaining.hours}h</span>
         </div>
     )
 }
@@ -201,37 +381,100 @@ const ErrorModal = ({ message, onRetry, onCancel, modeColor }) => (
 )
 
 // ============================================
+// PROGRESS STEPS INDICATOR
+// ============================================
+const ProgressSteps = ({ currentStep, modeColor }) => {
+    const steps = [
+        { icon: '📸', label: 'Photo' },
+        { icon: '⚡', label: 'Analyze' },
+        { icon: '🔍', label: 'Queue' },
+        { icon: '⚔️', label: 'Battle' }
+    ]
+
+    return (
+        <div className="flex items-center justify-center gap-1">
+            {steps.map((step, i) => (
+                <React.Fragment key={i}>
+                    <div className="flex flex-col items-center">
+                        <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
+                                }`}
+                            style={{
+                                background: i <= currentStep
+                                    ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
+                                    : 'rgba(255,255,255,0.1)',
+                                boxShadow: i === currentStep ? `0 0 15px ${modeColor}50` : 'none'
+                            }}
+                        >
+                            {i < currentStep ? '✓' : step.icon}
+                        </div>
+                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
+                            }`}>
+                            {step.label}
+                        </span>
+                    </div>
+                    {i < steps.length - 1 && (
+                        <div
+                            className="w-6 h-0.5 rounded-full transition-all duration-500 -mt-3"
+                            style={{
+                                background: i < currentStep ? modeColor : 'rgba(255,255,255,0.15)'
+                            }}
+                        />
+                    )}
+                </React.Fragment>
+            ))}
+        </div>
+    )
+}
+
+// ============================================
 // MAIN ARENA ENTRY SCREEN
 // ============================================
 export default function ArenaEntryScreen({
     userId,
-    onAnalysisComplete,  // Called with (score, photoDataUrl, mode) when ready for queue
+    onAnalysisComplete,
     onBack,
+    onShowLeaderboard,
     playSound,
     vibrate
 }) {
-    // Screen state: 'entry' | 'analyzing'
     const [screenState, setScreenState] = useState('entry')
     const [onlineCount, setOnlineCount] = useState(null)
     const [photoData, setPhotoData] = useState(null)
     const [analysisProgress, setAnalysisProgress] = useState(0)
     const [error, setError] = useState(null)
     const [analysisTip, setAnalysisTip] = useState(0)
+    const [showStatsExpanded, setShowStatsExpanded] = useState(false)
 
     const todayMode = getTodayArenaMode()
     const fileInputRef = useRef(null)
     const abortControllerRef = useRef(null)
 
+    // Fetch all progression data
+    const streakData = getStreakData()
+    const nextStreakReward = getNextStreakReward()
+    const winStreakData = getWinStreakData()
+    const allTimeStats = getAllTimeStats()
+    const winRate = getWinRate()
+    const tierData = getCurrentTier()
+    const seasonTimeRemaining = getSeasonTimeRemaining()
+    const dailyRecord = getDailyArenaRecord()
+    const nextMilestone = getNextMilestone()
+
     const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
 
-    // Fun tips during analysis
     const ANALYSIS_TIPS = [
         "Scanning your fit...",
         "Calculating drip levels...",
         "Measuring aura intensity...",
         "Consulting the fashion gods...",
-        "Almost ready to battle..."
+        "Finding your opponent..."
     ]
+
+    // Update daily streak on entry
+    useEffect(() => {
+        updateDailyStreak()
+    }, [])
 
     // Rotate tips during analysis
     useEffect(() => {
@@ -263,28 +506,22 @@ export default function ArenaEntryScreen({
     // Simulate progress during analysis
     useEffect(() => {
         if (screenState !== 'analyzing') return
-
         const interval = setInterval(() => {
             setAnalysisProgress(prev => {
-                if (prev >= 90) return prev // Cap at 90 until complete
+                if (prev >= 90) return prev
                 return prev + Math.random() * 15
             })
         }, 300)
-
         return () => clearInterval(interval)
     }, [screenState])
 
-    // Handle file selection
     const handleFileSelect = async (e) => {
         const file = e.target.files?.[0]
-        if (!file) {
-            return // User cancelled - do nothing
-        }
+        if (!file) return
 
         playSound?.('click')
         vibrate?.([50, 30, 50])
 
-        // Convert to data URL
         const reader = new FileReader()
         reader.onload = () => {
             const dataUrl = reader.result
@@ -297,12 +534,9 @@ export default function ArenaEntryScreen({
             setError("Couldn't read photo. Please try again!")
         }
         reader.readAsDataURL(file)
-
-        // Reset file input for re-selection
         e.target.value = ''
     }
 
-    // Analyze photo via API
     const analyzePhoto = async (imageData) => {
         abortControllerRef.current = new AbortController()
 
@@ -320,35 +554,27 @@ export default function ArenaEntryScreen({
                 signal: abortControllerRef.current.signal
             })
 
-            if (!response.ok) {
-                throw new Error('Analysis failed')
-            }
+            if (!response.ok) throw new Error('Analysis failed')
 
             const result = await response.json()
             const score = result.scores?.overall || result.score || 75
 
-            // Success! Complete progress and move to queue
             setAnalysisProgress(100)
             playSound?.('celebrate')
             vibrate?.([100, 50, 100])
 
-            // Brief pause to show 100% then transition
             setTimeout(() => {
                 onAnalysisComplete(score, imageData, todayMode.mode)
             }, 500)
 
         } catch (err) {
-            if (err.name === 'AbortError') {
-                console.log('[Arena] Analysis cancelled')
-                return
-            }
+            if (err.name === 'AbortError') return
             console.error('[Arena] Analysis failed:', err)
             setError("Couldn't analyze your photo. Want to try again?")
             vibrate?.([100, 100, 100])
         }
     }
 
-    // Cancel analysis
     const handleCancel = () => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort()
@@ -360,24 +586,28 @@ export default function ArenaEntryScreen({
         setError(null)
     }
 
-    // Retry after error
     const handleRetry = () => {
         setError(null)
         setScreenState('entry')
         setPhotoData(null)
-        // Trigger file picker
         setTimeout(() => fileInputRef.current?.click(), 100)
     }
 
-    // Open camera
     const handleEnterArena = () => {
         playSound?.('click')
         vibrate?.([30, 20, 30])
         fileInputRef.current?.click()
     }
 
-    // Current step for progress indicator
+    const handleClaimReward = () => {
+        // TODO: Implement reward claiming logic
+        playSound?.('celebrate')
+        vibrate?.([100, 50, 100, 50, 100])
+    }
+
     const currentStep = screenState === 'entry' ? 0 : 1
+    const totalBattlesToday = dailyRecord.wins + dailyRecord.losses + dailyRecord.ties
+    const hasPlayedBefore = allTimeStats.totalBattles > 0
 
     // ============================================
     // ANALYZING SCREEN
@@ -390,9 +620,8 @@ export default function ArenaEntryScreen({
                     background: `linear-gradient(135deg, #0a0a1a 0%, ${todayMode.color}20 50%, #0a0a1a 100%)`
                 }}
             >
-                <FloatingParticles color={todayMode.color} />
+                <AnimatedBackground color={todayMode.color} />
 
-                {/* Cancel Button - High z-index and larger touch target */}
                 <button
                     onClick={(e) => {
                         e.preventDefault()
@@ -410,14 +639,11 @@ export default function ArenaEntryScreen({
                     <span className="text-white text-xl font-bold">✕</span>
                 </button>
 
-                {/* Progress Steps */}
                 <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
                     <ProgressSteps currentStep={currentStep} modeColor={todayMode.color} />
                 </div>
 
-                {/* Main Content */}
                 <div className="flex flex-col items-center text-center z-10 max-w-md w-full">
-                    {/* Photo Preview with Scan Effect */}
                     <div className="relative mb-8">
                         <div
                             className="w-48 h-48 rounded-2xl overflow-hidden relative"
@@ -434,15 +660,12 @@ export default function ArenaEntryScreen({
                             )}
                             <ScanLines color={todayMode.color} />
                         </div>
-
-                        {/* Pulsing ring around photo */}
                         <div
                             className="absolute -inset-4 rounded-3xl animate-ping opacity-20"
                             style={{ border: `2px solid ${todayMode.color}` }}
                         />
                     </div>
 
-                    {/* Mode Badge */}
                     <div
                         className="flex items-center gap-2 px-4 py-2 rounded-full mb-4"
                         style={{
@@ -456,7 +679,6 @@ export default function ArenaEntryScreen({
                         </span>
                     </div>
 
-                    {/* Analyzing Text */}
                     <h2 className="text-2xl font-black text-white mb-2">
                         Analyzing Your Fit
                     </h2>
@@ -464,7 +686,6 @@ export default function ArenaEntryScreen({
                         {ANALYSIS_TIPS[analysisTip]}
                     </p>
 
-                    {/* Progress Bar */}
                     <div className="w-full max-w-xs mb-4">
                         <div className="h-3 bg-white/10 rounded-full overflow-hidden">
                             <div
@@ -480,13 +701,11 @@ export default function ArenaEntryScreen({
                         </p>
                     </div>
 
-                    {/* Cancel text */}
                     <p className="text-white/30 text-xs">
                         Tap ✕ to cancel
                     </p>
                 </div>
 
-                {/* Error Modal */}
                 {error && (
                     <ErrorModal
                         message={error}
@@ -499,7 +718,6 @@ export default function ArenaEntryScreen({
                     />
                 )}
 
-                {/* CSS Animations */}
                 <style>{`
                     @keyframes arena-float {
                         0%, 100% { transform: translateY(0); opacity: 0; }
@@ -516,24 +734,27 @@ export default function ArenaEntryScreen({
                         50% { opacity: 1; }
                         100% { top: 100%; opacity: 0; }
                     }
+                    @keyframes orb-float {
+                        0%, 100% { transform: translate(0, 0) scale(1); }
+                        50% { transform: translate(-20px, 20px) scale(1.1); }
+                    }
                 `}</style>
             </div>
         )
     }
 
     // ============================================
-    // ENTRY SCREEN
+    // ENTRY SCREEN - LEGENDARY VERSION
     // ============================================
     return (
         <div
-            className="fixed inset-0 flex flex-col items-center justify-center p-6 overflow-hidden"
+            className="fixed inset-0 flex flex-col overflow-y-auto overflow-x-hidden"
             style={{
-                background: `linear-gradient(135deg, #0a0a1a 0%, ${todayMode.color}15 50%, #0a1a2a 100%)`
+                background: `linear-gradient(180deg, #0a0a1a 0%, ${todayMode.color}08 50%, #0a0a1a 100%)`
             }}
         >
-            <FloatingParticles color={todayMode.color} />
+            <AnimatedBackground color={todayMode.color} />
 
-            {/* Hidden file input - positioned off-screen to avoid any interference */}
             <input
                 type="file"
                 accept="image/*"
@@ -544,191 +765,241 @@ export default function ArenaEntryScreen({
                 aria-hidden="true"
             />
 
-            {/* Back Button - High z-index and larger touch target */}
-            <button
-                onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    playSound?.('click')
-                    vibrate?.(10)
-                    onBack?.()
-                }}
-                className="absolute top-4 left-4 w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90"
-                style={{
-                    background: 'rgba(0,0,0,0.5)',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    zIndex: 9999,
-                    touchAction: 'manipulation'
-                }}
-            >
-                <span className="text-white text-xl font-bold">←</span>
-            </button>
-
-            {/* Online Count Badge */}
-            {onlineCount !== null && (
-                <div
-                    className="absolute top-6 right-6 flex items-center gap-2 px-3 py-2 rounded-full z-10"
+            {/* Top Bar */}
+            <div className="relative z-20 flex items-center justify-between p-4 pt-6">
+                <button
+                    onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        playSound?.('click')
+                        vibrate?.(10)
+                        onBack?.()
+                    }}
+                    className="w-11 h-11 flex items-center justify-center rounded-full transition-all active:scale-90"
                     style={{
-                        background: 'rgba(0,255,136,0.15)',
-                        border: '1px solid rgba(0,255,136,0.3)'
+                        background: 'rgba(255,255,255,0.05)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-green-400 text-sm font-bold">{onlineCount} online</span>
-                </div>
-            )}
+                    <span className="text-white text-lg">←</span>
+                </button>
 
-            {/* Main Content - Scrollable area */}
-            <div className="flex flex-col items-center text-center z-10 max-w-md w-full pt-16 pb-6">
-                {/* Progress Steps - Inside content flow, not absolute */}
-                <div className="mb-4">
-                    <ProgressSteps currentStep={currentStep} modeColor={todayMode.color} />
-                </div>
-
-                {/* Globe Icon with glow */}
-                <div className="relative mb-3">
+                {/* Online Count */}
+                {onlineCount !== null && (
                     <div
-                        className="text-7xl"
+                        className="flex items-center gap-2 px-3 py-2 rounded-full"
                         style={{
-                            filter: `drop-shadow(0 0 30px ${todayMode.color}80)`,
-                            animation: 'globe-pulse 3s ease-in-out infinite'
+                            background: 'rgba(0,255,136,0.1)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(0,255,136,0.2)'
                         }}
                     >
-                        🌍
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                        <span className="text-green-400 text-sm font-bold">{onlineCount} live</span>
                     </div>
-                    {/* Orbiting ring */}
-                    <div
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                            border: `2px solid ${todayMode.color}30`,
-                            animation: 'orbit 8s linear infinite'
-                        }}
-                    />
+                )}
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col items-center px-5 pb-8 z-10">
+                {/* Hero Section */}
+                <div className="text-center mb-6">
+                    <div className="relative inline-block mb-4">
+                        <span
+                            className="text-7xl"
+                            style={{
+                                filter: `drop-shadow(0 0 40px ${todayMode.color})`,
+                                animation: 'globe-pulse 3s ease-in-out infinite'
+                            }}
+                        >
+                            🌍
+                        </span>
+                        {/* Orbiting rings */}
+                        <div
+                            className="absolute inset-0 rounded-full"
+                            style={{
+                                border: `1px solid ${todayMode.color}30`,
+                                transform: 'scale(1.8)',
+                                animation: 'orbit 10s linear infinite'
+                            }}
+                        />
+                        <div
+                            className="absolute inset-0 rounded-full"
+                            style={{
+                                border: `1px dashed ${todayMode.color}20`,
+                                transform: 'scale(2.2)',
+                                animation: 'orbit 15s linear infinite reverse'
+                            }}
+                        />
+                    </div>
+
+                    <h1
+                        className="text-4xl font-black text-white mb-1"
+                        style={{ textShadow: `0 0 40px ${todayMode.color}60` }}
+                    >
+                        Global Arena
+                    </h1>
+                    <p className="text-white/50 text-base">Battle anyone in the world</p>
                 </div>
 
-                {/* Title */}
-                <h1
-                    className="text-4xl font-black text-white mb-2"
-                    style={{
-                        textShadow: `0 0 30px ${todayMode.color}60`
-                    }}
-                >
-                    Global Arena
-                </h1>
-
-                {/* Subtitle */}
-                <p className="text-white/60 text-lg mb-6">
-                    Battle anyone in the world
-                </p>
-
-                {/* Today's Mode Card - Enhanced */}
+                {/* Season Tier + Countdown */}
                 <div
-                    className="w-full p-5 rounded-2xl mb-6 relative overflow-hidden"
+                    className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
                     style={{
-                        background: `linear-gradient(135deg, ${todayMode.color}15 0%, ${todayMode.color}05 100%)`,
-                        border: `1px solid ${todayMode.color}30`,
-                        backdropFilter: 'blur(10px)'
+                        background: `linear-gradient(135deg, ${tierData.tier.color}15, transparent)`,
+                        backdropFilter: 'blur(20px)',
+                        border: `1px solid ${tierData.tier.color}30`
                     }}
                 >
-                    {/* Shimmer effect */}
+                    <div className="flex items-center justify-between">
+                        <TierBadge
+                            tier={tierData.tier}
+                            progress={tierData.progress}
+                            pointsToNext={tierData.pointsToNext}
+                        />
+                        <div className="flex items-center gap-2">
+                            <SeasonCountdown timeRemaining={seasonTimeRemaining} tier={tierData.tier} />
+                            {/* Leaderboard Button */}
+                            <button
+                                onClick={() => {
+                                    playSound?.('click')
+                                    vibrate?.(10)
+                                    onShowLeaderboard?.()
+                                }}
+                                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                                style={{
+                                    background: `${tierData.tier.color}20`,
+                                    border: `1px solid ${tierData.tier.color}40`
+                                }}
+                            >
+                                <span className="text-lg">🏆</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Today's Mode Card */}
+                <div
+                    className="w-full max-w-md p-5 rounded-2xl mb-4 relative overflow-hidden"
+                    style={{
+                        background: `linear-gradient(135deg, ${todayMode.color}20, ${todayMode.color}05)`,
+                        backdropFilter: 'blur(20px)',
+                        border: `1px solid ${todayMode.color}40`
+                    }}
+                >
                     <div
-                        className="absolute inset-0 opacity-30"
+                        className="absolute inset-0"
                         style={{
-                            background: `linear-gradient(90deg, transparent, ${todayMode.color}20, transparent)`,
-                            animation: 'shimmer 3s ease-in-out infinite'
+                            background: `linear-gradient(90deg, transparent, ${todayMode.color}15, transparent)`,
+                            animation: 'shimmer 4s ease-in-out infinite'
                         }}
                     />
-
-                    <p className="text-white/50 text-xs uppercase tracking-widest mb-2 relative z-10">
-                        Today's Mode
+                    <p className="text-white/40 text-[10px] uppercase tracking-widest mb-2 relative z-10">
+                        Today's Battle Mode
                     </p>
-                    <div className="flex items-center justify-center gap-3 relative z-10">
-                        <span className="text-5xl" style={{ filter: `drop-shadow(0 0 10px ${todayMode.color})` }}>
+                    <div className="flex items-center gap-4 relative z-10">
+                        <span
+                            className="text-5xl"
+                            style={{ filter: `drop-shadow(0 0 15px ${todayMode.color})` }}
+                        >
                             {todayMode.emoji}
                         </span>
-                        <div className="text-left">
-                            <p className="text-white font-black text-2xl">{todayMode.name}</p>
-                            <p style={{ color: todayMode.color }} className="text-sm font-medium">
+                        <div>
+                            <div className="text-white font-black text-2xl">{todayMode.name}</div>
+                            <div style={{ color: todayMode.color }} className="text-sm font-medium">
                                 {todayMode.tagline}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Today's Record - Only shows if user has played today */}
-                {(() => {
-                    const record = getDailyArenaRecord()
-                    const totalBattles = record.wins + record.losses + record.ties
-                    if (totalBattles === 0) return null
-
-                    return (
-                        <div className="flex items-center justify-center gap-4 mb-4 px-4 py-2 rounded-full bg-white/5 border border-white/10">
-                            <span className="text-white/50 text-xs uppercase tracking-wider">Today</span>
-                            <div className="flex items-center gap-3">
-                                <span className="text-green-400 font-black">{record.wins}W</span>
-                                <span className="text-white/20">-</span>
-                                <span className="text-red-400 font-black">{record.losses}L</span>
-                                <span className="text-white/20">-</span>
-                                <span className="text-yellow-400 font-black">{record.ties}T</span>
-                            </div>
-                        </div>
-                    )
-                })()}
-
-                {/* How it Works - Visual Steps */}
-                <div className="flex items-center justify-center gap-3 mb-8">
-                    {[
-                        { icon: '📸', label: 'Snap' },
-                        { icon: '→', label: '' },
-                        { icon: '🔍', label: 'Match' },
-                        { icon: '→', label: '' },
-                        { icon: '⚔️', label: 'Battle' }
-                    ].map((step, i) => (
-                        <div key={i} className="flex flex-col items-center">
-                            <span className={`text-xl ${step.label ? '' : 'text-white/30'}`}>{step.icon}</span>
-                            {step.label && <span className="text-white/40 text-[10px] mt-1">{step.label}</span>}
-                        </div>
-                    ))}
+                {/* Daily Streak Card */}
+                <div className="w-full max-w-md mb-4">
+                    <StreakCard
+                        streakData={streakData}
+                        nextReward={nextStreakReward}
+                        modeColor={todayMode.color}
+                        onClaim={handleClaimReward}
+                    />
                 </div>
 
-                {/* MEGA Enter Button */}
+                {/* Stats Dashboard (only if played before) */}
+                {hasPlayedBefore && (
+                    <div className="w-full max-w-md mb-4">
+                        <StatsDashboard
+                            stats={allTimeStats}
+                            winRate={winRate}
+                            winStreak={winStreakData}
+                            modeColor={todayMode.color}
+                        />
+                    </div>
+                )}
+
+                {/* Today's Record */}
+                {totalBattlesToday > 0 && (
+                    <div
+                        className="w-full max-w-md flex items-center justify-center gap-4 px-4 py-3 rounded-2xl mb-4"
+                        style={{
+                            background: 'rgba(255,255,255,0.03)',
+                            border: '1px solid rgba(255,255,255,0.08)'
+                        }}
+                    >
+                        <span className="text-white/40 text-xs uppercase tracking-wider">Today</span>
+                        <div className="flex items-center gap-3 text-lg font-black">
+                            <span className="text-green-400">{dailyRecord.wins}W</span>
+                            <span className="text-white/20">·</span>
+                            <span className="text-red-400">{dailyRecord.losses}L</span>
+                            <span className="text-white/20">·</span>
+                            <span className="text-yellow-400">{dailyRecord.ties}T</span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Next Milestone Teaser */}
+                {nextMilestone && (
+                    <div className="w-full max-w-md flex items-center justify-center gap-2 text-white/30 text-xs mb-6">
+                        <span>{nextMilestone.emoji}</span>
+                        <span>Next: {nextMilestone.name} - {nextMilestone.description}</span>
+                    </div>
+                )}
+
+                {/* BATTLE BUTTON */}
                 <button
                     onClick={handleEnterArena}
-                    className="w-full py-6 rounded-2xl font-black text-xl text-white transition-all active:scale-[0.97] relative overflow-hidden group"
+                    className="w-full max-w-md py-5 rounded-2xl font-black text-xl text-white transition-all active:scale-[0.97] relative overflow-hidden group"
                     style={{
-                        background: `linear-gradient(135deg, ${todayMode.color} 0%, #00ff88 100%)`,
-                        boxShadow: `0 0 50px ${todayMode.color}50, 0 4px 30px rgba(0,0,0,0.4)`
+                        background: `linear-gradient(135deg, ${todayMode.color}, #00ff88)`,
+                        boxShadow: `0 0 60px ${todayMode.color}50, 0 8px 40px rgba(0,0,0,0.4)`
                     }}
                 >
-                    {/* Button glow effect */}
+                    {/* Animated shine */}
                     <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute inset-0"
                         style={{
-                            background: `radial-gradient(circle at center, ${todayMode.color}40, transparent)`
+                            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                            animation: 'button-shine 3s ease-in-out infinite'
                         }}
                     />
-
-                    {/* Button content */}
+                    {/* Content */}
                     <span className="flex items-center justify-center gap-3 relative z-10">
-                        <span className="text-3xl">📸</span>
-                        <span>Enter Arena</span>
+                        <span className="text-3xl">⚔️</span>
+                        <span className="tracking-wide">ENTER BATTLE</span>
                     </span>
-
-                    {/* Pulsing border */}
+                    {/* Pulsing glow */}
                     <div
-                        className="absolute inset-0 rounded-2xl animate-pulse opacity-50"
-                        style={{ border: `2px solid ${todayMode.color}` }}
+                        className="absolute inset-0 rounded-2xl animate-pulse opacity-40"
+                        style={{ boxShadow: `inset 0 0 30px ${todayMode.color}` }}
                     />
                 </button>
 
-                {/* Privacy Note */}
-                <p className="text-white/30 text-[10px] mt-4 flex items-center gap-1">
+                {/* Privacy */}
+                <p className="text-white/20 text-[10px] mt-4 flex items-center gap-1">
                     <span>🔒</span>
-                    Photos auto-deleted after battle
+                    Photos deleted after battle
                 </p>
             </div>
 
-            {/* CSS Animations */}
             <style>{`
                 @keyframes arena-float {
                     0%, 100% { transform: translateY(0); opacity: 0; }
@@ -738,15 +1009,27 @@ export default function ArenaEntryScreen({
                 }
                 @keyframes globe-pulse {
                     0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
+                    50% { transform: scale(1.08); }
                 }
                 @keyframes orbit {
-                    0% { transform: rotate(0deg) scale(1.5); }
-                    100% { transform: rotate(360deg) scale(1.5); }
+                    0% { transform: rotate(0deg) scale(1.8); }
+                    100% { transform: rotate(360deg) scale(1.8); }
                 }
                 @keyframes shimmer {
                     0% { transform: translateX(-100%); }
                     100% { transform: translateX(100%); }
+                }
+                @keyframes orb-float {
+                    0%, 100% { transform: translate(0, 0) scale(1); }
+                    50% { transform: translate(-30px, 30px) scale(1.15); }
+                }
+                @keyframes fire-dance {
+                    0% { transform: scaleY(1) translateX(0); }
+                    100% { transform: scaleY(1.2) translateX(2px); }
+                }
+                @keyframes button-shine {
+                    0% { transform: translateX(-100%); }
+                    50%, 100% { transform: translateX(200%); }
                 }
             `}</style>
         </div>

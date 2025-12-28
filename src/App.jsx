@@ -9,7 +9,7 @@ import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants
 import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
-import { recordArenaResult } from './screens/ArenaEntryScreen'
+import { recordArenaResult } from './utils/arenaStorage'
 import {
   trackScanComplete,
   trackModeSelect,
@@ -53,6 +53,7 @@ const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
 const MeetTheJudges = lazy(() => import('./screens/MeetTheJudges'))
 const ArenaQueueScreen = lazy(() => import('./screens/ArenaQueueScreen'))  // Global Arena
 const ArenaEntryScreen = lazy(() => import('./screens/ArenaEntryScreen'))  // Arena Entry
+const ArenaLeaderboard = lazy(() => import('./screens/ArenaLeaderboard'))  // Arena Rankings
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -485,7 +486,7 @@ export default function App() {
   // ============================================
   // GLOBAL ARENA STATE - Real-time matchmaking
   // ============================================
-  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue'
+  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue' | 'leaderboard'
   const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode }
   const [arenaMode, setArenaMode] = useState(null)  // Mode for arena (from daily rotation)
 
@@ -2481,6 +2482,23 @@ export default function App() {
             setArenaScreen(null)
             setArenaMode(null)
           }}
+          onShowLeaderboard={() => setArenaScreen('leaderboard')}
+          playSound={playSound}
+          vibrate={vibrate}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
+  // GLOBAL ARENA LEADERBOARD SCREEN
+  // ============================================
+  if (arenaScreen === 'leaderboard') {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <ArenaLeaderboard
+          onClose={() => setArenaScreen('entry')}
+          modeColor="#00d4ff"
           playSound={playSound}
           vibrate={vibrate}
         />
