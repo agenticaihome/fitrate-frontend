@@ -843,12 +843,55 @@ export default function HomeScreen({
                 ) : (
                     /* Main CTA - Simplified */
                     <div className="flex flex-col items-center w-full">
+                        {/* Challenge Mode Banner */}
+                        {(dailyChallengeMode || eventMode) && (
+                            <div
+                                className="w-full max-w-xs mb-4 p-3 rounded-2xl text-center relative"
+                                style={{
+                                    background: dailyChallengeMode
+                                        ? 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(139,92,246,0.15) 100%)'
+                                        : 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(6,182,212,0.15) 100%)',
+                                    border: dailyChallengeMode
+                                        ? '1px solid rgba(59,130,246,0.4)'
+                                        : '1px solid rgba(16,185,129,0.4)'
+                                }}
+                            >
+                                <div className="flex items-center justify-center gap-2 mb-1">
+                                    <span className="text-xl">{dailyChallengeMode ? '⚡' : '🏆'}</span>
+                                    <span className="text-white font-bold text-sm">
+                                        {dailyChallengeMode ? 'Daily Challenge Active' : 'Weekly Challenge Active'}
+                                    </span>
+                                </div>
+                                <p className="text-white/60 text-xs">
+                                    {dailyChallengeMode
+                                        ? `Today: ${getDailyMode().emoji} ${getDailyMode().label} Mode`
+                                        : currentEvent?.theme || 'Beat the leaderboard!'}
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(10)
+                                        setDailyChallengeMode?.(false)
+                                        setEventMode?.(false)
+                                    }}
+                                    className="absolute top-2 right-2 text-white/40 text-xs px-2 py-1 rounded-full hover:text-white/70"
+                                    style={{ background: 'rgba(255,255,255,0.1)' }}
+                                >
+                                    ✕ Exit
+                                </button>
+                            </div>
+                        )}
+
                         {/* Single breathing ring */}
                         <div className="relative mb-6">
                             <div
                                 className="absolute inset-0 rounded-full pointer-events-none"
                                 style={{
-                                    border: `2px solid ${currentMode.color}30`,
+                                    border: dailyChallengeMode
+                                        ? '2px solid rgba(59,130,246,0.3)'
+                                        : eventMode
+                                            ? '2px solid rgba(16,185,129,0.3)'
+                                            : `2px solid ${currentMode.color}30`,
                                     transform: 'scale(1.1)',
                                     animation: 'ring-breathe 3s ease-in-out infinite'
                                 }}
@@ -856,55 +899,102 @@ export default function HomeScreen({
 
                             <button
                                 onClick={handleStart}
-                                aria-label="Take a photo to rate your outfit"
+                                aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
                                 className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all active:scale-[0.97]"
                                 style={{
-                                    background: `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
-                                    border: `3px solid ${currentMode.color}60`,
-                                    boxShadow: `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
+                                    background: dailyChallengeMode
+                                        ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
+                                        : eventMode
+                                            ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
+                                            : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
+                                    border: dailyChallengeMode
+                                        ? '3px solid rgba(59,130,246,0.6)'
+                                        : eventMode
+                                            ? '3px solid rgba(16,185,129,0.6)'
+                                            : `3px solid ${currentMode.color}60`,
+                                    boxShadow: dailyChallengeMode
+                                        ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
+                                        : eventMode
+                                            ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
+                                            : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
                                 }}
                             >
                                 {/* Inner gradient */}
                                 <div
                                     className="absolute inset-4 rounded-full"
                                     style={{
-                                        background: `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
-                                        boxShadow: `0 0 60px ${currentMode.glow}`
+                                        background: dailyChallengeMode
+                                            ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+                                            : eventMode
+                                                ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
+                                                : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
+                                        boxShadow: dailyChallengeMode
+                                            ? '0 0 60px rgba(59,130,246,0.5)'
+                                            : eventMode
+                                                ? '0 0 60px rgba(16,185,129,0.5)'
+                                                : `0 0 60px ${currentMode.glow}`
                                     }}
                                 />
 
                                 {/* Icon */}
-                                <span className="relative text-6xl mb-2">📸</span>
+                                <span className="relative text-6xl mb-2">
+                                    {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
+                                </span>
 
-                                {/* Main Text - Always the same */}
-                                <span className="relative text-white font-black text-2xl tracking-wide">
-                                    RATE MY OUTFIT
+                                {/* Main Text - Changes based on mode */}
+                                <span className="relative text-white font-black text-xl tracking-wide text-center px-4">
+                                    {dailyChallengeMode
+                                        ? 'DAILY CHALLENGE'
+                                        : eventMode
+                                            ? 'WEEKLY CHALLENGE'
+                                            : 'RATE MY OUTFIT'}
                                 </span>
 
                                 {/* Mode indicator - Subtle */}
                                 <span className="relative text-white/70 text-sm font-medium mt-1">
-                                    {currentMode.emoji} {currentMode.label} Mode
+                                    {dailyChallengeMode
+                                        ? `${getDailyMode().emoji} ${getDailyMode().label} Mode`
+                                        : eventMode
+                                            ? currentEvent?.theme || 'Beat the leaderboard!'
+                                            : `${currentMode.emoji} ${currentMode.label} Mode`}
                                 </span>
                             </button>
                         </div>
 
-                        {/* Mode Selector - Clean pill button */}
-                        <button
-                            onClick={() => {
-                                playSound('click')
-                                vibrate(15)
-                                setShowModeDrawer(true)
-                            }}
-                            className="flex items-center gap-2 px-5 py-3 rounded-full transition-all active:scale-95 mb-4"
-                            style={{
-                                background: `${currentMode.color}20`,
-                                border: `1px solid ${currentMode.color}40`
-                            }}
-                        >
-                            <span className="text-xl">{currentMode.emoji}</span>
-                            <span className="text-white font-semibold">{currentMode.label}</span>
-                            <span className="text-white/50 text-sm">• Change ▼</span>
-                        </button>
+                        {/* Mode Selector - Hidden during challenge modes */}
+                        {!dailyChallengeMode && !eventMode && (
+                            <button
+                                onClick={() => {
+                                    playSound('click')
+                                    vibrate(15)
+                                    setShowModeDrawer(true)
+                                }}
+                                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all active:scale-95 mb-4"
+                                style={{
+                                    background: `${currentMode.color}20`,
+                                    border: `1px solid ${currentMode.color}40`
+                                }}
+                            >
+                                <span className="text-xl">{currentMode.emoji}</span>
+                                <span className="text-white font-semibold">{currentMode.label}</span>
+                                <span className="text-white/50 text-sm">• Change ▼</span>
+                            </button>
+                        )}
+
+                        {/* Challenge quick action - during challenge modes */}
+                        {(dailyChallengeMode || eventMode) && (
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
+                                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all active:scale-95 mb-4"
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(255,255,255,0.2)'
+                                }}
+                            >
+                                <span className="text-lg">📊</span>
+                                <span className="text-white font-semibold">View Leaderboard</span>
+                            </button>
+                        )}
 
                         {/* Social Proof + Privacy */}
                         <div className="text-center mb-4">
@@ -980,39 +1070,29 @@ export default function HomeScreen({
                                 </button>
                             )}
 
-                            {/* Challenges */}
+                            {/* Challenges - Single entry for Daily + Weekly */}
                             <button
                                 onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
-                                className="p-4 rounded-2xl transition-all active:scale-[0.97]"
+                                className="p-4 rounded-2xl transition-all active:scale-[0.97] col-span-2"
                                 style={{
-                                    background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(45,212,191,0.1) 100%)',
-                                    border: '1px solid rgba(16,185,129,0.3)'
-                                }}
-                            >
-                                <span className="text-2xl block mb-1">🏆</span>
-                                <span className="text-white font-bold text-sm block">Challenges</span>
-                                <span className="text-emerald-300/70 text-xs">Win Free Scans</span>
-                            </button>
-
-                            {/* Daily Challenge */}
-                            <button
-                                onClick={() => {
-                                    playSound('click')
-                                    vibrate(15)
-                                    const dailyMode = getDailyMode()
-                                    setMode(dailyMode.id)
-                                    setDailyChallengeMode?.(true)
-                                    setShowMoreFeatures(false)
-                                }}
-                                className="p-4 rounded-2xl transition-all active:scale-[0.97]"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.1) 100%)',
+                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(16,185,129,0.1) 100%)',
                                     border: '1px solid rgba(59,130,246,0.3)'
                                 }}
                             >
-                                <span className="text-2xl block mb-1">⚡</span>
-                                <span className="text-white font-bold text-sm block">Daily Challenge</span>
-                                <span className="text-blue-300/70 text-xs">{getDailyMode().label} Mode</span>
+                                <div className="flex items-center justify-center gap-4">
+                                    <div className="text-center">
+                                        <span className="text-2xl">⚡</span>
+                                        <p className="text-xs text-blue-300/70">Daily</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <span className="text-3xl">🏆</span>
+                                        <p className="text-white font-bold text-sm">Challenges</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <span className="text-2xl">🌟</span>
+                                        <p className="text-xs text-emerald-300/70">Weekly</p>
+                                    </div>
+                                </div>
                             </button>
                         </div>
 
