@@ -811,33 +811,76 @@ export default function HomeScreen({
                             ✨ Unlock Unlimited
                         </button>
 
-                        <div className="text-white/50 text-sm">or flex for free:</div>
+                        <div className="text-white/50 text-sm mb-2">or play for free:</div>
 
-                        <div className="flex gap-3">
-                            {onStartFashionShow && (
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                                    className="px-5 py-3 rounded-xl transition-all active:scale-95"
-                                    style={{
-                                        background: 'rgba(139,92,246,0.2)',
-                                        border: '1px solid rgba(139,92,246,0.3)'
-                                    }}
-                                >
-                                    <span className="text-purple-300 font-medium">🎭 Battle Friends</span>
-                                </button>
-                            )}
+                        <div className="flex flex-col gap-3 w-full max-w-xs">
                             {onOpenArena && (
                                 <button
                                     onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
-                                    className="px-5 py-3 rounded-xl transition-all active:scale-95"
+                                    className="w-full px-5 py-4 rounded-xl transition-all active:scale-95 flex items-center justify-between"
                                     style={{
                                         background: 'rgba(0,212,255,0.15)',
                                         border: '1px solid rgba(0,212,255,0.3)'
                                     }}
                                 >
-                                    <span className="text-cyan-300 font-medium">🌍 Go Global</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-2xl">🌍</span>
+                                        <div className="text-left">
+                                            <span className="text-cyan-300 font-bold block">Global Arena</span>
+                                            <span className="text-cyan-400/70 text-xs">1v1 Battles</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-cyan-400 text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,212,255,0.2)' }}>
+                                        10 FREE/day
+                                    </span>
                                 </button>
                             )}
+                            {onStartFashionShow && (
+                                <button
+                                    onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
+                                    className="w-full px-5 py-4 rounded-xl transition-all active:scale-95 flex items-center justify-between"
+                                    style={{
+                                        background: 'rgba(139,92,246,0.2)',
+                                        border: '1px solid rgba(139,92,246,0.3)'
+                                    }}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-2xl">🎭</span>
+                                        <div className="text-left">
+                                            <span className="text-purple-300 font-bold block">Fashion Show</span>
+                                            <span className="text-purple-400/70 text-xs">Battle Friends</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-purple-400 text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(139,92,246,0.2)' }}>
+                                        FREE
+                                    </span>
+                                </button>
+                            )}
+                            <button
+                                onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
+                                className="w-full px-5 py-4 rounded-xl transition-all active:scale-95"
+                                style={{
+                                    background: 'rgba(59,130,246,0.15)',
+                                    border: '1px solid rgba(59,130,246,0.3)'
+                                }}
+                            >
+                                <div className="flex items-center justify-around">
+                                    <div className="text-center">
+                                        <span className="text-xl">⚡</span>
+                                        <p className="text-blue-300 font-bold text-xs">Daily</p>
+                                        <p className="text-blue-400/70 text-[10px]">1 FREE/day</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <span className="text-2xl">🏆</span>
+                                        <p className="text-white font-bold text-sm">Challenges</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <span className="text-xl">🌟</span>
+                                        <p className="text-emerald-300 font-bold text-xs">Weekly</p>
+                                        <p className="text-emerald-400/70 text-[10px]">1 FREE/week</p>
+                                    </div>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 ) : (
@@ -1044,13 +1087,17 @@ export default function HomeScreen({
                                         border: '1px solid rgba(0,212,255,0.3)'
                                     }}
                                 >
-                                    <span className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                                        style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
-                                        LIVE
-                                    </span>
+                                    <div className="absolute top-2 right-2 flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                                            style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
+                                            LIVE
+                                        </span>
+                                    </div>
                                     <span className="text-2xl block mb-1">🌍</span>
-                                    <span className="text-white font-bold text-sm block">Arena</span>
-                                    <span className="text-cyan-300/70 text-xs">1v1 Battles</span>
+                                    <span className="text-white font-bold text-sm block">Global Arena</span>
+                                    <span className="text-cyan-300/70 text-xs block">1v1 Battles</span>
+                                    <span className="text-cyan-400 text-[10px] font-semibold mt-1 block">🎮 10 FREE matches/day</span>
                                 </button>
                             )}
 
@@ -1066,7 +1113,7 @@ export default function HomeScreen({
                                 >
                                     <span className="text-2xl block mb-1">🎭</span>
                                     <span className="text-white font-bold text-sm block">Fashion Show</span>
-                                    <span className="text-purple-300/70 text-xs">With Friends</span>
+                                    <span className="text-purple-300/70 text-xs">Battle Friends</span>
                                 </button>
                             )}
 
@@ -1079,18 +1126,20 @@ export default function HomeScreen({
                                     border: '1px solid rgba(59,130,246,0.3)'
                                 }}
                             >
-                                <div className="flex items-center justify-center gap-4">
-                                    <div className="text-center">
-                                        <span className="text-2xl">⚡</span>
-                                        <p className="text-xs text-blue-300/70">Daily</p>
+                                <div className="flex items-center justify-around">
+                                    <div className="text-center flex-1">
+                                        <span className="text-2xl block">⚡</span>
+                                        <p className="text-white font-bold text-xs">Daily</p>
+                                        <p className="text-blue-300 text-[10px] font-semibold">1 FREE scan/day</p>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="text-3xl">🏆</span>
+                                    <div className="text-center px-3">
+                                        <span className="text-3xl block">🏆</span>
                                         <p className="text-white font-bold text-sm">Challenges</p>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="text-2xl">🌟</span>
-                                        <p className="text-xs text-emerald-300/70">Weekly</p>
+                                    <div className="text-center flex-1">
+                                        <span className="text-2xl block">🌟</span>
+                                        <p className="text-white font-bold text-xs">Weekly</p>
+                                        <p className="text-emerald-300 text-[10px] font-semibold">1 FREE scan/week</p>
                                     </div>
                                 </div>
                             </button>

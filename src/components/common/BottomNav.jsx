@@ -155,15 +155,17 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                 <button
                     onClick={() => handleTap('arena')}
                     aria-label="Arena - 1v1 Battles"
-                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
+                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90 overflow-visible"
                     style={{
                         transform: activeTab === 'arena' ? 'translateY(-2px)' : 'translateY(0)',
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    {/* Live indicator */}
-                    <div className="absolute -top-1 right-1 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    {/* Live indicator - positioned near icon */}
+                    <div className="absolute top-0.5 right-2 flex items-center gap-1 z-10">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" style={{
+                            boxShadow: '0 0 6px rgba(74, 222, 128, 0.8)'
+                        }} />
                     </div>
                     <ArenaIcon active={activeTab === 'arena'} />
                     <span className={`text-[10px] mt-1 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-white/50'}`}>
