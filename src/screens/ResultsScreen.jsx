@@ -84,20 +84,28 @@ const getModeColors = (mode) => {
 
 const TierBadge = ({ tier, score }) => {
     const tierConfig = {
-        legendary: { label: '👑 LEGENDARY', bg: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)', text: '#000', glow: '#ffd700' },
+        legendary: {
+            label: '👑 LEGENDARY',
+            bg: 'linear-gradient(135deg, #ffd700 0%, #ff6b9d 25%, #c084fc 50%, #22d3ee 75%, #ffd700 100%)',
+            text: '#000',
+            glow: '#ffd700',
+            isHolographic: true
+        },
         fire: { label: '🔥 FIRE', bg: 'linear-gradient(135deg, #ff6b35 0%, #ff0080 100%)', text: '#fff', glow: '#ff6b35' },
         great: { label: '✨ GREAT', bg: 'linear-gradient(135deg, #00d4ff 0%, #0066ff 100%)', text: '#fff', glow: '#00d4ff' },
-        good: { label: '👍 GOOD', bg: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)', text: '#000', glow: '#00ff88' },
-        mid: { label: '😐 MID', bg: 'linear-gradient(135deg, #ffaa00 0%, #ff6b00 100%)', text: '#000', glow: '#ffaa00' },
-        low: { label: '💀 ROUGH', bg: 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)', text: '#fff', glow: '#ff4444' }
+        good: { label: '👍 SOLID', bg: 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)', text: '#000', glow: '#00ff88' },
+        mid: { label: '😬 MID', bg: 'linear-gradient(135deg, #ffaa00 0%, #ff6b00 100%)', text: '#000', glow: '#ffaa00' },
+        low: { label: '💀 OUCH', bg: 'linear-gradient(135deg, #ff4444 0%, #cc0000 100%)', text: '#fff', glow: '#ff4444' }
     }
     const config = tierConfig[tier] || tierConfig.mid
 
     return (
         <div
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-lg tracking-wide shadow-2xl"
+            className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-lg tracking-wide shadow-2xl ${config.isHolographic ? 'holographic-bg' : ''}`}
             style={{
                 background: config.bg,
+                backgroundSize: config.isHolographic ? '300% 300%' : 'auto',
+                animation: config.isHolographic ? 'holographic 4s ease infinite' : 'none',
                 color: config.text,
                 boxShadow: `0 8px 32px ${config.glow}66, 0 4px 16px rgba(0,0,0,0.3)`
             }}

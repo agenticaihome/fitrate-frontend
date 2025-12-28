@@ -157,20 +157,32 @@ const FloatingParticles = ({ accentColor }) => {
 
 // ============================================
 // MODE DATA - All 12 AI Judges
+// Punchier descriptions for 2025
 // ============================================
 const MODES = [
-    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive vibes', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)' },
-    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)' },
-    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'Balanced take', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)' },
-    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)' },
-    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Date check', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star rating', color: '#ffd700', glow: 'rgba(255,215,0,0.4)' },
-    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Energy read', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)' },
-    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)' },
-    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: "That's hot", color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Evil era', color: '#4c1d95', glow: 'rgba(76,29,149,0.4)' },
-    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft & cute', color: '#ffb6c1', glow: 'rgba(255,182,193,0.4)' },
-    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Drip check', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
+    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Your biggest fan', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)' },
+    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Friendship-ending honesty', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)' },
+    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'No cap, real talk', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)' },
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)' },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'AI off its meds', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)' },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)' },
+    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)' },
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
+]
+
+// ============================================
+// SOCIAL PROOF - Live activity simulation
+// ============================================
+const SOCIAL_PROOF_MESSAGES = [
+    '847 fits rated in the last hour',
+    '12.4K outfits rated today',
+    'Join 50K+ fashion lovers',
+    '94 avg score in the last 10 mins',
+    'Someone just got a 98!',
 ]
 
 // Daily Challenge: Rotating mode based on day of year
@@ -779,12 +791,12 @@ export default function HomeScreen({
             {/* ============================================ */}
             <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
                 {scansRemaining === 0 && !isPro && purchasedScans === 0 ? (
-                    /* Out of Scans State - Clean & Clear */
+                    /* Out of Scans State - Fun personality */
                     <div className="flex flex-col items-center gap-6 py-8">
                         <div className="text-center">
-                            <span className="text-5xl block mb-3">⏳</span>
-                            <h2 className="text-white text-xl font-bold mb-1">Out of Scans</h2>
-                            <p className="text-white/60 text-sm">Resets at midnight</p>
+                            <span className="text-5xl block mb-3">😅</span>
+                            <h2 className="text-white text-xl font-bold mb-1">You've been busy!</h2>
+                            <p className="text-white/60 text-sm">Fresh scans drop at midnight ⏰</p>
                         </div>
 
                         <button
@@ -796,10 +808,10 @@ export default function HomeScreen({
                                 boxShadow: '0 4px 25px rgba(0,212,255,0.4)'
                             }}
                         >
-                            ✨ Get More Scans
+                            ✨ Unlock Unlimited
                         </button>
 
-                        <div className="text-white/50 text-sm">or keep playing free:</div>
+                        <div className="text-white/50 text-sm">or flex for free:</div>
 
                         <div className="flex gap-3">
                             {onStartFashionShow && (
@@ -811,7 +823,7 @@ export default function HomeScreen({
                                         border: '1px solid rgba(139,92,246,0.3)'
                                     }}
                                 >
-                                    <span className="text-purple-300 font-medium">🎭 Fashion Show</span>
+                                    <span className="text-purple-300 font-medium">🎭 Battle Friends</span>
                                 </button>
                             )}
                             {onOpenArena && (
@@ -823,7 +835,7 @@ export default function HomeScreen({
                                         border: '1px solid rgba(0,212,255,0.3)'
                                     }}
                                 >
-                                    <span className="text-cyan-300 font-medium">🌍 Arena</span>
+                                    <span className="text-cyan-300 font-medium">🌍 Go Global</span>
                                 </button>
                             )}
                         </div>
@@ -894,10 +906,15 @@ export default function HomeScreen({
                             <span className="text-white/50 text-sm">• Change ▼</span>
                         </button>
 
-                        {/* Privacy - minimal */}
-                        <p className="text-white/40 text-xs mb-4">
-                            🔒 Photos auto-deleted • Your privacy protected
-                        </p>
+                        {/* Social Proof + Privacy */}
+                        <div className="text-center mb-4">
+                            <p className="text-purple-300/70 text-xs mb-1">
+                                🔥 {SOCIAL_PROOF_MESSAGES[Math.floor(Date.now() / 60000) % SOCIAL_PROOF_MESSAGES.length]}
+                            </p>
+                            <p className="text-white/40 text-[10px]">
+                                🔒 Photos auto-deleted
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>
@@ -1174,20 +1191,24 @@ export default function HomeScreen({
                             <p className="text-white/50 text-sm">How should we rate your fit?</p>
                         </div>
 
-                        {/* Mode Grid - 4 columns */}
+                        {/* Mode Grid - 4 columns with elastic selection */}
                         <div className="grid grid-cols-4 gap-2">
                             {MODES.map((m) => (
                                 <button
                                     key={m.id}
-                                    onClick={() => {
+                                    onClick={(e) => {
                                         playSound('click')
-                                        vibrate(15)
-                                        setMode(m.id)
-                                        setEventMode(false)
-                                        setDailyChallengeMode?.(false)
-                                        setShowModeDrawer(false)
+                                        vibrate([15, 10, 25]) // Quick triple-tap feel
+                                        // Add elastic animation class
+                                        e.currentTarget.classList.add('animate-mode-select')
+                                        setTimeout(() => {
+                                            setMode(m.id)
+                                            setEventMode(false)
+                                            setDailyChallengeMode?.(false)
+                                            setShowModeDrawer(false)
+                                        }, 200)
                                     }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all active:scale-95 ${mode === m.id ? 'ring-2' : ''}`}
+                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all ${mode === m.id ? 'ring-2' : ''}`}
                                     style={{
                                         background: `${m.color}15`,
                                         ringColor: m.color

@@ -13,17 +13,38 @@
 
 /* CSS Variables */
 :root {
-  --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ================================================ */
+  /* 2025 ULTRA-FAST MICRO-INTERACTIONS              */
+  /* Research shows 150-200ms is optimal for Gen Z   */
+  /* ================================================ */
+  --transition-instant: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-normal: 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   --shadow-physical: 0 8px 0 rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.3);
   --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
   --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+
+  /* ================================================ */
+  /* UPGRADED BACKGROUND COLORS                       */
+  /* Softer dark purples instead of pure black       */
+  /* ================================================ */
+  --bg-darkest: #0a0a12;
+  --bg-dark: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-elevated: #252538;
 
   /* Brand Colors - Purple to Blue gradient */
   --brand-purple: #A855F7;
   --brand-purple-mid: #8B5CF6;
   --brand-blue: #3B82F6;
   --brand-accent: #00D4FF;
+
+  /* 2025 Trending Colors */
+  --digital-lavender: #B8A9C9;
+  --neo-mint: #AAF0D1;
+
   /* Cyan dot accent */
   --brand-gradient: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-purple-mid) 50%, var(--brand-blue) 100%);
 
@@ -197,7 +218,7 @@ body,
 
 body {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0a0a0f;
+  background: var(--bg-dark);
   color: white;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -211,7 +232,7 @@ body {
 /* ============================================ */
 
 .is-standalone {
-  background: #0a0a0f;
+  background: var(--bg-dark);
   /* Ensure full viewport utilization */
   min-height: 100vh;
   min-height: -webkit-fill-available;
@@ -636,6 +657,143 @@ button,
   .btn-responsive-text {
     font-size: clamp(0.75rem, 3.8vw, 1rem);
   }
+}
+
+/* ============================================ */
+/* 2025 ENHANCED MICRO-ANIMATIONS              */
+/* Ultra-fast, elastic, satisfying feedback    */
+/* ============================================ */
+
+/* Quick elastic pop for button taps */
+@keyframes quickPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* Elastic mode selection feedback */
+@keyframes modeSelect {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  50% { transform: scale(0.95); }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Score counting anticipation */
+@keyframes scoreReveal {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.1); }
+  80% { transform: scale(0.98); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Holographic shimmer for LEGENDARY tier */
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Skeleton loading shimmer */
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Ring breathing animation */
+@keyframes ring-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.08); opacity: 0.6; }
+}
+
+/* Glow breathing animation */
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* Particle float animation */
+@keyframes particle-float {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: var(--opacity, 0.2); }
+  90% { opacity: var(--opacity, 0.2); }
+  100% { transform: translateY(-100vh) translateX(var(--drift, 20px)); opacity: 0; }
+}
+
+/* Staggered fade-up for lists */
+@keyframes stagger-fade-up {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Utility classes for new animations */
+.animate-quick-pop {
+  animation: quickPop 0.2s ease-out;
+}
+
+.animate-mode-select {
+  animation: modeSelect 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-score-reveal {
+  animation: scoreReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-stagger-fade-up {
+  animation: stagger-fade-up 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+/* Skeleton loading effect */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Holographic effect for LEGENDARY scores */
+.holographic-legendary {
+  background: linear-gradient(
+    135deg,
+    #ffd700 0%,
+    #ff6b9d 20%,
+    #c084fc 40%,
+    #22d3ee 60%,
+    #4ade80 80%,
+    #ffd700 100%
+  );
+  background-size: 300% 300%;
+  animation: holographic 4s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.holographic-bg {
+  background: linear-gradient(
+    135deg,
+    rgba(255,215,0,0.3) 0%,
+    rgba(255,107,157,0.3) 20%,
+    rgba(192,132,252,0.3) 40%,
+    rgba(34,211,238,0.3) 60%,
+    rgba(74,222,128,0.3) 80%,
+    rgba(255,215,0,0.3) 100%
+  );
+  background-size: 300% 300%;
+  animation: holographic 4s ease infinite;
 }
 
 /* ============================================ */

@@ -3,25 +3,26 @@ import Footer from '../components/common/Footer'
 import { playSound, vibrate } from '../utils/soundEffects'
 
 // === COPY POOLS (curious → clever → spicy progression) ===
+// 2025 Gen Z approved - punchier and funnier
 const COPY_CURIOUS = [
-    "Running vibe diagnostics…",
-    "Checking fit chemistry…",
-    "Assessing confidence signal…",
-    "Detecting fabric decisions…"
+    "Judging... respectfully 👀",
+    "Analyzing drip levels...",
+    "Processing main character vibes...",
+    "Checking the fit algorithm..."
 ]
 
 const COPY_CLEVER = [
-    "Consulting the fashion gods…",
-    "Measuring drip integrity…",
-    "Cross-checking with the internet's opinion…",
-    "Calculating style potential…"
+    "Consulting the fashion gods...",
+    "Running it by Anna Wintour...",
+    "Asking the internet's opinion...",
+    "Calculating slay potential..."
 ]
 
 const COPY_SPICY = [
-    "Synthesizing social risk…",
-    "Evaluating outfit bravery…",
-    "Detecting fabric failure…",
-    "Assessing the bold choices…"
+    "Preparing to be honest...",
+    "Loading emotional damage...",
+    "Warming up the roasts...",
+    "Summoning fashion demons..."
 ]
 
 // Shuffle array helper
