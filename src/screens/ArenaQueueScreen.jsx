@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { getTodayArenaMode } from './ArenaEntryScreen'
+import { getDisplayName } from '../utils/displayNameStorage'
 
 // ============================================
 // FLOATING PARTICLES
@@ -529,7 +530,7 @@ export default function ArenaQueueScreen({
                                 </div>
                             )}
                         </div>
-                        <p className="text-white/60 text-[10px] mt-1">You</p>
+                        <p className="text-white/60 text-[10px] mt-1">{getDisplayName() || 'You'}</p>
                         <p className="font-black text-base" style={{ color: modeColor }}>
                             {Math.round(score)}
                         </p>

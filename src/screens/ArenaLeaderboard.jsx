@@ -116,6 +116,30 @@ const LeaderboardRow = ({ rank, name, points, tier, isCurrentUser, modeColor }) 
 }
 
 // ============================================
+// LEADERBOARD SKELETON (Loading State)
+// ============================================
+const LeaderboardSkeleton = () => (
+    <div className="space-y-2 animate-pulse">
+        {[1, 2, 3, 4, 5].map(i => (
+            <div
+                key={i}
+                className="flex items-center gap-3 p-3 rounded-xl"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+            >
+                <div className="w-8 h-8 rounded-lg bg-white/10" />
+                <div className="flex-1">
+                    <div className="h-4 w-24 bg-white/10 rounded mb-1" />
+                </div>
+                <div className="w-8 h-8 rounded-md bg-white/10" />
+                <div className="text-right">
+                    <div className="h-4 w-12 bg-white/10 rounded" />
+                </div>
+            </div>
+        ))}
+    </div>
+)
+
+// ============================================
 // TIER PROGRESS CARD
 // ============================================
 const TierProgressCard = ({ tierData, seasonData, modeColor }) => {
@@ -442,17 +466,21 @@ export default function ArenaLeaderboard({
                             <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider">
                                 Top Players
                             </h3>
-                            {leaderboardData.slice(0, 5).map((player, i) => (
-                                <LeaderboardRow
-                                    key={player.id}
-                                    rank={i + 1}
-                                    name={player.name}
-                                    points={player.points}
-                                    tier={player.tier}
-                                    isCurrentUser={false}
-                                    modeColor={modeColor}
-                                />
-                            ))}
+                            {loading ? (
+                                <LeaderboardSkeleton />
+                            ) : (
+                                leaderboardData.slice(0, 5).map((player, i) => (
+                                    <LeaderboardRow
+                                        key={player.id}
+                                        rank={i + 1}
+                                        name={player.name}
+                                        points={player.points}
+                                        tier={player.tier}
+                                        isCurrentUser={player.isCurrentUser}
+                                        modeColor={modeColor}
+                                    />
+                                ))
+                            )}
 
                             {/* Separator if user not in top 5 */}
                             {userRank > 5 && (

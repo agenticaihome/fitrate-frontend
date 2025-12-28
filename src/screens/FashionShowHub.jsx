@@ -37,6 +37,7 @@ export default function FashionShowHub({
 
     // Runway state
     const [scoreboard, setScoreboard] = useState(showData?.scoreboard || [])
+    const [scoreboardLoading, setScoreboardLoading] = useState(true)
     const [timeRemaining, setTimeRemaining] = useState(() => {
         // Calculate from expiresAt for accuracy, fallback to timeRemaining
         if (showData?.expiresAt) {
@@ -110,6 +111,8 @@ export default function FashionShowHub({
                 }
             } catch (err) {
                 console.error('[FashionShow] Scoreboard poll error:', err)
+            } finally {
+                setScoreboardLoading(false)
             }
         }
         fetchScoreboard()
@@ -465,7 +468,18 @@ export default function FashionShowHub({
                     <span className="text-xs text-white/40">{scoreboard.length} entries</span>
                 </div>
 
-                {scoreboard.length === 0 ? (
+                {scoreboardLoading && scoreboard.length === 0 ? (
+                    <div className="space-y-2 animate-pulse">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="p-3 rounded-xl bg-white/5 flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white/10" />
+                                <div className="w-14 h-14 rounded-xl bg-white/10" />
+                                <div className="flex-1 h-4 bg-white/10 rounded" />
+                                <div className="w-12 h-6 bg-white/10 rounded" />
+                            </div>
+                        ))}
+                    </div>
+                ) : scoreboard.length === 0 ? (
                     <div className="text-center py-8 text-white/30 text-sm">
                         No walks yet — be the first! 🎭
                     </div>
