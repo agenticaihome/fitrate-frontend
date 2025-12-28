@@ -20,6 +20,39 @@ export const getTodayArenaMode = () => {
 }
 
 // ============================================
+// DAILY ARENA RECORD (Client-side tracking)
+// Resets each day at midnight
+// ============================================
+const getTodayKey = () => new Date().toISOString().split('T')[0] // YYYY-MM-DD
+
+export const getDailyArenaRecord = () => {
+    try {
+        const todayKey = getTodayKey()
+        const stored = localStorage.getItem('fitrate_arena_daily')
+        if (stored) {
+            const data = JSON.parse(stored)
+            if (data.date === todayKey) {
+                return data
+            }
+        }
+        return { date: todayKey, wins: 0, losses: 0, ties: 0 }
+    } catch (e) {
+        return { date: getTodayKey(), wins: 0, losses: 0, ties: 0 }
+    }
+}
+
+export const recordArenaResult = (result) => { // 'win' | 'loss' | 'tie'
+    const record = getDailyArenaRecord()
+
+    if (result === 'win') record.wins++
+    else if (result === 'loss') record.losses++
+    else record.ties++
+
+    localStorage.setItem('fitrate_arena_daily', JSON.stringify(record))
+    return record
+}
+
+// ============================================
 // FLOATING PARTICLES - Mode-themed
 // ============================================
 const FloatingParticles = ({ color = '#00d4ff' }) => {
@@ -74,9 +107,8 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                 <React.Fragment key={i}>
                     <div className="flex flex-col items-center">
                         <div
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${
-                                i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
-                            }`}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center text-base transition-all duration-500 ${i < currentStep ? 'scale-95' : i === currentStep ? 'scale-105' : 'scale-95 opacity-40'
+                                }`}
                             style={{
                                 background: i <= currentStep
                                     ? `linear-gradient(135deg, ${modeColor}, ${modeColor}80)`
@@ -86,9 +118,8 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[9px] mt-0.5 transition-all ${
-                            i <= currentStep ? 'text-white/80' : 'text-white/30'
-                        }`}>
+                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
+                            }`}>
                             {step.label}
                         </span>
                     </div>
@@ -623,6 +654,26 @@ export default function ArenaEntryScreen({
                         </div>
                     </div>
                 </div>
+
+                {/* Today's Record - Only shows if user has played today */}
+                {(() => {
+                    const record = getDailyArenaRecord()
+                    const totalBattles = record.wins + record.losses + record.ties
+                    if (totalBattles === 0) return null
+
+                    return (
+                        <div className="flex items-center justify-center gap-4 mb-4 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+                            <span className="text-white/50 text-xs uppercase tracking-wider">Today</span>
+                            <div className="flex items-center gap-3">
+                                <span className="text-green-400 font-black">{record.wins}W</span>
+                                <span className="text-white/20">-</span>
+                                <span className="text-red-400 font-black">{record.losses}L</span>
+                                <span className="text-white/20">-</span>
+                                <span className="text-yellow-400 font-black">{record.ties}T</span>
+                            </div>
+                        </div>
+                    )
+                })()}
 
                 {/* How it Works - Visual Steps */}
                 <div className="flex items-center justify-center gap-3 mb-8">

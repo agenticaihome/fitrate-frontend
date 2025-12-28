@@ -9,6 +9,7 @@ import { LIMITS, PRICES, RESETS, STRIPE_LINKS, ROUTES } from './config/constants
 import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
+import { recordArenaResult } from './screens/ArenaEntryScreen'
 import {
   trackScanComplete,
   trackModeSelect,
@@ -2590,12 +2591,22 @@ export default function App() {
       </Suspense>
     )
   }
-
   // ============================================
   // BATTLE RESULTS REVEAL - Dramatic cinematic reveal animation
   // Shows when battle is completed and user triggers "See Battle Results"
   // ============================================
   if (showBattleReveal && challengePartyData && challengePartyData.status === 'completed') {
+    // Record Arena result for daily tracking (only once per battle)
+    const arenaResultKey = `arena_result_${challengePartyData._id || challengePartyData.id || 'unknown'}`
+    if (arenaData && !sessionStorage.getItem(arenaResultKey)) {
+      const myScore = isCreatorOfChallenge ? challengePartyData.creatorScore : challengePartyData.responderScore
+      const opponentScore = isCreatorOfChallenge ? challengePartyData.responderScore : challengePartyData.creatorScore
+      const result = myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie'
+      recordArenaResult(result)
+      sessionStorage.setItem(arenaResultKey, 'recorded') // Prevent double-recording
+      console.log(`[Arena] Recorded result: ${result}`)
+    }
+
     return (
       <Suspense fallback={<LoadingFallback />}>
         <BattleResultsReveal
