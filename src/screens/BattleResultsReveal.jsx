@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
+import BattleShareCard from '../components/modals/BattleShareCard'
 
 /**
  * BattleResultsReveal - CINEMATIC PREMIUM Battle Results
@@ -415,6 +416,7 @@ export default function BattleResultsReveal({
     const [showChromatic, setShowChromatic] = useState(false)
     const [showVictoryRays, setShowVictoryRays] = useState(false)
     const [cameraZoom, setCameraZoom] = useState(1)
+    const [showShareCard, setShowShareCard] = useState(false)
 
     // Battle data
     const creatorScore = battleData?.creatorScore || 0
@@ -776,6 +778,11 @@ export default function BattleResultsReveal({
                     0% { background-position: -200% center; }
                     100% { background-position: 200% center; }
                 }
+
+                @keyframes fade-in-up {
+                    0% { opacity: 0; transform: translateY(20px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
             `}</style>
 
             {/* Confetti */}
@@ -1073,8 +1080,66 @@ export default function BattleResultsReveal({
                                         textShadow: `0 0 20px ${accentColor}40`
                                     }}
                                 >
-                                    {tied ? 'Exactly matched!' : `Won by ${Math.round(diff)} points`}
+                                    {tied ? 'Exactly matched!' : userWon ? `Won by ${Math.round(diff)} points` : `Lost by ${Math.round(diff)} points`}
                                 </p>
+
+                                {/* AI Battle Commentary */}
+                                {battleData?.battleCommentary && (
+                                    <div
+                                        className="mt-6 mx-4 p-4 rounded-2xl"
+                                        style={{
+                                            background: 'rgba(255,255,255,0.05)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            animation: 'fade-in-up 0.5s ease-out 0.3s both'
+                                        }}
+                                    >
+                                        {/* AI Judge Header */}
+                                        <div className="flex items-center justify-center gap-2 mb-3">
+                                            <span className="text-lg">🤖</span>
+                                            <span className="text-xs font-bold text-white/50 uppercase tracking-wider">AI Judge Says</span>
+                                        </div>
+
+                                        {/* Battle Commentary */}
+                                        <p className="text-white/90 text-sm font-medium text-center mb-4">
+                                            "{battleData.battleCommentary}"
+                                        </p>
+
+                                        {/* Winning Factor */}
+                                        {battleData?.winningFactor && !tied && (
+                                            <div
+                                                className="flex items-center justify-center gap-2 p-2 rounded-xl"
+                                                style={{
+                                                    background: `${accentColor}15`,
+                                                    border: `1px solid ${accentColor}30`
+                                                }}
+                                            >
+                                                <span className="text-sm">⚡</span>
+                                                <span className="text-xs text-white/70">
+                                                    <span className="font-bold" style={{ color: accentColor }}>Key Factor: </span>
+                                                    {battleData.winningFactor}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Outfit Verdicts */}
+                                        {(battleData?.outfit1Verdict || battleData?.outfit2Verdict) && (
+                                            <div className="grid grid-cols-2 gap-3 mt-4">
+                                                {battleData?.outfit1Verdict && (
+                                                    <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                        <div className="text-[10px] text-white/40 mb-1">{isCreator ? 'You' : 'Them'}</div>
+                                                        <div className="text-xs text-white/70">{battleData.outfit1Verdict}</div>
+                                                    </div>
+                                                )}
+                                                {battleData?.outfit2Verdict && (
+                                                    <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                                        <div className="text-[10px] text-white/40 mb-1">{isCreator ? 'Them' : 'You'}</div>
+                                                        <div className="text-xs text-white/70">{battleData.outfit2Verdict}</div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -1145,7 +1210,7 @@ export default function BattleResultsReveal({
                                 onClick={() => {
                                     playSound('click')
                                     vibrate(20)
-                                    onShare?.()
+                                    setShowShareCard(true)
                                 }}
                                 className="flex-1 py-3.5 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
                                 style={{
@@ -1196,6 +1261,15 @@ export default function BattleResultsReveal({
                 >
                     Skip →
                 </button>
+            )}
+
+            {/* Battle Share Card Modal */}
+            {showShareCard && (
+                <BattleShareCard
+                    battleData={battleData}
+                    isCreator={isCreator}
+                    onClose={() => setShowShareCard(false)}
+                />
             )}
         </div>
     )

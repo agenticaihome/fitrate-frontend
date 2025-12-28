@@ -238,11 +238,11 @@ const MilestonesSection = ({ unlockedMilestones, allMilestones }) => {
 // ============================================
 const SeasonRewardsPreview = ({ tierData }) => {
     const rewards = [
-        { tier: 'Bronze', reward: '1 Free Scan', emoji: '🥉' },
-        { tier: 'Silver', reward: '3 Scans + Frame', emoji: '🥈' },
-        { tier: 'Gold', reward: '5 Scans + Gold Frame', emoji: '🥇' },
-        { tier: 'Platinum', reward: '10 Scans + Animated Frame', emoji: '💎' },
-        { tier: 'Diamond', reward: '20 Scans + Champion Badge', emoji: '👑' }
+        { tier: 'Bronze', reward: '+1 Scan', emoji: '🥉' },
+        { tier: 'Silver', reward: '+3 Scans + Frame', emoji: '🥈' },
+        { tier: 'Gold', reward: '+5 Scans + Gold Frame', emoji: '🥇' },
+        { tier: 'Platinum', reward: '+10 Scans + Animated Frame', emoji: '💎' },
+        { tier: 'Diamond', reward: '+25 Scans + Champion Badge', emoji: '👑' }
     ]
 
     const currentTierIndex = SEASON_TIERS.findIndex(t => t.name === tierData.tier.name)
@@ -328,15 +328,15 @@ export default function ArenaLeaderboard({
                         setLeaderboardData(entries)
                         if (data.userRank) setApiUserRank(data.userRank)
                     } else {
-                        // No entries yet, use mock
-                        setLeaderboardData(MOCK_LEADERBOARD)
+                        // No entries yet - show empty state
+                        setLeaderboardData([])
                     }
                 } else {
-                    setLeaderboardData(MOCK_LEADERBOARD)
+                    setLeaderboardData([])
                 }
             } catch (err) {
-                console.log('[ArenaLeaderboard] API fetch failed, using mock data:', err.message)
-                setLeaderboardData(MOCK_LEADERBOARD)
+                console.log('[ArenaLeaderboard] API fetch failed:', err.message)
+                setLeaderboardData([])
             } finally {
                 setLoading(false)
             }
@@ -468,6 +468,15 @@ export default function ArenaLeaderboard({
                             </h3>
                             {loading ? (
                                 <LeaderboardSkeleton />
+                            ) : leaderboardData.length === 0 ? (
+                                <div
+                                    className="text-center py-8 rounded-xl"
+                                    style={{ background: 'rgba(255,255,255,0.03)' }}
+                                >
+                                    <div className="text-4xl mb-3">🏆</div>
+                                    <div className="text-white/80 font-bold mb-1">Be the first!</div>
+                                    <div className="text-white/50 text-sm">No battles yet this season. Start competing to claim the top spot!</div>
+                                </div>
                             ) : (
                                 leaderboardData.slice(0, 5).map((player, i) => (
                                     <LeaderboardRow

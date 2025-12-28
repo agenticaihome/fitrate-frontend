@@ -80,14 +80,33 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom']
+        // Optimized chunking for faster initial load
+        manualChunks: (id) => {
+          // Core React - cached long term
+          if (id.includes('node_modules/react')) {
+            return 'react-vendor'
+          }
+          // Heavy screens - load on demand
+          if (id.includes('/screens/Results') ||
+            id.includes('/screens/Battle') ||
+            id.includes('/screens/Arena') ||
+            id.includes('/screens/FashionShow')) {
+            return 'screens-heavy'
+          }
+          // Modals - load on demand
+          if (id.includes('/modals/')) {
+            return 'modals'
+          }
+          // Utils - small, cache long term
+          if (id.includes('/utils/')) {
+            return 'utils'
+          }
         }
       }
     },
     cssCodeSplit: false,
     sourcemap: false,
-    chunkSizeWarningLimit: 500
+    chunkSizeWarningLimit: 600
   },
   // Dev server optimizations
   server: {

@@ -10,6 +10,7 @@ import { getScoreColor } from './utils/scoreUtils'
 import { compressImage, cleanupBlobUrls, hintGarbageCollection, createThumbnail } from './utils/imageUtils'
 import { generateShareCard as generateShareCardUtil } from './utils/shareUtils'
 import { recordArenaResult } from './utils/arenaStorage'
+import { usePrefetchData } from './hooks/usePrefetch'
 import {
   trackScanComplete,
   trackModeSelect,
@@ -625,7 +626,8 @@ export default function App() {
     return id
   })
 
-
+  // PERFORMANCE: Prefetch common data in background for instant navigation
+  usePrefetchData(userId)
 
   // Check Pro status on load (Identity: Email OR UserId)
   useEffect(() => {
