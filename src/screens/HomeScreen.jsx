@@ -45,6 +45,56 @@ const FloatingParticles = ({ accentColor }) => {
     )
 }
 
+// ============================================
+// LIVE ACTIVITY TICKER - Social Proof
+// Shows simulated recent activity to make app feel alive
+// ============================================
+const ACTIVITY_MESSAGES = [
+    { emoji: '🔥', text: 'Someone scored 94 in Roast mode!' },
+    { emoji: '⚔️', text: 'Arena battle just finished!' },
+    { emoji: '🎯', text: 'New player joined the Arena' },
+    { emoji: '✨', text: 'Someone got a 98 score!' },
+    { emoji: '😇', text: '3 scans in Nice mode just now' },
+    { emoji: '🏆', text: 'New high score in Arena!' },
+    { emoji: '📸', text: '12 outfits rated this minute' },
+    { emoji: '💀', text: 'Brutal roast delivered!' },
+]
+
+const LiveActivityTicker = () => {
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [isVisible, setIsVisible] = useState(true)
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setIsVisible(false)
+            setTimeout(() => {
+                setCurrentIndex(prev => (prev + 1) % ACTIVITY_MESSAGES.length)
+                setIsVisible(true)
+            }, 300)
+        }, 4000)
+        return () => clearInterval(interval)
+    }, [])
+
+    const activity = ACTIVITY_MESSAGES[currentIndex]
+
+    return (
+        <div
+            className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full mb-3 transition-all duration-300"
+            style={{
+                background: 'rgba(139,92,246,0.15)',
+                border: '1px solid rgba(139,92,246,0.2)',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(-5px)'
+            }}
+        >
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-xs text-white/60">
+                {activity.emoji} {activity.text}
+            </span>
+        </div>
+    )
+}
+
 // Daily Challenge: Rotating mode based on day of year (12 modes)
 const DAILY_MODES = [
     { id: 'nice', emoji: '😇', label: 'Nice' },
@@ -1167,6 +1217,9 @@ export default function HomeScreen({
             </div>
 
 
+            {/* Live Activity Ticker - Social Proof */}
+            {!eventMode && !dailyChallengeMode && <LiveActivityTicker />}
+
             {/* Privacy Assurance */}
             <p className="text-center text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 {eventMode
@@ -1229,15 +1282,41 @@ export default function HomeScreen({
             )}
 
             {/* My Battles Section - Active 1v1 Battles */}
-            {activeBattles.length > 0 && (
-                <div className="w-full max-w-sm mb-4">
-                    <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
-                        <div className="flex items-center gap-2">
-                            <span className="text-lg">⚔️</span>
-                            <span className="text-white/60 text-sm font-semibold">My Battles</span>
+            <div className="w-full max-w-sm mb-4">
+                <div className="flex items-center justify-between mb-3 px-1 animate-stagger-fade-up stagger-1" style={{ opacity: 0 }}>
+                    <div className="flex items-center gap-2">
+                        <span className="text-lg">⚔️</span>
+                        <span className="text-white/60 text-sm font-semibold">My Battles</span>
+                        {activeBattles.length > 0 && (
                             <span className="text-white/30 text-xs">({activeBattles.length})</span>
-                        </div>
+                        )}
                     </div>
+                </div>
+
+                {activeBattles.length === 0 ? (
+                    /* Empty State - Engaging CTA */
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(15)
+                            // Navigate to Arena for a battle
+                            setArenaScreen?.('entry')
+                        }}
+                        className="w-full p-5 rounded-2xl transition-all active:scale-[0.98] animate-stagger-fade-up"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(0,212,255,0.05) 100%)',
+                            border: '1px dashed rgba(139,92,246,0.3)',
+                            opacity: 0,
+                            animationDelay: '0.1s'
+                        }}
+                    >
+                        <div className="text-center">
+                            <span className="text-3xl mb-2 block">🎯</span>
+                            <p className="text-white/70 font-semibold text-sm mb-1">No battles yet!</p>
+                            <p className="text-purple-400 text-xs">Tap to enter the Arena →</p>
+                        </div>
+                    </button>
+                ) : (
                     <div className="space-y-2">
                         {activeBattles.map((battle, index) => {
                             const modeEmojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏' }
@@ -1268,15 +1347,12 @@ export default function HomeScreen({
                                     >
                                         <span className="text-2xl">{modeEmojis[battle.mode] || '⚔️'}</span>
                                         <div>
-                                            <p className="text-white font-semibold text-sm">
-                                                You scored {Math.round(battle.myScore)}
+                                            <p className="text-white font-bold text-sm">
+                                                {battle.mode?.charAt(0).toUpperCase() + battle.mode?.slice(1) || 'Battle'} Mode
                                             </p>
-                                            <p className={`${statusColor} text-[10px] font-medium`}>
-                                                {statusText}
-                                            </p>
+                                            <p className={`text-xs ${statusColor}`}>{statusText}</p>
                                         </div>
                                     </button>
-                                    {/* Dismiss/Remove Button */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation()
@@ -1297,8 +1373,8 @@ export default function HomeScreen({
                             )
                         })}
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* My Shows Section - Active Fashion Shows */}
             {activeShows.length > 0 && (
