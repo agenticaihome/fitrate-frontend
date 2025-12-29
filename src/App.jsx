@@ -50,6 +50,7 @@ const BattleResultsReveal = lazy(() => import('./screens/BattleResultsReveal'))
 const FashionShowCreate = lazy(() => import('./screens/FashionShowCreate'))
 const FashionShowInvite = lazy(() => import('./screens/FashionShowInvite'))
 const FashionShowHub = lazy(() => import('./screens/FashionShowHub'))
+const FashionShowResults = lazy(() => import('./screens/FashionShowResults'))
 const ChallengesScreen = lazy(() => import('./screens/ChallengesScreen'))
 const MeetTheJudges = lazy(() => import('./screens/MeetTheJudges'))
 const ArenaQueueScreen = lazy(() => import('./screens/ArenaQueueScreen'))  // Global Arena
@@ -2428,6 +2429,41 @@ export default function App() {
   }
 
   // ============================================
+  // FASHION SHOW RESULTS (Grand Finale when show ends)
+  // ============================================
+  if (fashionShowScreen === 'results' && fashionShowData) {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <FashionShowResults
+          showData={fashionShowData}
+          scoreboard={fashionShowData?.scoreboard || []}
+          userId={userId}
+          onShare={() => {
+            const url = `https://fitrate.app/f/${fashionShowId}`
+            if (navigator.share) {
+              navigator.share({
+                title: `Fashion Show Results`,
+                text: `🎭 Check out the results from "${fashionShowData?.name}"!`,
+                url
+              })
+            } else {
+              navigator.clipboard.writeText(url)
+            }
+          }}
+          onNewShow={() => setFashionShowScreen('create')}
+          onBack={() => {
+            setFashionShowScreen(null)
+            setFashionShowId(null)
+            setFashionShowData(null)
+            setScreen('home')
+            window.history.pushState({}, '', '/')
+          }}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // FASHION SHOW HUB (Merged Join + Runway + Camera)
   // Skip if showing results/analyzing - let those screens take priority
   // ============================================
@@ -2466,6 +2502,10 @@ export default function App() {
             } else {
               navigator.clipboard.writeText(url)
             }
+          }}
+          onViewResults={() => {
+            // Navigate to grand finale results screen
+            setFashionShowScreen('results')
           }}
           onBack={() => {
             // Clean exit: reset all Fashion Show state and go home

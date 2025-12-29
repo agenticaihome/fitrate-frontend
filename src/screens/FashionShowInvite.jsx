@@ -38,8 +38,8 @@ export default function FashionShowInvite({
         vibrate(30)
 
         const shareData = {
-            title: `Join my Fashion Show: ${showData?.name}`,
-            text: `🎭 Join "${showData?.name}" on FitRate!\n\nLet's see who has the best fit.`,
+            title: `🎭 Join "${showData?.name}" - Outfit Competition!`,
+            text: `I just started an outfit competition on FitRate! 📸\n\nSnap your fit, get scored by AI, and let's see who WINS 👑\n\nJoin now:`,
             url: inviteUrl
         }
 

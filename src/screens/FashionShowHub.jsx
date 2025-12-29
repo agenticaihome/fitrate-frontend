@@ -22,6 +22,7 @@ export default function FashionShowHub({
     walksAllowed = 1,
     onImageSelected,
     onShare,
+    onViewResults,
     onBack
 }) {
     // Join state
@@ -361,9 +362,23 @@ export default function FashionShowHub({
 
             {/* Show Ended Banner */}
             {(showEnded || timeRemaining <= 0) && (
-                <div className="mx-4 mb-3 p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-center">
-                    <div className="text-lg font-bold text-amber-400">🏁 Show Ended</div>
-                    <p className="text-amber-200/70 text-sm mt-1">Check out the final scores below!</p>
+                <div className="mx-4 mb-3">
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-center">
+                        <div className="text-2xl mb-1">🏁</div>
+                        <div className="text-lg font-bold text-amber-400">Show Complete!</div>
+                        <p className="text-amber-200/70 text-sm mt-1 mb-3">See who won the competition</p>
+                        <button
+                            onClick={() => { playSound('success'); vibrate([50, 30, 50]); onViewResults?.(); }}
+                            className="px-6 py-3 rounded-xl font-bold text-white active:scale-[0.98] transition-transform"
+                            style={{
+                                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
+                                color: '#000',
+                                boxShadow: '0 4px 20px rgba(255,215,0,0.4)'
+                            }}
+                        >
+                            🏆 View Full Results
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -374,6 +389,16 @@ export default function FashionShowHub({
                     <span className="px-3 py-1 rounded-full bg-white/10 text-white/60">{showData.vibeLabel}</span>
                     {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
                 </div>
+                {/* Participant counter - creates FOMO */}
+                {scoreboard.length > 0 && (
+                    <div className="mt-2 flex items-center justify-center gap-2">
+                        <span className="text-purple-400 font-bold">{scoreboard.length} {scoreboard.length === 1 ? 'friend' : 'friends'}</span>
+                        <span className="text-white/40">competing</span>
+                        {scoreboard[0] && canStillWalk && (
+                            <span className="text-amber-400 text-sm ml-2">👑 {scoreboard[0].nickname} leads with {scoreboard[0].score?.toFixed(0)}</span>
+                        )}
+                    </div>
+                )}
                 {canStillWalk && (
                     <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
                 )}
@@ -420,7 +445,7 @@ export default function FashionShowHub({
                                 : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]'
                                 }`}
                         >
-                            {loading ? '⏳ Joining...' : '📸 Walk the Runway'}
+                            {loading ? '⏳ Joining...' : '📸 Snap Your Fit & Join'}
                         </button>
                     </div>
                 ) : !hasJoined && !canStillWalk ? (
@@ -454,7 +479,8 @@ export default function FashionShowHub({
                         ) : (
                             <>
                                 <span className="text-3xl">📸</span>
-                                <span>Walk the Runway</span>
+                                <span>Snap Your Fit</span>
+                                <span className="text-sm font-normal text-white/60">Take a photo to compete</span>
                             </>
                         )}
                     </button>
