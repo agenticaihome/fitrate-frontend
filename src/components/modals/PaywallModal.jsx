@@ -335,7 +335,7 @@ export default function PaywallModal({
                                 </span>
                             </div>
                             <p className="text-white/60 text-sm ml-9">
-                                25 scans every day • Just ${(PRICES.PRO_YEARLY / 12).toFixed(2)}/month
+                                Unlimited scans* • Just ${(PRICES.PRO_YEARLY / 12).toFixed(2)}/month
                             </p>
                             <div className="mt-3 ml-9 text-2xl font-black text-white">
                                 ${PRICES.PRO_YEARLY}<span className="text-white/50 text-sm font-normal">/year</span>
@@ -360,7 +360,7 @@ export default function PaywallModal({
                                 <span className="text-white font-bold text-lg">Monthly Flex</span>
                             </div>
                             <p className="text-white/60 text-sm ml-9">
-                                25 scans every day • Cancel anytime
+                                Unlimited scans* • Cancel anytime
                             </p>
                             <div className="mt-3 ml-9 text-2xl font-black text-white">
                                 ${PRICES.PRO_MONTHLY}<span className="text-white/50 text-sm font-normal">/month</span>
@@ -399,6 +399,13 @@ export default function PaywallModal({
                     <span>•</span>
                     <span>💬 Support</span>
                 </div>
+
+                {/* Fair use note for unlimited */}
+                {activeTab === 'unlimited' && (
+                    <p className="text-white/25 text-[10px] text-center mb-3">
+                        *Fair use: up to 100 scans/day – more than you'll ever need! 💫
+                    </p>
+                )}
 
                 {/* Legal links */}
                 <div className="flex items-center justify-center gap-3 text-white/30 text-[10px] mb-4">
