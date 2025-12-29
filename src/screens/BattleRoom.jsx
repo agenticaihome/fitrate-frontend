@@ -68,6 +68,11 @@ export default function BattleRoom({
     const responderScore = battleData?.responderScore || 0
     const battleMode = battleData?.mode || 'nice'
 
+    // NEW: Original scores (what users saw when they first scanned)
+    const originalCreatorScore = battleData?.originalCreatorScore
+    const originalResponderScore = battleData?.originalResponderScore
+    const scoresRecalculated = battleData?.scoresRecalculated
+
     // Platform detection
     const isAndroid = () => /Android/i.test(navigator.userAgent)
     const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
@@ -413,9 +418,21 @@ export default function BattleRoom({
                         <span className="text-sm text-white/50 font-bold uppercase tracking-wider mb-1">
                             {isCreator ? 'You' : 'Challenger'}
                         </span>
-                        <span className="text-4xl font-black" style={{ color: creatorWon ? winColor : '#fff' }}>
-                            {Math.round(creatorScore)}
-                        </span>
+                        {scoresRecalculated && originalCreatorScore != null ? (
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-lg text-white/50">{Math.round(originalCreatorScore)}</span>
+                                    <span className="text-sm text-white/30">→</span>
+                                    <span className="text-3xl font-black" style={{ color: creatorWon ? winColor : '#fff' }}>
+                                        {Math.round(creatorScore)}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <span className="text-4xl font-black" style={{ color: creatorWon ? winColor : '#fff' }}>
+                                {Math.round(creatorScore)}
+                            </span>
+                        )}
                     </div>
 
                     <div className="text-2xl font-black text-white/30">VS</div>
@@ -437,11 +454,36 @@ export default function BattleRoom({
                         <span className="text-sm text-white/50 font-bold uppercase tracking-wider mb-1">
                             {isCreator ? 'Opponent' : 'You'}
                         </span>
-                        <span className="text-4xl font-black" style={{ color: responderWon ? winColor : '#fff' }}>
-                            {Math.round(responderScore)}
-                        </span>
+                        {scoresRecalculated && originalResponderScore != null ? (
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-lg text-white/50">{Math.round(originalResponderScore)}</span>
+                                    <span className="text-sm text-white/30">→</span>
+                                    <span className="text-3xl font-black" style={{ color: responderWon ? winColor : '#fff' }}>
+                                        {Math.round(responderScore)}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <span className="text-4xl font-black" style={{ color: responderWon ? winColor : '#fff' }}>
+                                {Math.round(responderScore)}
+                            </span>
+                        )}
                     </div>
                 </div>
+
+                {/* Score Recalculation Explanation */}
+                {scoresRecalculated && (
+                    <p
+                        className="text-xs text-white/40 text-center mb-4 px-4 italic max-w-xs"
+                        style={{
+                            opacity: revealed ? 1 : 0,
+                            transition: 'opacity 0.5s ease-out 0.4s'
+                        }}
+                    >
+                        When outfits are compared head-to-head, the AI re-evaluates them against each other
+                    </p>
+                )}
 
                 {/* Point Difference */}
                 <p className="text-xl mb-8" style={{
