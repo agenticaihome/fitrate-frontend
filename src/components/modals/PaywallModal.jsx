@@ -5,7 +5,7 @@ import { PRICES, STRIPE_LINKS } from '../../config/constants'
 // Gentle floating hearts/stars animation
 const FloatingEmojis = () => {
     const emojis = useMemo(() =>
-        ['✨', '💫', '⭐', '🌟', '💖'].flatMap((emoji, i) =>
+        ['👗', '👠', '💄', '👜', '👔', '✨'].flatMap((emoji, i) =>
             Array.from({ length: 3 }, (_, j) => ({
                 id: i * 3 + j,
                 emoji,
@@ -106,7 +106,7 @@ export default function PaywallModal({
             scans: 3,
             price: PRICES.SCAN_PACK_3,
             link: STRIPE_LINKS.impulsePack,
-            emoji: '🌱',
+            emoji: '👕',
             label: 'Try it out',
             subtext: 'Perfect for a quick vibe check'
         },
@@ -115,7 +115,7 @@ export default function PaywallModal({
             scans: 10,
             price: PRICES.SCAN_PACK_10,
             link: STRIPE_LINKS.starterPack,
-            emoji: '🌿',
+            emoji: '👗',
             label: 'Getting started',
             subtext: 'A week of daily fits'
         },
@@ -125,7 +125,7 @@ export default function PaywallModal({
             price: PRICES.SCAN_PACK_25,
             link: STRIPE_LINKS.popularPack,
             popular: true,
-            emoji: '🌸',
+            emoji: '👠',
             label: 'Fan favorite',
             subtext: 'Most loved by our community'
         },
@@ -134,7 +134,7 @@ export default function PaywallModal({
             scans: 50,
             price: PRICES.SCAN_PACK_50,
             link: STRIPE_LINKS.valuePack,
-            emoji: '🌺',
+            emoji: '💎',
             label: 'Style enthusiast',
             subtext: 'For serious outfit queens'
         },
@@ -143,7 +143,7 @@ export default function PaywallModal({
             scans: 100,
             price: PRICES.SCAN_PACK_100,
             link: STRIPE_LINKS.megaPack,
-            emoji: '🌻',
+            emoji: '👑',
             label: 'Fashionista pack',
             subtext: 'Best value for trendsetters'
         },
