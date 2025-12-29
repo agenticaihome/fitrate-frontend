@@ -51,15 +51,6 @@ const DURATIONS = [
     { hours: 168, label: '7 Days' }
 ]
 
-// Max participants options - show ends when full
-const MAX_PARTICIPANTS = [
-    { count: 4, label: '4 people' },
-    { count: 8, label: '8 people' },
-    { count: 12, label: '12 people' },
-    { count: 20, label: '20 people' },
-    { count: 0, label: 'Unlimited' }
-]
-
 export default function FashionShowCreate({
     isPro,
     userId,
@@ -249,27 +240,33 @@ export default function FashionShowCreate({
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
                         Max Participants
                     </label>
-                    <p className="text-xs text-white/40 mb-3">Show ends automatically when full</p>
-                    <div className="flex flex-wrap gap-2">
-                        {MAX_PARTICIPANTS.map((p) => {
-                            const isSelected = maxParticipants === p.count
-                            return (
-                                <button
-                                    key={p.count}
-                                    onClick={() => {
-                                        setMaxParticipants(p.count)
-                                        playSound('click')
-                                        vibrate(15)
-                                    }}
-                                    className={`py-2 px-4 rounded-xl border transition-all ${isSelected
-                                        ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
-                                        : 'border-white/20 bg-white/5 text-white/60'
-                                        }`}
-                                >
-                                    {p.label}
-                                </button>
-                            )
-                        })}
+                    <p className="text-xs text-white/40 mb-3">Show ends automatically when full (leave empty for unlimited)</p>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="number"
+                            value={maxParticipants || ''}
+                            onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0
+                                setMaxParticipants(Math.min(100, Math.max(0, val)))
+                            }}
+                            placeholder="Unlimited"
+                            min="2"
+                            max="100"
+                            className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-white/30 focus:outline-none focus:border-purple-500 text-center text-lg"
+                        />
+                        <button
+                            onClick={() => {
+                                setMaxParticipants(0)
+                                playSound('click')
+                                vibrate(15)
+                            }}
+                            className={`py-3 px-4 rounded-xl border transition-all ${maxParticipants === 0
+                                ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
+                                : 'border-white/20 bg-white/5 text-white/60'
+                                }`}
+                        >
+                            ∞ Unlimited
+                        </button>
                     </div>
                 </div>
 
