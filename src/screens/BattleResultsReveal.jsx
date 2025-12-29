@@ -425,6 +425,11 @@ export default function BattleResultsReveal({
     const responderThumb = battleData?.responderThumb
     const battleMode = battleData?.mode || 'nice'
 
+    // NEW: Original scores (what users saw when they first scanned)
+    const originalCreatorScore = battleData?.originalCreatorScore
+    const originalResponderScore = battleData?.originalResponderScore
+    const scoresRecalculated = battleData?.scoresRecalculated
+
     // Determine winner - USE API winner field (AI head-to-head comparison)
     // Falls back to score comparison for legacy battles without winner field
     const apiWinner = battleData?.winner // 'creator' | 'opponent' | 'tie' | null
@@ -932,11 +937,25 @@ export default function BattleResultsReveal({
                                         className="text-center mt-4"
                                         style={{ animation: 'score-pop-3d 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' }}
                                     >
-                                        <AnimatedScore
-                                            targetScore={Math.round(creatorScore)}
-                                            color={creatorWon ? winColor : '#fff'}
-                                            isWinner={creatorWon}
-                                        />
+                                        {scoresRecalculated && originalCreatorScore != null ? (
+                                            <div className="flex flex-col items-center">
+                                                <div className="flex items-center gap-1.5 mb-1">
+                                                    <span className="text-lg text-white/50">{Math.round(originalCreatorScore)}</span>
+                                                    <span className="text-sm text-white/30">→</span>
+                                                </div>
+                                                <AnimatedScore
+                                                    targetScore={Math.round(creatorScore)}
+                                                    color={creatorWon ? winColor : '#fff'}
+                                                    isWinner={creatorWon}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <AnimatedScore
+                                                targetScore={Math.round(creatorScore)}
+                                                color={creatorWon ? winColor : '#fff'}
+                                                isWinner={creatorWon}
+                                            />
+                                        )}
                                         <div className="text-xs text-white/40 mt-1">/100</div>
                                     </div>
                                 )}
@@ -1054,17 +1073,42 @@ export default function BattleResultsReveal({
                                         className="text-center mt-4"
                                         style={{ animation: 'score-pop-3d 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s forwards', opacity: 0 }}
                                     >
-                                        <AnimatedScore
-                                            targetScore={Math.round(responderScore)}
-                                            color={responderWon ? winColor : '#fff'}
-                                            delay={150}
-                                            isWinner={responderWon}
-                                        />
+                                        {scoresRecalculated && originalResponderScore != null ? (
+                                            <div className="flex flex-col items-center">
+                                                <div className="flex items-center gap-1.5 mb-1">
+                                                    <span className="text-lg text-white/50">{Math.round(originalResponderScore)}</span>
+                                                    <span className="text-sm text-white/30">→</span>
+                                                </div>
+                                                <AnimatedScore
+                                                    targetScore={Math.round(responderScore)}
+                                                    color={responderWon ? winColor : '#fff'}
+                                                    delay={150}
+                                                    isWinner={responderWon}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <AnimatedScore
+                                                targetScore={Math.round(responderScore)}
+                                                color={responderWon ? winColor : '#fff'}
+                                                delay={150}
+                                                isWinner={responderWon}
+                                            />
+                                        )}
                                         <div className="text-xs text-white/40 mt-1">/100</div>
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* Score Recalculation Explanation */}
+                        {phase >= 3 && scoresRecalculated && (
+                            <p
+                                className="text-xs text-white/40 text-center mb-4 px-4 italic"
+                                style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}
+                            >
+                                When outfits are compared head-to-head, the AI re-evaluates them against each other
+                            </p>
+                        )}
 
                         {/* Result Text - Glitch Effect */}
                         {phase >= 3 && (

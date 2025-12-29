@@ -44,6 +44,11 @@ export default function BattleScreen({
     const responderScore = battleData?.responderScore || 0
     const battleMode = battleData?.mode || 'nice'  // AI mode for this battle
 
+    // NEW: Original scores (what users saw when they first scanned)
+    const originalCreatorScore = battleData?.originalCreatorScore
+    const originalResponderScore = battleData?.originalResponderScore
+    const scoresRecalculated = battleData?.scoresRecalculated
+
     // Mode display helpers
     const getModeEmoji = (m) => {
         const emojis = { nice: '😇', roast: '🔥', honest: '📊', savage: '💀', rizz: '😏', celeb: '⭐', aura: '🔮', chaos: '🎪', y2k: '💎', villain: '🖤', coquette: '🎀', hypebeast: '👟' }
@@ -348,12 +353,27 @@ export default function BattleScreen({
                     <span className="text-xs text-white/50 uppercase tracking-wider">
                         {isCreator ? 'You' : 'Them'}
                     </span>
-                    <span
-                        className="text-3xl font-black"
-                        style={{ color: creatorWon ? winColor : '#fff' }}
-                    >
-                        {Math.round(creatorScore)}
-                    </span>
+                    {scoresRecalculated && originalCreatorScore != null ? (
+                        <div className="flex flex-col items-center">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-sm text-white/50">{Math.round(originalCreatorScore)}</span>
+                                <span className="text-xs text-white/30">→</span>
+                                <span
+                                    className="text-2xl font-black"
+                                    style={{ color: creatorWon ? winColor : '#fff' }}
+                                >
+                                    {Math.round(creatorScore)}
+                                </span>
+                            </div>
+                        </div>
+                    ) : (
+                        <span
+                            className="text-3xl font-black"
+                            style={{ color: creatorWon ? winColor : '#fff' }}
+                        >
+                            {Math.round(creatorScore)}
+                        </span>
+                    )}
                 </div>
 
                 {/* VS */}
@@ -382,14 +402,42 @@ export default function BattleScreen({
                     <span className="text-xs text-white/50 uppercase tracking-wider">
                         {isCreator ? 'Them' : 'You'}
                     </span>
-                    <span
-                        className="text-3xl font-black"
-                        style={{ color: responderWon ? winColor : '#fff' }}
-                    >
-                        {Math.round(responderScore)}
-                    </span>
+                    {scoresRecalculated && originalResponderScore != null ? (
+                        <div className="flex flex-col items-center">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-sm text-white/50">{Math.round(originalResponderScore)}</span>
+                                <span className="text-xs text-white/30">→</span>
+                                <span
+                                    className="text-2xl font-black"
+                                    style={{ color: responderWon ? winColor : '#fff' }}
+                                >
+                                    {Math.round(responderScore)}
+                                </span>
+                            </div>
+                        </div>
+                    ) : (
+                        <span
+                            className="text-3xl font-black"
+                            style={{ color: responderWon ? winColor : '#fff' }}
+                        >
+                            {Math.round(responderScore)}
+                        </span>
+                    )}
                 </div>
             </div>
+
+            {/* Score Recalculation Explanation */}
+            {scoresRecalculated && (
+                <p
+                    className="text-xs text-white/40 text-center mb-4 px-4 italic max-w-xs"
+                    style={{
+                        opacity: revealed ? 1 : 0,
+                        transition: 'opacity 0.5s ease-out 0.4s'
+                    }}
+                >
+                    When outfits are compared head-to-head, the AI re-evaluates them against each other
+                </p>
+            )}
 
             {/* Point Difference */}
             <p

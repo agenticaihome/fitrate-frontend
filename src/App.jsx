@@ -111,6 +111,11 @@ const normalizeBattleData = (data) => {
     battleCommentary: data.battleCommentary || null,
     winningFactor: data.winningFactor || null,
     marginOfVictory: data.marginOfVictory ?? null,
+    // NEW: Original scores (what users saw when they first scanned)
+    originalCreatorScore: data.originalCreatorScore ?? data.creator?.originalScore ?? null,
+    originalResponderScore: data.originalResponderScore ?? data.opponent?.originalScore ?? null,
+    // NEW: Flag indicating if scores were recalculated for head-to-head comparison
+    scoresRecalculated: data.scoresRecalculated ?? false,
     // Outfit verdicts from nested structure or direct fields
     outfit1Verdict: data.creator?.verdict || data.outfit1Verdict || null,
     outfit2Verdict: data.opponent?.verdict || data.outfit2Verdict || null

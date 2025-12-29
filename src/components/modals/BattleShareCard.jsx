@@ -22,6 +22,11 @@ export default function BattleShareCard({
     const battleCommentary = battleData?.battleCommentary
     const winningFactor = battleData?.winningFactor
 
+    // NEW: Original scores (what users saw when they first scanned)
+    const originalCreatorScore = battleData?.originalCreatorScore
+    const originalResponderScore = battleData?.originalResponderScore
+    const scoresRecalculated = battleData?.scoresRecalculated
+
     // Determine winner - USE API winner field (AI head-to-head comparison)
     // Falls back to score comparison for legacy battles without winner field
     const apiWinner = battleData?.winner // 'creator' | 'opponent' | 'tie' | null
@@ -41,6 +46,10 @@ export default function BattleShareCard({
     const opponentScore = isCreator ? responderScore : creatorScore
     const userThumb = isCreator ? creatorThumb : responderThumb
     const opponentThumb = isCreator ? responderThumb : creatorThumb
+
+    // NEW: Original scores for user and opponent
+    const userOriginalScore = isCreator ? originalCreatorScore : originalResponderScore
+    const opponentOriginalScore = isCreator ? originalResponderScore : originalCreatorScore
 
     const handleShare = async () => {
         playSound('click')
@@ -157,11 +166,25 @@ export default function BattleShareCard({
                                     )}
                                 </div>
                                 <div className="text-xs text-white/50 mb-1">You</div>
-                                <div className="text-2xl font-black" style={{
-                                    color: userWon ? winColor : tied ? tieColor : '#fff'
-                                }}>
-                                    {userScore.toFixed(1)}
-                                </div>
+                                {scoresRecalculated && userOriginalScore != null ? (
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex items-center gap-1 text-xs text-white/40">
+                                            <span>{Math.round(userOriginalScore)}</span>
+                                            <span>→</span>
+                                        </div>
+                                        <div className="text-xl font-black" style={{
+                                            color: userWon ? winColor : tied ? tieColor : '#fff'
+                                        }}>
+                                            {userScore.toFixed(1)}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-2xl font-black" style={{
+                                        color: userWon ? winColor : tied ? tieColor : '#fff'
+                                    }}>
+                                        {userScore.toFixed(1)}
+                                    </div>
+                                )}
                             </div>
 
                             {/* VS Badge */}
@@ -187,13 +210,34 @@ export default function BattleShareCard({
                                     )}
                                 </div>
                                 <div className="text-xs text-white/50 mb-1">Opponent</div>
-                                <div className="text-2xl font-black" style={{
-                                    color: !userWon && !tied ? winColor : tied ? tieColor : '#fff'
-                                }}>
-                                    {opponentScore.toFixed(1)}
-                                </div>
+                                {scoresRecalculated && opponentOriginalScore != null ? (
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex items-center gap-1 text-xs text-white/40">
+                                            <span>{Math.round(opponentOriginalScore)}</span>
+                                            <span>→</span>
+                                        </div>
+                                        <div className="text-xl font-black" style={{
+                                            color: !userWon && !tied ? winColor : tied ? tieColor : '#fff'
+                                        }}>
+                                            {opponentScore.toFixed(1)}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-2xl font-black" style={{
+                                        color: !userWon && !tied ? winColor : tied ? tieColor : '#fff'
+                                    }}>
+                                        {opponentScore.toFixed(1)}
+                                    </div>
+                                )}
                             </div>
                         </div>
+
+                        {/* Score Recalculation Note */}
+                        {scoresRecalculated && (
+                            <div className="text-[9px] text-white/30 text-center mb-2 italic">
+                                Scores recalculated for head-to-head comparison
+                            </div>
+                        )}
 
                         {/* Win Margin */}
                         {!tied && (
