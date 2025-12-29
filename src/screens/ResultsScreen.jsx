@@ -1401,26 +1401,34 @@ export default function ResultsScreen({
 
             {/* ===== CELEBRITY JUDGE CARD - Pro Mode ===== */}
             {
-                scores.mode === 'celeb' && scores.celebrityJudge && (
+                scores.mode === 'celeb' && scores.judgedBy && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context */}
                         <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
+                            {/* Judge Badge */}
                             <div className="flex items-center gap-2 mb-3">
                                 <span className="text-2xl">🎭</span>
-                                <span className="text-lg font-black text-yellow-400">{scores.celebrityJudge}</span>
+                                <span className="text-xs text-white/50 uppercase tracking-wider">Judged by</span>
+                                <span className="text-lg font-black text-yellow-400">{scores.judgedBy}</span>
                             </div>
-                            {scores.celebQuote && (
+                            {/* Judge Quote - uses the line field */}
+                            {scores.line && (
                                 <blockquote className="bg-yellow-500/10 rounded-xl p-4 mb-3 border-l-4 border-yellow-500">
-                                    <p className="text-sm text-white/90 italic">"{scores.celebQuote}"</p>
-                                    <cite className="text-[10px] text-yellow-400/70 mt-2 block">— {scores.celebrityJudge}</cite>
+                                    <p className="text-sm text-white/90 italic">"{scores.line}"</p>
+                                    <cite className="text-[10px] text-yellow-400/70 mt-2 block">— {scores.judgedBy}</cite>
                                 </blockquote>
                             )}
-                            <div className="text-center">
+                            {/* Would Wear Decision */}
+                            <div className="text-center mb-3">
                                 <span className={`text-xl font-black ${scores.wouldTheyWear ? 'text-green-400' : 'text-red-400'}`}>
                                     {scores.wouldTheyWear ? '✅ Would Wear' : '❌ Would NOT Wear'}
                                 </span>
                             </div>
+                            {/* Disclaimer */}
+                            <p className="text-[9px] text-white/30 text-center italic">
+                                AI parody characters for entertainment only. Not affiliated with any real celebrities.
+                            </p>
                         </div>
                     </div>
                 )
