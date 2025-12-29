@@ -622,7 +622,7 @@ export default function HomeScreen({
             background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 30%, #12091f 70%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
-            paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))'
+            paddingBottom: 'calc(120px + env(safe-area-inset-bottom, 0px))'
         }}>
             {/* Subtle Background - Only ONE animated glow */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
