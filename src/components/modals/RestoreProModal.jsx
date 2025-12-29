@@ -1,5 +1,7 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { playSound, vibrate } from '../../utils/soundEffects'
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-api-production.up.railway.app'
 
 // Premium floating particles
 const FloatingParticles = () => {
@@ -40,23 +42,63 @@ const FloatingParticles = () => {
 }
 
 /**
- * RestoreProModal
- *
- * Shows contact support info for Pro restoration.
- * Manual verification via Stripe dashboard is more secure than email-only.
+ * RestoreProModal - Self-Service Purchase Recovery
+ * Users enter their checkout email to restore Pro + purchased scans
  */
-export default function RestoreProModal({ onClose }) {
+export default function RestoreProModal({ onClose, userId, onRestoreSuccess }) {
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState(null)
+
     const handleClose = () => {
         playSound('click')
         vibrate(10)
         onClose()
     }
 
-    const handleContactSupport = () => {
+    const handleRestore = async (e) => {
+        e.preventDefault()
+        if (!email.trim()) {
+            setError('Please enter your email')
+            return
+        }
+
         playSound('click')
         vibrate(20)
-        // Open email client with pre-filled subject
-        window.location.href = 'mailto:support@agenticaihome.com?subject=Restore%20Pro%20Access&body=Hi%2C%0A%0AI%20need%20to%20restore%20my%20Pro%20access.%0A%0AEmail%20used%20for%20purchase%3A%20%0A%0AThank%20you!'
+        setLoading(true)
+        setError('')
+
+        try {
+            const response = await fetch(`${API_URL}/api/restore`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: userId || localStorage.getItem('fitrate_user_id'),
+                    email: email.trim()
+                })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                playSound('success')
+                vibrate([30, 20, 30])
+                setSuccess(data)
+
+                // Notify parent component
+                if (onRestoreSuccess) {
+                    onRestoreSuccess(data)
+                }
+            } else {
+                setError(data.error || 'No purchases found for this email')
+            }
+        } catch (err) {
+            console.error('Restore error:', err)
+            setError('Connection error. Please try again.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -99,55 +141,118 @@ export default function RestoreProModal({ onClose }) {
                     <span className="text-white text-xl">×</span>
                 </button>
 
-                {/* Header */}
-                <div className="text-center mb-6">
-                    <div className="text-5xl mb-3 relative inline-block" style={{
-                        animation: 'float-gentle 3s ease-in-out infinite',
-                        filter: 'drop-shadow(0 0 20px rgba(139,92,246,0.5))'
-                    }}>🔄</div>
-                    <h2 id="restore-title" className="text-2xl font-black text-white mb-1">
-                        Restore Pro
-                    </h2>
-                    <p className="text-sm text-gray-400">
-                        New device or cleared data?
-                    </p>
-                </div>
+                {success ? (
+                    /* Success State */
+                    <div className="text-center py-4">
+                        <div className="text-6xl mb-4">🎉</div>
+                        <h2 className="text-2xl font-black text-white mb-2">
+                            Restored!
+                        </h2>
+                        <p className="text-purple-200/80 mb-4">
+                            {success.message}
+                        </p>
 
-                {/* Info */}
-                <div className="bg-white/5 rounded-2xl p-4 mb-4 text-center">
-                    <p className="text-sm text-white/80 mb-3">
-                        To restore your Pro access on a new device, contact our support team.
-                    </p>
-                    <p className="text-xs text-white/50">
-                        We'll verify your purchase via Stripe and restore access within 24 hours.
-                    </p>
-                </div>
+                        <div className="bg-white/5 rounded-2xl p-4 mb-6 space-y-2">
+                            {success.restoredPro && (
+                                <div className="flex items-center justify-center gap-2 text-green-400">
+                                    <span>👑</span>
+                                    <span>Pro Status Restored</span>
+                                </div>
+                            )}
+                            {success.restoredScans > 0 && (
+                                <div className="flex items-center justify-center gap-2 text-cyan-400">
+                                    <span>📦</span>
+                                    <span>{success.restoredScans} Scans Recovered</span>
+                                </div>
+                            )}
+                        </div>
 
-                {/* Contact Button with premium shine */}
-                <button
-                    onClick={handleContactSupport}
-                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-3 btn-premium-shine relative overflow-hidden"
-                    style={{
-                        background: 'linear-gradient(135deg, #A855F7 0%, #3B82F6 100%)',
-                        color: 'white',
-                        boxShadow: '0 8px 30px rgba(139,92,246,0.4), 0 0 0 1px rgba(139,92,246,0.3)'
-                    }}
-                >
-                    Contact Support
-                </button>
+                        <button
+                            onClick={handleClose}
+                            className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97]"
+                            style={{
+                                background: 'linear-gradient(135deg, #A855F7 0%, #3B82F6 100%)',
+                                color: 'white',
+                                boxShadow: '0 8px 30px rgba(139,92,246,0.4)'
+                            }}
+                        >
+                            Awesome! ✨
+                        </button>
+                    </div>
+                ) : (
+                    /* Restore Form */
+                    <>
+                        {/* Header */}
+                        <div className="text-center mb-5">
+                            <div className="text-5xl mb-3 relative inline-block" style={{
+                                animation: 'float-gentle 3s ease-in-out infinite',
+                                filter: 'drop-shadow(0 0 20px rgba(139,92,246,0.5))'
+                            }}>🔄</div>
+                            <h2 id="restore-title" className="text-2xl font-black text-white mb-1">
+                                Restore Purchases
+                            </h2>
+                            <p className="text-sm text-gray-400">
+                                New device or cleared data? No worries!
+                            </p>
+                        </div>
 
-                {/* Cancel */}
-                <button
-                    onClick={handleClose}
-                    className="w-full py-2 text-sm text-gray-500 font-medium"
-                >
-                    Maybe later
-                </button>
+                        {/* Email Form */}
+                        <form onSubmit={handleRestore}>
+                            <div className="mb-4">
+                                <label className="block text-sm text-white/60 mb-2">
+                                    Email used at checkout
+                                </label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                                    placeholder="your@email.com"
+                                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none transition-colors"
+                                    disabled={loading}
+                                />
+                            </div>
 
-                {/* Why manual? */}
-                <p className="text-[10px] text-white/30 text-center mt-4">
-                    🔒 Manual verification protects your account from unauthorized access
-                </p>
+                            {error && (
+                                <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm text-center">
+                                    {error}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] mb-3 relative overflow-hidden disabled:opacity-50"
+                                style={{
+                                    background: 'linear-gradient(135deg, #A855F7 0%, #3B82F6 100%)',
+                                    color: 'white',
+                                    boxShadow: '0 8px 30px rgba(139,92,246,0.4), 0 0 0 1px rgba(139,92,246,0.3)'
+                                }}
+                            >
+                                {loading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Restoring...
+                                    </span>
+                                ) : (
+                                    'Restore My Purchases 🔓'
+                                )}
+                            </button>
+                        </form>
+
+                        {/* Cancel */}
+                        <button
+                            onClick={handleClose}
+                            className="w-full py-2 text-sm text-gray-500 font-medium"
+                        >
+                            Cancel
+                        </button>
+
+                        {/* Security note */}
+                        <p className="text-[10px] text-white/30 text-center mt-4">
+                            🔒 We'll restore your Pro status and any purchased scans
+                        </p>
+                    </>
+                )}
             </div>
         </div>
     )

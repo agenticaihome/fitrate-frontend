@@ -16,20 +16,21 @@ export const LIMITS = {
 };
 
 export const PRICES = {
-    // Legacy (keeping for any existing subscribers)
-    PRO_WEEKLY: 2.99,
-
-    // 5-Tier Scan Pack System (Clash of Clans style)
-    SCAN_PACK_3: 0.99,      // Tier 1: Tiny - removes friction
-    SCAN_PACK_10: 2.99,     // Tier 2: Starter - "smart choice"
+    // 5-Tier Scan Pack System (Optimized for teens)
+    SCAN_PACK_3: 0.99,      // Tier 1: Impulse - removes friction
+    SCAN_PACK_10: 2.99,     // Tier 2: Starter
     SCAN_PACK_25: 4.99,     // Tier 3: Popular ⭐ - sweet spot
-    SCAN_PACK_50: 7.99,     // Tier 4: Best Value
-    SCAN_PACK_100: 12.99,   // Tier 5: Pro Pack - anchor
+    SCAN_PACK_50: 6.99,     // Tier 4: Value - best $/scan
+    SCAN_PACK_100: 9.99,    // Tier 5: Mega - anchor
 
     // First-Time Buyer Offer (one-time only)
     FIRST_TIME_SCANS: 10,
     FIRST_TIME_PRICE: 0.99,
     FIRST_TIME_ORIGINAL: 2.99,
+
+    // Subscriptions
+    PRO_MONTHLY: 3.99,
+    PRO_YEARLY: 29.99,
 };
 
 export const RESETS = {
@@ -37,41 +38,21 @@ export const RESETS = {
     TIME_DISPLAY: 'Midnight UTC',
 };
 
-// Stripe Checkout Links
-// YOUR EXISTING PRODUCTS: 5 scans, 15 scans, 50 scans, proRoast
+// Stripe Checkout Links (Production)
 export const STRIPE_LINKS = {
-    // ============================================
-    // 5-TIER SCAN PACKS
-    // You have 4 existing links - edit them in Stripe:
-    // ============================================
+    // First-Time Offer: 10 scans @ $0.99 (67% OFF)
+    firstTimeOffer: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',
 
-    // Tier 1: 3 scans @ $0.99 (EDIT your old 5-scan product → change to 3 scans @ $0.99)
-    tinyPack: 'https://buy.stripe.com/aFa7sN1OEeZl0iXbjdfYY04',
+    // Scan Packs
+    impulsePack: 'https://buy.stripe.com/8x28wR50Q5oLaXBcnhfYY07',   // 3 scans @ $0.99
+    starterPack: 'https://buy.stripe.com/00w7sN64UbN97Lp0EzfYY08',   // 10 scans @ $2.99
+    popularPack: 'https://buy.stripe.com/5kQbJ350Q2czc1FbjdfYY09',   // 25 scans @ $4.99 ⭐
+    valuePack: 'https://buy.stripe.com/eVq00ldxm04r7Lp871fYY0a',     // 50 scans @ $6.99
+    megaPack: 'https://buy.stripe.com/28EfZj9h618ve9NgDxfYY0b',      // 100 scans @ $9.99
 
-    // Tier 2: 10 scans @ $2.99 (EDIT your old 15-scan product → change to 10 scans @ $2.99)
-    starterPack: 'https://buy.stripe.com/5kQ4gBfFu9F1ghVfztfYY05',
-
-    // Tier 3: 25 scans @ $4.99 ⭐ MOST POPULAR (CREATE NEW or edit another)
-    popularPack: 'NEED_NEW_25_SCAN_LINK',
-
-    // Tier 4: 50 scans @ $7.99 (EDIT your old 50-scan product → change price to $7.99)
-    valuePack: 'https://buy.stripe.com/4gMaEZ1OEeZlc1FcnhfYY06',
-
-    // Tier 5: 100 scans @ $12.99 (EDIT your old proRoast → change to 100 scans @ $12.99)
-    proPack: 'https://buy.stripe.com/3cI9AVgJy7wT3v9gDxfYY01',
-
-    // First-Time Offer: 10 scans @ $0.99 (CREATE NEW in Stripe)
-    firstTimeOffer: 'NEED_TO_CREATE_FIRST_TIME_LINK',
-
-    // ============================================
-    // SUBSCRIPTIONS - 25 scans/day (CREATE NEW)
-    // ============================================
-
-    // Monthly: $4.99/mo - 25 scans/day
-    proMonthly: 'NEED_TO_CREATE_MONTHLY_SUB',
-
-    // Yearly: $29.99/yr - 25 scans/day (50% off = "2 months free")
-    proYearly: 'NEED_TO_CREATE_YEARLY_SUB',
+    // Subscriptions
+    proMonthly: 'https://buy.stripe.com/14AeVf3WMaJ5d5JevpfYY0c',    // $3.99/mo
+    proYearly: 'https://buy.stripe.com/aFaaEZ9h66sP2r5bjdfYY0d',     // $29.99/yr
 };
 
 // Subscription Pricing
