@@ -23,7 +23,7 @@
         }
 
         .container {
-            max-width: 680px;
+            max-width: 720px;
             margin: 0 auto;
         }
 
@@ -61,8 +61,15 @@
         h2 {
             font-size: 1.25rem;
             font-weight: 700;
-            margin: 2rem 0 1rem;
+            margin: 2.5rem 0 1rem;
             color: #00d4ff;
+        }
+
+        h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         p,
@@ -71,12 +78,64 @@
             margin-bottom: 1rem;
         }
 
-        ul {
+        ul,
+        ol {
             padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .highlight {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid #00ff88;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight p {
+            margin: 0;
+            color: #00ff88;
+            font-weight: 600;
+        }
+
+        .warning {
+            background: rgba(255, 136, 0, 0.1);
+            border-left: 3px solid #ff8800;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .warning p {
+            margin: 0;
+            color: #ff8800;
         }
 
         a {
             color: #00d4ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        td {
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .footer {
@@ -96,6 +155,31 @@
         .footer a:hover {
             color: #fff;
         }
+
+        .toc {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .toc-title {
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .toc a:hover {
+            color: #00d4ff;
+        }
     </style>
 </head>
 
@@ -104,91 +188,394 @@
         <a href="/" class="back">← Back to FitRate</a>
 
         <h1>Terms of Service</h1>
-        <p class="updated">Last updated: December 17, 2025</p>
+        <p class="updated">Last updated: December 28, 2024 | Effective: December 28, 2024</p>
 
-        <h2>Agreement</h2>
-        <p>By using FitRate, you agree to these terms. If you don't agree, please don't use the app.</p>
+        <p>Welcome to FitRate! These Terms of Service ("Terms") govern your use of the FitRate application and website
+            (the "Service") operated by Agentic AI Home ("we," "us," or "our").</p>
 
-        <h2>What FitRate Does</h2>
-        <p>FitRate uses AI to analyze and rate outfit photos. The ratings are for entertainment and should not be taken
-            as professional fashion advice.</p>
+        <div class="highlight">
+            <p>📋 By using FitRate, you agree to these Terms. If you don't agree, please don't use the Service.</p>
+        </div>
 
-        <h2>Your Responsibilities</h2>
+        <div class="toc">
+            <div class="toc-title">📋 Table of Contents</div>
+            <a href="#acceptance">1. Acceptance of Terms</a>
+            <a href="#description">2. Service Description</a>
+            <a href="#eligibility">3. Eligibility</a>
+            <a href="#account">4. Account & Registration</a>
+            <a href="#purchases">5. Purchases & Subscriptions</a>
+            <a href="#refunds">6. Refund Policy</a>
+            <a href="#user-content">7. User Content</a>
+            <a href="#acceptable-use">8. Acceptable Use</a>
+            <a href="#competitions">9. Competitions & Events</a>
+            <a href="#intellectual-property">10. Intellectual Property</a>
+            <a href="#disclaimers">11. Disclaimers</a>
+            <a href="#limitation">12. Limitation of Liability</a>
+            <a href="#indemnification">13. Indemnification</a>
+            <a href="#termination">14. Termination</a>
+            <a href="#disputes">15. Dispute Resolution</a>
+            <a href="#changes">16. Changes to Terms</a>
+            <a href="#contact">17. Contact Us</a>
+        </div>
+
+        <h2 id="acceptance">1. Acceptance of Terms</h2>
+        <p>By accessing or using FitRate, you confirm that:</p>
         <ul>
-            <li>Only upload photos you have the right to share</li>
-            <li>Don't upload inappropriate, illegal, or harmful content</li>
-            <li>Don't attempt to abuse, hack, or overload our service</li>
-            <li>Be at least 13 years old to use this service</li>
+            <li>You have read, understood, and agree to be bound by these Terms</li>
+            <li>You agree to our <a href="/privacy">Privacy Policy</a></li>
+            <li>You meet the eligibility requirements below</li>
+            <li>You have the legal capacity to enter into binding agreements</li>
         </ul>
 
-        <h2>Our Responsibilities</h2>
+        <h2 id="description">2. Service Description</h2>
+        <p>FitRate is an AI-powered outfit rating application that:</p>
         <ul>
-            <li>Provide the outfit rating service as described</li>
-            <li>Protect your privacy (see our <a href="/privacy">Privacy Policy</a>)</li>
-            <li>Process refunds for Pro purchases within 7 days if unsatisfied</li>
+            <li>Analyzes photos of outfits using artificial intelligence</li>
+            <li>Provides entertainment-focused ratings and feedback</li>
+            <li>Offers competitive features including battles, fashion shows, and leaderboards</li>
+            <li>Operates as a Progressive Web App (PWA) accessible via web browser</li>
         </ul>
 
-        <h2>Purchases</h2>
+        <div class="warning">
+            <p>⚠️ Ratings are AI-generated for entertainment purposes only. They are subjective, not professional
+                fashion advice, and should not be relied upon for any important decisions.</p>
+        </div>
 
-        <p><strong>Rating Packs (One-time)</strong></p>
+        <h2 id="eligibility">3. Eligibility</h2>
+        <h3>Age Requirements</h3>
         <ul>
-            <li>Starter Pack: 5 ratings — $1.99</li>
-            <li>Popular Pack: 15 ratings — $3.99</li>
-            <li>Power Pack: 50 ratings — $9.99</li>
+            <li><strong>Minimum age:</strong> You must be at least 13 years old to use FitRate</li>
+            <li><strong>Minors (13-17):</strong> Must have parental or guardian consent</li>
+            <li><strong>Purchases:</strong> Users under 18 must have parental permission to make purchases</li>
         </ul>
 
-        <p><strong>Pro Roast ($0.99 one-time)</strong></p>
+        <h3>Additional Requirements</h3>
         <ul>
-            <li>Premium AI-powered roast with enhanced detail and humor</li>
-            <li>One-time purchase, no subscription</li>
+            <li>You must not be prohibited from using the Service under applicable laws</li>
+            <li>Your account must not have been previously terminated by us</li>
         </ul>
 
-        <p><strong>FitRate Pro ($2.99/week)</strong></p>
+        <h2 id="account">4. Account & Registration</h2>
+        <p>FitRate uses anonymous device-based identification:</p>
         <ul>
-            <li>25 ratings per day (vs 2 for free users)</li>
-            <li>Access to all modes: Nice, Honest, Roast, Savage</li>
-            <li>Cancel anytime</li>
-            <li>Payments processed securely by Stripe</li>
-            <li>Refunds available within 7 days of purchase</li>
+            <li>No formal account registration is required</li>
+            <li>A unique device identifier is generated automatically</li>
+            <li>Your email is collected only if you make a purchase (for recovery purposes)</li>
+            <li>You are responsible for maintaining access to your device</li>
         </ul>
 
-        <h2>Disclaimers</h2>
+        <h3>Account Recovery</h3>
+        <p>If you clear your browser data or use a new device:</p>
         <ul>
-            <li>AI ratings are subjective and for entertainment purposes</li>
-            <li>We don't guarantee the accuracy of any ratings or suggestions</li>
-            <li>We're not responsible for decisions you make based on our ratings</li>
-            <li>Service availability may vary; we don't guarantee 100% uptime</li>
+            <li>You can restore purchases using the email associated with your Stripe payment</li>
+            <li>Access the restore feature via the settings icon (⚙️) in the app</li>
         </ul>
 
-        <h2>Weekly Events & Competitions</h2>
-        <p>FitRate offers optional weekly themed events with leaderboards. By participating:</p>
+        <h2 id="purchases">5. Purchases & Subscriptions</h2>
+
+        <h3>5.1 Scan Packs (One-Time Purchases)</h3>
+        <table>
+            <tr>
+                <th>Pack</th>
+                <th>Price (USD)</th>
+                <th>Scans Included</th>
+            </tr>
+            <tr>
+                <td>Impulse Pack</td>
+                <td>$0.99</td>
+                <td>3 scans</td>
+            </tr>
+            <tr>
+                <td>Starter Pack</td>
+                <td>$2.99</td>
+                <td>10 scans</td>
+            </tr>
+            <tr>
+                <td>Popular Pack</td>
+                <td>$4.99</td>
+                <td>25 scans</td>
+            </tr>
+            <tr>
+                <td>Value Pack</td>
+                <td>$6.99</td>
+                <td>50 scans</td>
+            </tr>
+            <tr>
+                <td>Mega Pack</td>
+                <td>$9.99</td>
+                <td>100 scans</td>
+            </tr>
+        </table>
         <ul>
-            <li>Events are for <strong>entertainment and bragging rights only</strong> — no prizes at this time</li>
+            <li>Scan packs <strong>never expire</strong></li>
+            <li>Scans are tied to your device identifier and email</li>
+            <li>Scans can be recovered via email if device data is cleared</li>
+        </ul>
+
+        <h3>5.2 FitRate Pro Subscription</h3>
+        <table>
+            <tr>
+                <th>Plan</th>
+                <th>Price (USD)</th>
+                <th>Benefits</th>
+            </tr>
+            <tr>
+                <td>Monthly</td>
+                <td>$3.99/month</td>
+                <td>25 scans per day, priority Arena queue</td>
+            </tr>
+            <tr>
+                <td>Yearly</td>
+                <td>$29.99/year</td>
+                <td>25 scans per day, priority Arena queue, 2 months free</td>
+            </tr>
+        </table>
+        <ul>
+            <li>Daily scans reset at midnight UTC</li>
+            <li>Unused daily scans do not roll over</li>
+            <li>Cancel anytime; access continues until period ends</li>
+        </ul>
+
+        <h3>5.3 Payment Processing</h3>
+        <ul>
+            <li>All payments are processed securely by Stripe</li>
+            <li>We never store or have access to your payment card details</li>
+            <li>Prices are in US Dollars (USD) and may vary by region</li>
+            <li>You are responsible for any applicable taxes</li>
+        </ul>
+
+        <h2 id="refunds">6. Refund Policy</h2>
+
+        <h3>Scan Packs (One-Time Purchases)</h3>
+        <ul>
+            <li>Eligible for refund within <strong>7 days</strong> of purchase</li>
+            <li>Must not have used more than 25% of purchased scans</li>
+            <li>Refunds processed via Stripe to original payment method</li>
+        </ul>
+
+        <h3>Subscriptions</h3>
+        <ul>
+            <li>Eligible for refund within <strong>7 days</strong> of initial subscription or renewal</li>
+            <li>Pro-rated refunds are not available for partial months</li>
+            <li>Cancel anytime to prevent future charges</li>
+        </ul>
+
+        <h3>How to Request a Refund</h3>
+        <p>Email <a href="mailto:support@agenticaihome.com">support@agenticaihome.com</a> with:</p>
+        <ul>
+            <li>Email used for purchase</li>
+            <li>Date of purchase</li>
+            <li>Reason for refund request</li>
+        </ul>
+        <p>We will respond within 3 business days.</p>
+
+        <h2 id="user-content">7. User Content</h2>
+
+        <h3>7.1 Photos You Upload</h3>
+        <ul>
+            <li>You retain all ownership rights to your photos</li>
+            <li>Photos are processed by AI and deleted immediately (within 30 seconds)</li>
+            <li>We do not store, sell, or share your photos except as described in our Privacy Policy</li>
+            <li>We do not use your photos to train AI models</li>
+        </ul>
+
+        <h3>7.2 Limited License Grant</h3>
+        <p>By uploading photos, you grant FitRate a limited, non-exclusive license to:</p>
+        <ul>
+            <li>Process photos using AI for outfit analysis</li>
+            <li>Display photos in leaderboards if you place in Top 5 of an event</li>
+            <li>This license terminates when photos are deleted (immediately after processing, or at event conclusion
+                for leaderboard entries)</li>
+        </ul>
+
+        <h3>7.3 Content Warranties</h3>
+        <p>By uploading content, you represent and warrant that:</p>
+        <ul>
+            <li>You own the photo or have permission to use it</li>
+            <li>The photo does not violate any third party's rights</li>
+            <li>The photo complies with our Acceptable Use policy</li>
+        </ul>
+
+        <h2 id="acceptable-use">8. Acceptable Use</h2>
+
+        <h3>You MUST NOT:</h3>
+        <ul>
+            <li>Upload photos containing nudity, sexual content, or minors in inappropriate situations</li>
+            <li>Upload photos promoting violence, hate speech, or illegal activities</li>
+            <li>Upload photos that infringe on intellectual property rights</li>
+            <li>Attempt to bypass rate limits, security measures, or abuse prevention systems</li>
+            <li>Use automated tools, bots, or scripts to access the Service</li>
+            <li>Create multiple accounts to abuse free tiers or promotions</li>
+            <li>Resell, redistribute, or commercially exploit the Service</li>
+            <li>Interfere with or disrupt the Service or servers</li>
+            <li>Attempt to reverse engineer the AI or algorithms</li>
+            <li>Harass, bully, or intimidate other users</li>
+        </ul>
+
+        <h3>Enforcement</h3>
+        <p>Violations may result in:</p>
+        <ul>
+            <li>Warning or account restriction</li>
+            <li>Permanent account termination</li>
+            <li>Forfeiture of any purchases without refund</li>
+            <li>Reporting to law enforcement if applicable</li>
+        </ul>
+
+        <h2 id="competitions">9. Competitions & Events</h2>
+
+        <h3>9.1 Event Rules</h3>
+        <ul>
+            <li>Weekly events and competitions are <strong>for entertainment and bragging rights only</strong></li>
+            <li>No monetary prizes are offered at this time</li>
             <li>Rankings are AI-generated and subjective</li>
-            <li>FitRate may disqualify entries that violate rules</li>
-            <li>FitRate may modify or cancel events at any time</li>
-            <li>Your outfit images may be displayed in leaderboards if you place in Top 5</li>
-            <li>You retain all rights to your images; you grant FitRate a limited license to display them in event contexts</li>
-            <li>Only clothing/styling is judged — never body, weight, age, or identity</li>
+            <li>We reserve the right to disqualify entries violating these Terms</li>
+            <li>We may modify or cancel events at any time</li>
         </ul>
 
-        <h2>Brand Disclaimer</h2>
-        <p>FitRate is not affiliated with, endorsed by, or sponsored by any clothing brands appearing in user-submitted images. All brand names, logos, and trademarks are property of their respective owners.</p>
+        <h3>9.2 Leaderboard Display</h3>
+        <ul>
+            <li>Leaderboards display anonymous placeholder names by default</li>
+            <li>Top 5 finishers may have their outfit photo displayed publicly</li>
+            <li>Only clothing and styling are judged—never body, weight, age, or identity</li>
+        </ul>
 
-        <h2>Age Requirement</h2>
-        <p>You must be at least <strong>13 years old</strong> to use FitRate. Users under 18 should have parental consent. We do not knowingly collect data from children under 13.</p>
+        <h3>9.3 Arena Battles</h3>
+        <ul>
+            <li>Free users receive 10 arena battles per day</li>
+            <li>Pro users receive unlimited battles with priority queue</li>
+            <li>Battle results are determined by AI comparison and are final</li>
+        </ul>
 
-        <h2>Changes to Terms</h2>
-        <p>We may update these terms. Continued use after changes means you accept the new terms.</p>
+        <h2 id="intellectual-property">10. Intellectual Property</h2>
 
-        <h2>Contact</h2>
-        <p>Questions? Email us at <a href="mailto:support@agenticaihome.com">support@agenticaihome.com</a></p>
+        <h3>Our Property</h3>
+        <p>FitRate and its original content, features, and functionality are owned by Agentic AI Home and protected by:
+        </p>
+        <ul>
+            <li>Copyright laws</li>
+            <li>Trademark laws</li>
+            <li>Trade secret laws</li>
+            <li>Other intellectual property rights</li>
+        </ul>
+
+        <h3>Brand Disclaimer</h3>
+        <p>FitRate is <strong>not affiliated with, endorsed by, or sponsored by</strong> any clothing brands appearing
+            in user-submitted images. All brand names, logos, and trademarks are property of their respective owners.
+        </p>
+
+        <h3>Feedback</h3>
+        <p>If you provide feedback or suggestions, you grant us the right to use them without compensation or
+            attribution.</p>
+
+        <h2 id="disclaimers">11. Disclaimers</h2>
+
+        <div class="warning">
+            <p>⚠️ THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND.</p>
+        </div>
+
+        <p>We specifically disclaim:</p>
+        <ul>
+            <li><strong>Accuracy:</strong> AI ratings are subjective and for entertainment only</li>
+            <li><strong>Availability:</strong> We do not guarantee 100% uptime</li>
+            <li><strong>Results:</strong> We don't guarantee any specific outcomes from using the Service</li>
+            <li><strong>Third Parties:</strong> We are not responsible for third-party services (Stripe, AI providers)
+            </li>
+            <li><strong>Fitness:</strong> No guarantee the Service is suitable for any particular purpose</li>
+        </ul>
+
+        <h2 id="limitation">12. Limitation of Liability</h2>
+
+        <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
+        <ul>
+            <li>We are not liable for any indirect, incidental, special, consequential, or punitive damages</li>
+            <li>We are not liable for any loss of profits, data, or goodwill</li>
+            <li>Our total liability shall not exceed the amount you paid us in the 12 months preceding the claim, or
+                $100 USD, whichever is greater</li>
+            <li>These limitations apply even if we have been advised of the possibility of such damages</li>
+        </ul>
+
+        <h2 id="indemnification">13. Indemnification</h2>
+
+        <p>You agree to defend, indemnify, and hold harmless Agentic AI Home and its officers, directors, employees, and
+            agents from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from:
+        </p>
+        <ul>
+            <li>Your use of the Service</li>
+            <li>Your violation of these Terms</li>
+            <li>Your violation of any third party rights</li>
+            <li>Content you upload</li>
+        </ul>
+
+        <h2 id="termination">14. Termination</h2>
+
+        <h3>By You</h3>
+        <ul>
+            <li>You may stop using the Service at any time</li>
+            <li>Cancel subscriptions through your Stripe account or by contacting us</li>
+        </ul>
+
+        <h3>By Us</h3>
+        <p>We may terminate or suspend your access immediately, without notice, if:</p>
+        <ul>
+            <li>You breach these Terms</li>
+            <li>We are required to do so by law</li>
+            <li>We discontinue the Service</li>
+        </ul>
+
+        <h3>Effect of Termination</h3>
+        <ul>
+            <li>Provisions that should survive will survive (liability, indemnification, IP rights)</li>
+            <li>Termination for cause may result in forfeiture of purchases</li>
+        </ul>
+
+        <h2 id="disputes">15. Dispute Resolution</h2>
+
+        <h3>Informal Resolution</h3>
+        <p>Before filing any claim, you agree to try to resolve the dispute informally by contacting us at <a
+                href="mailto:support@agenticaihome.com">support@agenticaihome.com</a>. We will try to resolve the issue
+            within 30 days.</p>
+
+        <h3>Governing Law</h3>
+        <p>These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict of
+            law principles.</p>
+
+        <h3>Arbitration Agreement</h3>
+        <p>Any dispute not resolved informally shall be resolved through binding arbitration, except:</p>
+        <ul>
+            <li>You may bring claims in small claims court if eligible</li>
+            <li>Either party may seek injunctive relief in any court of competent jurisdiction</li>
+        </ul>
+
+        <h3>Class Action Waiver</h3>
+        <p>You agree to resolve disputes on an individual basis. You waive any right to participate in class action
+            lawsuits or class-wide arbitration.</p>
+
+        <h2 id="changes">16. Changes to Terms</h2>
+        <ul>
+            <li>We may update these Terms at any time</li>
+            <li>Material changes will be announced in-app with at least 7 days notice</li>
+            <li>Continued use after changes constitutes acceptance</li>
+            <li>If you disagree with changes, you must stop using the Service</li>
+        </ul>
+
+        <h2 id="contact">17. Contact Us</h2>
+        <p>For questions about these Terms:</p>
+        <ul>
+            <li><strong>Email:</strong> <a href="mailto:support@agenticaihome.com">support@agenticaihome.com</a></li>
+            <li><strong>Response Time:</strong> Within 3 business days</li>
+        </ul>
+
+        <p><strong>Agentic AI Home</strong><br>
+            Operating as FitRate<br>
+            United States</p>
 
         <div class="footer">
             <a href="/">Home</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
             <a href="/about">About</a>
+            <p style="margin-top: 1rem; color: rgba(255,255,255,0.3); font-size: 0.7rem;">© 2024 Agentic AI Home. All
+                rights reserved.</p>
         </div>
     </div>
 </body>

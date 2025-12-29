@@ -23,7 +23,7 @@
         }
 
         .container {
-            max-width: 680px;
+            max-width: 720px;
             margin: 0 auto;
         }
 
@@ -61,18 +61,25 @@
         h2 {
             font-size: 1.25rem;
             font-weight: 700;
-            margin: 2rem 0 1rem;
+            margin: 2.5rem 0 1rem;
             color: #00d4ff;
         }
 
-        p,
-        li {
+        h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        p, li {
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 1rem;
         }
 
         ul {
             padding-left: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .highlight {
@@ -89,8 +96,43 @@
             font-weight: 600;
         }
 
+        .warning {
+            background: rgba(255, 136, 0, 0.1);
+            border-left: 3px solid #ff8800;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .warning p {
+            margin: 0;
+            color: #ff8800;
+        }
+
         a {
             color: #00d4ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        td {
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .footer {
@@ -110,6 +152,31 @@
         .footer a:hover {
             color: #fff;
         }
+
+        .toc {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .toc-title {
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .toc a:hover {
+            color: #00d4ff;
+        }
     </style>
 </head>
 
@@ -118,84 +185,368 @@
         <a href="/" class="back">← Back to FitRate</a>
 
         <h1>Privacy Policy</h1>
-        <p class="updated">Last updated: December 17, 2025</p>
+        <p class="updated">Last updated: December 28, 2024 | Effective: December 28, 2024</p>
 
         <div class="highlight">
-            <p>🔒 Your photos are analyzed instantly and never stored on our servers.</p>
+            <p>🔒 TL;DR: Your photos are analyzed instantly and never stored. We don't sell your data. Period.</p>
         </div>
 
-        <h2>What We Collect</h2>
-        <p>When you use FitRate, we collect:</p>
+        <p>Agentic AI Home ("we," "us," or "our") operates FitRate (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application or website.</p>
+
+        <div class="toc">
+            <div class="toc-title">📋 Table of Contents</div>
+            <a href="#info-collect">1. Information We Collect</a>
+            <a href="#how-use">2. How We Use Your Information</a>
+            <a href="#data-sharing">3. Data Sharing & Third Parties</a>
+            <a href="#data-retention">4. Data Retention</a>
+            <a href="#data-security">5. Data Security</a>
+            <a href="#your-rights">6. Your Privacy Rights</a>
+            <a href="#gdpr">7. GDPR Rights (European Users)</a>
+            <a href="#ccpa">8. CCPA Rights (California Users)</a>
+            <a href="#international">9. International Data Transfers</a>
+            <a href="#children">10. Children's Privacy</a>
+            <a href="#cookies">11. Cookies & Tracking</a>
+            <a href="#changes">12. Changes to This Policy</a>
+            <a href="#contact">13. Contact Us</a>
+        </div>
+
+        <h2 id="info-collect">1. Information We Collect</h2>
+
+        <h3>1.1 Information You Provide</h3>
+        <table>
+            <tr>
+                <th>Data Type</th>
+                <th>Purpose</th>
+                <th>Retention</th>
+            </tr>
+            <tr>
+                <td><strong>Photos you upload</strong></td>
+                <td>AI outfit analysis</td>
+                <td>Deleted immediately after processing (&lt;30 seconds)</td>
+            </tr>
+            <tr>
+                <td><strong>Email address</strong> (if you purchase)</td>
+                <td>Payment processing, purchase recovery</td>
+                <td>Until you request deletion</td>
+            </tr>
+            <tr>
+                <td><strong>Payment information</strong></td>
+                <td>Process transactions</td>
+                <td>Handled by Stripe; we never see card details</td>
+            </tr>
+        </table>
+
+        <h3>1.2 Automatically Collected Information</h3>
+        <table>
+            <tr>
+                <th>Data Type</th>
+                <th>Purpose</th>
+                <th>Retention</th>
+            </tr>
+            <tr>
+                <td><strong>Device identifier</strong></td>
+                <td>Account persistence, abuse prevention</td>
+                <td>Until you clear browser data</td>
+            </tr>
+            <tr>
+                <td><strong>IP address</strong></td>
+                <td>Security, rate limiting, fraud prevention</td>
+                <td>48 hours (anonymized after)</td>
+            </tr>
+            <tr>
+                <td><strong>Usage analytics</strong></td>
+                <td>Improve app experience</td>
+                <td>26 months (anonymized)</td>
+            </tr>
+            <tr>
+                <td><strong>Crash reports</strong></td>
+                <td>Fix bugs and errors</td>
+                <td>90 days</td>
+            </tr>
+        </table>
+
+        <h3>1.3 Information We Do NOT Collect</h3>
         <ul>
-            <li><strong>Photos you upload</strong> — Sent directly to our AI for analysis, then immediately discarded.
-                We do not store, save, or retain your images.</li>
-            <li><strong>Usage data</strong> — Anonymous analytics like page views and feature usage to improve the app.
-            </li>
-            <li><strong>Payment info</strong> — If you purchase Pro, Stripe securely handles your payment. We never see
-                your card details.</li>
+            <li>❌ Biometric data or facial recognition</li>
+            <li>❌ Precise geolocation</li>
+            <li>❌ Contacts, calendars, or other personal data</li>
+            <li>❌ Health or fitness data</li>
+            <li>❌ Your photos for AI training purposes</li>
         </ul>
 
-        <h2>How We Use Your Data</h2>
+        <h2 id="how-use">2. How We Use Your Information</h2>
+        <p>We use collected information for the following purposes:</p>
         <ul>
-            <li>To analyze your outfit and provide ratings</li>
-            <li>To improve our AI and app experience</li>
-            <li>To process payments (Pro users only)</li>
+            <li><strong>Service Delivery:</strong> Analyze your outfits and provide AI-generated ratings</li>
+            <li><strong>Purchases:</strong> Process payments and enable purchase recovery via email</li>
+            <li><strong>Security:</strong> Prevent fraud, abuse, and unauthorized access</li>
+            <li><strong>Improvement:</strong> Analyze usage patterns to enhance the app</li>
+            <li><strong>Competitions:</strong> Display anonymous leaderboard rankings for events</li>
+            <li><strong>Communication:</strong> Respond to support requests (email only)</li>
         </ul>
 
-        <h2>What We Don't Do</h2>
+        <div class="warning">
+            <p>⚠️ We do NOT use your photos to train AI models. Images are processed and deleted immediately.</p>
+        </div>
+
+        <h2 id="data-sharing">3. Data Sharing & Third Parties</h2>
+        <p>We share data only with the following service providers, solely to operate our Service:</p>
+
+        <table>
+            <tr>
+                <th>Provider</th>
+                <th>Purpose</th>
+                <th>Data Shared</th>
+                <th>Privacy Policy</th>
+            </tr>
+            <tr>
+                <td><strong>Google Gemini AI</strong></td>
+                <td>Outfit analysis</td>
+                <td>Photos (deleted after analysis)</td>
+                <td><a href="https://policies.google.com/privacy" target="_blank">Link</a></td>
+            </tr>
+            <tr>
+                <td><strong>OpenAI</strong></td>
+                <td>Outfit analysis (Pro users)</td>
+                <td>Photos (deleted after analysis)</td>
+                <td><a href="https://openai.com/privacy" target="_blank">Link</a></td>
+            </tr>
+            <tr>
+                <td><strong>Stripe</strong></td>
+                <td>Payment processing</td>
+                <td>Email, payment info</td>
+                <td><a href="https://stripe.com/privacy" target="_blank">Link</a></td>
+            </tr>
+            <tr>
+                <td><strong>Cloudflare</strong></td>
+                <td>Hosting, CDN, security</td>
+                <td>IP address, usage data</td>
+                <td><a href="https://www.cloudflare.com/privacypolicy/" target="_blank">Link</a></td>
+            </tr>
+            <tr>
+                <td><strong>Railway</strong></td>
+                <td>Backend hosting</td>
+                <td>Server logs</td>
+                <td><a href="https://railway.app/legal/privacy" target="_blank">Link</a></td>
+            </tr>
+            <tr>
+                <td><strong>Upstash (Redis)</strong></td>
+                <td>Data storage</td>
+                <td>User preferences, scores</td>
+                <td><a href="https://upstash.com/privacy" target="_blank">Link</a></td>
+            </tr>
+        </table>
+
+        <h3>We Do NOT:</h3>
         <ul>
-            <li>❌ We don't store your photos</li>
-            <li>❌ We don't sell your data</li>
-            <li>❌ We don't share your info with third parties for marketing</li>
-            <li>❌ We don't use your photos to train AI models</li>
+            <li>❌ Sell your personal information to third parties</li>
+            <li>❌ Share your data with advertisers or data brokers</li>
+            <li>❌ Use your photos for marketing without explicit consent</li>
+            <li>❌ Share data with third parties for their own marketing purposes</li>
         </ul>
 
-        <h2>Third-Party Services</h2>
-        <p>We use:</p>
+        <h2 id="data-retention">4. Data Retention</h2>
+        <p>We retain your information only as long as necessary:</p>
         <ul>
-            <li><strong>Google Analytics</strong> — For anonymous usage statistics</li>
-            <li><strong>Stripe</strong> — For secure payment processing</li>
-            <li><strong>Google Gemini AI</strong> — For outfit analysis (free users) — your photo is sent, analyzed,
-                then deleted</li>
-            <li><strong>OpenAI GPT-4 Vision</strong> — For outfit analysis (Pro users) — your photo is sent, analyzed,
-                then deleted</li>
+            <li><strong>Photos:</strong> Deleted immediately after AI analysis (&lt;30 seconds)</li>
+            <li><strong>Purchase records:</strong> Retained indefinitely for purchase recovery</li>
+            <li><strong>Scores/Rankings:</strong> Retained for 90 days after event ends</li>
+            <li><strong>Analytics:</strong> Retained for 26 months in anonymized form</li>
+            <li><strong>Server logs:</strong> Retained for 48 hours, then deleted</li>
         </ul>
 
-        <h2>Weekly Events & Leaderboards</h2>
-        <p>If you participate in weekly events, we collect:</p>
+        <h2 id="data-security">5. Data Security</h2>
+        <p>We implement industry-standard security measures:</p>
         <ul>
-            <li><strong>AI-generated scores</strong> — Your outfit rating for the event theme</li>
-            <li><strong>Anonymous leaderboard data</strong> — Your rank using a fun placeholder name (e.g., "Fashionista
-                #1")</li>
-            <li><strong>Event metadata</strong> — Theme participation, submission timestamps</li>
+            <li>🔐 HTTPS/TLS encryption for all data in transit</li>
+            <li>🔐 Encrypted data storage (AES-256)</li>
+            <li>🔐 Rate limiting and abuse prevention</li>
+            <li>🔐 Regular security audits</li>
+            <li>🔐 Access controls and authentication for backend systems</li>
         </ul>
-        <p><strong>Important:</strong> Leaderboard placement is anonymous by default. Your email, name, and identity are
-            never displayed publicly.</p>
+        <p>While we take reasonable precautions, no method of transmission over the Internet is 100% secure. We cannot guarantee absolute security.</p>
 
-        <h2>Image Processing Clarification</h2>
+        <h2 id="your-rights">6. Your Privacy Rights</h2>
+        <p>Regardless of your location, you have the right to:</p>
         <ul>
-            <li>Images are processed by AI services to generate outfit ratings</li>
-            <li>Images are <strong>not</strong> sold or shared with third parties</li>
-            <li>Images are <strong>not</strong> used for identity recognition or facial analysis</li>
-            <li>Images may be displayed publicly <strong>only</strong> if you place Top 5 in a weekly event</li>
+            <li><strong>Access:</strong> Request a copy of your personal data</li>
+            <li><strong>Correction:</strong> Request correction of inaccurate data</li>
+            <li><strong>Deletion:</strong> Request deletion of your personal data</li>
+            <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format</li>
+            <li><strong>Opt-out:</strong> Opt out of analytics via browser settings</li>
+            <li><strong>Withdraw consent:</strong> Withdraw consent at any time</li>
         </ul>
+        <p>To exercise these rights, email us at <a href="mailto:privacy@agenticaihome.com">privacy@agenticaihome.com</a>. We will respond within 30 days.</p>
 
-        <h2>Your Rights</h2>
-        <p>You can:</p>
+        <h2 id="gdpr">7. GDPR Rights (European Users)</h2>
+        <p>If you are in the European Economic Area (EEA), UK, or Switzerland, you have additional rights under GDPR:</p>
+
+        <h3>Legal Basis for Processing</h3>
+        <table>
+            <tr>
+                <th>Purpose</th>
+                <th>Legal Basis</th>
+            </tr>
+            <tr>
+                <td>Outfit analysis</td>
+                <td>Consent (you upload photos voluntarily)</td>
+            </tr>
+            <tr>
+                <td>Payment processing</td>
+                <td>Contractual necessity</td>
+            </tr>
+            <tr>
+                <td>Fraud prevention</td>
+                <td>Legitimate interest</td>
+            </tr>
+            <tr>
+                <td>Analytics</td>
+                <td>Legitimate interest (with opt-out)</td>
+            </tr>
+        </table>
+
+        <h3>Your GDPR Rights</h3>
         <ul>
-            <li>Request deletion of any data we have about you</li>
-            <li>Opt out of analytics (using browser settings)</li>
-            <li>Contact us with any privacy concerns</li>
+            <li><strong>Right to be forgotten:</strong> Request complete erasure of your data</li>
+            <li><strong>Right to restrict processing:</strong> Limit how we use your data</li>
+            <li><strong>Right to object:</strong> Object to processing based on legitimate interest</li>
+            <li><strong>Right to lodge a complaint:</strong> File a complaint with your local Data Protection Authority</li>
         </ul>
 
-        <h2>Contact</h2>
-        <p>Questions? Email us at <a href="mailto:support@agenticaihome.com">support@agenticaihome.com</a></p>
+        <p><strong>Data Controller:</strong> Agentic AI Home<br>
+        <strong>Contact:</strong> <a href="mailto:privacy@agenticaihome.com">privacy@agenticaihome.com</a></p>
+
+        <h2 id="ccpa">8. CCPA Rights (California Users)</h2>
+        <p>If you are a California resident, you have rights under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA):</p>
+
+        <h3>Your Rights</h3>
+        <ul>
+            <li><strong>Right to Know:</strong> Request disclosure of data we collect about you</li>
+            <li><strong>Right to Delete:</strong> Request deletion of your personal information</li>
+            <li><strong>Right to Correct:</strong> Request correction of inaccurate information</li>
+            <li><strong>Right to Opt-Out of Sale/Sharing:</strong> We do NOT sell or share your personal information</li>
+            <li><strong>Right to Non-Discrimination:</strong> We won't discriminate for exercising your rights</li>
+        </ul>
+
+        <div class="highlight">
+            <p>🚫 We Do Not Sell Your Personal Information. We do not share personal information for cross-context behavioral advertising.</p>
+        </div>
+
+        <h3>Categories of Personal Information Collected (Last 12 Months)</h3>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Collected</th>
+                <th>Sold</th>
+                <th>Disclosed</th>
+            </tr>
+            <tr>
+                <td>Identifiers (email, device ID)</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Service providers only</td>
+            </tr>
+            <tr>
+                <td>Commercial information (purchases)</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Stripe only</td>
+            </tr>
+            <tr>
+                <td>Internet activity (usage data)</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>Analytics only</td>
+            </tr>
+            <tr>
+                <td>Geolocation (IP-based, approximate)</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td>No</td>
+            </tr>
+            <tr>
+                <td>Audio/Visual (photos)</td>
+                <td>Temporarily</td>
+                <td>No</td>
+                <td>AI providers (deleted immediately)</td>
+            </tr>
+        </table>
+
+        <p>To submit a CCPA request, email <a href="mailto:privacy@agenticaihome.com">privacy@agenticaihome.com</a> with subject "CCPA Request." We will verify your identity and respond within 45 days.</p>
+
+        <h2 id="international">9. International Data Transfers</h2>
+        <p>Your data may be transferred to and processed in countries outside your residence, including the United States. We ensure appropriate safeguards are in place:</p>
+        <ul>
+            <li>Service providers are contractually bound to protect your data</li>
+            <li>We use Standard Contractual Clauses for EU data transfers</li>
+            <li>Our US-based providers maintain Privacy Shield certifications where applicable</li>
+        </ul>
+
+        <h2 id="children">10. Children's Privacy</h2>
+        <p>FitRate is intended for users aged 13 and older. We do not knowingly collect personal information from children under 13.</p>
+        <ul>
+            <li>Users aged 13-17 should have parental consent</li>
+            <li>If we learn we collected data from a child under 13, we will delete it immediately</li>
+            <li>Parents may contact us to request deletion: <a href="mailto:privacy@agenticaihome.com">privacy@agenticaihome.com</a></li>
+        </ul>
+
+        <h2 id="cookies">11. Cookies & Tracking Technologies</h2>
+        <p>We use minimal tracking technologies:</p>
+
+        <table>
+            <tr>
+                <th>Technology</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+                <th>Opt-Out</th>
+            </tr>
+            <tr>
+                <td>LocalStorage</td>
+                <td>Save preferences, user ID</td>
+                <td>Until cleared</td>
+                <td>Clear browser data</td>
+            </tr>
+            <tr>
+                <td>Cloudflare cookies</td>
+                <td>Security, performance</td>
+                <td>Session</td>
+                <td>N/A (essential)</td>
+            </tr>
+        </table>
+
+        <p>We do NOT use:</p>
+        <ul>
+            <li>❌ Third-party advertising cookies</li>
+            <li>❌ Social media tracking pixels</li>
+            <li>❌ Cross-site tracking</li>
+        </ul>
+
+        <h2 id="changes">12. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last updated" date.</p>
+        <ul>
+            <li>Material changes will be announced in-app</li>
+            <li>Continued use after changes constitutes acceptance</li>
+            <li>We encourage you to review this policy periodically</li>
+        </ul>
+
+        <h2 id="contact">13. Contact Us</h2>
+        <p>For privacy-related inquiries:</p>
+        <ul>
+            <li><strong>Email:</strong> <a href="mailto:privacy@agenticaihome.com">privacy@agenticaihome.com</a></li>
+            <li><strong>General Support:</strong> <a href="mailto:support@agenticaihome.com">support@agenticaihome.com</a></li>
+            <li><strong>Response Time:</strong> Within 30 days</li>
+        </ul>
+
+        <p><strong>Agentic AI Home</strong><br>
+        Operating as FitRate<br>
+        United States</p>
 
         <div class="footer">
             <a href="/">Home</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
             <a href="/about">About</a>
+            <p style="margin-top: 1rem; color: rgba(255,255,255,0.3); font-size: 0.7rem;">© 2024 Agentic AI Home. All rights reserved.</p>
         </div>
     </div>
 </body>

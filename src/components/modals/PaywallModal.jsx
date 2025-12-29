@@ -280,8 +280,8 @@ export default function PaywallModal({
                                 key={pack.id}
                                 onClick={() => handlePurchase(pack.link, pack.id)}
                                 className={`w-full p-4 rounded-2xl flex items-center gap-4 transition-all active:scale-[0.98] group relative overflow-hidden ${pack.popular
-                                        ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400/50'
-                                        : 'bg-white/5 border border-white/10 hover:border-white/20'
+                                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400/50'
+                                    : 'bg-white/5 border border-white/10 hover:border-white/20'
                                     }`}
                             >
                                 {pack.popular && (
@@ -317,8 +317,8 @@ export default function PaywallModal({
                         <button
                             onClick={() => { playSound('click'); setSelectedPlan('yearly'); }}
                             className={`w-full p-4 rounded-2xl text-left transition-all relative overflow-hidden ${selectedPlan === 'yearly'
-                                    ? 'bg-gradient-to-r from-purple-500/25 to-pink-500/25 border-2 border-purple-400/50'
-                                    : 'bg-white/5 border border-white/10'
+                                ? 'bg-gradient-to-r from-purple-500/25 to-pink-500/25 border-2 border-purple-400/50'
+                                : 'bg-white/5 border border-white/10'
                                 }`}
                         >
                             {selectedPlan === 'yearly' && (
@@ -345,8 +345,8 @@ export default function PaywallModal({
                         <button
                             onClick={() => { playSound('click'); setSelectedPlan('monthly'); }}
                             className={`w-full p-4 rounded-2xl text-left transition-all relative ${selectedPlan === 'monthly'
-                                    ? 'bg-gradient-to-r from-purple-500/25 to-pink-500/25 border-2 border-purple-400/50'
-                                    : 'bg-white/5 border border-white/10'
+                                ? 'bg-gradient-to-r from-purple-500/25 to-pink-500/25 border-2 border-purple-400/50'
+                                : 'bg-white/5 border border-white/10'
                                 }`}
                         >
                             {selectedPlan === 'monthly' && (
@@ -391,12 +391,19 @@ export default function PaywallModal({
                 )}
 
                 {/* Friendly reassurance */}
-                <div className="flex items-center justify-center gap-4 text-white/40 text-xs mb-4">
+                <div className="flex items-center justify-center gap-4 text-white/40 text-xs mb-3">
                     <span>🔒 Secure</span>
                     <span>•</span>
                     <span>⏱️ Never expires</span>
                     <span>•</span>
                     <span>💬 Support</span>
+                </div>
+
+                {/* Legal links */}
+                <div className="flex items-center justify-center gap-3 text-white/30 text-[10px] mb-4">
+                    <a href="/terms" target="_blank" className="hover:text-white/50 transition-colors underline">Terms of Service</a>
+                    <span>•</span>
+                    <a href="/privacy" target="_blank" className="hover:text-white/50 transition-colors underline">Privacy Policy</a>
                 </div>
 
                 {/* Warm close option */}
@@ -410,3 +417,4 @@ export default function PaywallModal({
         </div>
     )
 }
+

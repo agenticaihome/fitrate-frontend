@@ -251,9 +251,17 @@ export default function RestoreProModal({ onClose, userId, onRestoreSuccess }) {
                         <p className="text-[10px] text-white/30 text-center mt-4">
                             🔒 We'll restore your Pro status and any purchased scans
                         </p>
+
+                        {/* Legal links */}
+                        <div className="flex items-center justify-center gap-3 text-white/20 text-[10px] mt-3">
+                            <a href="/terms" target="_blank" className="hover:text-white/40 transition-colors underline">Terms</a>
+                            <span>•</span>
+                            <a href="/privacy" target="_blank" className="hover:text-white/40 transition-colors underline">Privacy</a>
+                        </div>
                     </>
                 )}
             </div>
         </div>
     )
 }
+
