@@ -272,6 +272,40 @@ export const generateShareCard = async ({
                 ctx.fillText(line, canvas.width / 2, insightY + (i * 38))
             })
 
+            // ===== CELEBRITY JUDGE BADGE - Celeb Mode Only =====
+            const insightBottomY = insightY + (Math.min(insightLines.length, 2) * 38)
+            let judgeBadgeBottomY = insightBottomY  // Track where content ends for spacing
+
+            if (currentMode === 'celeb' && scores.judgedBy) {
+                const judgeBadgeY = insightBottomY + 30
+                const judgeBadgeHeight = 48
+                const judgeText = `🎭 Judged by ${scores.judgedBy}`
+
+                ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, sans-serif'
+                const judgeBadgeTextWidth = ctx.measureText(judgeText).width
+                const judgeBadgeWidth = judgeBadgeTextWidth + 40
+                const judgeBadgeX = (canvas.width - judgeBadgeWidth) / 2
+
+                // Dark badge background with gold border
+                ctx.fillStyle = 'rgba(0,0,0,0.6)'
+                ctx.beginPath()
+                ctx.roundRect(judgeBadgeX, judgeBadgeY, judgeBadgeWidth, judgeBadgeHeight, 24)
+                ctx.fill()
+
+                // Gold border
+                ctx.strokeStyle = 'rgba(255,215,0,0.5)'
+                ctx.lineWidth = 2
+                ctx.stroke()
+
+                // Judge text in gold
+                ctx.fillStyle = '#ffd700'
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillText(judgeText, canvas.width / 2, judgeBadgeY + judgeBadgeHeight / 2)
+
+                judgeBadgeBottomY = judgeBadgeY + judgeBadgeHeight
+            }
+
             // ===== SUBSCORES ROW - Compact & Clean =====
             const subscoreY = canvas.height - 270
             const subscores = [
@@ -341,11 +375,19 @@ export const generateShareCard = async ({
             const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
             const dateStr = `${shortMonths[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
 
+            // For celeb mode, show disclaimer instead of just date
             const dateY = canvas.height - 100
             ctx.fillStyle = 'rgba(255,255,255,0.4)'
             ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
-            ctx.fillText(dateStr, canvas.width / 2, dateY)
+
+            if (currentMode === 'celeb') {
+                // Show disclaimer with date for celeb mode
+                ctx.font = '20px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.fillText('AI parody • Not a real celeb • ' + dateStr, canvas.width / 2, dateY)
+            } else {
+                ctx.fillText(dateStr, canvas.width / 2, dateY)
+            }
 
             // ===== FITRATE LOGO =====
             const logoY = canvas.height - 55
@@ -377,6 +419,14 @@ export const generateShareCard = async ({
                     if (score >= 75) return `${score}/100. Your turn — let's see what you got 👀\n${link}`
                     if (score >= 50) return `I got ${score}. Can you do better?\n${link}`
                     return `${score}/100... surely you can beat this 😅\n${link}`
+                }
+
+                // Celebrity mode - include judge name
+                if (currentMode === 'celeb' && scores.judgedBy) {
+                    if (score >= 90) return `${scores.judgedBy} gave me ${score}/100! 🎭 #FitRateCeleb\n${link}`
+                    if (score >= 75) return `${scores.judgedBy} judged my outfit: ${score}/100 🎭 #FitRateCeleb\n${link}`
+                    if (score >= 50) return `${scores.judgedBy} wasn't impressed... ${score}/100 🎭 #FitRateCeleb\n${link}`
+                    return `${scores.judgedBy} destroyed me 💀 ${score}/100 #FitRateCeleb\n${link}`
                 }
 
                 if (scores.roastMode || scores.mode === 'roast') {
