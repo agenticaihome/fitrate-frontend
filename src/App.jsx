@@ -3251,10 +3251,12 @@ export default function App() {
           declineCountdown={declineCountdown}
           checkoutLoading={checkoutLoading}
           startCheckout={startCheckout}
+          userId={userId}
         />
       </Suspense>
     )
   }
+
 
   // ============================================
   // LEADERBOARD MODAL (Full view from Weekly Challenge)
