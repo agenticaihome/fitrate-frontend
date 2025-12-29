@@ -618,7 +618,7 @@ export default function HomeScreen({
     // RENDER: Dashboard View (Simplified & Clean)
     // ==========================================
     return (
-        <div className="min-h-screen flex flex-col items-center p-6 overflow-hidden relative" style={{
+        <div className="min-h-screen flex flex-col items-center p-6 overflow-x-hidden relative" style={{
             background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 30%, #12091f 70%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
