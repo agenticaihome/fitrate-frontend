@@ -390,12 +390,19 @@ export default function FashionShowHub({
                     {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
                 </div>
                 {/* Participant counter - creates FOMO */}
-                {scoreboard.length > 0 && (
-                    <div className="mt-2 flex items-center justify-center gap-2">
+                {(scoreboard.length > 0 || showData?.maxParticipants) && (
+                    <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                         <span className="text-purple-400 font-bold">{scoreboard.length} {scoreboard.length === 1 ? 'friend' : 'friends'}</span>
                         <span className="text-white/40">competing</span>
+                        {showData?.maxParticipants && (
+                            <span className={`text-sm px-2 py-0.5 rounded-full ${scoreboard.length >= showData.maxParticipants ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                {scoreboard.length >= showData.maxParticipants
+                                    ? '🚫 FULL'
+                                    : `${showData.maxParticipants - scoreboard.length} spots left`}
+                            </span>
+                        )}
                         {scoreboard[0] && canStillWalk && (
-                            <span className="text-amber-400 text-sm ml-2">👑 {scoreboard[0].nickname} leads with {scoreboard[0].score?.toFixed(0)}</span>
+                            <span className="text-amber-400 text-sm">👑 {scoreboard[0].nickname} leads with {scoreboard[0].score?.toFixed(0)}</span>
                         )}
                     </div>
                 )}

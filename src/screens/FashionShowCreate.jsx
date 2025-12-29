@@ -51,6 +51,15 @@ const DURATIONS = [
     { hours: 168, label: '7 Days' }
 ]
 
+// Max participants options - show ends when full
+const MAX_PARTICIPANTS = [
+    { count: 4, label: '4 people' },
+    { count: 8, label: '8 people' },
+    { count: 12, label: '12 people' },
+    { count: 20, label: '20 people' },
+    { count: 0, label: 'Unlimited' }
+]
+
 export default function FashionShowCreate({
     isPro,
     userId,
@@ -60,6 +69,7 @@ export default function FashionShowCreate({
     const [showName, setShowName] = useState('')
     const [vibe, setVibe] = useState('nice')
     const [duration, setDuration] = useState(24)
+    const [maxParticipants, setMaxParticipants] = useState(0) // 0 = unlimited
     const [familySafe, setFamilySafe] = useState(true) // Default ON
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -98,6 +108,7 @@ export default function FashionShowCreate({
                     vibe,
                     familySafe,
                     durationHours: duration,
+                    maxParticipants: maxParticipants || null, // null = unlimited
                     entriesPerPerson: 1,
                     userId
                 })
@@ -227,6 +238,35 @@ export default function FashionShowCreate({
                                         }`}
                                 >
                                     {d.label}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
+
+                {/* Max Participants */}
+                <div className="mb-6">
+                    <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                        Max Participants
+                    </label>
+                    <p className="text-xs text-white/40 mb-3">Show ends automatically when full</p>
+                    <div className="flex flex-wrap gap-2">
+                        {MAX_PARTICIPANTS.map((p) => {
+                            const isSelected = maxParticipants === p.count
+                            return (
+                                <button
+                                    key={p.count}
+                                    onClick={() => {
+                                        setMaxParticipants(p.count)
+                                        playSound('click')
+                                        vibrate(15)
+                                    }}
+                                    className={`py-2 px-4 rounded-xl border transition-all ${isSelected
+                                        ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
+                                        : 'border-white/20 bg-white/5 text-white/60'
+                                        }`}
+                                >
+                                    {p.label}
                                 </button>
                             )
                         })}
