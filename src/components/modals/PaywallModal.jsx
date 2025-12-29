@@ -151,7 +151,7 @@ export default function PaywallModal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 overflow-y-auto"
             style={{
                 background: 'linear-gradient(180deg, rgba(15,10,25,0.97) 0%, rgba(25,15,40,0.98) 100%)',
                 backdropFilter: 'blur(20px)',
@@ -159,6 +159,7 @@ export default function PaywallModal({
             }}
             onClick={(e) => e.target === e.currentTarget && setShowPaywall(false)}
         >
+
             {/* Warm ambient glow */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute w-[500px] h-[500px] rounded-full" style={{
