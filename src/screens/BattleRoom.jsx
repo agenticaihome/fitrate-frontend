@@ -45,6 +45,7 @@ export default function BattleRoom({
     // State
     const [showConfetti, setShowConfetti] = useState(false)
     const [revealed, setRevealed] = useState(false)
+    const [linkCopied, setLinkCopied] = useState(false)  // P2.4: Track copy feedback
     const [timeRemaining, setTimeRemaining] = useState(() => {
         if (battleData?.expiresAt) {
             return Math.max(0, new Date(battleData.expiresAt).getTime() - Date.now())
@@ -60,6 +61,21 @@ export default function BattleRoom({
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
     const streamRef = useRef(null)
+
+    // P2.6: Check for recent photo in localStorage
+    const recentPhoto = useMemo(() => {
+        try {
+            const stored = localStorage.getItem('fitrate_last_outfit_photo')
+            if (stored) {
+                const parsed = JSON.parse(stored)
+                // Only use if less than 1 hour old
+                if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                    return parsed.data
+                }
+            }
+        } catch (e) { /* ignore */ }
+        return null
+    }, [])
 
     // Battle state
     const isCompleted = battleData?.status === 'completed'
@@ -653,6 +669,29 @@ export default function BattleRoom({
                                 }}>
                                 📤 Share Battle Link
                             </button>
+
+                            {/* P2.4: One-tap copy link button */}
+                            <button
+                                onClick={async () => {
+                                    playSound('click')
+                                    vibrate(15)
+                                    const url = `https://fitrate.app/b/${battleId}`
+                                    try {
+                                        await navigator.clipboard.writeText(url)
+                                        setLinkCopied(true)
+                                        setTimeout(() => setLinkCopied(false), 2000)
+                                    } catch (e) {
+                                        console.warn('Copy failed:', e)
+                                    }
+                                }}
+                                className="w-full py-4 rounded-xl font-bold text-base transition-all active:scale-[0.97]"
+                                style={{
+                                    background: linkCopied ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.08)',
+                                    color: linkCopied ? '#00ff88' : 'rgba(255,255,255,0.8)',
+                                    border: linkCopied ? '1px solid rgba(0,255,136,0.4)' : '1px solid rgba(255,255,255,0.15)'
+                                }}>
+                                {linkCopied ? '✅ Copied!' : '📋 Copy Link'}
+                            </button>
                         </>
                     ) : (
                         <>
@@ -667,8 +706,27 @@ export default function BattleRoom({
                                 {isProcessing ? '⏳ Processing...' : '📸 Snap Your Outfit'}
                             </button>
 
+                            {/* P2.6: Use recent photo if available */}
+                            {recentPhoto && !isProcessing && (
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(20)
+                                        setIsProcessing(true)
+                                        onImageSelected?.(recentPhoto, 'battle')
+                                    }}
+                                    className="w-full py-4 rounded-xl font-bold text-base transition-all active:scale-[0.97]"
+                                    style={{
+                                        background: 'rgba(139,92,246,0.15)',
+                                        color: '#a78bfa',
+                                        border: '1px solid rgba(139,92,246,0.4)'
+                                    }}>
+                                    ⚡ Use Last Photo
+                                </button>
+                            )}
+
                             <p className="text-center text-white/40 text-sm">
-                                Take a photo and see who wins!
+                                {recentPhoto ? 'Or take a new outfit photo' : 'Take a photo and see who wins!'}
                             </p>
                         </>
                     )}

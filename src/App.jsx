@@ -2886,6 +2886,13 @@ export default function App() {
           onImageSelected={(img, scanType) => {
             setUploadedImage(img)
             setScreen('analyzing')
+            // P2.6: Store last outfit photo for quick battle response (1 hour expiry)
+            try {
+              localStorage.setItem('fitrate_last_outfit_photo', JSON.stringify({
+                data: img,
+                timestamp: Date.now()
+              }))
+            } catch (e) { /* localStorage full, ignore */ }
             analyzeOutfit(img, scanType)
           }}
           onShowPaywall={() => setShowPaywall(true)}
