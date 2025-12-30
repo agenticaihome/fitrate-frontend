@@ -437,11 +437,19 @@ export default function App() {
   })
 
   // Helper to add a battle to active battles list
-  const addToActiveBattles = (battleId, myScore, mode = 'nice', status = 'waiting') => {
+  const addToActiveBattles = (battleId, myScore, mode = 'nice', status = 'waiting', expiresAt = null) => {
     setActiveBattles(prev => {
       // Don't add duplicates
       if (prev.some(b => b.battleId === battleId)) return prev
-      const updated = [...prev, { battleId, myScore, mode, status, createdAt: Date.now() }]
+      // Store expiresAt from API so timer doesn't reset on page reload
+      const updated = [...prev, {
+        battleId,
+        myScore,
+        mode,
+        status,
+        createdAt: Date.now(),
+        expiresAt: expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      }]
       localStorage.setItem('fitrate_active_battles', JSON.stringify(updated))
       return updated
     })
@@ -2146,7 +2154,7 @@ export default function App() {
             created.push(data.challengeId)
             localStorage.setItem('fitrate_created_challenges', JSON.stringify(created))
             // Add to active battles list (shows in "My Battles" on home screen)
-            addToActiveBattles(data.challengeId, scores.overall, mode, 'waiting')
+            addToActiveBattles(data.challengeId, scores.overall, mode, 'waiting', data.expiresAt)
             console.log('[Battle] Created room:', data.challengeId)
           }
         } catch (err) {
