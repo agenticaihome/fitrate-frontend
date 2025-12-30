@@ -1,8 +1,12 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo, Suspense, lazy } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
 import { LIMITS } from '../config/constants'
+
+// Lazy load 3D particle field for performance
+const ParticleField = lazy(() => import('../components/3d/ParticleField').then(m => ({ default: m.ParticleFieldLight })))
 
 // ============================================
 // FIRST-TIME ONBOARDING MODAL
@@ -115,39 +119,87 @@ const OnboardingOverlay = ({ onComplete }) => {
 }
 
 // ============================================
-// SIMPLIFIED FLOATING PARTICLES (reduced count)
+// ENHANCED FLOATING PARTICLES with parallax layers
 // ============================================
-const FloatingParticles = ({ accentColor }) => {
+const FloatingParticles = ({ accentColor, secondaryColor = '#8b5cf6' }) => {
     const particles = useMemo(() =>
-        Array.from({ length: 12 }, (_, i) => ({
+        Array.from({ length: 15 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
-            size: 1 + Math.random() * 2,
+            size: 1 + Math.random() * 3,
             delay: Math.random() * 15,
-            duration: 20 + Math.random() * 15,
-            opacity: 0.1 + Math.random() * 0.15,
-            drift: -20 + Math.random() * 40,
-            color: i % 3 === 0 ? accentColor : '#fff'
-        })), [accentColor]
+            duration: 18 + Math.random() * 18,
+            opacity: 0.15 + Math.random() * 0.2,
+            drift: -25 + Math.random() * 50,
+            color: i % 4 === 0 ? accentColor : i % 4 === 1 ? secondaryColor : '#fff',
+            layer: i % 3 // 0 = deep, 1 = mid, 2 = near (faster)
+        })), [accentColor, secondaryColor]
     )
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {particles.map(p => (
-                <div
+            {/* Deep layer particles (slowest) */}
+            {particles.filter(p => p.layer === 0).map(p => (
+                <motion.div
                     key={p.id}
                     className="absolute rounded-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: p.opacity * 0.6 }}
+                    transition={{ duration: 1, delay: p.delay * 0.1 }}
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-10px',
+                        width: p.size * 0.8,
+                        height: p.size * 0.8,
+                        background: p.color,
+                        boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+                        animation: `particle-float ${p.duration * 1.3}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift * 0.5}px`
+                    }}
+                />
+            ))}
+
+            {/* Mid layer particles */}
+            {particles.filter(p => p.layer === 1).map(p => (
+                <motion.div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: p.opacity * 0.8 }}
+                    transition={{ duration: 0.8, delay: p.delay * 0.1 }}
                     style={{
                         left: `${p.left}%`,
                         bottom: '-10px',
                         width: p.size,
                         height: p.size,
                         background: p.color,
-                        opacity: p.opacity,
                         boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
                         animation: `particle-float ${p.duration}s linear infinite`,
                         animationDelay: `${p.delay}s`,
                         '--drift': `${p.drift}px`
+                    }}
+                />
+            ))}
+
+            {/* Near layer particles (fastest, brightest) */}
+            {particles.filter(p => p.layer === 2).map(p => (
+                <motion.div
+                    key={p.id}
+                    className="absolute rounded-full"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: p.opacity, scale: 1 }}
+                    transition={{ duration: 0.5, delay: p.delay * 0.1 }}
+                    style={{
+                        left: `${p.left}%`,
+                        bottom: '-10px',
+                        width: p.size * 1.2,
+                        height: p.size * 1.2,
+                        background: p.color,
+                        boxShadow: `0 0 ${p.size * 4}px ${p.color}`,
+                        animation: `particle-float ${p.duration * 0.7}s linear infinite`,
+                        animationDelay: `${p.delay}s`,
+                        '--drift': `${p.drift * 1.5}px`
                     }}
                 />
             ))}
@@ -627,16 +679,90 @@ export default function HomeScreen({
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
             paddingBottom: 'calc(120px + env(safe-area-inset-bottom, 0px))'
         }}>
-            {/* Subtle Background - Only ONE animated glow */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-[500px] h-[500px] rounded-full" style={{
-                    background: `radial-gradient(circle, ${currentMode.glow} 0%, transparent 60%)`,
-                    top: '35%', left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    animation: 'glow-breathe 6s ease-in-out infinite',
-                    opacity: 0.3
-                }} />
-                <FloatingParticles accentColor={currentMode.color} />
+            {/* Enhanced 3D Parallax Background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none parallax-scene">
+                {/* Deep layer - slowest */}
+                <motion.div
+                    className="parallax-orb parallax-orb-1"
+                    style={{
+                        '--orb-color-1': `${currentMode.color}15`,
+                        top: '10%',
+                        left: '15%'
+                    }}
+                    animate={{
+                        x: [0, 30, 0],
+                        y: [0, -20, 0]
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                    }}
+                />
+
+                {/* Mid layer orbs */}
+                <motion.div
+                    className="parallax-orb parallax-orb-2"
+                    style={{
+                        '--orb-color-2': 'rgba(139,92,246,0.12)',
+                        top: '55%',
+                        right: '5%'
+                    }}
+                    animate={{
+                        x: [0, -25, 0],
+                        y: [0, 15, 0]
+                    }}
+                    transition={{
+                        duration: 18,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 2
+                    }}
+                />
+
+                {/* Central breathing glow */}
+                <motion.div
+                    className="absolute w-[500px] h-[500px] rounded-full"
+                    style={{
+                        background: `radial-gradient(circle, ${currentMode.glow} 0%, transparent 60%)`,
+                        top: '35%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        filter: 'blur(40px)'
+                    }}
+                    animate={{
+                        scale: [1, 1.1, 1],
+                        opacity: [0.3, 0.5, 0.3]
+                    }}
+                    transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                    }}
+                />
+
+                {/* Accent orb */}
+                <motion.div
+                    className="parallax-orb parallax-orb-3"
+                    style={{
+                        '--orb-color-3': 'rgba(255,107,53,0.1)',
+                        top: '75%',
+                        left: '30%'
+                    }}
+                    animate={{
+                        x: [0, 20, 0],
+                        y: [0, -30, 0]
+                    }}
+                    transition={{
+                        duration: 22,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 5
+                    }}
+                />
+
+                {/* Multi-layer floating particles */}
+                <FloatingParticles accentColor={currentMode.color} secondaryColor="#8b5cf6" />
             </div>
 
             {/* Hidden Inputs */}
@@ -1078,74 +1204,108 @@ export default function HomeScreen({
 
                 {showMoreFeatures && (
                     <div className="space-y-3 mt-2 animate-fade-in" style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
-                        {/* Quick Actions Grid */}
+                        {/* Quick Actions Grid - Clay Cards with 3D depth */}
                         <div className="grid grid-cols-2 gap-3">
                             {/* Arena */}
                             {onOpenArena && (
-                                <button
+                                <motion.button
                                     onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
-                                    className="p-4 rounded-2xl transition-all active:scale-[0.97] relative"
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,255,136,0.1) 100%)',
-                                        border: '1px solid rgba(0,212,255,0.3)'
-                                    }}
+                                    className="p-4 rounded-2xl relative clay-card-cyan card-float-3d"
+                                    whileHover={{ scale: 1.02, y: -4 }}
+                                    whileTap={{ scale: 0.97, y: 2 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 }}
                                 >
                                     <div className="absolute top-2 right-2 flex items-center gap-1">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                        <motion.span
+                                            className="w-1.5 h-1.5 rounded-full bg-green-400"
+                                            animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
+                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                        />
                                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
                                             style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
                                             LIVE
                                         </span>
                                     </div>
-                                    <span className="text-2xl block mb-1">🌍</span>
+                                    <motion.span
+                                        className="text-2xl block mb-1"
+                                        animate={{ rotate: [0, 5, -5, 0] }}
+                                        transition={{ duration: 4, repeat: Infinity }}
+                                    >
+                                        🌍
+                                    </motion.span>
                                     <span className="text-white font-bold text-sm block">Global Arena</span>
                                     <span className="text-cyan-300/70 text-xs block">1v1 Battles</span>
                                     <span className="text-cyan-400 text-[10px] font-semibold mt-1 block">🎮 10 FREE matches/day</span>
-                                </button>
+                                </motion.button>
                             )}
 
                             {/* Fashion Show */}
                             {onStartFashionShow && (
-                                <button
+                                <motion.button
                                     onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                                    className="p-4 rounded-2xl transition-all active:scale-[0.97]"
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(168,85,247,0.15) 100%)',
-                                        border: '1px solid rgba(139,92,246,0.3)'
-                                    }}
+                                    className="p-4 rounded-2xl clay-card-purple card-float-3d"
+                                    whileHover={{ scale: 1.02, y: -4 }}
+                                    whileTap={{ scale: 0.97, y: 2 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.15 }}
                                 >
-                                    <span className="text-2xl block mb-1">🎭</span>
+                                    <motion.span
+                                        className="text-2xl block mb-1"
+                                        animate={{ y: [0, -3, 0] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                    >
+                                        🎭
+                                    </motion.span>
                                     <span className="text-white font-bold text-sm block">Fashion Show</span>
                                     <span className="text-purple-300/70 text-xs">Battle Friends</span>
-                                </button>
+                                </motion.button>
                             )}
 
-                            {/* Challenges - Single entry for Daily + Weekly */}
-                            <button
+                            {/* Challenges - Clay card with 3D effect */}
+                            <motion.button
                                 onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
-                                className="p-4 rounded-2xl transition-all active:scale-[0.97] col-span-2"
+                                className="p-4 rounded-2xl col-span-2 clay-card card-float-3d"
                                 style={{
-                                    background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(16,185,129,0.1) 100%)',
-                                    border: '1px solid rgba(59,130,246,0.3)'
+                                    background: 'linear-gradient(145deg, rgba(59,130,246,0.12) 0%, rgba(16,185,129,0.08) 100%)'
                                 }}
+                                whileHover={{ scale: 1.01, y: -3 }}
+                                whileTap={{ scale: 0.98, y: 1 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
                             >
                                 <div className="flex items-center justify-around">
-                                    <div className="text-center flex-1">
+                                    <motion.div
+                                        className="text-center flex-1"
+                                        animate={{ y: [0, -2, 0] }}
+                                        transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+                                    >
                                         <span className="text-2xl block">⚡</span>
                                         <p className="text-white font-bold text-xs">Daily</p>
                                         <p className="text-blue-300 text-[10px] font-semibold">1 FREE scan/day</p>
-                                    </div>
-                                    <div className="text-center px-3">
+                                    </motion.div>
+                                    <motion.div
+                                        className="text-center px-3"
+                                        animate={{ scale: [1, 1.05, 1] }}
+                                        transition={{ duration: 3, repeat: Infinity }}
+                                    >
                                         <span className="text-3xl block">🏆</span>
                                         <p className="text-white font-bold text-sm">Challenges</p>
-                                    </div>
-                                    <div className="text-center flex-1">
+                                    </motion.div>
+                                    <motion.div
+                                        className="text-center flex-1"
+                                        animate={{ y: [0, -2, 0] }}
+                                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                                    >
                                         <span className="text-2xl block">🌟</span>
                                         <p className="text-white font-bold text-xs">Weekly</p>
                                         <p className="text-emerald-300 text-[10px] font-semibold">1 FREE scan/week</p>
-                                    </div>
+                                    </motion.div>
                                 </div>
-                            </button>
+                            </motion.button>
                         </div>
 
                         {/* Active Battles */}
@@ -1298,83 +1458,150 @@ export default function HomeScreen({
                 </div>
             )}
 
-            {/* Mode Drawer - Clean Grid */}
-            {showModeDrawer && (
-                <div
-                    className="fixed inset-0 z-[60] flex items-end justify-center"
-                    style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)'
-                    }}
-                    onClick={() => setShowModeDrawer(false)}
-                >
-                    <div
-                        className="w-full max-w-md p-5 pb-8 rounded-t-3xl"
-                        style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)',
-                            animation: 'slideUp 0.3s ease-out'
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="w-10 h-1 bg-white/30 rounded-full mx-auto mb-4" />
-
-                        <div className="text-center mb-5">
-                            <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
-                            <p className="text-white/50 text-sm">How should we rate your fit?</p>
-                        </div>
-
-                        {/* Mode Grid - 4 columns with elastic selection */}
-                        <div className="grid grid-cols-4 gap-2">
-                            {MODES.map((m) => (
-                                <button
-                                    key={m.id}
-                                    onClick={(e) => {
-                                        playSound('click')
-                                        vibrate([15, 10, 25]) // Quick triple-tap feel
-                                        // Add elastic animation class
-                                        e.currentTarget.classList.add('animate-mode-select')
-                                        setTimeout(() => {
-                                            setMode(m.id)
-                                            setEventMode(false)
-                                            setDailyChallengeMode?.(false)
-                                            setShowModeDrawer(false)
-                                        }, 200)
-                                    }}
-                                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl transition-all ${mode === m.id ? 'ring-2' : ''}`}
-                                    style={{
-                                        background: `${m.color}15`,
-                                        ringColor: m.color
-                                    }}
-                                    aria-label={`${m.label} mode - ${m.desc}`}
-                                >
-                                    <span className="text-2xl">{m.emoji}</span>
-                                    <span className="text-[11px] font-bold text-white/90">{m.label}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Meet The Judges */}
-                        <button
-                            onClick={() => {
-                                setShowModeDrawer(false)
-                                onNavigate?.('judges')
-                            }}
-                            className="w-full py-3 text-cyan-400 text-sm font-bold mt-4 flex items-center justify-center gap-2"
-                        >
-                            <span>👥</span>
-                            <span>Meet Your AI Judges</span>
-                            <span className="text-cyan-400/50">→</span>
-                        </button>
-
-                        <button
+            {/* Mode Drawer - Animated with Stagger */}
+            <AnimatePresence>
+                {showModeDrawer && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            className="fixed inset-0 z-[60]"
+                            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                             onClick={() => setShowModeDrawer(false)}
-                            className="w-full py-2 text-white/40 text-sm font-medium"
+                        />
+
+                        {/* Drawer */}
+                        <motion.div
+                            className="fixed bottom-0 left-0 right-0 z-[60] w-full max-w-md mx-auto p-5 pb-8 rounded-t-3xl glass-heavy"
+                            style={{
+                                background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)'
+                            }}
+                            initial={{ y: '100%' }}
+                            animate={{ y: 0 }}
+                            exit={{ y: '100%' }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                            drag="y"
+                            dragConstraints={{ top: 0, bottom: 0 }}
+                            dragElastic={{ top: 0, bottom: 0.5 }}
+                            onDragEnd={(_, info) => {
+                                if (info.offset.y > 100) setShowModeDrawer(false)
+                            }}
+                            onClick={e => e.stopPropagation()}
                         >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
+                            {/* Handle */}
+                            <motion.div
+                                className="w-10 h-1 bg-white/30 rounded-full mx-auto mb-4"
+                                initial={{ width: 0 }}
+                                animate={{ width: 40 }}
+                                transition={{ delay: 0.1 }}
+                            />
+
+                            {/* Header */}
+                            <motion.div
+                                className="text-center mb-5"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
+                                <p className="text-white/50 text-sm">How should we rate your fit?</p>
+                            </motion.div>
+
+                            {/* Mode Grid - Staggered animation */}
+                            <div className="grid grid-cols-4 gap-2">
+                                {MODES.map((m, index) => (
+                                    <motion.button
+                                        key={m.id}
+                                        onClick={() => {
+                                            playSound('click')
+                                            vibrate([15, 10, 25])
+                                            setTimeout(() => {
+                                                setMode(m.id)
+                                                setEventMode(false)
+                                                setDailyChallengeMode?.(false)
+                                                setShowModeDrawer(false)
+                                            }, 150)
+                                        }}
+                                        className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl relative overflow-hidden ${mode === m.id ? 'ring-2' : ''}`}
+                                        style={{
+                                            background: `${m.color}15`,
+                                            ringColor: m.color
+                                        }}
+                                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                        animate={{
+                                            opacity: 1,
+                                            scale: 1,
+                                            y: 0,
+                                            transition: {
+                                                type: 'spring',
+                                                stiffness: 400,
+                                                damping: 20,
+                                                delay: index * 0.03
+                                            }
+                                        }}
+                                        whileHover={{ scale: 1.08, rotateY: 5 }}
+                                        whileTap={{ scale: 0.92 }}
+                                        aria-label={`${m.label} mode - ${m.desc}`}
+                                    >
+                                        {/* Glow on selected */}
+                                        {mode === m.id && (
+                                            <motion.div
+                                                className="absolute inset-0 rounded-xl pointer-events-none"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                style={{
+                                                    boxShadow: `inset 0 0 15px ${m.glow}, 0 0 15px ${m.glow}`
+                                                }}
+                                            />
+                                        )}
+                                        <motion.span
+                                            className="text-2xl relative z-10"
+                                            animate={mode === m.id ? {
+                                                scale: [1, 1.2, 1],
+                                                rotate: [0, 10, -10, 0]
+                                            } : {}}
+                                            transition={{ duration: 0.4 }}
+                                        >
+                                            {m.emoji}
+                                        </motion.span>
+                                        <span className="text-[11px] font-bold text-white/90 relative z-10">{m.label}</span>
+                                    </motion.button>
+                                ))}
+                            </div>
+
+                            {/* Meet The Judges */}
+                            <motion.button
+                                onClick={() => {
+                                    setShowModeDrawer(false)
+                                    onNavigate?.('judges')
+                                }}
+                                className="w-full py-3 text-cyan-400 text-sm font-bold mt-4 flex items-center justify-center gap-2"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <span>👥</span>
+                                <span>Meet Your AI Judges</span>
+                                <span className="text-cyan-400/50">→</span>
+                            </motion.button>
+
+                            <motion.button
+                                onClick={() => setShowModeDrawer(false)}
+                                className="w-full py-2 text-white/40 text-sm font-medium"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                Cancel
+                            </motion.button>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
 
             {/* Inline Styles */}
             <style>{`
