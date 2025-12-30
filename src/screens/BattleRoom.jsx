@@ -650,12 +650,23 @@ export default function BattleRoom({
                 <div className="flex flex-col gap-4 w-full max-w-sm">
                     {isCreator ? (
                         <>
-                            {/* Creator waiting - auto-refresh message */}
+                            {/* Creator waiting - with forfeit countdown */}
                             <div className="text-center py-3">
                                 <p className="text-white/50 text-sm mb-2">
                                     ⏳ Waiting for someone to accept...
                                 </p>
-                                <p className="text-white/30 text-xs">
+                                {/* P2.5: Show forfeit countdown */}
+                                {battleData?.forfeitAt && (() => {
+                                    const forfeitMs = Math.max(0, new Date(battleData.forfeitAt).getTime() - Date.now())
+                                    const hours = Math.floor(forfeitMs / (1000 * 60 * 60))
+                                    const mins = Math.floor((forfeitMs % (1000 * 60 * 60)) / (1000 * 60))
+                                    return forfeitMs > 0 ? (
+                                        <p className="text-green-400/70 text-xs">
+                                            🏆 Auto-win in {hours}h {mins}m if no response
+                                        </p>
+                                    ) : null
+                                })()}
+                                <p className="text-white/30 text-xs mt-1">
                                     {loading ? '🔄 Checking...' : 'Auto-refreshing every 10 seconds'}
                                 </p>
                             </div>
