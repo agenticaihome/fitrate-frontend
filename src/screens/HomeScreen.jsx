@@ -1159,83 +1159,250 @@ export default function HomeScreen({
                             </div>
                         )}
 
-                        {/* Single breathing ring */}
+                        {/* ============================================ */}
+                        {/* PREMIUM 3D MAIN BUTTON */}
+                        {/* ============================================ */}
                         <div className="relative mb-6">
-                            <div
-                                className="absolute inset-0 rounded-full pointer-events-none"
-                                style={{
-                                    border: dailyChallengeMode
-                                        ? '2px solid rgba(59,130,246,0.3)'
-                                        : eventMode
-                                            ? '2px solid rgba(16,185,129,0.3)'
-                                            : `2px solid ${currentMode.color}30`,
-                                    transform: 'scale(1.1)',
-                                    animation: 'ring-breathe 3s ease-in-out infinite'
-                                }}
-                            />
+                            {/* Outer pulsing rings - 3 layers */}
+                            {[1, 2, 3].map((ring) => (
+                                <motion.div
+                                    key={ring}
+                                    className="absolute inset-0 rounded-full pointer-events-none"
+                                    style={{
+                                        border: `2px solid ${dailyChallengeMode ? 'rgba(59,130,246,0.4)' : eventMode ? 'rgba(16,185,129,0.4)' : currentMode.color}`,
+                                        opacity: 0
+                                    }}
+                                    animate={{
+                                        scale: [1, 1.3 + ring * 0.15],
+                                        opacity: [0.6, 0]
+                                    }}
+                                    transition={{
+                                        duration: 2.5,
+                                        repeat: Infinity,
+                                        delay: ring * 0.5,
+                                        ease: 'easeOut'
+                                    }}
+                                />
+                            ))}
 
-                            <button
+                            {/* Orbiting particles */}
+                            {[...Array(8)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute w-2 h-2 rounded-full pointer-events-none"
+                                    style={{
+                                        background: i % 2 === 0
+                                            ? (dailyChallengeMode ? '#3b82f6' : eventMode ? '#10b981' : currentMode.color)
+                                            : '#fff',
+                                        boxShadow: `0 0 10px ${dailyChallengeMode ? '#3b82f6' : eventMode ? '#10b981' : currentMode.color}`,
+                                        left: '50%',
+                                        top: '50%',
+                                        marginLeft: -4,
+                                        marginTop: -4
+                                    }}
+                                    animate={{
+                                        x: [
+                                            Math.cos((i / 8) * Math.PI * 2) * 145,
+                                            Math.cos((i / 8) * Math.PI * 2 + Math.PI * 2) * 145
+                                        ],
+                                        y: [
+                                            Math.sin((i / 8) * Math.PI * 2) * 145,
+                                            Math.sin((i / 8) * Math.PI * 2 + Math.PI * 2) * 145
+                                        ],
+                                        scale: [1, 1.5, 1],
+                                        opacity: [0.4, 1, 0.4]
+                                    }}
+                                    transition={{
+                                        duration: 8,
+                                        repeat: Infinity,
+                                        ease: 'linear',
+                                        delay: i * 0.2
+                                    }}
+                                />
+                            ))}
+
+                            {/* Main button with 3D depth */}
+                            <motion.button
                                 onClick={handleStart}
                                 aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
-                                className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all active:scale-[0.97]"
+                                className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
                                 style={{
-                                    background: dailyChallengeMode
-                                        ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
-                                        : eventMode
-                                            ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
-                                            : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
-                                    border: dailyChallengeMode
-                                        ? '3px solid rgba(59,130,246,0.6)'
-                                        : eventMode
-                                            ? '3px solid rgba(16,185,129,0.6)'
-                                            : `3px solid ${currentMode.color}60`,
-                                    boxShadow: dailyChallengeMode
-                                        ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
-                                        : eventMode
-                                            ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
-                                            : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
+                                    background: 'transparent',
+                                    perspective: '1000px'
+                                }}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                animate={{
+                                    y: [0, -8, 0]
+                                }}
+                                transition={{
+                                    y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+                                    scale: { type: 'spring', stiffness: 400, damping: 17 }
                                 }}
                             >
-                                {/* Inner gradient */}
+                                {/* Deep shadow layer */}
                                 <div
-                                    className="absolute inset-4 rounded-full"
+                                    className="absolute inset-2 rounded-full"
                                     style={{
-                                        background: dailyChallengeMode
-                                            ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
-                                            : eventMode
-                                                ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
-                                                : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
-                                        boxShadow: dailyChallengeMode
-                                            ? '0 0 60px rgba(59,130,246,0.5)'
-                                            : eventMode
-                                                ? '0 0 60px rgba(16,185,129,0.5)'
-                                                : `0 0 60px ${currentMode.glow}`
+                                        background: 'rgba(0,0,0,0.5)',
+                                        filter: 'blur(20px)',
+                                        transform: 'translateY(15px) scale(0.9)'
                                     }}
                                 />
 
-                                {/* Icon */}
-                                <span className="relative text-6xl mb-2">
-                                    {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
-                                </span>
+                                {/* Outer glow */}
+                                <motion.div
+                                    className="absolute inset-0 rounded-full"
+                                    style={{
+                                        background: dailyChallengeMode
+                                            ? 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)'
+                                            : eventMode
+                                                ? 'radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%)'
+                                                : `radial-gradient(circle, ${currentMode.color}40 0%, transparent 70%)`,
+                                        filter: 'blur(20px)'
+                                    }}
+                                    animate={{
+                                        scale: [1, 1.1, 1],
+                                        opacity: [0.5, 0.8, 0.5]
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                />
 
-                                {/* Main Text - Changes based on mode */}
-                                <span className="relative text-white font-black text-xl tracking-wide text-center px-4">
-                                    {dailyChallengeMode
-                                        ? 'DAILY CHALLENGE'
-                                        : eventMode
-                                            ? 'WEEKLY CHALLENGE'
-                                            : 'RATE MY OUTFIT'}
-                                </span>
+                                {/* Main 3D sphere - outer ring */}
+                                <div
+                                    className="absolute inset-0 rounded-full"
+                                    style={{
+                                        background: dailyChallengeMode
+                                            ? 'linear-gradient(145deg, #4f8df7 0%, #2563eb 50%, #1d4ed8 100%)'
+                                            : eventMode
+                                                ? 'linear-gradient(145deg, #34d399 0%, #10b981 50%, #059669 100%)'
+                                                : `linear-gradient(145deg, ${currentMode.color} 0%, ${currentMode.color}dd 50%, ${currentMode.color}aa 100%)`,
+                                        boxShadow: dailyChallengeMode
+                                            ? 'inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px rgba(59,130,246,0.5), 0 20px 40px rgba(0,0,0,0.3)'
+                                            : eventMode
+                                                ? 'inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px rgba(16,185,129,0.5), 0 20px 40px rgba(0,0,0,0.3)'
+                                                : `inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px ${currentMode.glow}, 0 20px 40px rgba(0,0,0,0.3)`,
+                                        border: dailyChallengeMode
+                                            ? '3px solid rgba(147,197,253,0.5)'
+                                            : eventMode
+                                                ? '3px solid rgba(167,243,208,0.5)'
+                                                : `3px solid ${currentMode.color}80`
+                                    }}
+                                />
 
-                                {/* Mode indicator - Subtle */}
-                                <span className="relative text-white/70 text-sm font-medium mt-1">
-                                    {dailyChallengeMode
-                                        ? `${getDailyMode().emoji} ${getDailyMode().label} Mode`
-                                        : eventMode
-                                            ? currentEvent?.theme || 'Beat the leaderboard!'
-                                            : `${currentMode.emoji} ${currentMode.label} Mode`}
-                                </span>
-                            </button>
+                                {/* Inner sphere with depth */}
+                                <div
+                                    className="absolute inset-4 rounded-full overflow-hidden"
+                                    style={{
+                                        background: dailyChallengeMode
+                                            ? 'linear-gradient(180deg, #60a5fa 0%, #3b82f6 40%, #1d4ed8 100%)'
+                                            : eventMode
+                                                ? 'linear-gradient(180deg, #6ee7b7 0%, #10b981 40%, #047857 100%)'
+                                                : `linear-gradient(180deg, ${currentMode.color} 0%, ${currentMode.color}cc 40%, ${currentMode.color}88 100%)`,
+                                        boxShadow: 'inset 0 -15px 40px rgba(0,0,0,0.4), inset 0 10px 30px rgba(255,255,255,0.15)'
+                                    }}
+                                >
+                                    {/* Glass reflection highlight */}
+                                    <div
+                                        className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/3 rounded-full"
+                                        style={{
+                                            background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
+                                            filter: 'blur(2px)'
+                                        }}
+                                    />
+
+                                    {/* Shimmer sweep effect */}
+                                    <motion.div
+                                        className="absolute inset-0"
+                                        style={{
+                                            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)'
+                                        }}
+                                        animate={{
+                                            x: ['-150%', '150%']
+                                        }}
+                                        transition={{
+                                            duration: 3,
+                                            repeat: Infinity,
+                                            repeatDelay: 2,
+                                            ease: 'easeInOut'
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Center content */}
+                                <div className="relative z-10 flex flex-col items-center">
+                                    {/* Animated icon */}
+                                    <motion.span
+                                        className="text-5xl mb-2"
+                                        style={{
+                                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                                        }}
+                                        animate={{
+                                            scale: [1, 1.1, 1],
+                                            rotate: [0, 5, -5, 0]
+                                        }}
+                                        transition={{
+                                            duration: 3,
+                                            repeat: Infinity,
+                                            ease: 'easeInOut'
+                                        }}
+                                    >
+                                        {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
+                                    </motion.span>
+
+                                    {/* Main text with shadow */}
+                                    <span
+                                        className="text-white font-black text-xl tracking-wide text-center px-4"
+                                        style={{
+                                            textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.2)'
+                                        }}
+                                    >
+                                        {dailyChallengeMode
+                                            ? 'DAILY CHALLENGE'
+                                            : eventMode
+                                                ? 'WEEKLY CHALLENGE'
+                                                : 'RATE MY FIT'}
+                                    </span>
+
+                                    {/* Mode indicator with glow */}
+                                    <motion.span
+                                        className="text-white/90 text-sm font-semibold mt-1 px-3 py-1 rounded-full"
+                                        style={{
+                                            background: 'rgba(255,255,255,0.15)',
+                                            backdropFilter: 'blur(4px)',
+                                            textShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                                        }}
+                                        animate={{
+                                            opacity: [0.8, 1, 0.8]
+                                        }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                    >
+                                        {dailyChallengeMode
+                                            ? `${getDailyMode().emoji} ${getDailyMode().label}`
+                                            : eventMode
+                                                ? currentEvent?.theme || 'Beat the leaderboard!'
+                                                : `${currentMode.emoji} ${currentMode.label}`}
+                                    </motion.span>
+                                </div>
+
+                                {/* Bottom highlight reflection */}
+                                <div
+                                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-1/2 h-8 rounded-full"
+                                    style={{
+                                        background: 'linear-gradient(0deg, rgba(255,255,255,0.08) 0%, transparent 100%)',
+                                        filter: 'blur(4px)'
+                                    }}
+                                />
+                            </motion.button>
+
+                            {/* Tap hint */}
+                            <motion.p
+                                className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-medium whitespace-nowrap"
+                                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                            >
+                                tap to start
+                            </motion.p>
                         </div>
 
                         {/* Mode Selector - Hidden during challenge modes */}
