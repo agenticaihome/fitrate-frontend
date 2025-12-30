@@ -187,15 +187,15 @@ export const generateShareCard = async ({
             ringGradient.addColorStop(0, ringColors.from)
             ringGradient.addColorStop(1, ringColors.to)
 
-            // Outer glow
+            // Outer glow - ENHANCED for more visual impact
             ctx.shadowColor = ringColors.from
-            ctx.shadowBlur = 40
+            ctx.shadowBlur = 60
 
             // Draw ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = ringGradient
-            ctx.lineWidth = 14
+            ctx.lineWidth = 16
             ctx.stroke()
             ctx.shadowBlur = 0
 
@@ -249,19 +249,31 @@ export const generateShareCard = async ({
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
 
-            // ===== VERDICT HEADLINE =====
+            // ===== VERDICT HEADLINE - Enhanced with text shadow for pop =====
             const verdictY = modeBadgeY + modeBadgeHeight + 55
             const verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
+            // Add text shadow for pop on busy backgrounds
+            ctx.shadowColor = 'rgba(0,0,0,0.5)'
+            ctx.shadowBlur = 8
+            ctx.shadowOffsetX = 0
+            ctx.shadowOffsetY = 2
+
             ctx.fillStyle = '#ffffff'
-            ctx.font = '800 56px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = '800 58px -apple-system, BlinkMacSystemFont, sans-serif'  // Slightly larger, heavier
             ctx.textAlign = 'center'
             ctx.textBaseline = 'alphabetic'
 
             const verdictLines = wrapText(ctx, verdict, canvas.width - 80)
             verdictLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, verdictY + (i * 64))
+                ctx.fillText(line, canvas.width / 2, verdictY + (i * 66))
             })
+
+            // Reset shadow for other elements
+            ctx.shadowColor = 'transparent'
+            ctx.shadowBlur = 0
+            ctx.shadowOffsetX = 0
+            ctx.shadowOffsetY = 0
 
             // ===== AI INSIGHT (subtitle) =====
             const insightY = verdictY + (Math.min(verdictLines.length, 2) * 64) + 25
@@ -424,20 +436,28 @@ export const generateShareCard = async ({
                 ctx.fillText(dateStr, canvas.width / 2, dateY)
             }
 
-            // ===== FITRATE LOGO =====
+            // ===== FITRATE LOGO - Enhanced with glow =====
             const logoY = canvas.height - 55
             if (logoImg) {
-                const logoHeight = 45
+                const logoHeight = 48  // Slightly larger
                 const logoWidth = (logoImg.width / logoImg.height) * logoHeight
                 const logoX = (canvas.width - logoWidth) / 2
-                ctx.globalAlpha = 0.7
+
+                // Add subtle glow around logo
+                ctx.shadowColor = 'rgba(255,255,255,0.4)'
+                ctx.shadowBlur = 15
+                ctx.globalAlpha = 0.85  // Increased contrast
                 ctx.drawImage(logoImg, logoX, logoY - logoHeight / 2, logoWidth, logoHeight)
                 ctx.globalAlpha = 1.0
+                ctx.shadowBlur = 0
             } else {
-                // Fallback text logo
-                ctx.fillStyle = 'rgba(255,255,255,0.6)'
-                ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
+                // Fallback text logo with glow
+                ctx.shadowColor = 'rgba(255,255,255,0.3)'
+                ctx.shadowBlur = 10
+                ctx.fillStyle = 'rgba(255,255,255,0.75)'
+                ctx.font = 'bold 34px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.fillText('FitRate', canvas.width / 2, logoY)
+                ctx.shadowBlur = 0
             }
 
             // ===== P4.4: CREATOR HANDLE WATERMARK =====

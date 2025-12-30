@@ -578,7 +578,7 @@ export default function HomeScreen({
     const getScanStatusText = () => {
         if (isPro) return '∞ Unlimited Scans'
         if (purchasedScans > 0) return `${purchasedScans} Bonus Scans`
-        return `${scansRemaining} FREE/day`
+        return `${scansRemaining} scan${scansRemaining !== 1 ? 's' : ''} left`
     }
 
     const getScanStatusIcon = () => {
