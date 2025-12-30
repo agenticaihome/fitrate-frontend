@@ -19,22 +19,56 @@ export const getApiHeaders = () => ({
 })
 
 /**
- * Make an authenticated API request
+ * Make an authenticated API request with retry logic (P4.2)
+ * @param {string} endpoint - API endpoint path
+ * @param {Object} options - Fetch options
+ * @param {number} retries - Number of retries (default 2)
  */
-export const apiRequest = async (endpoint, options = {}) => {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers: {
-            ...getApiHeaders(),
-            ...options.headers
-        }
-    })
+export const apiRequest = async (endpoint, options = {}, retries = 2) => {
+    let lastError
 
-    if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers: {
+                    ...getApiHeaders(),
+                    ...options.headers
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`)
+            }
+
+            return response.json()
+        } catch (error) {
+            lastError = error
+            console.warn(`[API] Attempt ${attempt + 1} failed for ${endpoint}:`, error.message)
+
+            // Don't retry on last attempt or for client errors (4xx)
+            if (attempt < retries && !error.message.includes('4')) {
+                // Exponential backoff: 500ms, 1000ms
+                await new Promise(r => setTimeout(r, 500 * Math.pow(2, attempt)))
+            }
+        }
     }
 
-    return response.json()
+    // All retries failed - throw for caller to handle
+    throw lastError
+}
+
+/**
+ * Safe API request that returns null on failure instead of throwing (P4.2)
+ * Useful for non-critical data fetching
+ */
+export const safeApiRequest = async (endpoint, options = {}, retries = 1) => {
+    try {
+        return await apiRequest(endpoint, options, retries)
+    } catch (error) {
+        console.warn(`[API] Safe request failed for ${endpoint}:`, error.message)
+        return null
+    }
 }
 
 /**

@@ -978,14 +978,28 @@ export default function App() {
 
   // Fetch daily challenge leaderboard
   // bustCache: add timestamp to bypass service worker cache (used on day reset)
-  const fetchDailyLeaderboard = async (bustCache = false) => {
+  const fetchDailyLeaderboard = async (bustCache = false, showTopRankCelebration = false) => {
     try {
       const cacheParam = bustCache ? `&_t=${Date.now()}` : ''
       const res = await fetch(`${API_BASE}/leaderboard/today?userId=${encodeURIComponent(userId)}${cacheParam}`, { headers: getApiHeaders() })
       const data = await res.json()
       if (data.success) {
         setDailyLeaderboard(data.leaderboard || [])
-        if (data.userRank) setUserDailyRank(data.userRank)
+        if (data.userRank) {
+          const oldRank = userDailyRank
+          setUserDailyRank(data.userRank)
+
+          // P4.3: Celebrate when user enters Top 10 (new or improved rank)
+          if (showTopRankCelebration && data.userRank <= 10) {
+            const isNewEntry = !oldRank || data.userRank < oldRank
+            if (isNewEntry) {
+              setToastMessage(`🏆 You're #${data.userRank} on today's leaderboard!`)
+              setShowToast(true)
+              playSound('success')
+              vibrate([50, 30, 100])
+            }
+          }
+        }
       }
     } catch (e) {
       console.error('Failed to fetch daily leaderboard:', e)
@@ -1980,6 +1994,9 @@ export default function App() {
         isWeeklyChallenge: isProEventSubmission,
         isFashionShow: Boolean(activeFashionShow?.id)
       })
+
+      // P4.3: Check if user made the daily leaderboard top 10 (celebrate!)
+      fetchDailyLeaderboard(true, true)
 
       // Refresh event status if user participated in event mode
       if (eventMode && currentEvent) {
