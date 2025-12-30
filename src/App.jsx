@@ -20,7 +20,8 @@ import {
   trackPaywallView,
   trackDailyChallengeJoin,
   trackWeeklyChallengeJoin,
-  trackScanError
+  trackScanError,
+  trackVisitSource
 } from './utils/analytics'
 
 // Note: Custom hooks created in src/hooks/ but not yet integrated
@@ -287,6 +288,11 @@ export default function App() {
       setInAppBrowser(detected)
       console.log(`[FitRate] Detected ${detected} in-app browser`)
     }
+  }, [])
+
+  // GA4: Track visit source (UTM params + referrer) on first visit
+  useEffect(() => {
+    trackVisitSource()
   }, [])
 
   // Track last score for "you improved!" messaging

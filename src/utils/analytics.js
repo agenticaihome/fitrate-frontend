@@ -217,3 +217,62 @@ export const trackCameraPermission = (status) => {
         permission_status: status // 'granted', 'denied', 'prompt'
     })
 }
+
+// ============================================
+// TRAFFIC SOURCE TRACKING
+// ============================================
+
+/**
+ * Detect source from referrer URL
+ */
+const detectSourceFromReferrer = (referrer) => {
+    if (!referrer) return 'direct'
+    const r = referrer.toLowerCase()
+    if (r.includes('t.co') || r.includes('twitter.com') || r.includes('x.com')) return 'twitter'
+    if (r.includes('tiktok.com')) return 'tiktok'
+    if (r.includes('instagram.com')) return 'instagram'
+    if (r.includes('facebook.com') || r.includes('fb.com')) return 'facebook'
+    if (r.includes('youtube.com') || r.includes('youtu.be')) return 'youtube'
+    if (r.includes('reddit.com')) return 'reddit'
+    if (r.includes('google.')) return 'google'
+    return 'other'
+}
+
+/**
+ * Track visit source (call on app load)
+ * Captures UTM params and referrer for attribution
+ */
+export const trackVisitSource = () => {
+    // Only track once per session
+    if (sessionStorage.getItem('fitrate_visit_tracked')) return
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const utmSource = urlParams.get('utm_source')
+    const utmMedium = urlParams.get('utm_medium')
+    const utmCampaign = urlParams.get('utm_campaign')
+    const referrer = document.referrer
+
+    // Determine source - prefer UTM, fallback to referrer detection
+    const source = utmSource || detectSourceFromReferrer(referrer)
+    const medium = utmMedium || (referrer ? 'referral' : 'direct')
+
+    // Store in localStorage for later events
+    if (utmSource) localStorage.setItem('fitrate_utm_source', utmSource)
+    if (utmMedium) localStorage.setItem('fitrate_utm_medium', utmMedium)
+    if (utmCampaign) localStorage.setItem('fitrate_utm_campaign', utmCampaign)
+
+    // Fire GA4 event
+    gtag('event', 'visit_source', {
+        traffic_source: source,
+        traffic_medium: medium,
+        campaign: utmCampaign || 'none',
+        referrer_domain: referrer ? new URL(referrer).hostname : 'direct',
+        landing_page: window.location.pathname
+    })
+
+    // Mark as tracked for this session
+    sessionStorage.setItem('fitrate_visit_tracked', 'true')
+
+    console.log('[Analytics] Visit tracked:', { source, medium, campaign: utmCampaign })
+}
+
