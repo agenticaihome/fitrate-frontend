@@ -9,112 +9,217 @@ import { LIMITS } from '../config/constants'
 const ParticleField = lazy(() => import('../components/3d/ParticleField').then(m => ({ default: m.ParticleFieldLight })))
 
 // ============================================
-// FIRST-TIME ONBOARDING MODAL
-// Simple 3-step explainer for new users
+// CINEMATIC ONBOARDING - Premium first impression
 // ============================================
 const OnboardingOverlay = ({ onComplete }) => {
     const [step, setStep] = useState(0)
+    const [isExiting, setIsExiting] = useState(false)
 
     const steps = [
         {
             emoji: '📸',
             title: 'Snap Your Outfit',
-            desc: 'Take a photo of what you\'re wearing'
+            desc: 'Take a photo of what you\'re wearing',
+            color: '#00d4ff',
+            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(0,212,255,0.3) 0%, transparent 60%)'
         },
         {
             emoji: '🤖',
             title: 'AI Rates Your Style',
-            desc: 'Get a score from 1-100 with honest feedback'
+            desc: 'Get a score from 1-100 with honest feedback',
+            color: '#8b5cf6',
+            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(139,92,246,0.3) 0%, transparent 60%)'
         },
         {
             emoji: '🔥',
             title: 'Level Up Your Look',
-            desc: 'Get tips to improve & compete with friends'
+            desc: 'Get tips to improve & compete with friends',
+            color: '#ff6b35',
+            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(255,107,53,0.3) 0%, transparent 60%)'
         }
     ]
 
     const handleNext = () => {
         playSound('click')
-        vibrate(15)
+        vibrate([15, 10, 25])
         if (step < steps.length - 1) {
             setStep(step + 1)
         } else {
-            localStorage.setItem('fitrate_onboarded', 'true')
-            onComplete()
+            setIsExiting(true)
+            setTimeout(() => {
+                localStorage.setItem('fitrate_onboarded', 'true')
+                onComplete()
+            }, 500)
         }
     }
 
+    const currentStep = steps[step]
+
     return (
-        <div
+        <motion.div
             className="fixed inset-0 z-[100] flex items-center justify-center p-6"
             style={{
-                background: 'rgba(0,0,0,0.9)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)'
+                background: 'rgba(0,0,0,0.95)',
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)'
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isExiting ? 0 : 1 }}
+            transition={{ duration: 0.5 }}
         >
-            <div className="w-full max-w-sm text-center">
-                {/* Progress dots */}
-                <div className="flex justify-center gap-2 mb-8">
-                    {steps.map((_, i) => (
-                        <div
+            {/* Animated background glow */}
+            <motion.div
+                className="absolute inset-0 pointer-events-none"
+                style={{ background: currentStep.bgGradient }}
+                key={step}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+            />
+
+            {/* Floating particles */}
+            {Array.from({ length: 20 }).map((_, i) => (
+                <motion.div
+                    key={i}
+                    className="absolute w-1 h-1 rounded-full"
+                    style={{
+                        background: currentStep.color,
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        boxShadow: `0 0 10px ${currentStep.color}`
+                    }}
+                    animate={{
+                        y: [0, -30, 0],
+                        opacity: [0.2, 0.6, 0.2],
+                        scale: [1, 1.5, 1]
+                    }}
+                    transition={{
+                        duration: 3 + Math.random() * 2,
+                        repeat: Infinity,
+                        delay: Math.random() * 2
+                    }}
+                />
+            ))}
+
+            <div className="w-full max-w-sm text-center relative z-10">
+                {/* Progress bar */}
+                <div className="flex justify-center gap-3 mb-10">
+                    {steps.map((s, i) => (
+                        <motion.div
                             key={i}
-                            className="w-2 h-2 rounded-full transition-all duration-300"
+                            className="h-1 rounded-full"
                             style={{
-                                background: i === step ? '#00d4ff' : 'rgba(255,255,255,0.2)',
-                                transform: i === step ? 'scale(1.3)' : 'scale(1)'
+                                width: i === step ? 40 : 20,
+                                background: i <= step ? currentStep.color : 'rgba(255,255,255,0.2)'
                             }}
+                            animate={{
+                                width: i === step ? 40 : 20,
+                                boxShadow: i === step ? `0 0 10px ${currentStep.color}` : 'none'
+                            }}
+                            transition={{ duration: 0.3 }}
                         />
                     ))}
                 </div>
 
-                {/* Step content */}
-                <div
-                    key={step}
-                    className="animate-fade-in"
-                    style={{ animation: 'fadeSlideUp 0.4s ease-out' }}
-                >
-                    <span className="text-7xl block mb-6">{steps[step].emoji}</span>
-                    <h2 className="text-white text-2xl font-bold mb-3">
-                        {steps[step].title}
-                    </h2>
-                    <p className="text-white/60 text-lg mb-8">
-                        {steps[step].desc}
-                    </p>
-                </div>
+                {/* Step content with AnimatePresence */}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={step}
+                        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -30, scale: 0.9 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    >
+                        {/* Emoji with 3D effect */}
+                        <motion.div
+                            className="text-8xl mb-6 inline-block"
+                            style={{
+                                filter: `drop-shadow(0 0 40px ${currentStep.color})`
+                            }}
+                            animate={{
+                                y: [0, -10, 0],
+                                rotateY: [0, 10, 0, -10, 0]
+                            }}
+                            transition={{
+                                duration: 4,
+                                repeat: Infinity,
+                                ease: 'easeInOut'
+                            }}
+                        >
+                            {currentStep.emoji}
+                        </motion.div>
 
-                {/* CTA Button */}
-                <button
+                        {/* Title with gradient */}
+                        <motion.h2
+                            className="text-3xl font-black mb-3"
+                            style={{
+                                background: `linear-gradient(135deg, #fff 0%, ${currentStep.color} 100%)`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                textShadow: 'none'
+                            }}
+                        >
+                            {currentStep.title}
+                        </motion.h2>
+
+                        <p className="text-white/60 text-lg mb-10">
+                            {currentStep.desc}
+                        </p>
+                    </motion.div>
+                </AnimatePresence>
+
+                {/* Premium CTA Button */}
+                <motion.button
                     onClick={handleNext}
-                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98]"
+                    className="w-full py-4 rounded-2xl font-bold text-lg relative overflow-hidden"
                     style={{
-                        background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
-                        color: '#000',
-                        boxShadow: '0 4px 20px rgba(0,212,255,0.4)'
+                        background: `linear-gradient(135deg, ${currentStep.color} 0%, ${currentStep.color}cc 100%)`,
+                        color: '#fff',
+                        boxShadow: `0 8px 30px ${currentStep.color}50, 0 0 60px ${currentStep.color}20`
                     }}
+                    whileHover={{ scale: 1.02, boxShadow: `0 12px 40px ${currentStep.color}60, 0 0 80px ${currentStep.color}30` }}
+                    whileTap={{ scale: 0.98 }}
                 >
-                    {step < steps.length - 1 ? 'Next' : 'Let\'s Go! 🚀'}
-                </button>
+                    {/* Shimmer effect */}
+                    <motion.div
+                        className="absolute inset-0"
+                        style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)'
+                        }}
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                    />
+                    <span className="relative z-10">
+                        {step < steps.length - 1 ? 'Continue' : 'Let\'s Go! 🚀'}
+                    </span>
+                </motion.button>
+
+                {/* Step indicator */}
+                <motion.p
+                    className="mt-4 text-white/30 text-sm"
+                    animate={{ opacity: [0.3, 0.5, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                >
+                    {step + 1} of {steps.length}
+                </motion.p>
 
                 {/* Skip option */}
-                <button
+                <motion.button
                     onClick={() => {
-                        localStorage.setItem('fitrate_onboarded', 'true')
-                        onComplete()
+                        setIsExiting(true)
+                        setTimeout(() => {
+                            localStorage.setItem('fitrate_onboarded', 'true')
+                            onComplete()
+                        }, 300)
                     }}
-                    className="mt-4 text-white/40 text-sm"
+                    className="mt-2 text-white/30 text-sm hover:text-white/50 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                 >
                     Skip intro
-                </button>
+                </motion.button>
             </div>
-
-            <style>{`
-                @keyframes fadeSlideUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-            `}</style>
-        </div>
+        </motion.div>
     )
 }
 
