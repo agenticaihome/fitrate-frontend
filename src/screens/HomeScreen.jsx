@@ -1160,186 +1160,314 @@ export default function HomeScreen({
                         )}
 
                         {/* ============================================ */}
-                        {/* PREMIUM 3D MAIN BUTTON */}
+                        {/* 🌊 LIVING LIQUID ORB - Next Level UI */}
                         {/* ============================================ */}
-                        <div className="relative mb-6">
-                            {/* Outer pulsing rings - 3 layers */}
-                            {[1, 2, 3].map((ring) => (
-                                <motion.div
-                                    key={ring}
-                                    className="absolute inset-0 rounded-full pointer-events-none"
+                        <div className="relative mb-8" style={{ perspective: '1000px' }}>
+                            {/* SVG Filters for liquid/gooey effect */}
+                            <svg className="absolute w-0 h-0">
+                                <defs>
+                                    <filter id="goo">
+                                        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
+                                        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                                    </filter>
+                                    <filter id="liquid-distort">
+                                        <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" seed="1">
+                                            <animate attributeName="baseFrequency" values="0.01;0.015;0.01" dur="10s" repeatCount="indefinite" />
+                                        </feTurbulence>
+                                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+                                    </filter>
+                                    {/* Holographic gradient */}
+                                    <linearGradient id="holographic" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stopColor="#ff00ff">
+                                            <animate attributeName="stop-color" values="#ff00ff;#00ffff;#ffff00;#ff00ff" dur="4s" repeatCount="indefinite" />
+                                        </stop>
+                                        <stop offset="50%" stopColor="#00ffff">
+                                            <animate attributeName="stop-color" values="#00ffff;#ffff00;#ff00ff;#00ffff" dur="4s" repeatCount="indefinite" />
+                                        </stop>
+                                        <stop offset="100%" stopColor="#ffff00">
+                                            <animate attributeName="stop-color" values="#ffff00;#ff00ff;#00ffff;#ffff00" dur="4s" repeatCount="indefinite" />
+                                        </stop>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+
+                            {/* Aurora background waves */}
+                            <div className="absolute -inset-20 pointer-events-none overflow-hidden">
+                                {[...Array(3)].map((_, i) => (
+                                    <motion.div
+                                        key={`aurora-${i}`}
+                                        className="absolute w-[400px] h-[200px] rounded-full opacity-30"
+                                        style={{
+                                            background: `linear-gradient(${90 + i * 60}deg, ${currentMode.color}00 0%, ${currentMode.color}40 50%, ${currentMode.color}00 100%)`,
+                                            filter: 'blur(40px)',
+                                            left: '50%',
+                                            top: '50%',
+                                            marginLeft: -200,
+                                            marginTop: -100
+                                        }}
+                                        animate={{
+                                            rotate: [0 + i * 120, 360 + i * 120],
+                                            scale: [1, 1.2, 1]
+                                        }}
+                                        transition={{
+                                            rotate: { duration: 20 + i * 5, repeat: Infinity, ease: 'linear' },
+                                            scale: { duration: 8, repeat: Infinity, ease: 'easeInOut', delay: i * 2 }
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Magnetic floating particles */}
+                            <div className="absolute inset-0 pointer-events-none" style={{ filter: 'url(#goo)' }}>
+                                {[...Array(12)].map((_, i) => {
+                                    const angle = (i / 12) * Math.PI * 2
+                                    const radius = 120 + (i % 3) * 20
+                                    return (
+                                        <motion.div
+                                            key={`particle-${i}`}
+                                            className="absolute rounded-full"
+                                            style={{
+                                                width: 8 + (i % 4) * 4,
+                                                height: 8 + (i % 4) * 4,
+                                                background: i % 3 === 0
+                                                    ? currentMode.color
+                                                    : i % 3 === 1
+                                                        ? '#fff'
+                                                        : `${currentMode.color}88`,
+                                                boxShadow: `0 0 ${10 + i * 2}px ${currentMode.color}`,
+                                                left: '50%',
+                                                top: '50%'
+                                            }}
+                                            animate={{
+                                                x: [
+                                                    Math.cos(angle) * radius,
+                                                    Math.cos(angle + 0.5) * (radius - 30),
+                                                    Math.cos(angle + 1) * radius,
+                                                    Math.cos(angle + 1.5) * (radius + 20),
+                                                    Math.cos(angle + 2) * radius
+                                                ],
+                                                y: [
+                                                    Math.sin(angle) * radius,
+                                                    Math.sin(angle + 0.5) * (radius - 30),
+                                                    Math.sin(angle + 1) * radius,
+                                                    Math.sin(angle + 1.5) * (radius + 20),
+                                                    Math.sin(angle + 2) * radius
+                                                ],
+                                                scale: [1, 1.5, 1, 0.8, 1],
+                                                opacity: [0.6, 1, 0.6, 0.9, 0.6]
+                                            }}
+                                            transition={{
+                                                duration: 6 + i * 0.5,
+                                                repeat: Infinity,
+                                                ease: 'easeInOut',
+                                                delay: i * 0.3
+                                            }}
+                                        />
+                                    )
+                                })}
+                            </div>
+
+                            {/* Main liquid orb button */}
+                            <motion.button
+                                onClick={handleStart}
+                                aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
+                                className="relative w-64 h-64 flex flex-col items-center justify-center"
+                                style={{ transformStyle: 'preserve-3d' }}
+                                whileTap={{
+                                    scale: 0.92,
+                                    rotateX: 10,
+                                    transition: { type: 'spring', stiffness: 500, damping: 15 }
+                                }}
+                                animate={{
+                                    y: [0, -12, 0],
+                                    rotateX: [0, 2, 0, -2, 0],
+                                    rotateY: [0, 2, 0, -2, 0]
+                                }}
+                                transition={{
+                                    y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+                                    rotateX: { duration: 6, repeat: Infinity, ease: 'easeInOut' },
+                                    rotateY: { duration: 8, repeat: Infinity, ease: 'easeInOut' }
+                                }}
+                            >
+                                {/* Deep ambient shadow */}
+                                <div
+                                    className="absolute w-48 h-12 rounded-[50%] left-1/2 -translate-x-1/2"
                                     style={{
-                                        border: `2px solid ${dailyChallengeMode ? 'rgba(59,130,246,0.4)' : eventMode ? 'rgba(16,185,129,0.4)' : currentMode.color}`,
-                                        opacity: 0
-                                    }}
-                                    animate={{
-                                        scale: [1, 1.3 + ring * 0.15],
-                                        opacity: [0.6, 0]
-                                    }}
-                                    transition={{
-                                        duration: 2.5,
-                                        repeat: Infinity,
-                                        delay: ring * 0.5,
-                                        ease: 'easeOut'
+                                        bottom: -20,
+                                        background: 'radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%)',
+                                        filter: 'blur(15px)',
+                                        transform: 'translateX(-50%) translateZ(-50px)'
                                     }}
                                 />
-                            ))}
 
-                            {/* Orbiting particles */}
-                            {[...Array(8)].map((_, i) => (
+                                {/* Outer glow aura */}
                                 <motion.div
-                                    key={i}
-                                    className="absolute w-2 h-2 rounded-full pointer-events-none"
+                                    className="absolute inset-[-20px] rounded-full"
                                     style={{
-                                        background: i % 2 === 0
-                                            ? (dailyChallengeMode ? '#3b82f6' : eventMode ? '#10b981' : currentMode.color)
-                                            : '#fff',
-                                        boxShadow: `0 0 10px ${dailyChallengeMode ? '#3b82f6' : eventMode ? '#10b981' : currentMode.color}`,
-                                        left: '50%',
-                                        top: '50%',
-                                        marginLeft: -4,
-                                        marginTop: -4
+                                        background: `radial-gradient(circle, ${currentMode.color}30 0%, ${currentMode.color}10 40%, transparent 70%)`,
+                                        filter: 'blur(20px)'
                                     }}
                                     animate={{
-                                        x: [
-                                            Math.cos((i / 8) * Math.PI * 2) * 145,
-                                            Math.cos((i / 8) * Math.PI * 2 + Math.PI * 2) * 145
-                                        ],
-                                        y: [
-                                            Math.sin((i / 8) * Math.PI * 2) * 145,
-                                            Math.sin((i / 8) * Math.PI * 2 + Math.PI * 2) * 145
-                                        ],
-                                        scale: [1, 1.5, 1],
-                                        opacity: [0.4, 1, 0.4]
+                                        scale: [1, 1.15, 1],
+                                        opacity: [0.5, 0.8, 0.5]
+                                    }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                                />
+
+                                {/* Morphing liquid blob - outer layer */}
+                                <motion.div
+                                    className="absolute inset-0"
+                                    style={{
+                                        background: `
+                                            radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                                            radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.3) 0%, transparent 50%),
+                                            linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}dd 50%, ${currentMode.color}aa 100%)
+                                        `,
+                                        boxShadow: `
+                                            inset 0 -20px 40px rgba(0,0,0,0.4),
+                                            inset 0 20px 40px rgba(255,255,255,0.2),
+                                            0 0 80px ${currentMode.color}60,
+                                            0 20px 60px rgba(0,0,0,0.4)
+                                        `,
+                                        transformStyle: 'preserve-3d'
+                                    }}
+                                    animate={{
+                                        borderRadius: [
+                                            '60% 40% 50% 50% / 50% 50% 40% 60%',
+                                            '50% 60% 40% 50% / 40% 60% 50% 50%',
+                                            '40% 50% 60% 50% / 50% 40% 60% 50%',
+                                            '50% 40% 50% 60% / 60% 50% 40% 50%',
+                                            '60% 40% 50% 50% / 50% 50% 40% 60%'
+                                        ]
                                     }}
                                     transition={{
                                         duration: 8,
                                         repeat: Infinity,
-                                        ease: 'linear',
-                                        delay: i * 0.2
-                                    }}
-                                />
-                            ))}
-
-                            {/* Main button with 3D depth */}
-                            <motion.button
-                                onClick={handleStart}
-                                aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
-                                className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
-                                style={{
-                                    background: 'transparent',
-                                    perspective: '1000px'
-                                }}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                animate={{
-                                    y: [0, -8, 0]
-                                }}
-                                transition={{
-                                    y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-                                    scale: { type: 'spring', stiffness: 400, damping: 17 }
-                                }}
-                            >
-                                {/* Deep shadow layer */}
-                                <div
-                                    className="absolute inset-2 rounded-full"
-                                    style={{
-                                        background: 'rgba(0,0,0,0.5)',
-                                        filter: 'blur(20px)',
-                                        transform: 'translateY(15px) scale(0.9)'
+                                        ease: 'easeInOut'
                                     }}
                                 />
 
-                                {/* Outer glow */}
+                                {/* Inner liquid layer with holographic sheen */}
                                 <motion.div
-                                    className="absolute inset-0 rounded-full"
+                                    className="absolute inset-3 overflow-hidden"
                                     style={{
-                                        background: dailyChallengeMode
-                                            ? 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)'
-                                            : eventMode
-                                                ? 'radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%)'
-                                                : `radial-gradient(circle, ${currentMode.color}40 0%, transparent 70%)`,
-                                        filter: 'blur(20px)'
+                                        background: `
+                                            radial-gradient(ellipse at 25% 25%, rgba(255,255,255,0.4) 0%, transparent 40%),
+                                            linear-gradient(180deg, ${currentMode.color} 0%, ${currentMode.color}cc 60%, ${currentMode.color}88 100%)
+                                        `,
+                                        boxShadow: 'inset 0 -15px 50px rgba(0,0,0,0.5), inset 0 15px 30px rgba(255,255,255,0.2)'
                                     }}
                                     animate={{
-                                        scale: [1, 1.1, 1],
-                                        opacity: [0.5, 0.8, 0.5]
+                                        borderRadius: [
+                                            '50% 60% 40% 50% / 60% 40% 50% 50%',
+                                            '60% 40% 50% 50% / 50% 50% 60% 40%',
+                                            '40% 50% 60% 50% / 40% 60% 40% 60%',
+                                            '50% 60% 50% 40% / 50% 40% 50% 60%',
+                                            '50% 60% 40% 50% / 60% 40% 50% 50%'
+                                        ]
                                     }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                />
-
-                                {/* Main 3D sphere - outer ring */}
-                                <div
-                                    className="absolute inset-0 rounded-full"
-                                    style={{
-                                        background: dailyChallengeMode
-                                            ? 'linear-gradient(145deg, #4f8df7 0%, #2563eb 50%, #1d4ed8 100%)'
-                                            : eventMode
-                                                ? 'linear-gradient(145deg, #34d399 0%, #10b981 50%, #059669 100%)'
-                                                : `linear-gradient(145deg, ${currentMode.color} 0%, ${currentMode.color}dd 50%, ${currentMode.color}aa 100%)`,
-                                        boxShadow: dailyChallengeMode
-                                            ? 'inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px rgba(59,130,246,0.5), 0 20px 40px rgba(0,0,0,0.3)'
-                                            : eventMode
-                                                ? 'inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px rgba(16,185,129,0.5), 0 20px 40px rgba(0,0,0,0.3)'
-                                                : `inset 0 -8px 30px rgba(0,0,0,0.4), inset 0 8px 30px rgba(255,255,255,0.1), 0 0 60px ${currentMode.glow}, 0 20px 40px rgba(0,0,0,0.3)`,
-                                        border: dailyChallengeMode
-                                            ? '3px solid rgba(147,197,253,0.5)'
-                                            : eventMode
-                                                ? '3px solid rgba(167,243,208,0.5)'
-                                                : `3px solid ${currentMode.color}80`
-                                    }}
-                                />
-
-                                {/* Inner sphere with depth */}
-                                <div
-                                    className="absolute inset-4 rounded-full overflow-hidden"
-                                    style={{
-                                        background: dailyChallengeMode
-                                            ? 'linear-gradient(180deg, #60a5fa 0%, #3b82f6 40%, #1d4ed8 100%)'
-                                            : eventMode
-                                                ? 'linear-gradient(180deg, #6ee7b7 0%, #10b981 40%, #047857 100%)'
-                                                : `linear-gradient(180deg, ${currentMode.color} 0%, ${currentMode.color}cc 40%, ${currentMode.color}88 100%)`,
-                                        boxShadow: 'inset 0 -15px 40px rgba(0,0,0,0.4), inset 0 10px 30px rgba(255,255,255,0.15)'
+                                    transition={{
+                                        duration: 8,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                        delay: 0.5
                                     }}
                                 >
-                                    {/* Glass reflection highlight */}
-                                    <div
-                                        className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/3 rounded-full"
+                                    {/* Holographic rainbow sweep */}
+                                    <motion.div
+                                        className="absolute inset-0 opacity-30"
                                         style={{
-                                            background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
-                                            filter: 'blur(2px)'
+                                            background: 'linear-gradient(135deg, #ff006620 0%, #00ffff20 25%, #ffff0020 50%, #ff00ff20 75%, #00ff0020 100%)',
+                                            backgroundSize: '400% 400%'
+                                        }}
+                                        animate={{
+                                            backgroundPosition: ['0% 0%', '100% 100%', '0% 0%']
+                                        }}
+                                        transition={{
+                                            duration: 6,
+                                            repeat: Infinity,
+                                            ease: 'linear'
                                         }}
                                     />
 
-                                    {/* Shimmer sweep effect */}
+                                    {/* Liquid surface reflection */}
                                     <motion.div
-                                        className="absolute inset-0"
+                                        className="absolute top-0 left-0 right-0 h-1/2"
                                         style={{
-                                            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)'
+                                            background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 30%, transparent 100%)',
+                                            borderRadius: '50% 50% 40% 40% / 100% 100% 0% 0%',
+                                            filter: 'blur(1px)'
                                         }}
                                         animate={{
-                                            x: ['-150%', '150%']
+                                            opacity: [0.6, 0.8, 0.6],
+                                            scaleX: [1, 1.02, 1]
                                         }}
                                         transition={{
                                             duration: 3,
                                             repeat: Infinity,
-                                            repeatDelay: 2,
                                             ease: 'easeInOut'
                                         }}
                                     />
-                                </div>
+
+                                    {/* Moving light caustic */}
+                                    <motion.div
+                                        className="absolute w-full h-full"
+                                        style={{
+                                            background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.4) 0%, transparent 50%)'
+                                        }}
+                                        animate={{
+                                            x: [-30, 30, -30],
+                                            y: [-20, 20, -20],
+                                            opacity: [0.3, 0.6, 0.3]
+                                        }}
+                                        transition={{
+                                            duration: 5,
+                                            repeat: Infinity,
+                                            ease: 'easeInOut'
+                                        }}
+                                    />
+                                </motion.div>
+
+                                {/* Floating inner bubble accents */}
+                                {[...Array(5)].map((_, i) => (
+                                    <motion.div
+                                        key={`bubble-${i}`}
+                                        className="absolute rounded-full pointer-events-none"
+                                        style={{
+                                            width: 6 + i * 3,
+                                            height: 6 + i * 3,
+                                            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2))',
+                                            left: 60 + i * 25,
+                                            top: 80 + (i % 3) * 30
+                                        }}
+                                        animate={{
+                                            y: [0, -15, 0],
+                                            x: [0, i % 2 ? 8 : -8, 0],
+                                            opacity: [0.4, 0.8, 0.4],
+                                            scale: [1, 1.2, 1]
+                                        }}
+                                        transition={{
+                                            duration: 3 + i,
+                                            repeat: Infinity,
+                                            ease: 'easeInOut',
+                                            delay: i * 0.5
+                                        }}
+                                    />
+                                ))}
 
                                 {/* Center content */}
                                 <div className="relative z-10 flex flex-col items-center">
-                                    {/* Animated icon */}
-                                    <motion.span
+                                    {/* Animated emoji with float */}
+                                    <motion.div
                                         className="text-5xl mb-2"
                                         style={{
-                                            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                                            filter: 'drop-shadow(0 4px 15px rgba(0,0,0,0.4))'
                                         }}
                                         animate={{
-                                            scale: [1, 1.1, 1],
-                                            rotate: [0, 5, -5, 0]
+                                            y: [0, -5, 0],
+                                            scale: [1, 1.08, 1],
+                                            rotate: [0, 3, -3, 0]
                                         }}
                                         transition={{
                                             duration: 3,
@@ -1348,34 +1476,40 @@ export default function HomeScreen({
                                         }}
                                     >
                                         {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
-                                    </motion.span>
+                                    </motion.div>
 
-                                    {/* Main text with shadow */}
-                                    <span
+                                    {/* Main text */}
+                                    <motion.span
                                         className="text-white font-black text-xl tracking-wide text-center px-4"
                                         style={{
-                                            textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.2)'
+                                            textShadow: '0 2px 15px rgba(0,0,0,0.6), 0 0 40px rgba(255,255,255,0.3)'
                                         }}
+                                        animate={{
+                                            textShadow: [
+                                                '0 2px 15px rgba(0,0,0,0.6), 0 0 40px rgba(255,255,255,0.3)',
+                                                '0 2px 20px rgba(0,0,0,0.5), 0 0 60px rgba(255,255,255,0.4)',
+                                                '0 2px 15px rgba(0,0,0,0.6), 0 0 40px rgba(255,255,255,0.3)'
+                                            ]
+                                        }}
+                                        transition={{ duration: 2, repeat: Infinity }}
                                     >
                                         {dailyChallengeMode
                                             ? 'DAILY CHALLENGE'
                                             : eventMode
                                                 ? 'WEEKLY CHALLENGE'
                                                 : 'RATE MY FIT'}
-                                    </span>
+                                    </motion.span>
 
-                                    {/* Mode indicator with glow */}
+                                    {/* Mode pill with glass effect */}
                                     <motion.span
-                                        className="text-white/90 text-sm font-semibold mt-1 px-3 py-1 rounded-full"
+                                        className="text-white/95 text-sm font-bold mt-2 px-4 py-1.5 rounded-full"
                                         style={{
-                                            background: 'rgba(255,255,255,0.15)',
-                                            backdropFilter: 'blur(4px)',
-                                            textShadow: '0 1px 4px rgba(0,0,0,0.3)'
+                                            background: 'rgba(255,255,255,0.2)',
+                                            backdropFilter: 'blur(8px)',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)',
+                                            border: '1px solid rgba(255,255,255,0.2)'
                                         }}
-                                        animate={{
-                                            opacity: [0.8, 1, 0.8]
-                                        }}
-                                        transition={{ duration: 2, repeat: Infinity }}
+                                        whileHover={{ scale: 1.05 }}
                                     >
                                         {dailyChallengeMode
                                             ? `${getDailyMode().emoji} ${getDailyMode().label}`
@@ -1385,23 +1519,32 @@ export default function HomeScreen({
                                     </motion.span>
                                 </div>
 
-                                {/* Bottom highlight reflection */}
-                                <div
-                                    className="absolute bottom-4 left-1/2 -translate-x-1/2 w-1/2 h-8 rounded-full"
+                                {/* Bottom reflection on "surface" */}
+                                <motion.div
+                                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-32 h-8"
                                     style={{
-                                        background: 'linear-gradient(0deg, rgba(255,255,255,0.08) 0%, transparent 100%)',
-                                        filter: 'blur(4px)'
+                                        background: `radial-gradient(ellipse, ${currentMode.color}40 0%, transparent 70%)`,
+                                        filter: 'blur(8px)',
+                                        transform: 'translateX(-50%) scaleY(0.3)'
                                     }}
+                                    animate={{
+                                        opacity: [0.4, 0.6, 0.4],
+                                        scaleX: [1, 1.1, 1]
+                                    }}
+                                    transition={{ duration: 3, repeat: Infinity }}
                                 />
                             </motion.button>
 
-                            {/* Tap hint */}
+                            {/* Subtle interaction hint */}
                             <motion.p
-                                className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-medium whitespace-nowrap"
-                                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                                transition={{ duration: 2, repeat: Infinity }}
+                                className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-white/30 text-xs font-medium tracking-wider whitespace-nowrap"
+                                animate={{
+                                    opacity: [0.2, 0.4, 0.2],
+                                    y: [0, -2, 0]
+                                }}
+                                transition={{ duration: 3, repeat: Infinity }}
                             >
-                                tap to start
+                                ✦ tap to begin ✦
                             </motion.p>
                         </div>
 
