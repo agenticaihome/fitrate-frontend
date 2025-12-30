@@ -444,12 +444,31 @@ export default function ResultsScreen({
     const [revealStage, setRevealStage] = useState(0)
     const [displayedScore, setDisplayedScore] = useState(0)
     const [animationComplete, setAnimationComplete] = useState(false)
+    const [showStickyShare, setShowStickyShare] = useState(false)
 
     // Track if component is mounted to prevent state updates after unmount
     const isMounted = useRef(true)
     useEffect(() => {
         return () => { isMounted.current = false }
     }, [])
+
+    // ===== STICKY SHARE CTA: Show for 12 seconds after animation completes =====
+    useEffect(() => {
+        if (animationComplete && !pendingBattleId) {
+            // Show sticky share prompt after a short delay
+            const showTimeout = setTimeout(() => {
+                if (isMounted.current) setShowStickyShare(true)
+            }, 500)
+            // Hide after 12 seconds
+            const hideTimeout = setTimeout(() => {
+                if (isMounted.current) setShowStickyShare(false)
+            }, 12500)
+            return () => {
+                clearTimeout(showTimeout)
+                clearTimeout(hideTimeout)
+            }
+        }
+    }, [animationComplete, pendingBattleId])
 
     // ===== CARD DNA: Extract DNA-driven styling =====
     const dnaStyleTokens = cardDNA?.styleTokens || {}
@@ -1121,72 +1140,56 @@ export default function ResultsScreen({
                     }
                 </p>
 
-                {/* ===== AESTHETIC & CELEB MATCH BADGES ===== */}
-                <div className={`flex flex-wrap items-center justify-center gap-2 mt-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                    {/* Aesthetic Badge */}
-                    {scores.aesthetic && (
-                        <div
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                            style={{
-                                background: 'rgba(255,255,255,0.06)',
-                                border: '1px solid rgba(255,255,255,0.12)',
-                            }}
-                        >
-                            <span className="text-sm">✨</span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">
-                                {scores.aesthetic}
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Celeb Match Badge */}
-                    {scores.celebMatch && (
-                        <div
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,0,128,0.08) 100%)',
-                                border: '1px solid rgba(255,107,53,0.2)',
-                            }}
-                        >
-                            <span className="text-sm">🌟</span>
-                            <span className="text-[10px] font-bold text-white/60">Vibes like</span>
-                            <span className="text-[10px] font-black text-orange-400">
-                                {scores.celebMatch}
-                            </span>
-                        </div>
-                    )}
-                </div>
             </div>
 
-            {/* ===== SIMPLIFIED VERDICT SECTION (Golden Result Card style) ===== */}
+            {/* ===== HERO VERDICT SECTION - The screenshottable moment ===== */}
             <div className={`w-full max-w-sm px-4 mb-4 text-center transition-all duration-700 ${revealStage >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-                {/* Verdict Headline - BIGGER, HEAVIER (matches share card 38px) */}
+                {/* VERDICT HEADLINE - THE HERO (massively increased) */}
                 <h2
-                    className={`text-[38px] leading-tight mb-2 ${isLegendary ? 'legendary-text' : 'text-white'}`}
-                    style={{ fontWeight: 800 }}
+                    className={`text-5xl sm:text-[54px] leading-[1.1] mb-4 ${isLegendary ? 'legendary-text' : 'text-white'}`}
+                    style={{
+                        fontWeight: 900,
+                        textShadow: isLegendary
+                            ? '0 0 40px rgba(255,215,0,0.5)'
+                            : `0 0 30px ${modeColors.glow}`,
+                        letterSpacing: '-0.02em'
+                    }}
                 >
                     {scores.verdict}
                 </h2>
 
-                {/* Vibe Tag Line (Aesthetic · Celeb Reference) */}
-                <p className="text-sm text-white/55 italic mb-4">
-                    {scores.aesthetic && scores.celebMatch
-                        ? `${scores.aesthetic} · ${scores.celebMatch}`
-                        : scores.aesthetic
-                            ? `${scores.aesthetic} Aesthetic`
-                            : scores.celebMatch
-                                ? `Vibes like ${scores.celebMatch}`
-                                : socialProof.msg}
+                {/* Mode-specific social proof message */}
+                <p
+                    className="text-lg font-bold mb-3"
+                    style={{ color: socialProof.color }}
+                >
+                    {socialProof.msg}
                 </p>
 
                 {/* AI Tagline Quote */}
                 <p
-                    className="text-base font-medium mb-5"
-                    style={{ color: modeColors.accent }}
+                    className="text-base mb-5 italic"
+                    style={{ color: 'rgba(255,255,255,0.6)' }}
                 >
                     "{scores.tagline}"
                 </p>
+
+                {/* Vibe Context (Aesthetic + Celeb) - now smaller, supporting */}
+                {(scores.aesthetic || scores.celebMatch) && (
+                    <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                        {scores.aesthetic && (
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/60">
+                                ✨ {scores.aesthetic}
+                            </span>
+                        )}
+                        {scores.celebMatch && (
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold text-orange-400/80" style={{ background: 'rgba(255,107,53,0.1)', border: '1px solid rgba(255,107,53,0.2)' }}>
+                                🌟 Vibes like {scores.celebMatch}
+                            </span>
+                        )}
+                    </div>
+                )}
 
                 {/* 3-Pill Micro Scores (inline like share card) */}
                 <div className="flex justify-center gap-2 mb-4">
@@ -1700,6 +1703,35 @@ export default function ResultsScreen({
             <div className="h-4" />
 
             <Footer className="opacity-30 pt-6 pb-4" />
+
+            {/* ===== STICKY SHARE CTA - Floats at bottom for 12 seconds ===== */}
+            {showStickyShare && (
+                <div
+                    className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50"
+                    style={{
+                        animation: 'fadeInUp 0.4s ease-out, pulse 2s ease-in-out infinite'
+                    }}
+                >
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(30)
+                            setShowStickyShare(false) // Hide after clicking
+                            onGenerateShareCard()
+                        }}
+                        className="flex items-center gap-2 px-6 py-4 rounded-full font-black text-base transition-all active:scale-95"
+                        style={{
+                            background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                            color: '#000',
+                            boxShadow: '0 8px 32px rgba(0,212,255,0.5), 0 0 60px rgba(0,255,136,0.3)'
+                        }}
+                    >
+                        <span className="text-lg">📲</span>
+                        <span>Share to Story</span>
+                        <span className="text-lg">→</span>
+                    </button>
+                </div>
+            )}
         </div >
     )
 }
