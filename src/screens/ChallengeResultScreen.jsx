@@ -1,81 +1,168 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { playSound, vibrate } from '../utils/soundEffects'
+
+// Lazy load 3D ScoreOrb for legendary scores
+const ScoreOrb = lazy(() => import('../components/3d/ScoreOrb'))
 
 /**
  * ChallengeResultScreen - Shows "Who Won?" after a challenge scan
- * Stunning victory/defeat celebration with animations
+ * Premium 3D celebration with Framer Motion physics
  */
 
-// Confetti piece component
-function ConfettiPiece({ delay, color, left }) {
+// Framer Motion Confetti - Physics-based celebration
+function MotionConfetti({ isActive, colors, count = 70 }) {
+    const confetti = useMemo(() => {
+        if (!isActive) return []
+        return Array.from({ length: count }, (_, i) => ({
+            id: i,
+            x: 50 + (Math.random() - 0.5) * 80,
+            color: colors[i % colors.length],
+            size: 6 + Math.random() * 10,
+            rotation: Math.random() * 360,
+            delay: Math.random() * 0.5,
+            xDrift: (Math.random() - 0.5) * 200,
+            shape: Math.random() > 0.5 ? 'circle' : 'square'
+        }))
+    }, [isActive, colors, count])
+
+    if (!isActive) return null
+
     return (
-        <div
-            className="confetti-piece"
-            style={{
-                left: `${left}%`,
-                animationDelay: `${delay}s`,
-                width: Math.random() > 0.5 ? '10px' : '8px',
-                height: Math.random() > 0.5 ? '10px' : '8px',
-                background: color,
-                borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-                transform: `rotate(${Math.random() * 360}deg)`
-            }}
-        />
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+            {confetti.map(piece => (
+                <motion.div
+                    key={piece.id}
+                    className="absolute"
+                    style={{
+                        left: `${piece.x}%`,
+                        width: piece.size,
+                        height: piece.size,
+                        background: piece.color,
+                        borderRadius: piece.shape === 'circle' ? '50%' : '2px',
+                        boxShadow: `0 0 ${piece.size * 1.5}px ${piece.color}80`
+                    }}
+                    initial={{ top: '-5%', rotate: 0, scale: 1, opacity: 1 }}
+                    animate={{
+                        top: '110%',
+                        x: piece.xDrift,
+                        rotate: piece.rotation + 720,
+                        scale: [1, 1, 0.5],
+                        opacity: [1, 1, 0]
+                    }}
+                    transition={{
+                        duration: 3.5 + Math.random(),
+                        delay: piece.delay,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                />
+            ))}
+        </div>
     )
 }
 
-// Falling ember for loss state
-function FallingEmber({ delay, left, size }) {
+// Falling Embers for loss - Enhanced with motion
+function MotionEmbers({ isActive, count = 30 }) {
+    const embers = useMemo(() => {
+        if (!isActive) return []
+        return Array.from({ length: count }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            size: 3 + Math.random() * 6,
+            delay: Math.random() * 2.5,
+            xDrift: (Math.random() - 0.5) * 80
+        }))
+    }, [isActive, count])
+
+    if (!isActive) return null
+
     return (
-        <div
-            className="absolute pointer-events-none"
-            style={{
-                left: `${left}%`,
-                top: '-10px',
-                width: `${size}px`,
-                height: `${size}px`,
-                background: 'linear-gradient(135deg, #ff4444 0%, #ff8800 100%)',
-                borderRadius: '50%',
-                boxShadow: '0 0 6px 2px rgba(255,68,68,0.6)',
-                animation: `emberFall 3s ease-in forwards`,
-                animationDelay: `${delay}s`,
-                opacity: 0.8
-            }}
-        />
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+            {embers.map(ember => (
+                <motion.div
+                    key={ember.id}
+                    className="absolute rounded-full"
+                    style={{
+                        left: `${ember.left}%`,
+                        width: ember.size,
+                        height: ember.size,
+                        background: 'linear-gradient(135deg, #ff4444 0%, #ff8800 100%)',
+                        boxShadow: '0 0 10px 4px rgba(255,68,68,0.7)'
+                    }}
+                    initial={{ top: '-5%', opacity: 0.9, scale: 1 }}
+                    animate={{
+                        top: '110%',
+                        x: ember.xDrift,
+                        opacity: [0.9, 0.6, 0],
+                        scale: [1, 0.8, 0.4]
+                    }}
+                    transition={{
+                        duration: 3.5 + Math.random(),
+                        delay: ember.delay,
+                        ease: 'easeIn'
+                    }}
+                />
+            ))}
+        </div>
     )
 }
 
-// Floating sparkle particle
-function Sparkle({ style }) {
+// Floating sparkles with motion
+function MotionSparkles({ color, count = 12 }) {
+    const sparkles = useMemo(() => {
+        return Array.from({ length: count }, (_, i) => ({
+            id: i,
+            top: `${15 + Math.random() * 70}%`,
+            left: `${5 + Math.random() * 90}%`,
+            size: 2 + Math.random() * 4,
+            delay: Math.random() * 3
+        }))
+    }, [count])
+
     return (
-        <div
-            className="absolute pointer-events-none"
-            style={{
-                width: '4px',
-                height: '4px',
-                background: 'white',
-                borderRadius: '50%',
-                boxShadow: '0 0 6px 2px rgba(255,255,255,0.8)',
-                animation: 'sparkleFloat 2s ease-in-out infinite',
-                ...style
-            }}
-        />
+        <>
+            {sparkles.map(sparkle => (
+                <motion.div
+                    key={sparkle.id}
+                    className="absolute rounded-full pointer-events-none"
+                    style={{
+                        top: sparkle.top,
+                        left: sparkle.left,
+                        width: sparkle.size,
+                        height: sparkle.size,
+                        background: '#fff',
+                        boxShadow: `0 0 ${sparkle.size * 3}px ${color}`
+                    }}
+                    animate={{
+                        scale: [0, 1.5, 0],
+                        opacity: [0, 1, 0]
+                    }}
+                    transition={{
+                        duration: 2,
+                        delay: sparkle.delay,
+                        repeat: Infinity,
+                        repeatDelay: Math.random() * 2
+                    }}
+                />
+            ))}
+        </>
     )
 }
 
-// Animated score ring SVG
-function ScoreRing({ score, isWinner, color, size = 112 }) {
-    const radius = (size / 2) - 6
+// Animated Score Ring with motion
+function AnimatedScoreRing({ score, isWinner, color, size = 120 }) {
+    const radius = (size / 2) - 8
     const circumference = 2 * Math.PI * radius
-    const progress = score / 100
-    const strokeDashoffset = circumference * (1 - progress)
 
     return (
-        <svg
+        <motion.svg
             width={size}
             height={size}
             className="absolute inset-0 -rotate-90"
-            style={{ filter: isWinner ? `drop-shadow(0 0 15px ${color})` : 'none' }}
+            style={{ filter: isWinner ? `drop-shadow(0 0 20px ${color})` : 'none' }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
         >
             {/* Background ring */}
             <circle
@@ -84,25 +171,58 @@ function ScoreRing({ score, isWinner, color, size = 112 }) {
                 r={radius}
                 fill="none"
                 stroke="rgba(255,255,255,0.1)"
-                strokeWidth="4"
+                strokeWidth="5"
             />
             {/* Progress ring */}
-            <circle
+            <motion.circle
                 cx={size / 2}
                 cy={size / 2}
                 r={radius}
                 fill="none"
                 stroke={color}
-                strokeWidth="4"
+                strokeWidth="5"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
+                initial={{ strokeDashoffset: circumference }}
+                animate={{ strokeDashoffset: circumference * (1 - score / 100) }}
+                transition={{ duration: 1.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                 style={{
-                    transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    filter: isWinner ? `drop-shadow(0 0 8px ${color})` : 'none'
+                    filter: isWinner ? `drop-shadow(0 0 10px ${color})` : 'none'
                 }}
             />
-        </svg>
+        </motion.svg>
+    )
+}
+
+// Pulsing rings effect
+function PulsingRingsEffect({ color, isActive }) {
+    if (!isActive) return null
+
+    return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            {[0, 1, 2].map(i => (
+                <motion.div
+                    key={i}
+                    className="absolute rounded-full border-2"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        borderColor: color
+                    }}
+                    initial={{ scale: 0.8, opacity: 0.6 }}
+                    animate={{
+                        scale: [0.8, 1.4, 2],
+                        opacity: [0.6, 0.3, 0]
+                    }}
+                    transition={{
+                        duration: 2,
+                        delay: i * 0.4,
+                        repeat: Infinity,
+                        ease: 'easeOut'
+                    }}
+                />
+            ))}
+        </div>
     )
 }
 
@@ -113,12 +233,13 @@ export default function ChallengeResultScreen({
     onViewResults,
     onChallengeBack,
     onTryAgain,
-    onSendResultBack  // NEW: callback to share result back to challenger
+    onSendResultBack
 }) {
     const won = userScore > challengeScore
     const tied = userScore === challengeScore
     const lost = !won && !tied
     const diff = Math.round(Math.abs(userScore - challengeScore) * 10) / 10
+    const isLegendary = userScore >= 90
 
     // Animation states
     const [revealStage, setRevealStage] = useState(0)
@@ -128,54 +249,39 @@ export default function ChallengeResultScreen({
     const [showEmbers, setShowEmbers] = useState(false)
     const isMounted = useRef(true)
 
-    // Generate confetti pieces
-    const confettiPieces = useMemo(() => {
-        const colors = won
-            ? ['#00ff88', '#00d4ff', '#fff', '#88ffaa', '#00ffcc']
-            : tied
-                ? ['#ffd700', '#ffaa00', '#fff', '#ffcc00', '#ff8800']
-                : []
-        return colors.length > 0 ? Array.from({ length: 50 }, (_, i) => ({
-            id: i,
-            color: colors[i % colors.length],
-            left: Math.random() * 100,
-            delay: Math.random() * 0.5
-        })) : []
-    }, [won, tied])
+    const winColor = '#00ff88'
+    const loseColor = '#ff4444'
+    const tieColor = '#ffd700'
+    const accentColor = won ? winColor : tied ? tieColor : loseColor
 
-    // Generate embers for loss
-    const embers = useMemo(() => {
-        return Array.from({ length: 20 }, (_, i) => ({
-            id: i,
-            left: Math.random() * 100,
-            delay: Math.random() * 2,
-            size: 3 + Math.random() * 4
-        }))
-    }, [])
+    const confettiColors = won
+        ? ['#00ff88', '#00d4ff', '#fff', '#88ffaa', '#00ffcc', '#ffd700']
+        : ['#ffd700', '#ffaa00', '#fff', '#ffcc00', '#ff8800']
 
-    // Generate sparkles
-    const sparkles = useMemo(() => {
-        return Array.from({ length: 8 }, (_, i) => ({
-            id: i,
-            top: `${20 + Math.random() * 60}%`,
-            left: `${10 + Math.random() * 80}%`,
-            animationDelay: `${Math.random() * 2}s`,
-            opacity: 0.4 + Math.random() * 0.4
-        }))
-    }, [])
+    // Loss messages
+    const lossMessages = [
+        "Time for a comeback!",
+        "This isn't over...",
+        "Rematch incoming!",
+        "They got lucky.",
+        "Revenge loading..."
+    ]
+    const lossMessage = useMemo(() =>
+        lossMessages[Math.floor(Math.random() * lossMessages.length)],
+        [])
 
     // Staggered reveal animation
     useEffect(() => {
         isMounted.current = true
 
         const timers = [
-            setTimeout(() => isMounted.current && setRevealStage(1), 100),   // Background
-            setTimeout(() => isMounted.current && setRevealStage(2), 400),   // Icon
-            setTimeout(() => isMounted.current && setRevealStage(3), 700),   // Title
-            setTimeout(() => isMounted.current && setRevealStage(4), 1000),  // Avatars
-            setTimeout(() => isMounted.current && setRevealStage(5), 1400),  // Scores animate
-            setTimeout(() => isMounted.current && setRevealStage(6), 1800),  // Message
-            setTimeout(() => isMounted.current && setRevealStage(7), 2100),  // Buttons
+            setTimeout(() => isMounted.current && setRevealStage(1), 100),
+            setTimeout(() => isMounted.current && setRevealStage(2), 400),
+            setTimeout(() => isMounted.current && setRevealStage(3), 700),
+            setTimeout(() => isMounted.current && setRevealStage(4), 1000),
+            setTimeout(() => isMounted.current && setRevealStage(5), 1400),
+            setTimeout(() => isMounted.current && setRevealStage(6), 1800),
+            setTimeout(() => isMounted.current && setRevealStage(7), 2100),
         ]
 
         return () => {
@@ -184,16 +290,16 @@ export default function ChallengeResultScreen({
         }
     }, [])
 
-    // Confetti/ember trigger
+    // Celebration trigger
     useEffect(() => {
         if (revealStage >= 3) {
             if (won || tied) {
                 setShowConfetti(true)
-                const timer = setTimeout(() => setShowConfetti(false), 3500)
+                const timer = setTimeout(() => setShowConfetti(false), 4000)
                 return () => clearTimeout(timer)
             } else {
                 setShowEmbers(true)
-                const timer = setTimeout(() => setShowEmbers(false), 4000)
+                const timer = setTimeout(() => setShowEmbers(false), 4500)
                 return () => clearTimeout(timer)
             }
         }
@@ -209,7 +315,6 @@ export default function ChallengeResultScreen({
         const animate = () => {
             const elapsed = Date.now() - startTime
             const progress = Math.min(elapsed / duration, 1)
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3)
 
             if (isMounted.current) {
@@ -225,7 +330,7 @@ export default function ChallengeResultScreen({
         requestAnimationFrame(animate)
     }, [revealStage, userScore, challengeScore])
 
-    // Sound & haptic feedback
+    // Sound & haptic
     useEffect(() => {
         if (revealStage === 3) {
             if (won) {
@@ -235,221 +340,211 @@ export default function ChallengeResultScreen({
                 playSound('pop')
                 vibrate([50, 30, 50])
             } else {
-                // Dramatic loss sound
                 playSound('womp')
-                vibrate([200, 100, 200]) // Heavy defeat pattern
+                vibrate([200, 100, 200])
             }
         }
     }, [revealStage, won, tied])
 
-    const winColor = '#00ff88'
-    const loseColor = '#ff4444'
-    const tieColor = '#ffd700'
-    const accentColor = won ? winColor : tied ? tieColor : loseColor
-
-    // Loss-specific messages for motivation
-    const lossMessages = [
-        "Time for a comeback!",
-        "This isn't over...",
-        "Rematch incoming!",
-        "They got lucky.",
-        "Revenge loading..."
-    ]
-    const lossMessage = useMemo(() =>
-        lossMessages[Math.floor(Math.random() * lossMessages.length)],
-        [])
-
     return (
-        <div
+        <motion.div
             className="min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden"
             style={{
                 background: won
                     ? 'linear-gradient(180deg, #0a1a0a 0%, #001a00 50%, #0a1a0a 100%)'
                     : tied
                         ? 'linear-gradient(180deg, #1a1a0a 0%, #1a1a00 50%, #1a1a0a 100%)'
-                        : 'linear-gradient(180deg, #1a0a0a 0%, #1a0000 50%, #1a0a0a 100%)',
-                opacity: revealStage >= 1 ? 1 : 0,
-                transition: 'opacity 0.5s ease-out'
+                        : 'linear-gradient(180deg, #1a0a0a 0%, #1a0000 50%, #1a0a0a 100%)'
             }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
         >
             {/* Animated Background Glow */}
-            <div
+            <motion.div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                     background: won
-                        ? 'radial-gradient(circle at 50% 40%, rgba(0,255,136,0.25) 0%, transparent 60%)'
+                        ? 'radial-gradient(circle at 50% 40%, rgba(0,255,136,0.3) 0%, transparent 60%)'
                         : tied
-                            ? 'radial-gradient(circle at 50% 40%, rgba(255,215,0,0.25) 0%, transparent 60%)'
-                            : 'radial-gradient(circle at 50% 40%, rgba(255,68,68,0.2) 0%, transparent 60%)',
-                    animation: revealStage >= 2 ? 'pulse 3s ease-in-out infinite' : 'none',
-                    opacity: revealStage >= 1 ? 1 : 0,
-                    transition: 'opacity 0.8s ease-out'
+                            ? 'radial-gradient(circle at 50% 40%, rgba(255,215,0,0.3) 0%, transparent 60%)'
+                            : 'radial-gradient(circle at 50% 40%, rgba(255,68,68,0.25) 0%, transparent 60%)'
+                }}
+                animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.8, 1, 0.8]
+                }}
+                transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
                 }}
             />
 
-            {/* Secondary glow orb */}
-            <div
-                className="absolute pointer-events-none"
+            {/* Floating orbs */}
+            <motion.div
+                className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
                 style={{
-                    width: '300px',
-                    height: '300px',
-                    borderRadius: '50%',
                     background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
-                    top: '20%',
+                    top: '15%',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    filter: 'blur(40px)',
-                    opacity: revealStage >= 2 ? 0.8 : 0,
-                    transition: 'opacity 1s ease-out',
-                    animation: revealStage >= 2 ? 'float 6s ease-in-out infinite' : 'none'
+                    filter: 'blur(60px)'
+                }}
+                animate={{
+                    scale: [1, 1.2, 1],
+                    y: [0, -20, 0]
+                }}
+                transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
                 }}
             />
 
-            {/* Floating Sparkles (win) */}
-            {won && revealStage >= 4 && sparkles.map(sparkle => (
-                <Sparkle
-                    key={sparkle.id}
-                    style={{
-                        top: sparkle.top,
-                        left: sparkle.left,
-                        animationDelay: sparkle.animationDelay,
-                        opacity: sparkle.opacity
-                    }}
-                />
-            ))}
+            {/* Motion Sparkles (win) */}
+            {won && revealStage >= 4 && <MotionSparkles color={winColor} count={15} />}
 
-            {/* Falling Embers (loss) */}
-            {showEmbers && embers.map(ember => (
-                <FallingEmber
-                    key={ember.id}
-                    left={ember.left}
-                    delay={ember.delay}
-                    size={ember.size}
-                />
-            ))}
+            {/* Motion Confetti */}
+            <MotionConfetti
+                isActive={showConfetti}
+                colors={confettiColors}
+                count={80}
+            />
 
-            {/* Confetti */}
-            {showConfetti && confettiPieces.map(piece => (
-                <ConfettiPiece
-                    key={piece.id}
-                    color={piece.color}
-                    left={piece.left}
-                    delay={piece.delay}
-                />
-            ))}
+            {/* Motion Embers (loss) */}
+            <MotionEmbers isActive={showEmbers} count={35} />
 
-            {/* Result Icon - Dramatic entrance */}
-            <div
+            {/* Result Icon - Dramatic 3D entrance */}
+            <motion.div
                 className="text-8xl mb-6"
+                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                animate={{
+                    scale: revealStage >= 2 ? 1 : 0,
+                    rotate: revealStage >= 2 ? 0 : -180,
+                    opacity: revealStage >= 2 ? 1 : 0
+                }}
+                transition={{ type: 'spring', stiffness: 200, damping: 12 }}
                 style={{
-                    opacity: revealStage >= 2 ? 1 : 0,
-                    transform: revealStage >= 2
-                        ? 'scale(1) rotate(0deg)'
-                        : 'scale(0) rotate(-180deg)',
-                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    filter: revealStage >= 3 ? `drop-shadow(0 0 30px ${accentColor})` : 'none',
-                    animation: revealStage >= 3
-                        ? lost
-                            ? 'shake 0.5s ease-in-out 3'
-                            : 'float 3s ease-in-out infinite'
-                        : 'none'
+                    filter: revealStage >= 3 ? `drop-shadow(0 0 40px ${accentColor})` : 'none'
                 }}
             >
-                {won ? '🏆' : tied ? '🤝' : '💀'}
-            </div>
+                <motion.span
+                    animate={
+                        revealStage >= 3
+                            ? lost
+                                ? { x: [0, -10, 10, -10, 10, 0] }
+                                : { y: [0, -10, 0], rotateY: [0, 15, 0] }
+                            : {}
+                    }
+                    transition={{
+                        duration: lost ? 0.5 : 3,
+                        repeat: lost ? 2 : Infinity,
+                        ease: 'easeInOut'
+                    }}
+                    style={{ display: 'inline-block' }}
+                >
+                    {won ? '🏆' : tied ? '🤝' : '💀'}
+                </motion.span>
+            </motion.div>
 
-            {/* Result Title - Animated gradient text */}
-            <h1
+            {/* Result Title */}
+            <motion.h1
                 className={`text-4xl font-black mb-2 ${won ? 'legendary-text' : ''}`}
                 style={{
                     color: won ? undefined : (tied ? tieColor : loseColor),
-                    opacity: revealStage >= 3 ? 1 : 0,
-                    transform: revealStage >= 3 ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.8)',
-                    transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     textShadow: won
-                        ? `0 0 40px ${winColor}, 0 0 80px ${winColor}40`
-                        : tied
-                            ? `0 0 30px ${tieColor}80`
-                            : `0 0 30px ${loseColor}80`
+                        ? `0 0 50px ${winColor}, 0 0 100px ${winColor}40`
+                        : `0 0 40px ${accentColor}80`
                 }}
+                initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                animate={{
+                    opacity: revealStage >= 3 ? 1 : 0,
+                    y: revealStage >= 3 ? 0 : 30,
+                    scale: revealStage >= 3 ? 1 : 0.8
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
                 {won ? 'YOU WON!' : tied ? "IT'S A TIE!" : 'DEFEATED'}
-            </h1>
+            </motion.h1>
 
             {/* Sub-title for loss */}
-            {lost && revealStage >= 3 && (
-                <p
-                    className="text-lg font-medium mb-2"
-                    style={{
-                        color: 'rgba(255,255,255,0.5)',
-                        opacity: revealStage >= 3 ? 1 : 0,
-                        transform: revealStage >= 3 ? 'translateY(0)' : 'translateY(10px)',
-                        transition: 'all 0.4s ease-out 0.2s'
-                    }}
-                >
-                    {lossMessage}
-                </p>
-            )}
+            <AnimatePresence>
+                {lost && revealStage >= 3 && (
+                    <motion.p
+                        className="text-lg font-medium mb-2"
+                        style={{ color: 'rgba(255,255,255,0.5)' }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        {lossMessage}
+                    </motion.p>
+                )}
+            </AnimatePresence>
 
             {/* Score Comparison */}
-            <div
-                className="flex items-center gap-6 my-8"
-                style={{
+            <motion.div
+                className="flex items-center gap-8 my-8"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{
                     opacity: revealStage >= 4 ? 1 : 0,
-                    transform: revealStage >= 4 ? 'translateY(0)' : 'translateY(30px)',
-                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    y: revealStage >= 4 ? 0 : 40
                 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             >
-                {/* Your Score with Photo */}
+                {/* Your Score */}
                 <div className="flex flex-col items-center">
-                    <span
-                        className="text-sm text-white/50 uppercase tracking-widest mb-2 font-medium"
-                        style={{
-                            opacity: revealStage >= 4 ? 1 : 0,
-                            transition: 'opacity 0.3s ease-out 0.2s'
-                        }}
+                    <motion.span
+                        className="text-sm text-white/50 uppercase tracking-widest mb-3 font-medium"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: revealStage >= 4 ? 1 : 0 }}
+                        transition={{ delay: 0.2 }}
                     >
                         You
-                    </span>
-                    <div className="relative">
-                        {/* SVG Score Ring */}
+                    </motion.span>
+                    <div className="relative w-32 h-32">
+                        {/* Pulsing rings for winner */}
+                        <PulsingRingsEffect color={won ? winColor : tieColor} isActive={won || tied} />
+
+                        {/* Score Ring */}
                         {revealStage >= 5 && (
-                            <ScoreRing
+                            <AnimatedScoreRing
                                 score={userScore}
                                 isWinner={won || tied}
                                 color={won ? winColor : tied ? tieColor : 'rgba(255,255,255,0.3)'}
+                                size={128}
                             />
                         )}
 
-                        {/* Photo circle */}
-                        <div
-                            className="w-28 h-28 rounded-full overflow-hidden relative z-10"
+                        {/* Photo */}
+                        <motion.div
+                            className="w-full h-full rounded-full overflow-hidden relative z-10"
                             style={{
-                                border: won ? `3px solid ${winColor}` : tied ? `3px solid ${tieColor}` : '3px solid rgba(255,255,255,0.3)',
+                                border: won ? `4px solid ${winColor}` : tied ? `4px solid ${tieColor}` : '4px solid rgba(255,255,255,0.3)',
                                 boxShadow: won
-                                    ? `0 0 30px ${winColor}60, inset 0 0 20px ${winColor}20`
+                                    ? `0 0 40px ${winColor}60, inset 0 0 30px ${winColor}20`
                                     : tied
-                                        ? `0 0 25px ${tieColor}50`
-                                        : 'none',
-                                animation: won && revealStage >= 5 ? 'pulse 2s ease-in-out infinite' : 'none'
+                                        ? `0 0 35px ${tieColor}50`
+                                        : 'none'
                             }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: revealStage >= 4 ? 1 : 0 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
                         >
                             {userImage ? (
-                                <img
-                                    src={userImage}
-                                    alt="Your outfit"
-                                    className="w-full h-full object-cover"
-                                />
+                                <img src={userImage} alt="Your outfit" className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-white/10 flex items-center justify-center">
                                     <span className="text-3xl">👤</span>
                                 </div>
                             )}
-                        </div>
+                        </motion.div>
 
-                        {/* Score badge - animated pop */}
-                        <div
-                            className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xl font-black z-20"
+                        {/* Score Badge */}
+                        <motion.div
+                            className="absolute -bottom-4 left-1/2 px-5 py-2 rounded-full text-2xl font-black z-20"
                             style={{
                                 background: won
                                     ? `linear-gradient(135deg, ${winColor} 0%, #00d4ff 100%)`
@@ -459,72 +554,85 @@ export default function ChallengeResultScreen({
                                 color: won || tied ? '#000' : '#fff',
                                 border: won || tied ? 'none' : '2px solid rgba(255,255,255,0.3)',
                                 boxShadow: won
-                                    ? `0 4px 20px ${winColor}80`
+                                    ? `0 6px 25px ${winColor}80`
                                     : tied
-                                        ? `0 4px 20px ${tieColor}60`
+                                        ? `0 6px 25px ${tieColor}60`
                                         : 'none',
-                                transform: revealStage >= 5 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0)',
-                                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s'
+                                x: '-50%'
                             }}
+                            initial={{ scale: 0, y: 20 }}
+                            animate={{
+                                scale: revealStage >= 5 ? 1 : 0,
+                                y: revealStage >= 5 ? 0 : 20
+                            }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.3 }}
                         >
                             {displayedUserScore}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
-                {/* VS - Animated */}
-                <div
-                    className="text-2xl font-black"
+                {/* VS */}
+                <motion.div
+                    className="text-3xl font-black"
                     style={{
                         color: 'rgba(255,255,255,0.4)',
-                        textShadow: `0 0 20px ${accentColor}30`,
-                        opacity: revealStage >= 4 ? 1 : 0,
-                        transform: revealStage >= 4 ? 'scale(1)' : 'scale(0)',
-                        transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s'
+                        textShadow: `0 0 30px ${accentColor}30`
                     }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{
+                        scale: revealStage >= 4 ? 1 : 0,
+                        opacity: revealStage >= 4 ? 1 : 0
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.1 }}
                 >
                     VS
-                </div>
+                </motion.div>
 
                 {/* Challenger Score */}
                 <div className="flex flex-col items-center">
-                    <span
-                        className="text-sm text-white/50 uppercase tracking-widest mb-2 font-medium"
-                        style={{
-                            opacity: revealStage >= 4 ? 1 : 0,
-                            transition: 'opacity 0.3s ease-out 0.2s'
-                        }}
+                    <motion.span
+                        className="text-sm text-white/50 uppercase tracking-widest mb-3 font-medium"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: revealStage >= 4 ? 1 : 0 }}
+                        transition={{ delay: 0.2 }}
                     >
                         Them
-                    </span>
-                    <div className="relative">
-                        {/* SVG Score Ring */}
+                    </motion.span>
+                    <div className="relative w-32 h-32">
+                        {/* Pulsing rings for loser */}
+                        <PulsingRingsEffect color={loseColor} isActive={lost} />
+
+                        {/* Score Ring */}
                         {revealStage >= 5 && (
-                            <ScoreRing
+                            <AnimatedScoreRing
                                 score={challengeScore}
                                 isWinner={lost}
                                 color={lost ? loseColor : 'rgba(255,255,255,0.3)'}
+                                size={128}
                             />
                         )}
 
-                        {/* Placeholder circle for opponent */}
-                        <div
-                            className="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center relative z-10"
+                        {/* Opponent */}
+                        <motion.div
+                            className="w-full h-full rounded-full overflow-hidden flex items-center justify-center relative z-10"
                             style={{
                                 background: lost ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.08)',
-                                border: lost ? `3px solid ${loseColor}` : '3px solid rgba(255,255,255,0.2)',
+                                border: lost ? `4px solid ${loseColor}` : '4px solid rgba(255,255,255,0.2)',
                                 boxShadow: lost
-                                    ? `0 0 30px ${loseColor}50, inset 0 0 20px ${loseColor}20`
-                                    : 'none',
-                                animation: lost && revealStage >= 5 ? 'pulse 2s ease-in-out infinite' : 'none'
+                                    ? `0 0 40px ${loseColor}50, inset 0 0 30px ${loseColor}20`
+                                    : 'none'
                             }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: revealStage >= 4 ? 1 : 0 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.15 }}
                         >
                             <span className="text-4xl">{lost ? '😎' : '🤷'}</span>
-                        </div>
+                        </motion.div>
 
-                        {/* Score badge */}
-                        <div
-                            className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xl font-black z-20"
+                        {/* Score Badge */}
+                        <motion.div
+                            className="absolute -bottom-4 left-1/2 px-5 py-2 rounded-full text-2xl font-black z-20"
                             style={{
                                 background: lost
                                     ? `linear-gradient(135deg, ${loseColor} 0%, #ff8800 100%)`
@@ -532,131 +640,141 @@ export default function ChallengeResultScreen({
                                 color: '#fff',
                                 border: lost ? 'none' : '2px solid rgba(255,255,255,0.3)',
                                 boxShadow: lost
-                                    ? `0 4px 20px ${loseColor}60`
+                                    ? `0 6px 25px ${loseColor}60`
                                     : 'none',
-                                transform: revealStage >= 5 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0)',
-                                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s'
+                                x: '-50%'
                             }}
+                            initial={{ scale: 0, y: 20 }}
+                            animate={{
+                                scale: revealStage >= 5 ? 1 : 0,
+                                y: revealStage >= 5 ? 0 : 20
+                            }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.4 }}
                         >
                             {displayedChallengerScore}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Difference Message - Animated */}
-            <p
+            {/* Difference Message */}
+            <motion.p
                 className="text-lg mb-8"
-                style={{
-                    color: 'rgba(255,255,255,0.7)',
+                style={{ color: 'rgba(255,255,255,0.7)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
                     opacity: revealStage >= 6 ? 1 : 0,
-                    transform: revealStage >= 6 ? 'translateY(0)' : 'translateY(15px)',
-                    transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    y: revealStage >= 6 ? 0 : 20
                 }}
+                transition={{ duration: 0.4 }}
             >
                 {won
                     ? <span>You beat them by <strong style={{ color: winColor }}>{diff} points</strong>! 🔥</span>
                     : tied
                         ? <span>Exactly the same! <strong style={{ color: tieColor }}>Fate has spoken.</strong></span>
                         : <span>They won by <strong style={{ color: loseColor }}>{diff} points</strong></span>}
-            </p>
+            </motion.p>
 
-            {/* CTAs - Staggered reveal */}
-            <div
+            {/* CTAs */}
+            <motion.div
                 className="flex flex-col gap-3 w-full max-w-xs"
-                style={{
+                initial={{ opacity: 0, y: 30 }}
+                animate={{
                     opacity: revealStage >= 7 ? 1 : 0,
-                    transform: revealStage >= 7 ? 'translateY(0)' : 'translateY(20px)',
-                    transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    y: revealStage >= 7 ? 0 : 30
                 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             >
-                {/* Primary CTA - With shine effect */}
-                <button
+                {/* Primary CTA */}
+                <motion.button
                     onClick={() => {
                         playSound('click')
                         vibrate(20)
-                        if (won) {
-                            onViewResults()
-                        } else {
-                            onChallengeBack()
-                        }
+                        won ? onViewResults() : onChallengeBack()
                     }}
-                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.97] relative overflow-hidden btn-shine"
+                    className="w-full py-4 rounded-2xl font-bold text-lg relative overflow-hidden"
                     style={{
                         background: won
                             ? `linear-gradient(135deg, ${winColor} 0%, #00d4ff 100%)`
                             : `linear-gradient(135deg, ${loseColor} 0%, #ff8800 100%)`,
                         color: won ? '#000' : '#fff',
                         boxShadow: won
-                            ? `0 8px 30px ${winColor}50, 0 0 60px ${winColor}30`
-                            : `0 8px 30px ${loseColor}40`,
-                        animation: revealStage >= 7 ? 'pulseGlow 2s ease-in-out infinite' : 'none',
-                        '--glow-color': won ? winColor : loseColor
+                            ? `0 8px 35px ${winColor}60, 0 0 80px ${winColor}30`
+                            : `0 8px 35px ${loseColor}50`
                     }}
+                    whileHover={{ scale: 1.02, boxShadow: won
+                        ? `0 12px 50px ${winColor}70, 0 0 100px ${winColor}40`
+                        : `0 12px 50px ${loseColor}60`
+                    }}
+                    whileTap={{ scale: 0.97 }}
                 >
-                    {won ? '🏆 Flex Your Victory' : '⚔️ Demand Rematch!'}
-                </button>
+                    {/* Shimmer */}
+                    <motion.div
+                        className="absolute inset-0"
+                        style={{
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)'
+                        }}
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                    />
+                    <span className="relative z-10">
+                        {won ? '🏆 Flex Your Victory' : '⚔️ Demand Rematch!'}
+                    </span>
+                </motion.button>
 
-                {/* Send Result Back - Let challenger know! */}
+                {/* Send Result Back */}
                 {onSendResultBack && (
-                    <button
+                    <motion.button
                         onClick={() => {
                             playSound('click')
                             vibrate(15)
                             onSendResultBack()
                         }}
-                        className="w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.97]"
+                        className="w-full py-3 rounded-xl font-bold text-sm glass-medium"
                         style={{
-                            background: won
-                                ? 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,212,255,0.2) 100%)'
-                                : 'linear-gradient(135deg, rgba(255,68,68,0.2) 0%, rgba(255,136,0,0.2) 100%)',
                             color: accentColor,
-                            border: `1px solid ${accentColor}40`,
-                            backdropFilter: 'blur(10px)'
+                            border: `1px solid ${accentColor}40`
                         }}
+                        whileHover={{ scale: 1.02, borderColor: `${accentColor}60` }}
+                        whileTap={{ scale: 0.97 }}
                     >
                         {won ? '📤 Send Them Your Victory' : '📤 Tell Them You Accept'}
-                    </button>
+                    </motion.button>
                 )}
 
                 {/* Secondary CTA */}
-                <button
+                <motion.button
                     onClick={() => {
                         playSound('click')
                         vibrate(15)
-                        if (won) {
-                            onChallengeBack()
-                        } else {
-                            onTryAgain()
-                        }
+                        won ? onChallengeBack() : onTryAgain()
                     }}
-                    className="w-full py-3 rounded-xl font-medium text-sm transition-all active:scale-[0.97]"
-                    style={{
-                        background: 'rgba(255,255,255,0.08)',
-                        color: 'rgba(255,255,255,0.8)',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        backdropFilter: 'blur(10px)'
-                    }}
+                    className="w-full py-3 rounded-xl font-medium text-sm glass-light"
+                    style={{ color: 'rgba(255,255,255,0.8)' }}
+                    whileHover={{ scale: 1.02, background: 'rgba(255,255,255,0.1)' }}
+                    whileTap={{ scale: 0.97 }}
                 >
                     {won ? '👊 Battle Someone Else' : '📸 Try Different Outfit'}
-                </button>
+                </motion.button>
 
                 {/* View Full Results */}
-                <button
+                <motion.button
                     onClick={() => {
                         playSound('click')
                         vibrate(10)
                         onViewResults()
                     }}
-                    className="w-full py-2 text-sm font-medium transition-all active:opacity-60"
+                    className="w-full py-2 text-sm font-medium"
                     style={{
                         color: 'rgba(255,255,255,0.5)',
-                        textShadow: `0 0 20px ${accentColor}30`
+                        textShadow: `0 0 25px ${accentColor}30`
                     }}
+                    whileHover={{ color: 'rgba(255,255,255,0.8)' }}
+                    whileTap={{ scale: 0.97 }}
                 >
                     View Full Results →
-                </button>
-            </div>
-        </div>
+                </motion.button>
+            </motion.div>
+        </motion.div>
     )
 }
