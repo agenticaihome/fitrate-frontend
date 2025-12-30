@@ -1115,6 +1115,18 @@ export default function HomeScreen({
 
                         {/* Single breathing ring */}
                         <div className="relative mb-6">
+                            {/* Premium outer halo */}
+                            <div
+                                className="cta-halo"
+                                style={{ '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.2)' : eventMode ? 'rgba(16,185,129,0.2)' : `${currentMode.color}20` }}
+                            />
+
+                            {/* Rotating gradient glow ring */}
+                            <div
+                                className="cta-glow-ring"
+                                style={{ '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.4)' : eventMode ? 'rgba(16,185,129,0.4)' : `${currentMode.color}40` }}
+                            />
+
                             <div
                                 className="absolute inset-0 rounded-full pointer-events-none"
                                 style={{
@@ -1131,8 +1143,9 @@ export default function HomeScreen({
                             <button
                                 onClick={handleStart}
                                 aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
-                                className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center transition-all active:scale-[0.97]"
+                                className="cta-alive cta-touch relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
                                 style={{
+                                    '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.3)' : eventMode ? 'rgba(16,185,129,0.3)' : `${currentMode.color}30`,
                                     background: dailyChallengeMode
                                         ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
                                         : eventMode
@@ -1168,7 +1181,7 @@ export default function HomeScreen({
                                 />
 
                                 {/* Icon */}
-                                <span className="relative text-6xl mb-2">
+                                <span className="cta-icon-shimmer relative text-6xl mb-2">
                                     {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
                                 </span>
 
