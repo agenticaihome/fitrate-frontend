@@ -830,7 +830,7 @@ export default function HomeScreen({
             <div className="w-full flex items-center justify-between mb-4">
                 {/* Streak Badge - 48px touch target */}
                 <button
-                    className="relative w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90"
+                    className="relative w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90 overflow-visible"
                     style={{
                         background: dailyStreak?.current > 0
                             ? 'rgba(255,107,0,0.15)'
