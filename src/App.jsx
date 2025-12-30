@@ -1702,6 +1702,13 @@ export default function App() {
         setScores(scores)
 
         // ============================================
+        // FIRST SCAN COMPLETE: Unlock mode selector for future scans
+        // ============================================
+        if (!localStorage.getItem('fitrate_first_scan_complete')) {
+          localStorage.setItem('fitrate_first_scan_complete', 'true')
+          console.log('[Onboarding] First scan complete - mode selector unlocked')
+        }
+        // ============================================
         // Mark free user's weekly event entry as used
         // ============================================
         if (!isPro && data.eventStatus && (data.eventStatus.action === 'added' || data.eventStatus.action === 'improved')) {

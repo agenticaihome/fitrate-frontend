@@ -9,89 +9,58 @@ import { LIMITS } from '../config/constants'
 const ParticleField = lazy(() => import('../components/3d/ParticleField').then(m => ({ default: m.ParticleFieldLight })))
 
 // ============================================
-// CINEMATIC ONBOARDING - Premium first impression
+// SINGLE-SCREEN ONBOARDING - Zero friction first impression
 // ============================================
 const OnboardingOverlay = ({ onComplete }) => {
-    const [step, setStep] = useState(0)
     const [isExiting, setIsExiting] = useState(false)
 
-    const steps = [
-        {
-            emoji: '📸',
-            title: 'Snap Your Outfit',
-            desc: 'Take a photo of what you\'re wearing',
-            color: '#00d4ff',
-            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(0,212,255,0.3) 0%, transparent 60%)'
-        },
-        {
-            emoji: '🤖',
-            title: 'AI Rates Your Style',
-            desc: 'Get a score from 1-100 with honest feedback',
-            color: '#8b5cf6',
-            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(139,92,246,0.3) 0%, transparent 60%)'
-        },
-        {
-            emoji: '🔥',
-            title: 'Level Up Your Look',
-            desc: 'Get tips to improve & compete with friends',
-            color: '#ff6b35',
-            bgGradient: 'radial-gradient(circle at 50% 30%, rgba(255,107,53,0.3) 0%, transparent 60%)'
-        }
-    ]
-
-    const handleNext = () => {
+    const handleStart = () => {
         playSound('click')
-        vibrate([15, 10, 25])
-        if (step < steps.length - 1) {
-            setStep(step + 1)
-        } else {
-            setIsExiting(true)
-            setTimeout(() => {
-                localStorage.setItem('fitrate_onboarded', 'true')
-                onComplete()
-            }, 500)
-        }
+        vibrate([20, 15, 30])
+        setIsExiting(true)
+        setTimeout(() => {
+            localStorage.setItem('fitrate_onboarded', 'true')
+            onComplete()
+        }, 400)
     }
-
-    const currentStep = steps[step]
 
     return (
         <motion.div
             className="fixed inset-0 z-[100] flex items-center justify-center p-6"
             style={{
-                background: 'rgba(0,0,0,0.95)',
-                backdropFilter: 'blur(30px)',
-                WebkitBackdropFilter: 'blur(30px)'
+                background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 50%, #0a0610 100%)',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: isExiting ? 0 : 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
         >
             {/* Animated background glow */}
             <motion.div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: currentStep.bgGradient }}
-                key={step}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
+                style={{
+                    background: 'radial-gradient(circle at 50% 40%, rgba(0,212,255,0.2) 0%, transparent 50%)'
+                }}
+                animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             />
 
             {/* Floating particles */}
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 15 }).map((_, i) => (
                 <motion.div
                     key={i}
                     className="absolute w-1 h-1 rounded-full"
                     style={{
-                        background: currentStep.color,
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        boxShadow: `0 0 10px ${currentStep.color}`
+                        background: i % 3 === 0 ? '#00d4ff' : i % 3 === 1 ? '#8b5cf6' : '#fff',
+                        left: `${10 + Math.random() * 80}%`,
+                        top: `${10 + Math.random() * 80}%`,
+                        boxShadow: `0 0 8px ${i % 3 === 0 ? '#00d4ff' : '#8b5cf6'}`
                     }}
                     animate={{
-                        y: [0, -30, 0],
-                        opacity: [0.2, 0.6, 0.2],
-                        scale: [1, 1.5, 1]
+                        y: [0, -20, 0],
+                        opacity: [0.2, 0.5, 0.2],
                     }}
                     transition={{
                         duration: 3 + Math.random() * 2,
@@ -102,122 +71,81 @@ const OnboardingOverlay = ({ onComplete }) => {
             ))}
 
             <div className="w-full max-w-sm text-center relative z-10">
-                {/* Progress bar */}
-                <div className="flex justify-center gap-3 mb-10">
-                    {steps.map((s, i) => (
-                        <motion.div
-                            key={i}
-                            className="h-1 rounded-full"
-                            style={{
-                                width: i === step ? 40 : 20,
-                                background: i <= step ? currentStep.color : 'rgba(255,255,255,0.2)'
-                            }}
-                            animate={{
-                                width: i === step ? 40 : 20,
-                                boxShadow: i === step ? `0 0 10px ${currentStep.color}` : 'none'
-                            }}
-                            transition={{ duration: 0.3 }}
-                        />
-                    ))}
-                </div>
-
-                {/* Step content with AnimatePresence */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={step}
-                        initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -30, scale: 0.9 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    >
-                        {/* Emoji with 3D effect */}
-                        <motion.div
-                            className="text-8xl mb-6 inline-block"
-                            style={{
-                                filter: `drop-shadow(0 0 40px ${currentStep.color})`
-                            }}
-                            animate={{
-                                y: [0, -10, 0],
-                                rotateY: [0, 10, 0, -10, 0]
-                            }}
-                            transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: 'easeInOut'
-                            }}
-                        >
-                            {currentStep.emoji}
-                        </motion.div>
-
-                        {/* Title with gradient */}
-                        <motion.h2
-                            className="text-3xl font-black mb-3"
-                            style={{
-                                background: `linear-gradient(135deg, #fff 0%, ${currentStep.color} 100%)`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                textShadow: 'none'
-                            }}
-                        >
-                            {currentStep.title}
-                        </motion.h2>
-
-                        <p className="text-white/60 text-lg mb-10">
-                            {currentStep.desc}
-                        </p>
-                    </motion.div>
-                </AnimatePresence>
-
-                {/* Premium CTA Button */}
-                <motion.button
-                    onClick={handleNext}
-                    className="w-full py-4 rounded-2xl font-bold text-lg relative overflow-hidden"
+                {/* Hero emoji with glow */}
+                <motion.div
+                    className="text-[100px] mb-6 inline-block"
                     style={{
-                        background: `linear-gradient(135deg, ${currentStep.color} 0%, ${currentStep.color}cc 100%)`,
-                        color: '#fff',
-                        boxShadow: `0 8px 30px ${currentStep.color}50, 0 0 60px ${currentStep.color}20`
+                        filter: 'drop-shadow(0 0 40px rgba(0,212,255,0.5))'
                     }}
-                    whileHover={{ scale: 1.02, boxShadow: `0 12px 40px ${currentStep.color}60, 0 0 80px ${currentStep.color}30` }}
+                    animate={{
+                        y: [0, -12, 0],
+                        rotate: [0, 3, 0, -3, 0]
+                    }}
+                    transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: 'easeInOut'
+                    }}
+                >
+                    📸
+                </motion.div>
+
+                {/* Main headline */}
+                <motion.h1
+                    className="text-3xl font-black mb-3 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    Snap your outfit
+                </motion.h1>
+
+                {/* Subheadline */}
+                <motion.p
+                    className="text-xl text-white/60 mb-10"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                >
+                    Let's see what you've got 👀
+                </motion.p>
+
+                {/* Big CTA Button */}
+                <motion.button
+                    onClick={handleStart}
+                    className="w-full py-5 rounded-2xl font-black text-xl relative overflow-hidden"
+                    style={{
+                        background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
+                        color: '#000',
+                        boxShadow: '0 8px 40px rgba(0,212,255,0.4), 0 0 80px rgba(0,255,136,0.2)'
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.02, boxShadow: '0 12px 50px rgba(0,212,255,0.5), 0 0 100px rgba(0,255,136,0.3)' }}
                     whileTap={{ scale: 0.98 }}
                 >
                     {/* Shimmer effect */}
                     <motion.div
                         className="absolute inset-0"
                         style={{
-                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)'
+                            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)'
                         }}
                         animate={{ x: ['-100%', '100%'] }}
-                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                        transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5 }}
                     />
-                    <span className="relative z-10">
-                        {step < steps.length - 1 ? 'Continue' : 'Let\'s Go! 🚀'}
-                    </span>
+                    <span className="relative z-10">Let's Go! 🚀</span>
                 </motion.button>
 
-                {/* Step indicator */}
+                {/* Privacy note */}
                 <motion.p
-                    className="mt-4 text-white/30 text-sm"
-                    animate={{ opacity: [0.3, 0.5, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                    className="mt-6 text-white/30 text-xs"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
                 >
-                    {step + 1} of {steps.length}
+                    🔒 Your photos stay private • Auto-deleted
                 </motion.p>
-
-                {/* Skip option */}
-                <motion.button
-                    onClick={() => {
-                        setIsExiting(true)
-                        setTimeout(() => {
-                            localStorage.setItem('fitrate_onboarded', 'true')
-                            onComplete()
-                        }, 300)
-                    }}
-                    className="mt-2 text-white/30 text-sm hover:text-white/50 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    Skip intro
-                </motion.button>
             </div>
         </motion.div>
     )
@@ -329,17 +257,6 @@ const MODES = [
     { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)' },
     { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)' },
     { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
-]
-
-// ============================================
-// SOCIAL PROOF - Live activity simulation
-// ============================================
-const SOCIAL_PROOF_MESSAGES = [
-    '847 fits rated in the last hour',
-    '12.4K outfits rated today',
-    'Join 50K+ fashion lovers',
-    '94 avg score in the last 10 mins',
-    'Someone just got a 98!',
 ]
 
 // Daily Challenge: Rotating mode based on day of year
@@ -1238,8 +1155,9 @@ export default function HomeScreen({
                             </button>
                         </div>
 
-                        {/* Mode Selector - Hidden during challenge modes */}
-                        {!dailyChallengeMode && !eventMode && (
+                        {/* Mode Selector - Hidden during challenge modes AND for first-time users */}
+                        {/* First-timers get Nice mode by default, modes unlock after first scan */}
+                        {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
                             <button
                                 onClick={() => {
                                     playSound('click')
@@ -1273,13 +1191,10 @@ export default function HomeScreen({
                             </button>
                         )}
 
-                        {/* Social Proof + Privacy */}
+                        {/* Privacy Note */}
                         <div className="text-center mb-4">
-                            <p className="text-purple-300/70 text-xs mb-1">
-                                🔥 {SOCIAL_PROOF_MESSAGES[Math.floor(Date.now() / 60000) % SOCIAL_PROOF_MESSAGES.length]}
-                            </p>
-                            <p className="text-white/40 text-[10px]">
-                                🔒 Photos auto-deleted
+                            <p className="text-white/40 text-xs">
+                                🔒 Your photos stay private • Auto-deleted
                             </p>
                         </div>
                     </div>
