@@ -310,7 +310,9 @@ export default function HomeScreen({
     onNavigateToBattle,
     onRemoveBattle,
     onNavigate,
-    onOpenArena
+    onOpenArena,
+    dailyLeaderboard = [],
+    onShowChallenges
 }) {
     // ==========================================
     // Local State
@@ -935,6 +937,41 @@ export default function HomeScreen({
                     <p className="text-lg font-bold text-white">🎭 Walking in "{fashionShowName}"</p>
                     <p className="text-purple-300 text-sm">Take a photo to submit your fit!</p>
                 </div>
+            )}
+
+            {/* ============================================ */}
+            {/* P3.5 — TOP 3 LEADERBOARD MINI-WIDGET */}
+            {/* Shows daily challenge top 3 to drive engagement */}
+            {/* ============================================ */}
+            {dailyLeaderboard.length > 0 && !challengeScore && !fashionShowName && (
+                <button
+                    onClick={() => { playSound('click'); vibrate(15); onShowChallenges?.(); }}
+                    className="w-full max-w-sm mb-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,165,0,0.05) 100%)',
+                        border: '1px solid rgba(255,215,0,0.2)'
+                    }}
+                >
+                    <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-bold text-yellow-400">🏆 Today's Top 3</span>
+                        <span className="text-xs text-white/40">See All →</span>
+                    </div>
+                    <div className="flex items-center justify-around">
+                        {dailyLeaderboard.slice(0, 3).map((entry, i) => {
+                            const medals = ['🥇', '🥈', '🥉']
+                            return (
+                                <div key={i} className="flex flex-col items-center">
+                                    <span className="text-lg">{medals[i]}</span>
+                                    <span className="text-white font-bold text-lg">{entry.score}</span>
+                                    <span className="text-white/40 text-[10px] uppercase tracking-wide">
+                                        {entry.nickname || `User ${i + 1}`}
+                                    </span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <p className="text-center text-white/30 text-[10px] mt-2">Tap to compete!</p>
+                </button>
             )}
 
             {/* ============================================ */}

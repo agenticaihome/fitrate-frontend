@@ -2972,6 +2972,8 @@ export default function App() {
             setScreen(target)
           }}
           onOpenArena={openArenaEntry}
+          dailyLeaderboard={dailyLeaderboard}
+          onShowChallenges={() => { fetchDailyLeaderboard(); fetchLeaderboard(); fetchUserEventStatus(); setScreen('challenges'); }}
         />
         <BottomNav
           activeTab="home"
