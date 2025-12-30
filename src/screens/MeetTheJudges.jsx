@@ -11,7 +11,6 @@ const AI_JUDGES = [
         name: 'The Hype Friend',
         emoji: '😇',
         color: '#00ff88',
-        tier: 'FREE',
         tagline: 'Your biggest fan who still keeps it real',
         personality: 'Supportive, encouraging, genuinely finds your wins',
         judges: ['Confidence', 'Effort', 'Personal style'],
@@ -23,7 +22,6 @@ const AI_JUDGES = [
         name: 'The Roast Master',
         emoji: '🔥',
         color: '#ff6b35',
-        tier: 'FREE',
         tagline: 'Your funniest friend who talks shit but loves you',
         personality: 'Witty, playful shade, makes you laugh at yourself',
         judges: ['How roastable', 'Bold choices', 'Missed opportunities'],
@@ -35,7 +33,6 @@ const AI_JUDGES = [
         name: 'The Truth Teller',
         emoji: '🎯',
         color: '#3b82f6',
-        tier: 'PRO',
         tagline: 'A fashion expert with zero social anxiety',
         personality: 'Clinical precision, dry wit, actually helpful',
         judges: ['Proportions', 'Color theory', 'Fit quality'],
@@ -47,7 +44,6 @@ const AI_JUDGES = [
         name: 'The Destroyer',
         emoji: '💀',
         color: '#ff1493',
-        tier: 'PRO',
         tagline: 'Maximum destruction with surgical precision',
         personality: 'Brutal but brilliant, you laugh so hard you can\'t be mad',
         judges: ['Every single flaw', 'Missed potential', 'Style crimes'],
@@ -59,7 +55,6 @@ const AI_JUDGES = [
         name: 'The Wingman',
         emoji: '😏',
         color: '#ff69b4',
-        tier: 'PRO',
         tagline: 'Your dating advisor who actually knows clothes',
         personality: 'Charming, flirty analysis, dating app focused',
         judges: ['First impressions', 'Approachability', 'Rizz potential'],
@@ -71,7 +66,6 @@ const AI_JUDGES = [
         name: 'The Celebrity',
         emoji: '👑',
         color: '#ffd700',
-        tier: 'PRO',
         tagline: 'Full celebrity impersonation — Anna, Kanye, Rihanna',
         personality: 'Becomes the celeb completely with catchphrases',
         judges: ['Red carpet readiness', 'Star quality', 'Icon potential'],
@@ -83,7 +77,6 @@ const AI_JUDGES = [
         name: 'The Oracle',
         emoji: '🔮',
         color: '#9b59b6',
-        tier: 'PRO',
         tagline: 'Mystical fashion oracle who takes this WAY too seriously',
         personality: 'Cosmic, dramatic, reads your outfit like a tarot spread',
         judges: ['Energy', 'Chakra alignment', 'Cosmic vibes'],
@@ -95,7 +88,6 @@ const AI_JUDGES = [
         name: 'The Unhinged AI',
         emoji: '🎪',
         color: '#ff4444',
-        tier: 'PRO',
         tagline: 'An AI having an existential crisis about fashion',
         personality: 'Surreal tangents, creates outfit lore, breaks fourth wall',
         judges: ['??? The void ???', 'Outfit secrets', 'Existence itself'],
@@ -107,7 +99,6 @@ const AI_JUDGES = [
         name: 'The 2000s Icon',
         emoji: '💎',
         color: '#00CED1',
-        tier: 'FREE',
         tagline: 'Paris Hilton circa 2003 — everything is "hot" or "so not"',
         personality: 'Peak tabloid era energy, checks for bling and low-rise',
         judges: ['Bedazzle factor', 'Logo mania', 'Butterfly clip potential'],
@@ -119,7 +110,6 @@ const AI_JUDGES = [
         name: 'The Antagonist',
         emoji: '🖤',
         color: '#4c1d95',
-        tier: 'FREE',
         tagline: 'The main villain who just walked in and everyone noticed',
         personality: 'Rates intimidation, power, dramatic entrance potential',
         judges: ['Power presence', 'Intimidation', 'Scene-stealing'],
@@ -131,7 +121,6 @@ const AI_JUDGES = [
         name: 'The Pinterest Princess',
         emoji: '🎀',
         color: '#ffb6c1',
-        tier: 'FREE',
         tagline: 'Soft, romantic, bow-counting princess aesthetic',
         personality: 'Rates daintiness, romanticcore vibes, Lana Del Rey energy',
         judges: ['Bow count', 'Softness', 'Ballet flat potential'],
@@ -143,7 +132,6 @@ const AI_JUDGES = [
         name: 'The Drip Doctor',
         emoji: '👟',
         color: '#f97316',
-        tier: 'FREE',
         tagline: 'Streetwear connoisseur who knows retail from resale',
         personality: 'Rates brand recognition, sneaker game, estimated resale value',
         judges: ['Brand check', 'Drip level', 'Resale potential'],
@@ -242,21 +230,6 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
                                         </span>
                                     </div>
                                 </div>
-                                {/* Tier Badge */}
-                                <span
-                                    className="px-2 py-1 rounded-full text-[12px] font-bold uppercase tracking-wider"
-                                    style={{
-                                        background: judge.tier === 'FREE'
-                                            ? 'rgba(0,255,136,0.2)'
-                                            : 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,140,0,0.2) 100%)',
-                                        color: judge.tier === 'FREE' ? '#00ff88' : '#ffd700',
-                                        border: judge.tier === 'FREE'
-                                            ? '1px solid rgba(0,255,136,0.3)'
-                                            : '1px solid rgba(255,215,0,0.3)'
-                                    }}
-                                >
-                                    {judge.tier}
-                                </span>
                             </div>
 
                             {/* Tagline */}
