@@ -306,6 +306,38 @@ export const generateShareCard = async ({
                 judgeBadgeBottomY = judgeBadgeY + judgeBadgeHeight
             }
 
+            // ===== CELEBRITY MATCH BADGE - When AI detects celeb vibes =====
+            if (scores.celebMatch) {
+                const celebBadgeY = judgeBadgeBottomY + 25
+                const celebBadgeHeight = 52
+                const celebText = `⭐ Vibes like ${scores.celebMatch} ⭐`
+
+                ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
+                const celebBadgeTextWidth = ctx.measureText(celebText).width
+                const celebBadgeWidth = celebBadgeTextWidth + 50
+                const celebBadgeX = (canvas.width - celebBadgeWidth) / 2
+
+                // Orange gradient background
+                const celebGradient = ctx.createLinearGradient(celebBadgeX, celebBadgeY, celebBadgeX + celebBadgeWidth, celebBadgeY)
+                celebGradient.addColorStop(0, 'rgba(255,107,53,0.25)')
+                celebGradient.addColorStop(1, 'rgba(255,0,128,0.15)')
+                ctx.fillStyle = celebGradient
+                ctx.beginPath()
+                ctx.roundRect(celebBadgeX, celebBadgeY, celebBadgeWidth, celebBadgeHeight, 26)
+                ctx.fill()
+
+                // Orange border
+                ctx.strokeStyle = 'rgba(255,107,53,0.5)'
+                ctx.lineWidth = 2
+                ctx.stroke()
+
+                // Text in white
+                ctx.fillStyle = '#ffffff'
+                ctx.textAlign = 'center'
+                ctx.textBaseline = 'middle'
+                ctx.fillText(celebText, canvas.width / 2, celebBadgeY + celebBadgeHeight / 2)
+            }
+
             // ===== SUBSCORES ROW - Compact & Clean =====
             const subscoreY = canvas.height - 270
             const subscores = [
