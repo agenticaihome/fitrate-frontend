@@ -190,6 +190,130 @@
   transform: scale(var(--btn-active-scale));
 }
 
+/* ================================================ */
+/* PREMIUM MOTION UTILITIES - 98/100 Polish        */
+/* ================================================ */
+
+/* CTA Breathing Pulse - Draws attention to primary actions */
+.cta-pulse {
+  animation: cta-breathe 2s ease-in-out infinite;
+}
+
+@keyframes cta-breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+  }
+
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 8px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* Screen Transitions - Smooth fade/slide */
+.screen-enter {
+  animation: screen-fade-in 0.25s ease-out forwards;
+}
+
+.screen-exit {
+  animation: screen-fade-out 0.2s ease-in forwards;
+}
+
+@keyframes screen-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes screen-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Loading Skeleton - Shimmer effect */
+.skeleton {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Jackpot Golden Glow - For 100 scores */
+.jackpot-glow {
+  animation: jackpot-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes jackpot-pulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 30px rgba(255, 215, 0, 0.4),
+      0 0 60px rgba(255, 215, 0, 0.2),
+      inset 0 0 20px rgba(255, 215, 0, 0.1);
+    filter: brightness(1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 50px rgba(255, 215, 0, 0.6),
+      0 0 100px rgba(255, 215, 0, 0.3),
+      0 0 150px rgba(255, 215, 0, 0.1),
+      inset 0 0 30px rgba(255, 215, 0, 0.2);
+    filter: brightness(1.1);
+  }
+}
+
+/* Rainbow shimmer for legendary moments */
+.rainbow-shimmer {
+  background: linear-gradient(90deg,
+      #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000);
+  background-size: 400% 100%;
+  animation: rainbow-shift 3s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
 /* ============================================ */
 /* ACCESSIBILITY: Focus Indicators             */
 /* WCAG 2.2 AA compliant visible focus states  */
