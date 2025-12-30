@@ -1956,6 +1956,24 @@ export default function App() {
         console.log('[CardDNA] Received unique DNA:', data.cardDNA.signature)
       }
 
+      // P3.2: Store score history for historical graph (last 30 scans)
+      try {
+        const history = JSON.parse(localStorage.getItem('fitrate_score_history') || '[]')
+        history.push({
+          score: overall,
+          mode: effectiveMode,
+          timestamp: Date.now(),
+          subscores: {
+            color: data.scores.color,
+            fit: data.scores.fit,
+            style: data.scores.style
+          }
+        })
+        // Keep only last 30 entries
+        if (history.length > 30) history.shift()
+        localStorage.setItem('fitrate_score_history', JSON.stringify(history))
+      } catch (e) { /* localStorage full, ignore */ }
+
       // Track scan completion for GA4 analytics
       trackScanComplete(effectiveMode, overall, {
         isDailyChallenge: isProDailyChallengeSubmission,
