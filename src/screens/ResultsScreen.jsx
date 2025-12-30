@@ -1176,17 +1176,41 @@ export default function ResultsScreen({
                 </p>
 
                 {/* Vibe Context (Aesthetic + Celeb) - now smaller, supporting */}
-                {(scores.aesthetic || scores.celebMatch) && (
+                {scores.aesthetic && !scores.celebMatch && (
                     <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/60">
+                            ✨ {scores.aesthetic}
+                        </span>
+                    </div>
+                )}
+
+                {/* P3.4 — CELEBRITY MATCH CARD — Dedicated visual moment */}
+                {scores.celebMatch && (
+                    <div
+                        className="w-full mb-4 p-4 rounded-2xl text-center"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(255,107,53,0.12) 0%, rgba(255,0,128,0.08) 100%)',
+                            border: '1px solid rgba(255,107,53,0.25)',
+                            boxShadow: '0 0 30px rgba(255,107,53,0.15)'
+                        }}
+                    >
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <span className="text-2xl">⭐</span>
+                            <span className="text-xs font-bold uppercase tracking-widest text-orange-400/70">
+                                Celeb Vibes Detected
+                            </span>
+                            <span className="text-2xl">⭐</span>
+                        </div>
+                        <p className="text-2xl font-black text-white mb-1">
+                            {scores.celebMatch}
+                        </p>
+                        <p className="text-xs text-white/40">
+                            Your fit gives off {scores.celebMatch} energy ✨
+                        </p>
                         {scores.aesthetic && (
-                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/60">
-                                ✨ {scores.aesthetic}
-                            </span>
-                        )}
-                        {scores.celebMatch && (
-                            <span className="px-3 py-1 rounded-full text-xs font-semibold text-orange-400/80" style={{ background: 'rgba(255,107,53,0.1)', border: '1px solid rgba(255,107,53,0.2)' }}>
-                                🌟 Vibes like {scores.celebMatch}
-                            </span>
+                            <div className="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/50">
+                                {scores.aesthetic} Aesthetic
+                            </div>
                         )}
                     </div>
                 )}
