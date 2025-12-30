@@ -105,9 +105,11 @@ const TierBadge = ({ tier, score }) => {
             style={{
                 background: config.bg,
                 backgroundSize: config.isHolographic ? '300% 300%' : 'auto',
-                animation: config.isHolographic ? 'holographic 4s ease infinite' : 'none',
+                animation: `tierBadgeSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards, ${config.isHolographic ? 'holographic 4s ease infinite 0.9s' : 'none'}`,
                 color: config.text,
-                boxShadow: `0 8px 32px ${config.glow}66, 0 4px 16px rgba(0,0,0,0.3)`
+                boxShadow: `0 8px 32px ${config.glow}66, 0 4px 16px rgba(0,0,0,0.3)`,
+                transform: 'scale(0)',
+                opacity: 0
             }}
         >
             {config.label}
@@ -341,18 +343,26 @@ const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay
     )
 }
 
-// Enhanced Confetti with tier-appropriate colors
+// Enhanced Confetti with EXPLOSION PHYSICS - radial burst from center
 const Confetti = ({ count, colors, scoreKey }) => {
     const pieces = useMemo(() =>
-        Array.from({ length: count }, (_, i) => ({
-            id: i,
-            left: Math.random() * 100,
-            delay: Math.random() * 2,
-            duration: 2.5 + Math.random() * 2,
-            size: 8 + Math.random() * 10,
-            color: colors[i % colors.length],
-            rotation: Math.random() * 360,
-        })), [count, colors]
+        Array.from({ length: count }, (_, i) => {
+            // Calculate radial burst direction (360 degree spread)
+            const angle = (i / count) * 360 + Math.random() * 30
+            const radians = angle * (Math.PI / 180)
+            const burstDistance = 80 + Math.random() * 120
+            return {
+                id: i,
+                delay: Math.random() * 0.3, // Staggered burst
+                duration: 2.5 + Math.random() * 1.5,
+                size: 8 + Math.random() * 12,
+                color: colors[i % colors.length],
+                // Explosion physics - radial direction
+                explodeX: Math.cos(radians) * burstDistance,
+                explodeY: Math.sin(radians) * -burstDistance, // Negative = upward
+                driftX: -30 + Math.random() * 60,
+            }
+        }), [count, colors]
     )
 
     return (
@@ -362,13 +372,15 @@ const Confetti = ({ count, colors, scoreKey }) => {
                     key={`${scoreKey}-${p.id}`}
                     className="confetti-piece"
                     style={{
-                        left: `${p.left}%`,
                         width: p.size,
                         height: p.size,
                         background: p.color,
                         borderRadius: p.id % 2 === 0 ? '50%' : '2px',
                         animationDelay: `${p.delay}s`,
                         animationDuration: `${p.duration}s`,
+                        '--explode-x': `${p.explodeX}px`,
+                        '--explode-y': `${p.explodeY}px`,
+                        '--drift-x': `${p.driftX}px`,
                     }}
                 />
             ))}
@@ -595,13 +607,33 @@ export default function ResultsScreen({
             const progress = Math.min(elapsed / duration, 1)
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
             const currentScore = Math.floor(easeProgress * endScore)
-            setDisplayedScore(currentScore)
 
-            if (progress >= 1) {
+            // DRUMROLL EFFECT: Pause at score-1 for dramatic tension
+            if (currentScore >= endScore - 1 && currentScore < endScore && !window._drumrollPaused) {
+                window._drumrollPaused = true
+                setDisplayedScore(endScore - 1)
+                vibrate(20) // Subtle anticipation haptic
+                // Hold for 400ms then reveal final
+                setTimeout(() => {
+                    if (!isMounted.current) return
+                    playSound('pop')
+                    vibrate([30, 50, 80]) // Climactic haptic
+                    setDisplayedScore(endScore)
+                    setAnimationComplete(true)
+                    window._drumrollPaused = false
+                }, 400)
+                return
+            }
+
+            if (!window._drumrollPaused) {
+                setDisplayedScore(currentScore)
+            }
+
+            if (progress >= 1 && !window._drumrollPaused) {
                 // LOCK: Animation complete - set exact final value
                 setDisplayedScore(endScore)
                 setAnimationComplete(true)
-            } else {
+            } else if (!window._drumrollPaused) {
                 animationFrameId = requestAnimationFrame(animateScore)
             }
         }
