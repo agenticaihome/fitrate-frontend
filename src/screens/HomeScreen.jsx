@@ -102,13 +102,28 @@ const OnboardingOverlay = ({ onComplete }) => {
 
                 {/* Subheadline */}
                 <motion.p
-                    className="text-xl text-white/60 mb-10"
+                    className="text-xl text-white/60 mb-5"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
                     Let's see what you've got 👀
                 </motion.p>
+
+                {/* Free scans badge - KEY VALUE PROP */}
+                <motion.div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
+                    style={{
+                        background: 'rgba(0,212,255,0.15)',
+                        border: '1px solid rgba(0,212,255,0.3)'
+                    }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.35 }}
+                >
+                    <span className="text-lg">⚡</span>
+                    <span className="text-white/80 font-medium">2 FREE scans every day</span>
+                </motion.div>
 
                 {/* Big CTA Button */}
                 <motion.button
