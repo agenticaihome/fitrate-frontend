@@ -1557,7 +1557,7 @@ export default function HomeScreen({
 
                             {/* Header */}
                             <motion.div
-                                className="text-center mb-5"
+                                className="text-center mb-4"
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
@@ -1565,6 +1565,28 @@ export default function HomeScreen({
                                 <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
                                 <p className="text-white/50 text-sm">How should we rate your fit?</p>
                             </motion.div>
+
+                            {/* P3.3 — FEATURED MODE PREVIEW - Shows selected mode personality */}
+                            {mode && (() => {
+                                const currentModeData = MODES.find(m => m.id === mode) || MODES[0]
+                                return (
+                                    <motion.div
+                                        className="mb-4 p-4 rounded-2xl text-center"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.15 }}
+                                        style={{
+                                            background: `linear-gradient(135deg, ${currentModeData.color}20 0%, ${currentModeData.color}08 100%)`,
+                                            border: `1px solid ${currentModeData.color}40`,
+                                            boxShadow: `0 0 20px ${currentModeData.glow}`
+                                        }}
+                                    >
+                                        <span className="text-4xl inline-block mb-2">{currentModeData.emoji}</span>
+                                        <p className="text-lg font-black text-white mb-1">{currentModeData.label} Mode</p>
+                                        <p className="text-sm text-white/60 italic">"{currentModeData.desc}"</p>
+                                    </motion.div>
+                                )
+                            })()}
 
                             {/* Mode Grid - Staggered animation */}
                             <div className="grid grid-cols-4 gap-2">
