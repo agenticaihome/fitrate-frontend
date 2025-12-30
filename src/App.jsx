@@ -1766,6 +1766,19 @@ export default function App() {
         // ============================================
         const respondingBattleId = localStorage.getItem('fitrate_responding_challenge')
         if (respondingBattleId) {
+          // CONTENT MODERATION: Block battle entry if content flagged as inappropriate
+          if (data.scores.contentFlagged) {
+            console.warn('[Battle] Blocked response - content was flagged as inappropriate')
+            localStorage.removeItem('fitrate_responding_challenge')
+            localStorage.removeItem('fitrate_responding_battle_mode')
+            setToastMessage("This image can't be used for battles. Please retake with appropriate clothing. 👕")
+            setShowToast(true)
+            // Continue to normal results screen (don't join the battle)
+            setIsAnalyzing(false)
+            setScreen('results')
+            return
+          }
+
           try {
             const battleRes = await fetch(`${API_BASE}/battle/${respondingBattleId}/respond`, {
               method: 'POST',
@@ -1773,7 +1786,8 @@ export default function App() {
               body: JSON.stringify({
                 responderScore: overall,
                 responderId: userId,
-                responderThumb: imageData  // Use the actual photo from analyzeOutfit()
+                responderThumb: imageData,  // Use the actual photo from analyzeOutfit()
+                contentFlagged: data.scores.contentFlagged || false  // Server-side validation backup
               })
             })
             const battleResult = await battleRes.json()
@@ -1944,6 +1958,17 @@ export default function App() {
       // ============================================
       const respondingChallengeId = localStorage.getItem('fitrate_responding_challenge')
       if (respondingChallengeId) {
+        // CONTENT MODERATION: Block battle entry if content flagged as inappropriate
+        if (data.scores.contentFlagged) {
+          console.warn('[Challenge] Blocked response - content was flagged as inappropriate')
+          localStorage.removeItem('fitrate_responding_challenge')
+          setToastMessage("This image can't be used for battles. Please retake with appropriate clothing. 👕")
+          setShowToast(true)
+          // Continue to normal results screen (don't join the battle)
+          setScreen('results')
+          return
+        }
+
         try {
           const res = await fetch(`${API_BASE}/battle/${respondingChallengeId}/respond`, {
             method: 'POST',
@@ -1951,7 +1976,8 @@ export default function App() {
             body: JSON.stringify({
               responderScore: overall,
               responderId: userId,
-              responderThumb: imageData  // Use the actual photo from analyzeOutfit()
+              responderThumb: imageData,  // Use the actual photo from analyzeOutfit()
+              contentFlagged: data.scores.contentFlagged || false  // Server-side validation backup
             })
           })
           const challengeResult = await res.json()
@@ -2015,6 +2041,19 @@ export default function App() {
   // type: 'challenge' generates a 1v1 challenge link with score, otherwise normal share
   const generateShareCard = useCallback(async (type) => {
     const isChallenge = type === 'challenge'
+
+    // ============================================
+    // CONTENT MODERATION: Block battle creation for inappropriate content
+    // AI flags nudity, shirtless, underwear-only, etc. as contentFlagged: true
+    // ============================================
+    if (isChallenge && scores?.contentFlagged) {
+      setToastMessage("This image can't be used for battles. Please retake with appropriate clothing. 👕")
+      setShowToast(true)
+      playSound('error')
+      vibrate(50)
+      console.warn('[Battle] Blocked - content was flagged as inappropriate')
+      return
+    }
 
     // Satisfying feedback when generating
     playSound('share')
@@ -2086,7 +2125,8 @@ export default function App() {
               creatorScore: scores.overall,
               creatorId: userId,
               mode: mode,  // Send the mode so responder uses same mode
-              creatorThumb: uploadedImage  // Send creator's outfit photo
+              creatorThumb: uploadedImage,  // Send creator's outfit photo
+              contentFlagged: scores?.contentFlagged || false  // Server-side validation backup
             })
           })
           const data = await res.json()
