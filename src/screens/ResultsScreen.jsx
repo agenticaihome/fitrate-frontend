@@ -1008,7 +1008,7 @@ export default function ResultsScreen({
 
                         {/* Main score badge with gradient border effect */}
                         <div
-                            className="relative w-[100px] h-[100px] rounded-full flex flex-col items-center justify-center"
+                            className={`relative w-[100px] h-[100px] rounded-full flex flex-col items-center justify-center ${scores.overall === 100 ? 'jackpot-glow' : ''}`}
                             style={{
                                 background: `linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)`,
                                 border: `3px solid transparent`,
