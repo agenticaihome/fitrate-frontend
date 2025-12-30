@@ -87,7 +87,7 @@ export const PAYWALL = {
     headline: 'Unlock Unlimited Scans',
     subheadline: 'All 12 AI judges included!',
     benefits: [
-        '2 free scans daily',
+        '2 FREE scans/day (resets midnight)',
         'All 12 AI personalities',
         'Scans never expire',
         'Instant access',

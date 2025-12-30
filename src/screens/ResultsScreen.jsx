@@ -1717,7 +1717,7 @@ export default function ResultsScreen({
                                 You're on a roll!
                             </h3>
                             <p className="text-xs text-white/50 text-center mb-3">
-                                Free scans refresh tomorrow
+                                2 FREE scans reset at midnight ⏰
                             </p>
                             <div
                                 className="w-full py-3 rounded-xl font-bold text-sm text-center transition-all group-hover:brightness-110"
