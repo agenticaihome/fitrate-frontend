@@ -89,16 +89,19 @@ export const generateShareCard = async ({
     dailyChallengeContext = null,
     cardDNA = null,
     isChallenge = false,  // When true, generates a challenge link with score
-    challengeUrl = null   // The /c/:id URL from backend (if created)
+    challengeUrl = null,  // The /c/:id URL from backend (if created)
+    creatorMode = false,  // P4.4: Square format for TikTok/Instagram
+    creatorHandle = null  // P4.4: Optional @handle watermark
 }) => {
     return new Promise(async (resolve, reject) => {
         try {
             const canvas = document.createElement('canvas')
             const ctx = canvas.getContext('2d')
 
-            // Fixed dimensions (story format only for maximum impact)
+            // P4.4: Creator mode uses square 1:1 format for TikTok/Instagram
+            // Story format (9:16) is default for maximum vertical impact
             canvas.width = 1080
-            canvas.height = 1920
+            canvas.height = creatorMode ? 1080 : 1920
 
             // Load user image AND logo in parallel
             const [img, logoImg] = await Promise.all([
@@ -435,6 +438,19 @@ export const generateShareCard = async ({
                 ctx.fillStyle = 'rgba(255,255,255,0.6)'
                 ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, sans-serif'
                 ctx.fillText('FitRate', canvas.width / 2, logoY)
+            }
+
+            // ===== P4.4: CREATOR HANDLE WATERMARK =====
+            if (creatorHandle) {
+                ctx.fillStyle = 'rgba(255,255,255,0.5)'
+                ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+                ctx.textAlign = 'center'
+                // Position handle at bottom right corner
+                const handleX = canvas.width - 100
+                const handleY = canvas.height - 25
+                ctx.textAlign = 'right'
+                ctx.fillText(creatorHandle.startsWith('@') ? creatorHandle : `@${creatorHandle}`, handleX, handleY)
+                ctx.textAlign = 'center'  // Reset alignment
             }
 
             // ===== GENERATE SHARE TEXT =====
