@@ -195,7 +195,7 @@ export const generateShareCard = async ({
 
             const verdictLines = wrapText(ctx, verdict, canvas.width * 0.90)  // 90% width - WIDE
             const lineHeight = 88
-            verdictLines.slice(0, 2).forEach((line, i) => {
+            verdictLines.slice(0, 3).forEach((line, i) => {  // Allow 3 lines if needed
                 ctx.fillText(line, canvas.width / 2, headlineY + (i * lineHeight))
             })
 
@@ -204,15 +204,15 @@ export const generateShareCard = async ({
             ctx.shadowOffsetX = 0
             ctx.shadowOffsetY = 0
 
-            // ===== MODE BADGE (Readable) =====
-            const modeBadgeHeight = 38
+            // ===== MODE BADGE (Bigger, readable) =====
+            const modeBadgeHeight = 44
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
-            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
             const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
             const modeBadgeWidth = modeBadgeTextWidth + 32
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
-            const actualModeBadgeY = headlineY + ((Math.min(verdictLines.length, 2) - 1) * lineHeight) + 25
+            const actualModeBadgeY = headlineY + ((Math.min(verdictLines.length, 3) - 1) * lineHeight) + 25
 
             ctx.fillStyle = 'rgba(255,255,255,0.08)'
             ctx.beginPath()
@@ -223,8 +223,8 @@ export const generateShareCard = async ({
             ctx.lineWidth = 1
             ctx.stroke()
 
-            ctx.fillStyle = 'rgba(255,255,255,0.75)'
-            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.80)'
+            ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, actualModeBadgeY + modeBadgeHeight / 2)
@@ -323,8 +323,8 @@ export const generateShareCard = async ({
                 { icon: '✨', label: 'Style', value: scores.style || Math.round(score + (Math.random() * 6 - 3)) }
             ]
 
-            const subscoreItemWidth = 170
-            const subscoreGap = 25
+            const subscoreItemWidth = 180
+            const subscoreGap = 20
             const totalSubscoreWidth = (subscoreItemWidth * 3) + (subscoreGap * 2)
             const subscoreStartX = (canvas.width - totalSubscoreWidth) / 2
 
@@ -351,7 +351,7 @@ export const generateShareCard = async ({
 
             // ===== CTA BUTTON (Wide and bold) =====
             const actualCtaY = subscoreBottomY + 22
-            const ctaWidth = 620  // WIDE
+            const ctaWidth = 660  // WIDER
             const actualCtaHeight = 68  // Tall
             const ctaX = (canvas.width - ctaWidth) / 2
             const ctaText = 'Post yours → fitrate.app'
