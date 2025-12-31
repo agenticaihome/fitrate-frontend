@@ -286,9 +286,14 @@ export default function ShareSuccessScreen({
                 📸 Rate Another Fit
             </button>
 
-            {/* Secondary Option - Glassmorphism */}
+            {/* Secondary Option - Start a battle scan */}
             <button
-                onClick={() => handleAction('battle')}
+                onClick={() => {
+                    playSound('click')
+                    vibrate(20)
+                    // Go home - user can start a new scan to create a battle
+                    setScreen('home')
+                }}
                 className="w-full max-w-xs py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all active:scale-95 mb-6 glass-premium z-10 animate-stagger-fade-up"
                 style={{
                     border: '1px solid rgba(255,255,255,0.15)',
@@ -297,7 +302,7 @@ export default function ShareSuccessScreen({
                     animationDelay: '0.75s'
                 }}
             >
-                ⚔️ Challenge a Friend
+                📸 New Fit Battle
             </button>
 
             {/* Push Notification - Subtle, collapsible */}
