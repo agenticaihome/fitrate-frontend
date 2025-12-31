@@ -8,7 +8,7 @@ export const LIMITS = {
     // Pro scans (GPT-4o) earned via referrals or subscription
     FREE_SCANS_DAILY: 2,            // Gemini-powered free scans
     TOTAL_FREE_DAILY: 2,            // For user display
-    PRO_SCANS_DAILY: 25,            // Soft cap to prevent abuse
+    PRO_SCANS_DAILY: 100,           // Fair use limit for 'Unlimited' subscribers
 
     // Weekly Event
     FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
