@@ -213,22 +213,39 @@ export default function ChallengesScreen({
                                     </div>
                                 </div>
 
-                                {/* Timer Card */}
+                                {/* PRIZES Card - Actual scan rewards! */}
                                 <div className="rounded-2xl p-4" style={{
-                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
-                                    border: '1px solid rgba(59, 130, 246, 0.3)'
+                                    background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(251, 146, 60, 0.12) 100%)',
+                                    border: '1px solid rgba(255, 215, 0, 0.3)'
                                 }}>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-2xl">🏅</span>
-                                            <div>
-                                                <p className="text-blue-300 font-bold">BRAGGING RIGHTS</p>
-                                                <p className="text-white/50 text-xs">Top the leaderboard!</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-blue-400 font-bold text-lg">{dailyTimeRemaining}</p>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">🏆</span>
+                                        <p className="text-yellow-300 font-bold">PRIZES</p>
+                                        <div className="ml-auto text-right">
+                                            <p className="text-yellow-400 font-bold text-sm">{dailyTimeRemaining}</p>
                                             <p className="text-white/40 text-[10px]">until reset</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-2 text-center">
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-yellow-400 text-lg font-black">🥇</p>
+                                            <p className="text-white font-bold text-sm">10</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-gray-300 text-lg font-black">🥈🥉</p>
+                                            <p className="text-white font-bold text-sm">5</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-amber-600 text-xs font-bold">#4-10</p>
+                                            <p className="text-white font-bold text-sm">2</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-white/60 text-xs font-bold">Top 25%</p>
+                                            <p className="text-white font-bold text-sm">1</p>
+                                            <p className="text-white/40 text-[10px]">scan</p>
                                         </div>
                                     </div>
                                 </div>
@@ -366,25 +383,42 @@ export default function ChallengesScreen({
                                     <p className="text-white/60 text-sm">This week's theme</p>
                                 </div>
 
-                                {/* Timer Card */}
+                                {/* PRIZES Card - Weekly rewards! */}
                                 <div className="rounded-2xl p-4" style={{
-                                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%)',
-                                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                                    background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(251, 146, 60, 0.12) 100%)',
+                                    border: '1px solid rgba(255, 215, 0, 0.3)'
                                 }}>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-2xl">🏅</span>
-                                            <div>
-                                                <p className="text-emerald-300 font-bold">BRAGGING RIGHTS</p>
-                                                <p className="text-white/50 text-xs">Top the leaderboard!</p>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-2xl">🏆</span>
+                                        <p className="text-yellow-300 font-bold">WEEKLY PRIZES</p>
                                         {currentEvent.endDate && (
-                                            <div className="text-right">
-                                                <p className="text-emerald-400 font-bold text-lg">{formatTimeRemaining(new Date(currentEvent.endDate).getTime() - Date.now())}</p>
+                                            <div className="ml-auto text-right">
+                                                <p className="text-yellow-400 font-bold text-sm">{formatTimeRemaining(new Date(currentEvent.endDate).getTime() - Date.now())}</p>
                                                 <p className="text-white/40 text-[10px]">remaining</p>
                                             </div>
                                         )}
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-2 text-center">
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-yellow-400 text-lg font-black">🥇</p>
+                                            <p className="text-white font-bold text-sm">50</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-gray-300 text-lg font-black">🥈🥉</p>
+                                            <p className="text-white font-bold text-sm">25</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-amber-600 text-xs font-bold">#4-10</p>
+                                            <p className="text-white font-bold text-sm">10</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                                            <p className="text-white/60 text-xs font-bold">Top 25%</p>
+                                            <p className="text-white font-bold text-sm">3</p>
+                                            <p className="text-white/40 text-[10px]">scans</p>
+                                        </div>
                                     </div>
                                 </div>
 
