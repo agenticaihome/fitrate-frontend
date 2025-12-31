@@ -175,11 +175,8 @@ export const generateShareCard = async ({
             ctx.fillRect(0, canvas.height * 0.4, canvas.width, canvas.height * 0.6)
 
             // ===== STRICT VERTICAL ZONE SYSTEM =====
-            // "If anything crosses lanes → redesign"
-            // Zone 1: Headline ONLY
-            // Zone 2: Score + Mode ONLY  
-            // Zone 3: Insight + Supporting text ONLY
-            // Zone 4: Metrics + CTA
+            // New order: Headline → Mode → Score → Insight
+            // Mode BEFORE score sets the context for the number
 
             let verdict = scores.verdict || scores.tagline || 'Looking good today.'
 
@@ -187,8 +184,7 @@ export const generateShareCard = async ({
             verdict = verdict.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim()
 
             // ===== ZONE 1: HEADLINE (HERO) =====
-            // Fixed anchor - does not move based on content
-            const heroY = canvas.height * 0.57  // Locked position (tightened from 0.55)
+            const heroY = canvas.height * 0.55  // Slightly higher to accommodate mode below
 
             ctx.shadowColor = 'rgba(0,0,0,0.7)'
             ctx.shadowBlur = 15
@@ -196,12 +192,12 @@ export const generateShareCard = async ({
             ctx.shadowOffsetY = 4
 
             ctx.fillStyle = '#ffffff'
-            ctx.font = '800 80px -apple-system, BlinkMacSystemFont, sans-serif'  // Slightly smaller for tighter lines
+            ctx.font = '800 80px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'alphabetic'
 
             const verdictLines = wrapText(ctx, verdict, canvas.width - 80)
-            const lineHeight = 85  // Tighter line height
+            const lineHeight = 85
             verdictLines.slice(0, 2).forEach((line, i) => {
                 ctx.fillText(line, canvas.width / 2, heroY + (i * lineHeight))
             })
@@ -211,15 +207,40 @@ export const generateShareCard = async ({
             ctx.shadowOffsetX = 0
             ctx.shadowOffsetY = 0
 
-            // Calculate headline bottom - this is the zone boundary
-            const headlineBottomY = heroY + ((Math.min(verdictLines.length, 2) - 1) * lineHeight) + 30
+            // Calculate headline bottom
+            const headlineBottomY = heroY + ((Math.min(verdictLines.length, 2) - 1) * lineHeight) + 25
 
-            // ===== ZONE 2: SCORE + MODE (Hard anchor below headline) =====
-            // Minimum safe gap from headline bottom
-            const safeGap = 28  // Tightened from 40 - "intentionally paired"
-            const badgeSize = 140  // Compact stamp
+            // ===== ZONE 1.5: MODE BADGE (Context setter - BEFORE score) =====
+            // "This was Nice Mode" → Now you know how to read the score
+            const modeBadgeY = headlineBottomY + 12  // Tight to headline
+            const modeBadgeHeight = 34
+            const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
+
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
+            const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
+            const modeBadgeWidth = modeBadgeTextWidth + 26
+            const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
+
+            ctx.fillStyle = 'rgba(255,255,255,0.08)'
+            ctx.beginPath()
+            ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
+            ctx.fill()
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'
+            ctx.lineWidth = 1
+            ctx.stroke()
+
+            ctx.fillStyle = 'rgba(255,255,255,0.75)'
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
+
+            // ===== ZONE 2: SCORE RING (Now below mode) =====
+            const scoreGap = 18  // Tight gap from mode to score
+            const badgeSize = 140
             const badgeX = canvas.width / 2
-            const badgeY = headlineBottomY + safeGap + (badgeSize / 2)  // Center of ring
+            const badgeY = modeBadgeY + modeBadgeHeight + scoreGap + (badgeSize / 2)
 
             // Ring gradient
             const ringGradient = ctx.createLinearGradient(
@@ -229,11 +250,9 @@ export const generateShareCard = async ({
             ringGradient.addColorStop(0, ringColors.from)
             ringGradient.addColorStop(1, ringColors.to)
 
-            // Subtle glow
             ctx.shadowColor = ringColors.from
             ctx.shadowBlur = 18
 
-            // Draw ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = ringGradient
@@ -241,59 +260,31 @@ export const generateShareCard = async ({
             ctx.stroke()
             ctx.shadowBlur = 0
 
-            // Dark fill inside ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2 - 5, 0, Math.PI * 2)
             ctx.fillStyle = 'rgba(0,0,0,0.8)'
             ctx.fill()
 
-            // Score number
             ctx.fillStyle = '#ffffff'
             ctx.font = 'bold 65px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(score.toString(), badgeX, badgeY - 3)
 
-            // /100 - minimal
             ctx.fillStyle = 'rgba(255,255,255,0.35)'
             ctx.font = '18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.fillText('/100', badgeX, badgeY + 28)
 
-            // MODE BADGE - Attached to score ring like a label
-            const modeBadgeY = badgeY + badgeSize / 2 + 8  // Very tight to ring
-            const modeBadgeHeight = 32
-            const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
-
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
-            const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
-            const modeBadgeWidth = modeBadgeTextWidth + 22
-            const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
-
-            ctx.fillStyle = 'rgba(255,255,255,0.06)'
-            ctx.beginPath()
-            ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
-            ctx.fill()
-
-            ctx.strokeStyle = 'rgba(255,255,255,0.12)'
-            ctx.lineWidth = 1
-            ctx.stroke()
-
-            ctx.fillStyle = 'rgba(255,255,255,0.65)'
-            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
-
             // Zone 2 boundary
-            const scoreZoneBottomY = modeBadgeY + modeBadgeHeight
+            const scoreZoneBottomY = badgeY + badgeSize / 2
 
-            // ===== ZONE 3: INSIGHT (Below score zone with hard gap) =====
-            const zone3Gap = 25  // Tightened from 35 - subordinate zone
+            // ===== ZONE 3: INSIGHT (Below score) =====
+            const zone3Gap = 18  // Tighter
             const insightY = scoreZoneBottomY + zone3Gap
             const insightPool = score >= 75 ? AI_INSIGHT_POOLS.high : score >= 50 ? AI_INSIGHT_POOLS.mid : AI_INSIGHT_POOLS.low
             const insight = scores.insight || pickRandom(insightPool)
 
-            ctx.fillStyle = 'rgba(255,255,255,0.50)'  // Quieter
+            ctx.fillStyle = 'rgba(255,255,255,0.50)'
             ctx.font = '28px -apple-system, BlinkMacSystemFont, sans-serif'
             const insightLines = wrapText(ctx, insight, canvas.width - 100)
             insightLines.slice(0, 2).forEach((line, i) => {
@@ -305,8 +296,8 @@ export const generateShareCard = async ({
             let judgeBadgeBottomY = insightBottomY  // Track where content ends for spacing
 
             if (currentMode === 'celeb' && scores.judgedBy) {
-                const judgeBadgeY = insightBottomY + 30
-                const judgeBadgeHeight = 48
+                const judgeBadgeY = insightBottomY + 15  // Tighter gap
+                const judgeBadgeHeight = 42  // Slightly smaller
                 const judgeText = `🎭 Judged by ${scores.judgedBy}`
 
                 ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, sans-serif'
@@ -336,8 +327,8 @@ export const generateShareCard = async ({
 
             // ===== CELEBRITY MATCH BADGE - When AI detects celeb vibes =====
             if (scores.celebMatch) {
-                const celebBadgeY = judgeBadgeBottomY + 25
-                const celebBadgeHeight = 52
+                const celebBadgeY = judgeBadgeBottomY + 12  // Tighter gap
+                const celebBadgeHeight = 46  // Slightly smaller
                 const celebText = `⭐ Vibes like ${scores.celebMatch} ⭐`
 
                 ctx.font = 'bold 28px -apple-system, BlinkMacSystemFont, sans-serif'
