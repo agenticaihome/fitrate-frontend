@@ -57,17 +57,21 @@ textarea {
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   --shadow-physical: 0 8px 0 rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.3);
-  --shadow-glow-cyan: 0 0 30px rgba(0, 212, 255, 0.3);
-  --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 212, 255, 0.2);
+  --shadow-glow-gold: 0 0 20px rgba(255, 215, 0, 0.2);
 
   /* ================================================ */
   /* UPGRADED BACKGROUND COLORS                       */
-  /* Softer dark purples instead of pure black       */
+  /* Softer dark purples with BETTER card elevation  */
   /* ================================================ */
   --bg-darkest: #0a0a12;
   --bg-dark: #0f0f1a;
-  --bg-card: #1a1a2e;
-  --bg-elevated: #252538;
+  --bg-card: #1c1c32;
+  /* Lighter: was #1a1a2e */
+  --bg-elevated: #282845;
+  /* Lighter: was #252538 */
+  --bg-card-border: rgba(255, 255, 255, 0.08);
+  /* NEW: visible card borders */
 
   /* Brand Colors - Purple to Blue gradient */
   --brand-purple: #A855F7;
@@ -162,25 +166,36 @@ textarea {
   --radius-full: 9999px;
   /* Pills, badges */
 
-  /* Spacing Scale - Consistent rhythm */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-  --space-2xl: 32px;
-  --space-3xl: 48px;
+  /* Spacing Scale - Consistent rhythm, MORE BREATHING ROOM */
+  --space-xs: 6px;
+  /* Was 4px */
+  --space-sm: 10px;
+  /* Was 8px */
+  --space-md: 14px;
+  /* Was 12px */
+  --space-lg: 20px;
+  /* Was 16px */
+  --space-xl: 28px;
+  /* Was 24px */
+  --space-2xl: 40px;
+  /* Was 32px */
+  --space-3xl: 56px;
+  /* Was 48px */
 
   /* Button Active Scale - SINGLE VALUE everywhere */
   --btn-active-scale: 0.97;
 
-  /* Glass Effect - Unified blur + saturation */
+  /* Glass Effect - Unified blur + saturation, STRONGER BORDERS */
   --glass-blur: blur(20px);
   --glass-saturation: saturate(180%);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-bg-strong: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-strong: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  /* Slightly more visible: was 0.03 */
+  --glass-bg-strong: rgba(255, 255, 255, 0.08);
+  /* Slightly more visible: was 0.06 */
+  --glass-border: rgba(255, 255, 255, 0.12);
+  /* More visible: was 0.08 */
+  --glass-border-strong: rgba(255, 255, 255, 0.18);
+  /* More visible: was 0.12 */
 }
 
 /* ================================================ */
@@ -225,12 +240,57 @@ textarea {
 }
 
 /* ================================================ */
+/* TYPOGRAPHY HIERARCHY - Cleaner, Bolder           */
+/* ================================================ */
+
+/* Screen titles - big and bold */
+.text-screen-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* Section headings - medium emphasis */
+.text-section-heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.3;
+}
+
+/* Card titles - subtle emphasis */
+.text-card-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+/* Body text - readable */
+.text-body {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+/* Muted/caption text */
+.text-muted {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.4;
+}
+
 /* PREMIUM MOTION UTILITIES - 98/100 Polish        */
 /* ================================================ */
 
-/* CTA Breathing Pulse - Draws attention to primary actions */
+/* CTA Breathing Pulse - SUBTLE attention on primary actions */
 .cta-pulse {
-  animation: cta-breathe 2s ease-in-out infinite;
+  animation: cta-breathe 2.5s ease-in-out infinite;
 }
 
 @keyframes cta-breathe {
@@ -238,12 +298,14 @@ textarea {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.2);
   }
 
   50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px 8px rgba(139, 92, 246, 0.2);
+    transform: scale(1.01);
+    /* Reduced: was 1.02 */
+    box-shadow: 0 0 12px 4px rgba(139, 92, 246, 0.15);
+    /* Reduced: was 20px 8px 0.2 */
   }
 }
 
@@ -380,22 +442,29 @@ textarea {
   }
 }
 
-/* Rotating gradient glow ring - subtle outer halo */
+/* Rotating gradient glow ring - SUBTLE outer halo (reduced intensity) */
 .cta-glow-ring {
   position: absolute;
-  inset: -8px;
+  inset: -6px;
+  /* Reduced: was -8px */
   border-radius: 50%;
   background: conic-gradient(from var(--cta-glow-angle, 0deg),
       transparent 0deg,
-      var(--cta-glow-color, rgba(0, 212, 255, 0.4)) 60deg,
+      var(--cta-glow-color, rgba(0, 212, 255, 0.25)) 60deg,
+      /* Reduced: was 0.4 */
       transparent 120deg,
-      var(--cta-glow-color, rgba(139, 92, 246, 0.4)) 180deg,
+      var(--cta-glow-color, rgba(139, 92, 246, 0.25)) 180deg,
+      /* Reduced: was 0.4 */
       transparent 240deg,
-      var(--cta-glow-color, rgba(0, 212, 255, 0.4)) 300deg,
+      var(--cta-glow-color, rgba(0, 212, 255, 0.25)) 300deg,
+      /* Reduced: was 0.4 */
       transparent 360deg);
-  animation: cta-glow-rotate 8s linear infinite;
-  filter: blur(12px);
-  opacity: 0.6;
+  animation: cta-glow-rotate 10s linear infinite;
+  /* Slower: was 8s */
+  filter: blur(10px);
+  /* Reduced: was 12px */
+  opacity: 0.4;
+  /* Reduced: was 0.6 */
   pointer-events: none;
 }
 
