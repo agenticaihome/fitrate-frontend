@@ -176,27 +176,34 @@ export const generateShareCard = async ({
 
             // ===== NEW HIERARCHY: HEADLINE IS THE HERO =====
             // The AI verdict is the viral content, score validates
+            // "Design every card as if the AI sentence is the tweet."
 
-            const verdict = scores.verdict || scores.tagline || 'Looking good today.'
+            let verdict = scores.verdict || scores.tagline || 'Looking good today.'
+
+            // Strip emoji from headline (move to separate element if needed)
+            // Headlines should feel like album titles, not captions
+            verdict = verdict.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim()
 
             // ===== 1. VERDICT HEADLINE (PRIMARY HERO) =====
             // This is THE tweet, THE screenshot moment
-            const heroY = canvas.height * 0.52  // Higher up, prime real estate
+            // Moved DOWN 8% - lets the outfit breathe, feels more editorial
+            const heroY = canvas.height * 0.60  // Was 0.52, now lower for better composition
 
             // Strong text shadow for hero status
-            ctx.shadowColor = 'rgba(0,0,0,0.6)'
-            ctx.shadowBlur = 12
+            ctx.shadowColor = 'rgba(0,0,0,0.7)'
+            ctx.shadowBlur = 15
             ctx.shadowOffsetX = 0
-            ctx.shadowOffsetY = 3
+            ctx.shadowOffsetY = 4
 
             ctx.fillStyle = '#ffffff'
-            ctx.font = '800 70px -apple-system, BlinkMacSystemFont, sans-serif'  // BIGGER - hero size
+            ctx.font = '800 85px -apple-system, BlinkMacSystemFont, sans-serif'  // +21% from 70px
             ctx.textAlign = 'center'
             ctx.textBaseline = 'alphabetic'
 
-            const verdictLines = wrapText(ctx, verdict, canvas.width - 60)
+            // Smarter text wrapping - aim for balanced line widths
+            const verdictLines = wrapText(ctx, verdict, canvas.width - 80)  // Tighter margins
             verdictLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, heroY + (i * 78))
+                ctx.fillText(line, canvas.width / 2, heroY + (i * 90))  // 90px line height for larger font
             })
 
             // Reset shadow
@@ -206,11 +213,11 @@ export const generateShareCard = async ({
             ctx.shadowOffsetY = 0
 
             // ===== 2. SCORE RING (VALIDATION STAMP) =====
-            // Smaller, subtler - proves the AI backed up the headline
-            const badgeSize = 180  // Shrunk from 280 - it's a stamp, not the star
+            // Shrunk another 10% - it's proof, not the star
+            const badgeSize = 155  // Was 180, now 155 (-14%)
             const badgeX = canvas.width / 2
-            const verdictBottomY = heroY + (Math.min(verdictLines.length, 2) * 78)
-            const badgeY = verdictBottomY + 80  // Below headline
+            const verdictBottomY = heroY + (Math.min(verdictLines.length, 2) * 90)
+            const badgeY = verdictBottomY + 70  // Slightly tighter to headline
 
             // Ring gradient
             const ringGradient = ctx.createLinearGradient(
@@ -220,75 +227,76 @@ export const generateShareCard = async ({
             ringGradient.addColorStop(0, ringColors.from)
             ringGradient.addColorStop(1, ringColors.to)
 
-            // Subtle glow - not screaming, just confident
+            // Even subtler glow - confident, not screaming
             ctx.shadowColor = ringColors.from
-            ctx.shadowBlur = 30  // Reduced from 60
+            ctx.shadowBlur = 20  // Was 30
 
             // Draw ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = ringGradient
-            ctx.lineWidth = 10  // Thinner ring
+            ctx.lineWidth = 8  // Was 10
             ctx.stroke()
             ctx.shadowBlur = 0
 
             // Semi-transparent dark fill inside ring
             ctx.beginPath()
-            ctx.arc(badgeX, badgeY, badgeSize / 2 - 8, 0, Math.PI * 2)
-            ctx.fillStyle = 'rgba(0,0,0,0.7)'
+            ctx.arc(badgeX, badgeY, badgeSize / 2 - 6, 0, Math.PI * 2)
+            ctx.fillStyle = 'rgba(0,0,0,0.75)'
             ctx.fill()
 
-            // Score number - still prominent but not huge
+            // Score number - "Yeah, the AI backed this up"
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 90px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller than before
+            ctx.font = 'bold 75px -apple-system, BlinkMacSystemFont, sans-serif'  // Was 90, now 75
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(score.toString(), badgeX, badgeY - 8)
+            ctx.fillText(score.toString(), badgeX, badgeY - 5)
 
-            // /100 label - very subtle
-            ctx.fillStyle = 'rgba(255,255,255,0.5)'  // More transparent
-            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller
-            ctx.fillText('/100', badgeX, badgeY + 38)
+            // /100 label - barely there
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'  // Was 0.5
+            ctx.font = '20px -apple-system, BlinkMacSystemFont, sans-serif'  // Was 24
+            ctx.fillText('/100', badgeX, badgeY + 32)
 
             // ===== 3. MODE BADGE (TONE INDICATOR) =====
             // Small, tells you "this was a compliment not a roast"
-            const modeBadgeY = badgeY + badgeSize / 2 + 15
-            const modeBadgeHeight = 40  // Smaller
+            const modeBadgeY = badgeY + badgeSize / 2 + 12
+            const modeBadgeHeight = 36  // Was 40
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
-            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller text
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'  // Was 18
             const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
-            const modeBadgeWidth = modeBadgeTextWidth + 30
+            const modeBadgeWidth = modeBadgeTextWidth + 26
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
 
             // Softer semi-transparent background
-            ctx.fillStyle = 'rgba(255,255,255,0.1)'
+            ctx.fillStyle = 'rgba(255,255,255,0.08)'
             ctx.beginPath()
             ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
             ctx.fill()
 
             // Subtle border
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)'
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)'
             ctx.lineWidth = 1
             ctx.stroke()
 
             // Mode badge text - softer color
-            ctx.fillStyle = 'rgba(255,255,255,0.8)'
-            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.7)'
+            ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
 
-            // ===== AI INSIGHT (subtitle) =====
-            const insightY = modeBadgeY + modeBadgeHeight + 30
+            // ===== AI INSIGHT (subtitle/subcaption) =====
+            // More spacing, lower opacity - treat like a subcaption
+            const insightY = modeBadgeY + modeBadgeHeight + 45  // Was 30, now 45 for breathing room
             const insightPool = score >= 75 ? AI_INSIGHT_POOLS.high : score >= 50 ? AI_INSIGHT_POOLS.mid : AI_INSIGHT_POOLS.low
             const insight = scores.insight || pickRandom(insightPool)
 
-            ctx.fillStyle = 'rgba(255,255,255,0.7)'
-            ctx.font = '32px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.fillStyle = 'rgba(255,255,255,0.55)'  // Was 0.7, more subtle
+            ctx.font = '30px -apple-system, BlinkMacSystemFont, sans-serif'  // Was 32
             const insightLines = wrapText(ctx, insight, canvas.width - 100)
             insightLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, insightY + (i * 38))
+                ctx.fillText(line, canvas.width / 2, insightY + (i * 36))
             })
 
             // ===== CELEBRITY JUDGE BADGE - Celeb Mode Only =====
