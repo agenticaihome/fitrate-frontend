@@ -136,7 +136,7 @@ export default function ChallengesScreen({
     return (
         <div className="min-h-screen flex flex-col bg-[#0a0a0f] text-white" style={{
             paddingTop: 'max(24px, env(safe-area-inset-top))',
-            paddingBottom: 'calc(80px + env(safe-area-inset-bottom))'
+            paddingBottom: 'calc(100px + env(safe-area-inset-bottom))'
         }}>
             {/* Header - Centered title, no redundant back since BottomNav handles navigation */}
             <div className="flex items-center justify-center px-6 mb-4">
