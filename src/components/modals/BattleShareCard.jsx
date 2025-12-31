@@ -160,36 +160,9 @@ export default function BattleShareCard({
             if (err.name === 'AbortError') {
                 setShareStatus(null)
             } else {
-                // FALLBACK: Share text only when image fails
-                const fallbackText = userWon
-                    ? `🏆 I won a style battle on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} 🔥\n\nfitrate.app`
-                    : tied
-                        ? `🤝 Epic tie in a FitRate style battle! Both scored ${Math.round(userScore)}!\n\nfitrate.app`
-                        : `⚔️ Just battled on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} - so close!\n\nfitrate.app`
-
-                try {
-                    if (navigator.share) {
-                        await navigator.share({
-                            title: 'FitRate Battle Results',
-                            text: fallbackText
-                        })
-                        setShareStatus('success')
-                        playSound('success')
-                    } else if (navigator.clipboard) {
-                        await navigator.clipboard.writeText(fallbackText)
-                        setShareStatus('success')
-                        playSound('pop')
-                    } else {
-                        setShareStatus('error')
-                    }
-                } catch (fallbackErr) {
-                    // User cancelled text share - not an error
-                    if (fallbackErr.name === 'AbortError') {
-                        setShareStatus(null)
-                    } else {
-                        setShareStatus('error')
-                    }
-                }
+                setShareStatus('error')
+                playSound('error')
+                vibrate(50)
             }
         } finally {
             setIsSharing(false)
