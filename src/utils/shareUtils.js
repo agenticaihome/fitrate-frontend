@@ -188,7 +188,7 @@ export const generateShareCard = async ({
 
             // ===== ZONE 1: HEADLINE (HERO) =====
             // Fixed anchor - does not move based on content
-            const heroY = canvas.height * 0.55  // Locked position
+            const heroY = canvas.height * 0.57  // Locked position (tightened from 0.55)
 
             ctx.shadowColor = 'rgba(0,0,0,0.7)'
             ctx.shadowBlur = 15
@@ -216,7 +216,7 @@ export const generateShareCard = async ({
 
             // ===== ZONE 2: SCORE + MODE (Hard anchor below headline) =====
             // Minimum safe gap from headline bottom
-            const safeGap = 40  // "One line of text height" minimum
+            const safeGap = 28  // Tightened from 40 - "intentionally paired"
             const badgeSize = 140  // Compact stamp
             const badgeX = canvas.width / 2
             const badgeY = headlineBottomY + safeGap + (badgeSize / 2)  // Center of ring
@@ -288,7 +288,7 @@ export const generateShareCard = async ({
             const scoreZoneBottomY = modeBadgeY + modeBadgeHeight
 
             // ===== ZONE 3: INSIGHT (Below score zone with hard gap) =====
-            const zone3Gap = 35  // Clear separation
+            const zone3Gap = 25  // Tightened from 35 - subordinate zone
             const insightY = scoreZoneBottomY + zone3Gap
             const insightPool = score >= 75 ? AI_INSIGHT_POOLS.high : score >= 50 ? AI_INSIGHT_POOLS.mid : AI_INSIGHT_POOLS.low
             const insight = scores.insight || pickRandom(insightPool)
