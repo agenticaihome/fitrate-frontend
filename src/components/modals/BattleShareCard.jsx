@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { playSound, vibrate } from '../../utils/soundEffects'
 
@@ -14,6 +14,8 @@ export default function BattleShareCard({
     onClose
 }) {
     const cardRef = useRef(null)
+    const [isSharing, setIsSharing] = useState(false)
+    const [shareStatus, setShareStatus] = useState(null) // 'success' | 'error' | null
 
     const creatorScore = battleData?.creatorScore || 0
     const responderScore = battleData?.responderScore || 0
@@ -52,20 +54,43 @@ export default function BattleShareCard({
     const opponentOriginalScore = isCreator ? originalResponderScore : originalCreatorScore
 
     const handleShare = async () => {
+        if (isSharing) return // Prevent double-clicks
+
         playSound('click')
         vibrate(30)
+        setIsSharing(true)
+        setShareStatus(null)
 
-        if (!cardRef.current) return
+        if (!cardRef.current) {
+            setIsSharing(false)
+            setShareStatus('error')
+            return
+        }
 
         try {
+            // Generate image from card
             const canvas = await html2canvas(cardRef.current, {
                 scale: 2,
                 backgroundColor: '#0a0a0f',
                 logging: false,
-                useCORS: true
+                useCORS: true,
+                allowTaint: true, // Allow cross-origin images
+                onclone: (clonedDoc) => {
+                    // Fix any potential image loading issues in the clone
+                    const images = clonedDoc.querySelectorAll('img')
+                    images.forEach(img => {
+                        img.crossOrigin = 'anonymous'
+                    })
+                }
             })
 
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+            const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob(blob => {
+                    if (blob) resolve(blob)
+                    else reject(new Error('Failed to create image blob'))
+                }, 'image/png')
+            })
+
             const file = new File([blob], `fitrate-battle-${Date.now()}.png`, { type: 'image/png' })
 
             const shareText = userWon
@@ -74,14 +99,33 @@ export default function BattleShareCard({
                     ? `🤝 Epic tie in a FitRate style battle! Both scored ${Math.round(userScore)}!`
                     : `⚔️ Just battled on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} - so close!`
 
-            if (navigator.share && navigator.canShare({ files: [file] })) {
+            // Try native share with file
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     files: [file],
                     title: userWon ? 'I won a style battle! 🏆' : 'Check out this style battle!',
                     text: shareText
                 })
+                setShareStatus('success')
+                playSound('success')
+                vibrate([30, 20, 50])
+            } else if (navigator.share) {
+                // Share without file (text only)
+                await navigator.share({
+                    title: userWon ? 'I won a style battle! 🏆' : 'Check out this style battle!',
+                    text: shareText + '\n\nfitrate.app'
+                })
+                // Also download the image
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `fitrate-battle-${Date.now()}.png`
+                a.click()
+                URL.revokeObjectURL(url)
+                setShareStatus('success')
+                playSound('success')
             } else {
-                // Fallback: download
+                // Complete fallback: download + copy text
                 const url = URL.createObjectURL(blob)
                 const a = document.createElement('a')
                 a.href = url
@@ -91,11 +135,26 @@ export default function BattleShareCard({
 
                 // Copy text to clipboard
                 if (navigator.clipboard) {
-                    navigator.clipboard.writeText(shareText)
+                    await navigator.clipboard.writeText(shareText + '\n\nfitrate.app')
                 }
+
+                setShareStatus('success')
+                playSound('pop')
+                vibrate(20)
             }
         } catch (err) {
-            console.error('Share failed:', err)
+            console.error('[BattleShareCard] Share failed:', err)
+
+            // If user cancelled share, don't show error
+            if (err.name === 'AbortError') {
+                setShareStatus(null)
+            } else {
+                setShareStatus('error')
+                playSound('error')
+                vibrate(50)
+            }
+        } finally {
+            setIsSharing(false)
         }
     }
 
@@ -281,26 +340,50 @@ export default function BattleShareCard({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 mt-6 w-80">
-                    <button
-                        onClick={handleClose}
-                        className="flex-1 py-4 rounded-2xl font-bold bg-white/10 text-white active:scale-[0.97] transition-transform"
-                    >
-                        Close
-                    </button>
-                    <button
-                        onClick={handleShare}
-                        className="flex-1 py-4 rounded-2xl font-bold text-black active:scale-[0.97] transition-transform"
-                        style={{
-                            background: userWon
-                                ? `linear-gradient(135deg, ${winColor}, #00d4ff)`
-                                : tied
-                                    ? `linear-gradient(135deg, ${tieColor}, #ffa500)`
-                                    : `linear-gradient(135deg, #8b5cf6, #3b82f6)`
-                        }}
-                    >
-                        📤 Share
-                    </button>
+                <div className="flex flex-col gap-3 mt-6 w-80">
+                    {/* Status feedback */}
+                    {shareStatus === 'success' && (
+                        <div className="text-center text-sm py-2 px-4 rounded-xl bg-green-500/20 text-green-400 border border-green-500/30">
+                            ✓ Image saved! Share it from your gallery.
+                        </div>
+                    )}
+                    {shareStatus === 'error' && (
+                        <div className="text-center text-sm py-2 px-4 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30">
+                            Failed to share. Try again!
+                        </div>
+                    )}
+
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleClose}
+                            className="flex-1 py-4 rounded-2xl font-bold bg-white/10 text-white active:scale-[0.97] transition-transform"
+                            disabled={isSharing}
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={handleShare}
+                            disabled={isSharing}
+                            className="flex-1 py-4 rounded-2xl font-bold text-black active:scale-[0.97] transition-transform flex items-center justify-center gap-2"
+                            style={{
+                                background: userWon
+                                    ? `linear-gradient(135deg, ${winColor}, #00d4ff)`
+                                    : tied
+                                        ? `linear-gradient(135deg, ${tieColor}, #ffa500)`
+                                        : `linear-gradient(135deg, #8b5cf6, #3b82f6)`,
+                                opacity: isSharing ? 0.7 : 1
+                            }}
+                        >
+                            {isSharing ? (
+                                <>
+                                    <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></span>
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                <>📤 Share</>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
