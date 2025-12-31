@@ -781,7 +781,7 @@ export default function ResultsScreen({
                 background: bgGradient,
                 fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
                 paddingTop: 'max(1rem, env(safe-area-inset-top))',
-                paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+                paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 0px))'
             }}
         >
             {/* Premium floating particles */}
@@ -1755,8 +1755,8 @@ export default function ResultsScreen({
                 )
             }
 
-            {/* Extra bottom padding for sticky CTA visibility */}
-            <div className="h-4" />
+            {/* Extra bottom padding for BottomNav + sticky CTA visibility */}
+            <div className="h-20" />
 
             <Footer className="opacity-30 pt-6 pb-4" />
 

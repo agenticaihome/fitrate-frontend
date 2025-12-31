@@ -351,6 +351,9 @@ export default function App() {
   // Show dramatic battle reveal animation
   const [showBattleReveal, setShowBattleReveal] = useState(false)
 
+  // Track if last share was a challenge (for ShareSuccessScreen context)
+  const [lastShareWasChallenge, setLastShareWasChallenge] = useState(false)
+
   // ============================================
   // FASHION SHOW STATE
   // ============================================
@@ -2143,11 +2146,13 @@ export default function App() {
         }
 
         // Go to share success after a short delay
+        setLastShareWasChallenge(isChallenge)
         setTimeout(() => setScreen('share-success'), 1500)
       }).catch((err) => {
         console.warn('[Share] Clipboard copy failed:', err?.message || err)
         setToastMessage(isChallenge ? 'Challenge ready! Paste caption to send' : 'Image saved! Paste caption manually.')
         setShowToast(true)
+        setLastShareWasChallenge(isChallenge)
         setTimeout(() => setScreen('share-success'), 1500)
       })
     }
@@ -2245,6 +2250,7 @@ export default function App() {
           }
 
           // Success! Go to share-success screen
+          setLastShareWasChallenge(isChallenge)
           setScreen('share-success')
         } catch (err) {
           if (err.name !== 'AbortError') {
@@ -3395,6 +3401,22 @@ export default function App() {
           userId={userId}
           score={scores?.overall}
           totalReferrals={totalReferrals}
+          wasBattle={lastShareWasChallenge}
+          activeBattles={activeBattles}
+          onNavigateToBattle={(battleId) => {
+            // Navigate to most recent battle
+            setChallengePartyId(battleId)
+            window.history.pushState({}, '', `/b/${battleId}`)
+            setChallengePartyLoading(true)
+            fetch(`${API_BASE}/battle/${battleId}`, { headers: getApiHeaders() })
+              .then(res => res.json())
+              .then(data => {
+                setChallengePartyData(normalizeBattleData(data))
+                setIsCreatorOfChallenge(true)
+                if (data.status === 'completed') setShowBattleReveal(true)
+              })
+              .finally(() => setChallengePartyLoading(false))
+          }}
         />
       </Suspense>
     )

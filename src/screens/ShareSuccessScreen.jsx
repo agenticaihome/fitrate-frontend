@@ -149,10 +149,28 @@ export default function ShareSuccessScreen({
     setMode,
     setScreen,
     userId,
-    score
+    score,
+    wasBattle = false,
+    activeBattles = [],
+    onNavigateToBattle
 }) {
     const [showNotifications, setShowNotifications] = useState(false)
-    const celebration = getCelebrationContent(score)
+
+    // Get the most recent battle if wasBattle is true
+    const recentBattle = wasBattle && activeBattles.length > 0
+        ? activeBattles[0]
+        : null
+
+    const celebration = wasBattle
+        ? {
+            emoji: '⚔️',
+            headline: 'Battle Created!',
+            subtext: 'Share the link and wait for a challenger',
+            vibe: 'battle',
+            intensity: 'high',
+            color: '#00d4ff'
+        }
+        : getCelebrationContent(score)
 
     // Play celebration sound on mount with haptic
     useEffect(() => {
@@ -286,23 +304,29 @@ export default function ShareSuccessScreen({
                 📸 Rate Another Fit
             </button>
 
-            {/* Secondary Option - Start a battle scan */}
+            {/* Secondary Option - View Battle if just created, else New Battle */}
             <button
                 onClick={() => {
                     playSound('click')
                     vibrate(20)
-                    // Go home - user can start a new scan to create a battle
-                    setScreen('home')
+                    if (wasBattle && recentBattle && onNavigateToBattle) {
+                        // Navigate to the battle that was just created
+                        onNavigateToBattle(recentBattle.id)
+                    } else {
+                        // Go home - user can start a new scan to create a battle
+                        setScreen('home')
+                    }
                 }}
                 className="w-full max-w-xs py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all active:scale-95 mb-6 glass-premium z-10 animate-stagger-fade-up"
                 style={{
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    color: 'rgba(255,255,255,0.8)',
+                    border: wasBattle ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(255,255,255,0.15)',
+                    color: wasBattle ? '#00d4ff' : 'rgba(255,255,255,0.8)',
+                    background: wasBattle ? 'rgba(0,212,255,0.08)' : 'transparent',
                     opacity: 0,
                     animationDelay: '0.75s'
                 }}
             >
-                📸 New Fit Battle
+                {wasBattle ? '⚔️ View Battle Status' : '📸 New Fit Battle'}
             </button>
 
             {/* Push Notification - Subtle, collapsible */}
