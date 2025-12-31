@@ -618,8 +618,10 @@ body {
   transition: transform 0.05s linear;
 }
 
-/* Smoother animations in standalone */
-.is-standalone * {
+/* Smoother animations in standalone - ONLY for non-fixed elements */
+/* NOTE: transform: translateZ(0) on ancestors breaks position: fixed! */
+/* So we apply it selectively, NOT to fixed elements or their parents */
+.is-standalone .hw-accelerated {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
