@@ -57,27 +57,46 @@ export default function PWAUpdateBanner({ isStandalone }) {
         setIsRefreshing(true)
 
         try {
-            // Skip waiting service worker if available
             if ('serviceWorker' in navigator) {
                 const reg = await navigator.serviceWorker.getRegistration()
+
                 if (reg?.waiting) {
+                    // Set up listener BEFORE telling SW to skip waiting
+                    // This ensures we reload AFTER the new SW takes control
+                    const controllerChanged = new Promise((resolve) => {
+                        navigator.serviceWorker.addEventListener('controllerchange', () => {
+                            resolve()
+                        }, { once: true })
+                    })
+
+                    // Tell the waiting SW to activate
                     reg.waiting.postMessage({ type: 'SKIP_WAITING' })
+
+                    // Wait for the new SW to take control, then reload
+                    await controllerChanged
+
+                    // Small delay for iOS stability
+                    await new Promise(r => setTimeout(r, 100))
+
+                    // Use location.replace for iOS PWA compatibility
+                    // This reloads in-place without escaping to Safari
+                    window.location.replace(window.location.href)
+                    return
                 }
             }
 
-            // Clear caches for fresh content
+            // Fallback: If no waiting SW, just clear caches and reload
             if ('caches' in window) {
                 const keys = await caches.keys()
                 await Promise.all(keys.map(key => caches.delete(key)))
             }
 
-            // Small delay for visual feedback then reload
-            setTimeout(() => {
-                window.location.reload()
-            }, 300)
+            // Use location.replace instead of reload for iOS PWA
+            window.location.replace(window.location.href)
         } catch (err) {
             console.error('[PWA] Refresh failed:', err)
-            window.location.reload()
+            // Even on error, use replace not reload
+            window.location.replace(window.location.href)
         }
     }
 
@@ -132,7 +151,7 @@ export default function PWAUpdateBanner({ isStandalone }) {
                         animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
                     }}
                 >
-                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3" />
                 </svg>
                 {updateAvailable && (
                     <span style={{ fontWeight: 600 }}>Update</span>
