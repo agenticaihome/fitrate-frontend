@@ -3127,6 +3127,27 @@ export default function App() {
   }
 
   // ============================================
+  // PAYWALL MODAL - Show over any screen when triggered
+  // Must be BEFORE screen-specific renders to work as overlay
+  // ============================================
+  if (showPaywall) {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <PaywallModal
+          showPaywall={showPaywall}
+          setShowPaywall={setShowPaywall}
+          showDeclineOffer={showDeclineOffer}
+          setShowDeclineOffer={setShowDeclineOffer}
+          declineCountdown={declineCountdown}
+          checkoutLoading={checkoutLoading}
+          startCheckout={startCheckout}
+          userId={userId}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
   // RESULTS SCREEN - The Viral Engine
   // ============================================
   if (screen === 'results' && scores) {
@@ -3374,29 +3395,6 @@ export default function App() {
           userId={userId}
           score={scores?.overall}
           totalReferrals={totalReferrals}
-        />
-      </Suspense>
-    )
-  }
-
-  // ============================================
-  // PAYWALL MODAL - Pro upgrade with decline offer
-  // ============================================
-  // ============================================
-  // PAYWALL MODAL
-  // ============================================
-  if (showPaywall) {
-    return (
-      <Suspense fallback={<LoadingFallback />}>
-        <PaywallModal
-          showPaywall={showPaywall}
-          setShowPaywall={setShowPaywall}
-          showDeclineOffer={showDeclineOffer}
-          setShowDeclineOffer={setShowDeclineOffer}
-          declineCountdown={declineCountdown}
-          checkoutLoading={checkoutLoading}
-          startCheckout={startCheckout}
-          userId={userId}
         />
       </Suspense>
     )
