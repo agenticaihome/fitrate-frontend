@@ -2,13 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base Reset */
+/* Base Reset + PWA Native Feel */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  /* Disable iOS callout menu on long-press */
   user-select: none;
+}
+
+/* iOS Native Feel - Prevent browser-like behavior */
+html,
+body {
+  overscroll-behavior: none;
+  /* Prevent iOS rubber-band bounce */
+  -webkit-overflow-scrolling: touch;
+  /* Momentum scrolling */
+  touch-action: pan-x pan-y;
+  /* Smooth gestures */
+  overflow: hidden;
+  /* Prevent body scroll */
+  position: fixed;
+  /* Lock body in place for iOS */
+  width: 100%;
+  height: 100%;
+}
+
+/* Allow text selection only in form fields */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Hardware-accelerated animation utility */
+.hw-accelerated {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* CSS Variables */
