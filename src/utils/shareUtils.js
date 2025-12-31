@@ -174,10 +174,43 @@ export const generateShareCard = async ({
             ctx.fillStyle = bottomGradient
             ctx.fillRect(0, canvas.height * 0.4, canvas.width, canvas.height * 0.6)
 
-            // ===== SCORE RING - Positioned closer to bottom content =====
-            const badgeSize = 280
+            // ===== NEW HIERARCHY: HEADLINE IS THE HERO =====
+            // The AI verdict is the viral content, score validates
+
+            const verdict = scores.verdict || scores.tagline || 'Looking good today.'
+
+            // ===== 1. VERDICT HEADLINE (PRIMARY HERO) =====
+            // This is THE tweet, THE screenshot moment
+            const heroY = canvas.height * 0.52  // Higher up, prime real estate
+
+            // Strong text shadow for hero status
+            ctx.shadowColor = 'rgba(0,0,0,0.6)'
+            ctx.shadowBlur = 12
+            ctx.shadowOffsetX = 0
+            ctx.shadowOffsetY = 3
+
+            ctx.fillStyle = '#ffffff'
+            ctx.font = '800 70px -apple-system, BlinkMacSystemFont, sans-serif'  // BIGGER - hero size
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'alphabetic'
+
+            const verdictLines = wrapText(ctx, verdict, canvas.width - 60)
+            verdictLines.slice(0, 2).forEach((line, i) => {
+                ctx.fillText(line, canvas.width / 2, heroY + (i * 78))
+            })
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent'
+            ctx.shadowBlur = 0
+            ctx.shadowOffsetX = 0
+            ctx.shadowOffsetY = 0
+
+            // ===== 2. SCORE RING (VALIDATION STAMP) =====
+            // Smaller, subtler - proves the AI backed up the headline
+            const badgeSize = 180  // Shrunk from 280 - it's a stamp, not the star
             const badgeX = canvas.width / 2
-            const badgeY = canvas.height * 0.58  // Moved down further to minimize gap
+            const verdictBottomY = heroY + (Math.min(verdictLines.length, 2) * 78)
+            const badgeY = verdictBottomY + 80  // Below headline
 
             // Ring gradient
             const ringGradient = ctx.createLinearGradient(
@@ -187,96 +220,67 @@ export const generateShareCard = async ({
             ringGradient.addColorStop(0, ringColors.from)
             ringGradient.addColorStop(1, ringColors.to)
 
-            // Outer glow - ENHANCED for more visual impact
+            // Subtle glow - not screaming, just confident
             ctx.shadowColor = ringColors.from
-            ctx.shadowBlur = 60
+            ctx.shadowBlur = 30  // Reduced from 60
 
             // Draw ring
             ctx.beginPath()
             ctx.arc(badgeX, badgeY, badgeSize / 2, 0, Math.PI * 2)
             ctx.strokeStyle = ringGradient
-            ctx.lineWidth = 16
+            ctx.lineWidth = 10  // Thinner ring
             ctx.stroke()
             ctx.shadowBlur = 0
 
             // Semi-transparent dark fill inside ring
             ctx.beginPath()
-            ctx.arc(badgeX, badgeY, badgeSize / 2 - 12, 0, Math.PI * 2)
-            ctx.fillStyle = 'rgba(0,0,0,0.65)'
+            ctx.arc(badgeX, badgeY, badgeSize / 2 - 8, 0, Math.PI * 2)
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'
             ctx.fill()
 
-            // Score number
+            // Score number - still prominent but not huge
             ctx.fillStyle = '#ffffff'
-            ctx.font = 'bold 140px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 90px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller than before
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(score.toString(), badgeX, badgeY - 15)
+            ctx.fillText(score.toString(), badgeX, badgeY - 8)
 
-            // /100 label
-            ctx.fillStyle = 'rgba(255,255,255,0.7)'
-            ctx.font = '38px -apple-system, BlinkMacSystemFont, sans-serif'
-            ctx.fillText('/100', badgeX, badgeY + 60)
+            // /100 label - very subtle
+            ctx.fillStyle = 'rgba(255,255,255,0.5)'  // More transparent
+            ctx.font = '24px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller
+            ctx.fillText('/100', badgeX, badgeY + 38)
 
-            // ===== MODE BADGE - Below score ring =====
-            const modeBadgeY = badgeY + badgeSize / 2 + 25  // Tightened from 35
-            const modeBadgeHeight = 52
+            // ===== 3. MODE BADGE (TONE INDICATOR) =====
+            // Small, tells you "this was a compliment not a roast"
+            const modeBadgeY = badgeY + badgeSize / 2 + 15
+            const modeBadgeHeight = 40  // Smaller
             const modeBadgeText = `${modeConfig.emoji} ${modeConfig.label}`
 
-            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'  // Smaller text
             const modeBadgeTextWidth = ctx.measureText(modeBadgeText).width
-            const modeBadgeWidth = modeBadgeTextWidth + 40
+            const modeBadgeWidth = modeBadgeTextWidth + 30
             const modeBadgeX = (canvas.width - modeBadgeWidth) / 2
 
-            // Mode badge background
-            const modeBadgeGradient = ctx.createLinearGradient(modeBadgeX, modeBadgeY, modeBadgeX + modeBadgeWidth, modeBadgeY)
-            if (modeGradientMatch && modeGradientMatch.length >= 2) {
-                modeBadgeGradient.addColorStop(0, modeGradientMatch[0])
-                modeBadgeGradient.addColorStop(1, modeGradientMatch[1])
-            } else {
-                modeBadgeGradient.addColorStop(0, '#3b82f6')
-                modeBadgeGradient.addColorStop(1, '#06b6d4')
-            }
-
-            ctx.fillStyle = modeBadgeGradient
+            // Softer semi-transparent background
+            ctx.fillStyle = 'rgba(255,255,255,0.1)'
             ctx.beginPath()
             ctx.roundRect(modeBadgeX, modeBadgeY, modeBadgeWidth, modeBadgeHeight, modeBadgeHeight / 2)
             ctx.fill()
 
-            // Mode badge text
-            ctx.fillStyle = modeConfig.textColor
-            ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, sans-serif'
+            // Subtle border
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'
+            ctx.lineWidth = 1
+            ctx.stroke()
+
+            // Mode badge text - softer color
+            ctx.fillStyle = 'rgba(255,255,255,0.8)'
+            ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, sans-serif'
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             ctx.fillText(modeBadgeText, canvas.width / 2, modeBadgeY + modeBadgeHeight / 2)
 
-            // ===== VERDICT HEADLINE - Enhanced with text shadow for pop =====
-            const verdictY = modeBadgeY + modeBadgeHeight + 55
-            const verdict = scores.verdict || scores.tagline || 'Looking good today.'
-
-            // Add text shadow for pop on busy backgrounds
-            ctx.shadowColor = 'rgba(0,0,0,0.5)'
-            ctx.shadowBlur = 8
-            ctx.shadowOffsetX = 0
-            ctx.shadowOffsetY = 2
-
-            ctx.fillStyle = '#ffffff'
-            ctx.font = '800 58px -apple-system, BlinkMacSystemFont, sans-serif'  // Slightly larger, heavier
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'alphabetic'
-
-            const verdictLines = wrapText(ctx, verdict, canvas.width - 80)
-            verdictLines.slice(0, 2).forEach((line, i) => {
-                ctx.fillText(line, canvas.width / 2, verdictY + (i * 66))
-            })
-
-            // Reset shadow for other elements
-            ctx.shadowColor = 'transparent'
-            ctx.shadowBlur = 0
-            ctx.shadowOffsetX = 0
-            ctx.shadowOffsetY = 0
-
             // ===== AI INSIGHT (subtitle) =====
-            const insightY = verdictY + (Math.min(verdictLines.length, 2) * 64) + 25
+            const insightY = modeBadgeY + modeBadgeHeight + 30
             const insightPool = score >= 75 ? AI_INSIGHT_POOLS.high : score >= 50 ? AI_INSIGHT_POOLS.mid : AI_INSIGHT_POOLS.low
             const insight = scores.insight || pickRandom(insightPool)
 
