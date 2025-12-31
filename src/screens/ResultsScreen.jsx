@@ -1021,8 +1021,10 @@ export default function ResultsScreen({
                         >
                             {/* Score Number */}
                             <span
-                                className={`text-4xl font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
+                                className={`font-black leading-none ${isLegendary ? 'legendary-text' : ''}`}
                                 style={{
+                                    // Smaller font size when showing decimals to fit in circle
+                                    fontSize: displayedScore % 1 !== 0 ? '2rem' : '2.25rem',
                                     color: isLegendary ? undefined : '#fff',
                                     textShadow: animationComplete
                                         ? `0 0 30px ${ringColors.glow}, 0 0 60px ${ringColors.glow}`
@@ -1030,7 +1032,10 @@ export default function ResultsScreen({
                                     animation: revealStage >= 2 ? 'scoreNumberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none'
                                 }}
                             >
-                                {displayedScore}
+                                {/* Format: 73.4 stays, 73.0 becomes 73, integers stay as-is */}
+                                {displayedScore % 1 !== 0
+                                    ? displayedScore.toFixed(1).replace(/\.0$/, '')
+                                    : displayedScore}
                             </span>
                             {/* /100 */}
                             <span className="text-xs font-bold text-white/40">/100</span>
