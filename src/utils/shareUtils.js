@@ -358,7 +358,7 @@ export const generateShareCard = async ({
             }
 
             // ===== SUBSCORES ROW - Compact & Clean =====
-            const subscoreY = canvas.height - 270
+            const subscoreY = canvas.height - 230  // Was 270, moved up to reduce gap after vibes
             const subscores = [
                 { icon: '🎨', label: 'Color', value: scores.color || Math.round(score + (Math.random() * 6 - 3)) },
                 { icon: '👔', label: 'Fit', value: scores.fit || Math.round(score + (Math.random() * 6 - 3)) },
