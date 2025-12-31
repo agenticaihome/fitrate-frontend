@@ -2793,11 +2793,12 @@ export default function App() {
           onViewScorecard={() => {
             // Update URL first to prevent routing conflicts
             window.history.pushState({}, '', '/')
-            // Then batch all React state updates together
+            // Preserve battle ID so user can return to battle results
+            // The pendingBattleId enables the "See Battle Results" button in ResultsScreen
+            setPendingBattleId(challengePartyId)
+            // Hide battle reveal but DON'T clear data yet (needed for return)
             setShowBattleReveal(false)
-            setChallengePartyId(null)
-            setChallengePartyData(null)
-            // The scores are already set from the responder's analysis, just show results
+            // Go to results screen - user can return via onSeeBattleResults
             setScreen('results')
           }}
           onShare={() => {

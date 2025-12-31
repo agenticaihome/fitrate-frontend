@@ -69,19 +69,30 @@ export default function BattleShareCard({
 
         try {
             // Generate image from card
+            // Note: useCORS=true requires images to have proper CORS headers from server
+            // We DON'T use allowTaint because tainted canvases can't be exported
             const canvas = await html2canvas(cardRef.current, {
                 scale: 2,
                 backgroundColor: '#0a0a0f',
                 logging: false,
                 useCORS: true,
-                allowTaint: true, // Allow cross-origin images
+                // Don't use allowTaint - it prevents toBlob from working
+                // If images fail CORS, they just won't appear (better than total failure)
+                imageTimeout: 5000,
                 onclone: (clonedDoc) => {
-                    // Fix any potential image loading issues in the clone
+                    // Force crossOrigin on all images in the clone
                     const images = clonedDoc.querySelectorAll('img')
                     images.forEach(img => {
                         img.crossOrigin = 'anonymous'
+                        // Add error handler to prevent breaking if image fails
+                        img.onerror = () => {
+                            img.style.display = 'none'
+                        }
                     })
                 }
+            }).catch(err => {
+                console.error('[BattleShareCard] html2canvas failed:', err)
+                throw new Error('Failed to generate image')
             })
 
             const blob = await new Promise((resolve, reject) => {
