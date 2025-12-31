@@ -381,7 +381,7 @@ export default function ChallengesScreen({
                                         </div>
                                         {currentEvent.endDate && (
                                             <div className="text-right">
-                                                <p className="text-emerald-400 font-bold text-lg">{formatTimeRemaining(currentEvent.endDate)}</p>
+                                                <p className="text-emerald-400 font-bold text-lg">{formatTimeRemaining(new Date(currentEvent.endDate).getTime() - Date.now())}</p>
                                                 <p className="text-white/40 text-[10px]">remaining</p>
                                             </div>
                                         )}

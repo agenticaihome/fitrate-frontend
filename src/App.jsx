@@ -3404,6 +3404,10 @@ export default function App() {
           totalReferrals={totalReferrals}
           wasBattle={lastShareWasChallenge}
           activeBattles={activeBattles}
+          onCreateChallenge={() => {
+            // Create a challenge from the current score
+            generateShareCard('challenge')
+          }}
           onNavigateToBattle={(battleId) => {
             // Navigate to most recent battle
             setChallengePartyId(battleId)

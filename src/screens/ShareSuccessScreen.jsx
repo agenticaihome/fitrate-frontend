@@ -152,7 +152,8 @@ export default function ShareSuccessScreen({
     score,
     wasBattle = false,
     activeBattles = [],
-    onNavigateToBattle
+    onNavigateToBattle,
+    onCreateChallenge  // New: create a challenge from current score
 }) {
     const [showNotifications, setShowNotifications] = useState(false)
 
@@ -304,7 +305,7 @@ export default function ShareSuccessScreen({
                 📸 Rate Another Fit
             </button>
 
-            {/* Secondary Option - View Battle if just created, else New Battle */}
+            {/* Secondary Option - View Battle if just created, else Challenge a Friend */}
             <button
                 onClick={() => {
                     playSound('click')
@@ -312,21 +313,24 @@ export default function ShareSuccessScreen({
                     if (wasBattle && recentBattle && onNavigateToBattle) {
                         // Navigate to the battle that was just created
                         onNavigateToBattle(recentBattle.id)
+                    } else if (onCreateChallenge) {
+                        // Create a challenge from the current score
+                        onCreateChallenge()
                     } else {
-                        // Go home - user can start a new scan to create a battle
+                        // Fallback: go home
                         setScreen('home')
                     }
                 }}
                 className="w-full max-w-xs py-3 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all active:scale-95 mb-6 glass-premium z-10 animate-stagger-fade-up"
                 style={{
-                    border: wasBattle ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(255,255,255,0.15)',
-                    color: wasBattle ? '#00d4ff' : 'rgba(255,255,255,0.8)',
-                    background: wasBattle ? 'rgba(0,212,255,0.08)' : 'transparent',
+                    border: wasBattle ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(139,92,246,0.3)',
+                    color: wasBattle ? '#00d4ff' : '#a855f7',
+                    background: wasBattle ? 'rgba(0,212,255,0.08)' : 'rgba(139,92,246,0.08)',
                     opacity: 0,
                     animationDelay: '0.75s'
                 }}
             >
-                {wasBattle ? '⚔️ View Battle Status' : '📸 New Fit Battle'}
+                {wasBattle ? '⚔️ View Battle Status' : '⚔️ Challenge a Friend'}
             </button>
 
             {/* Push Notification - Subtle, collapsible */}
