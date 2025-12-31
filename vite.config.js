@@ -17,6 +17,23 @@ export default defineConfig({
         clientsClaim: true,
         // Clean up old caches from previous versions
         cleanupOutdatedCaches: true,
+        // SPA Navigation: Fallback to index.html for navigation requests
+        // This is critical for PWA to handle client-side routing correctly
+        navigateFallback: 'index.html',
+        // Exclude these routes from navigateFallback since they have edge functions
+        // that need to run for OG meta tag injection
+        navigateFallbackDenylist: [
+          /^\/b\//, // Battle rooms
+          /^\/c\//, // Challenge rooms  
+          /^\/f\//, // Fashion shows
+          /^\/about\.html$/,
+          /^\/privacy\.html$/,
+          /^\/terms\.html$/
+        ],
+        // Exclude HTML files with redirects from precaching
+        // These are fallback files that contain window.location.replace() 
+        // which Safari's SW doesn't like when served from cache
+        globPatterns: ['**/*.{js,css,png,svg,ico,woff,woff2}'],
         // Runtime caching for API requests
         runtimeCaching: [
           {
