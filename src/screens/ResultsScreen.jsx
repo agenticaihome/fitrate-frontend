@@ -1681,7 +1681,7 @@ export default function ResultsScreen({
                             {totalScans >= 2 && (
                                 <div
                                     className="p-3 rounded-xl border cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
-                                    onClick={onShowPaywall}
+                                    onClick={() => { playSound('click'); vibrate(15); onShowPaywall?.(); }}
                                     style={{
                                         background: 'linear-gradient(135deg, rgba(0,212,255,0.1) 0%, rgba(0,255,136,0.08) 100%)',
                                         borderColor: 'rgba(0,212,255,0.2)'
@@ -1703,7 +1703,7 @@ export default function ResultsScreen({
                     ) : (
                         <div
                             className="mt-4 p-5 rounded-2xl border cursor-pointer group transition-all hover:scale-[1.02] active:scale-[0.98]"
-                            onClick={onShowPaywall}
+                            onClick={() => { playSound('click'); vibrate(20); onShowPaywall?.(); }}
                             style={{
                                 background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(0,212,255,0.05) 100%)',
                                 borderColor: 'rgba(255,215,0,0.25)',
