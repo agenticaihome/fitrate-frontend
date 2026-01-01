@@ -608,7 +608,7 @@ export default function App() {
   const [currentEvent, setCurrentEvent] = useState(null)
   const [upcomingEvent, setUpcomingEvent] = useState(null)
   const [eventMode, setEventMode] = useState(false) // Default: opt-out of event, show normal mode
-  const [dailyChallengeMode, setDailyChallengeMode] = useState(false) // Daily challenge mode
+  const [dailyChallengeMode, setDailyChallengeMode] = useState(true) // Daily challenge mode - DEFAULT ON for competition-first UX
   const [userEventStatus, setUserEventStatus] = useState(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [leaderboard, setLeaderboard] = useState([]) // Weekly challenge leaderboard

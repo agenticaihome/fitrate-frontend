@@ -1280,7 +1280,53 @@ export default function HomeScreen({
             </div>
 
             {/* ============================================ */}
-            {/* MORE FEATURES - Collapsible Section */}
+            {/* ARENA CTA - Always Visible Competition */}
+            {/* ============================================ */}
+            {onOpenArena && (
+                <motion.button
+                    onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
+                    className="w-full max-w-sm p-4 rounded-2xl mb-4 relative overflow-hidden"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(139,92,246,0.1) 100%)',
+                        border: '1px solid rgba(0,212,255,0.3)'
+                    }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <motion.span
+                                className="text-3xl"
+                                animate={{ rotate: [0, 5, -5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity }}
+                            >
+                                🌍
+                            </motion.span>
+                            <div className="text-left">
+                                <span className="text-white font-bold text-lg block">Global Arena</span>
+                                <span className="text-cyan-300/70 text-xs">Random 1v1 • Win free scans</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <div className="flex items-center gap-1">
+                                <motion.span
+                                    className="w-2 h-2 rounded-full bg-green-400"
+                                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                />
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
+                                    LIVE
+                                </span>
+                            </div>
+                            <span className="text-cyan-400 text-xs font-bold mt-1">10 FREE/day →</span>
+                        </div>
+                    </div>
+                </motion.button>
+            )}
+
+            {/* ============================================ */}
+            {/* MORE WAYS TO COMPETE - Collapsible Section */}
             {/* ============================================ */}
             <div className="w-full max-w-sm">
                 <button
@@ -1292,7 +1338,7 @@ export default function HomeScreen({
                     className="w-full flex items-center justify-center gap-2 py-3 text-white/60 text-sm font-medium transition-all"
                 >
                     <span>{showMoreFeatures ? '▲' : '▼'}</span>
-                    <span>More Features</span>
+                    <span>More Ways to Compete</span>
                     {activeItemsCount > 0 && (
                         <span className="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">
                             {activeItemsCount}
@@ -1304,41 +1350,6 @@ export default function HomeScreen({
                     <div className="space-y-3 mt-2 animate-fade-in" style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
                         {/* Quick Actions Grid - Clay Cards with 3D depth */}
                         <div className="grid grid-cols-2 gap-3">
-                            {/* Arena */}
-                            {onOpenArena && (
-                                <motion.button
-                                    onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
-                                    className="p-4 rounded-2xl relative clay-card-cyan card-float-3d"
-                                    whileHover={{ scale: 1.02, y: -4 }}
-                                    whileTap={{ scale: 0.97, y: 2 }}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 }}
-                                >
-                                    <div className="absolute top-2 right-2 flex items-center gap-1">
-                                        <motion.span
-                                            className="w-1.5 h-1.5 rounded-full bg-green-400"
-                                            animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
-                                            transition={{ duration: 1.5, repeat: Infinity }}
-                                        />
-                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                                            style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
-                                            LIVE
-                                        </span>
-                                    </div>
-                                    <motion.span
-                                        className="text-2xl block mb-1"
-                                        animate={{ rotate: [0, 5, -5, 0] }}
-                                        transition={{ duration: 4, repeat: Infinity }}
-                                    >
-                                        🌍
-                                    </motion.span>
-                                    <span className="text-white font-bold text-sm block">Global Arena</span>
-                                    <span className="text-cyan-300/70 text-xs block">1v1 Battles</span>
-                                    <span className="text-cyan-400 text-[10px] font-semibold mt-1 block">🎮 10 FREE matches/day</span>
-                                </motion.button>
-                            )}
-
                             {/* Fashion Show */}
                             {onStartFashionShow && (
                                 <motion.button
@@ -1348,7 +1359,7 @@ export default function HomeScreen({
                                     whileTap={{ scale: 0.97, y: 2 }}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.15 }}
+                                    transition={{ delay: 0.1 }}
                                 >
                                     <motion.span
                                         className="text-2xl block mb-1"
@@ -1361,6 +1372,29 @@ export default function HomeScreen({
                                     <span className="text-purple-300/70 text-xs">Battle Friends</span>
                                 </motion.button>
                             )}
+
+                            {/* 1v1 Friend Battle placeholder - right column */}
+                            <motion.button
+                                onClick={() => { playSound('click'); vibrate(15); onShowRules?.(); }}
+                                className="p-4 rounded-2xl clay-card card-float-3d"
+                                style={{ background: 'linear-gradient(145deg, rgba(255,107,53,0.12) 0%, rgba(255,68,68,0.08) 100%)' }}
+                                whileHover={{ scale: 1.02, y: -4 }}
+                                whileTap={{ scale: 0.97, y: 2 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.15 }}
+                            >
+                                <motion.span
+                                    className="text-2xl block mb-1"
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    ⚔️
+                                </motion.span>
+                                <span className="text-white font-bold text-sm block">1v1 Battle</span>
+                                <span className="text-orange-300/70 text-xs">Challenge a Friend</span>
+                            </motion.button>
+
 
                             {/* Challenges - Clay card with 3D effect */}
                             <motion.button
