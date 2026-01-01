@@ -10,9 +10,8 @@ export const LIMITS = {
     TOTAL_FREE_DAILY: 2,            // For user display
     PRO_SCANS_DAILY: 100,           // Fair use limit for 'Unlimited' subscribers
 
-    // Weekly Event
-    FREE_EVENT_ENTRIES_WEEKLY: 1,  // Free users get 1 entry per week
-    PRO_EVENT_ENTRIES_DAILY: 5,    // Pro users can submit up to 5/day
+    // Weekly Event - SAME FOR EVERYONE
+    EVENT_ENTRIES_WEEKLY: 1,        // All users get 1 entry per week
 };
 
 export const PRICES = {
