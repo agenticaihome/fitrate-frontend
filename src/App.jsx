@@ -828,6 +828,36 @@ export default function App() {
     }
   }, [userId])
 
+  // CRITICAL: Sync scan count from backend (prevents cache bypass)
+  // Server is source of truth - localStorage is just a cache
+  useEffect(() => {
+    if (userId && userId.length >= 16) {
+      fetch(`${API_BASE}/api/pro/scan-status?userId=${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // Update scansRemaining from server count
+            setScansRemaining(data.scansRemaining)
+            // Update purchased scans from server
+            if (data.purchasedScans > 0) {
+              setPurchasedScans(data.purchasedScans)
+            }
+            // Sync localStorage with server truth
+            const today = new Date().toDateString()
+            localStorage.setItem('fitrate_scans', JSON.stringify({
+              date: today,
+              count: data.scansUsed
+            }))
+            console.log(`[SCAN SYNC] Server says: ${data.scansUsed}/${data.scansLimit} used, ${data.purchasedScans} purchased`)
+          }
+        })
+        .catch(err => {
+          console.warn('[SCAN SYNC] Failed to sync with server:', err)
+          // Keep local value on error
+        })
+    }
+  }, [userId])
+
   // Poll for referral notifications (when someone uses your link)
   useEffect(() => {
     if (!userId) return
