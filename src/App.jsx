@@ -3060,6 +3060,7 @@ export default function App() {
             // 'home' tab is already current, no action needed
           }}
           onOpenArena={openArenaEntry}
+          onStartFashionShow={() => setFashionShowScreen('create')}
           onScan={() => {
             // Trigger the main scan button on HomeScreen
             const mainCta = document.getElementById('main-scan-cta');
@@ -3243,6 +3244,7 @@ export default function App() {
               }
             }}
             onOpenArena={openArenaEntry}
+            onStartFashionShow={() => setFashionShowScreen('create')}
             onScan={() => {
               // Go home to scan again
               resetApp();

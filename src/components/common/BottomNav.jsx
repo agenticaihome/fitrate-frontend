@@ -6,7 +6,7 @@ import { playSound, vibrate } from '../../utils/soundEffects'
  * Clean, purposeful design with 4 clear destinations
  * No redundant scan button - main CTA is on HomeScreen
  */
-export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, onOpenArena }) {
+export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, onOpenArena, onStartFashionShow }) {
     const handleTap = (tabId) => {
         playSound('click')
         vibrate(15)
@@ -15,6 +15,8 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
             onScan?.()
         } else if (tabId === 'arena') {
             onOpenArena?.()
+        } else if (tabId === 'fashionshow') {
+            onStartFashionShow?.()
         } else {
             onNavigate?.(tabId)
         }
@@ -132,13 +134,13 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                 }}
             />
 
-            {/* Nav items - 3 clear destinations */}
-            <div className="relative h-full flex items-center justify-around px-8">
+            {/* Nav items - 4 clear destinations */}
+            <div className="relative h-full flex items-center justify-around px-4">
                 {/* Home */}
                 <button
                     onClick={() => handleTap('home')}
                     aria-label="Home"
-                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
+                    className="relative flex flex-col items-center justify-center w-14 h-14 transition-all active:scale-90"
                     style={{
                         transform: activeTab === 'home' ? 'translateY(-2px)' : 'translateY(0)',
                         transition: 'transform 0.2s ease-out'
@@ -151,20 +153,60 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                     {activeTab === 'home' && <ActiveIndicator />}
                 </button>
 
-                {/* Arena - Center emphasis */}
+                {/* Fashion Show */}
+                <button
+                    onClick={() => handleTap('fashionshow')}
+                    aria-label="Fashion Show"
+                    className="relative flex flex-col items-center justify-center w-14 h-14 transition-all active:scale-90"
+                    style={{
+                        transform: activeTab === 'fashionshow' ? 'translateY(-2px)' : 'translateY(0)',
+                        transition: 'transform 0.2s ease-out'
+                    }}
+                >
+                    <span className="text-xl" style={{
+                        filter: activeTab === 'fashionshow' ? 'drop-shadow(0 0 8px rgba(139,92,246,0.6))' : 'none'
+                    }}>🎭</span>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'fashionshow' ? 'text-purple-400' : 'text-white/50'}`}>
+                        Show
+                    </span>
+                    {activeTab === 'fashionshow' && <ActiveIndicator color="#a855f7" />}
+                </button>
+
+                {/* Challenges */}
+                <button
+                    onClick={() => handleTap('challenges')}
+                    aria-label="Challenges"
+                    className="relative flex flex-col items-center justify-center w-14 h-14 transition-all active:scale-90"
+                    style={{
+                        transform: (activeTab === 'challenges' || eventMode) ? 'translateY(-2px)' : 'translateY(0)',
+                        transition: 'transform 0.2s ease-out'
+                    }}
+                >
+                    <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />
+                    <span className={`text-[10px] mt-1 font-medium ${eventMode ? 'text-yellow-400' :
+                        activeTab === 'challenges' ? 'text-white' : 'text-white/50'
+                        }`}>
+                        Challenges
+                    </span>
+                    {(activeTab === 'challenges' || eventMode) && (
+                        <ActiveIndicator color={eventMode ? '#ffd700' : '#fff'} />
+                    )}
+                </button>
+
+                {/* Arena */}
                 <button
                     onClick={() => handleTap('arena')}
                     aria-label="Arena - 1v1 Battles"
-                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90 overflow-visible"
+                    className="relative flex flex-col items-center justify-center w-14 h-14 transition-all active:scale-90 overflow-visible"
                     style={{
                         transform: activeTab === 'arena' ? 'translateY(-2px)' : 'translateY(0)',
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    {/* Live indicator - positioned near icon */}
-                    <div className="absolute top-0.5 right-2 flex items-center gap-1 z-10">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" style={{
-                            boxShadow: '0 0 6px rgba(74, 222, 128, 0.8)'
+                    {/* Live indicator */}
+                    <div className="absolute top-1 right-1 flex items-center gap-0.5 z-10">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" style={{
+                            boxShadow: '0 0 4px rgba(74, 222, 128, 0.8)'
                         }} />
                     </div>
                     <ArenaIcon active={activeTab === 'arena'} />
@@ -172,28 +214,6 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         Arena
                     </span>
                     {activeTab === 'arena' && <ActiveIndicator color="#00d4ff" />}
-                </button>
-
-                {/* Challenges */}
-                <button
-                    onClick={() => handleTap('challenges')}
-                    aria-label="Challenges"
-                    className="relative flex flex-col items-center justify-center w-16 h-14 transition-all active:scale-90"
-                    style={{
-                        transform: (activeTab === 'challenges' || eventMode) ? 'translateY(-2px)' : 'translateY(0)',
-                        transition: 'transform 0.2s ease-out'
-                    }}
-                >
-                    <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />
-                    <span className={`text-[10px] mt-1 font-medium ${
-                        eventMode ? 'text-yellow-400' :
-                        activeTab === 'challenges' ? 'text-white' : 'text-white/50'
-                    }`}>
-                        Challenges
-                    </span>
-                    {(activeTab === 'challenges' || eventMode) && (
-                        <ActiveIndicator color={eventMode ? '#ffd700' : '#fff'} />
-                    )}
                 </button>
             </div>
 
