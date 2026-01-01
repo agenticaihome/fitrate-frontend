@@ -1518,7 +1518,8 @@ export default function HomeScreen({
                                 <span className="text-2xl">📷</span>
                                 Take Photo
                             </button>
-                            {!eventMode && !fashionShowName && (
+                            {/* Hide gallery for challenges - camera only to prevent gaming */}
+                            {!eventMode && !fashionShowName && !dailyChallengeMode && (
                                 <button
                                     onClick={handleAndroidUploadPhoto}
                                     className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
