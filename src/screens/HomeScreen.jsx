@@ -1471,17 +1471,16 @@ export default function HomeScreen({
             </div>
 
             {/* ============================================ */}
-            {/* COMPETE - Always Visible Clean Grid */}
+            {/* FIXED BOTTOM NAV BAR */}
             {/* ============================================ */}
-            <div className="w-full max-w-sm">
-                {/* Section Header */}
-                <div className="flex items-center gap-2 mb-3 px-1">
-                    <span className="text-lg">⚡</span>
-                    <span className="text-white/80 text-sm font-semibold">Ways to Compete</span>
-                </div>
-
-                {/* 3-Column Feature Grid */}
-                <div className="grid grid-cols-3 gap-2 mb-4">
+            <div
+                className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-6 pt-3"
+                style={{
+                    background: 'linear-gradient(to top, rgba(10,10,20,0.98) 0%, rgba(10,10,20,0.95) 60%, transparent 100%)',
+                    paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)'
+                }}
+            >
+                <div className="max-w-sm mx-auto grid grid-cols-3 gap-2">
                     {/* Global Arena */}
                     {onOpenArena && (
                         <motion.button
@@ -1560,91 +1559,10 @@ export default function HomeScreen({
                         <span className="text-emerald-300/70 text-[10px]">Daily + Weekly</span>
                     </motion.button>
                 </div>
-
-                {/* Active Battles - Only show when relevant */}
-                {activeBattles.length > 0 && (
-                    <div className="mb-3">
-                        <div className="flex items-center gap-2 mb-2 px-1">
-                            <span>⚔️</span>
-                            <span className="text-white/70 text-sm font-semibold">Your Battles</span>
-                        </div>
-                        <div className="space-y-2">
-                            {activeBattles.map((battle) => (
-                                <button
-                                    key={battle.battleId}
-                                    onClick={() => {
-                                        playSound('click')
-                                        vibrate(15)
-                                        onNavigateToBattle?.(battle.battleId)
-                                    }}
-                                    className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
-                                    style={{
-                                        background: battle.status === 'completed'
-                                            ? 'rgba(0,255,136,0.1)'
-                                            : 'rgba(255,107,53,0.1)',
-                                        border: battle.status === 'completed'
-                                            ? '1px solid rgba(0,255,136,0.2)'
-                                            : '1px solid rgba(255,107,53,0.2)'
-                                    }}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xl">
-                                            {getModeData(battle.mode)?.emoji || '⚔️'}
-                                        </span>
-                                        <div className="text-left">
-                                            <p className="text-white font-semibold text-sm">
-                                                {getModeData(battle.mode)?.label || 'Battle'}
-                                            </p>
-                                            <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
-                                                {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className="text-white/40">→</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Active Shows - Only show when relevant */}
-                {activeShows.length > 0 && (
-                    <div className="mb-3">
-                        <div className="flex items-center gap-2 mb-2 px-1">
-                            <span>🎭</span>
-                            <span className="text-white/70 text-sm font-semibold">Your Shows</span>
-                        </div>
-                        <div className="space-y-2">
-                            {activeShows.map((show) => (
-                                <button
-                                    key={show.showId}
-                                    onClick={() => {
-                                        playSound('click')
-                                        vibrate(15)
-                                        onNavigateToShow?.(show.showId)
-                                    }}
-                                    className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
-                                    style={{
-                                        background: 'rgba(139,92,246,0.1)',
-                                        border: '1px solid rgba(139,92,246,0.2)'
-                                    }}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xl">🎭</span>
-                                        <div className="text-left">
-                                            <p className="text-white font-semibold text-sm">{show.name}</p>
-                                            <p className="text-purple-300/70 text-xs">
-                                                {show.vibeLabel || 'Tap to rejoin'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className="text-white/40">→</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
+
+            {/* Spacer for fixed bottom nav */}
+            <div className="h-28" />
 
 
             {/* ============================================ */}
