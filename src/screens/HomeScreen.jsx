@@ -1233,7 +1233,7 @@ export default function HomeScreen({
                         )}
 
                         {/* Single breathing ring - NOW SWIPEABLE FOR MODE CHANGES */}
-                        <div className="relative mb-6">
+                        <div className="relative mb-3">
                             {/* Premium outer halo */}
                             <div
                                 className="cta-halo"
@@ -1420,6 +1420,30 @@ export default function HomeScreen({
                                             ← swipe to change →
                                         </motion.span>
                                     )}
+
+                                    {/* First-time user tooltip */}
+                                    {!dailyChallengeMode && !eventMode && !localStorage.getItem('fitrate_mode_tooltip_seen') && (
+                                        <motion.div
+                                            className="absolute -bottom-16 left-1/2 -translate-x-1/2 bg-black/90 border border-white/20 rounded-xl px-4 py-2 text-center whitespace-nowrap z-50"
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 2 }}
+                                        >
+                                            <p className="text-white/90 text-xs font-medium">👆 Tap to scan • 👈👉 Swipe for modes</p>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    localStorage.setItem('fitrate_mode_tooltip_seen', 'true')
+                                                    playSound('click')
+                                                }}
+                                                className="text-cyan-400 text-[10px] mt-1 hover:underline"
+                                            >
+                                                Got it!
+                                            </button>
+                                            {/* Arrow pointing up */}
+                                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[8px] border-transparent border-b-black/90" />
+                                        </motion.div>
+                                    )}
                                 </motion.button>
                             </motion.div>
                         </div>
@@ -1432,7 +1456,7 @@ export default function HomeScreen({
                                     vibrate(10)
                                     setShowModeDrawer(true)
                                 }}
-                                className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1 mb-4"
+                                className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1 mb-2"
                             >
                                 <span>All 12 Modes</span>
                                 <span>👥</span>
@@ -1456,7 +1480,7 @@ export default function HomeScreen({
                         )}
 
                         {/* Value Prop - Clear differentiation */}
-                        <div className="text-center mb-4">
+                        <div className="text-center mb-3">
                             <p className="text-white/60 text-xs mb-1">
                                 Get your rating → Dare friends to beat it
                             </p>
