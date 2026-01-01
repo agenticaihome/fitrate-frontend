@@ -564,10 +564,23 @@ export default function HomeScreen({
     }
 
     const proceedToCamera = () => {
+        // For challenge modes: force camera-only (no gallery pick)
+        const isChallengeMode = dailyChallengeMode || eventMode || fashionShowName
+
         if (isAndroid()) {
-            setShowAndroidPhotoModal(true)
+            if (isChallengeMode) {
+                // Skip modal, go straight to camera for challenges
+                document.getElementById('androidCameraInput')?.click()
+            } else {
+                setShowAndroidPhotoModal(true)
+            }
         } else if (isIOS()) {
-            document.getElementById('androidGalleryInput')?.click()
+            // iOS: Use camera input for challenges, gallery otherwise
+            if (isChallengeMode) {
+                document.getElementById('androidCameraInput')?.click()
+            } else {
+                document.getElementById('androidGalleryInput')?.click()
+            }
         } else {
             startCamera()
         }
