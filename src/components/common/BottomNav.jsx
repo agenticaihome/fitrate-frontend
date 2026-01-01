@@ -146,8 +146,11 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    <HomeIcon active={activeTab === 'home'} />
-                    <span className={`text-[10px] mt-1 font-medium ${activeTab === 'home' ? 'text-white' : 'text-white/50'}`}>
+                    <span className="text-xl transition-all duration-200" style={{
+                        filter: activeTab === 'home' ? 'drop-shadow(0 0 10px rgba(255,255,255,0.8))' : 'none',
+                        transform: activeTab === 'home' ? 'scale(1.1)' : 'scale(1)'
+                    }}>🏠</span>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'home' ? 'text-white' : 'text-white/50'}`}>
                         Home
                     </span>
                     {activeTab === 'home' && <ActiveIndicator />}
@@ -183,8 +186,15 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />
-                    <span className={`text-[10px] mt-1 font-medium ${eventMode ? 'text-yellow-400' :
+                    <span className="text-xl transition-all duration-200" style={{
+                        filter: eventMode
+                            ? 'drop-shadow(0 0 10px rgba(255,215,0,0.8))'
+                            : activeTab === 'challenges'
+                                ? 'drop-shadow(0 0 10px rgba(16,185,129,0.8))'
+                                : 'none',
+                        transform: (activeTab === 'challenges' || eventMode) ? 'scale(1.1)' : 'scale(1)'
+                    }}>🏆</span>
+                    <span className={`text-[10px] mt-0.5 font-medium ${eventMode ? 'text-yellow-400' :
                             activeTab === 'challenges' ? 'text-emerald-400' : 'text-white/50'
                         }`}>
                         Challenges
@@ -204,14 +214,17 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    {/* Live indicator - larger for visibility */}
+                    {/* Live indicator */}
                     <div className="absolute top-0.5 right-0 flex items-center gap-0.5 z-10">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" style={{
                             boxShadow: '0 0 6px rgba(74, 222, 128, 0.9)'
                         }} />
                     </div>
-                    <ArenaIcon active={activeTab === 'arena'} />
-                    <span className={`text-[10px] mt-1 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-white/50'}`}>
+                    <span className="text-xl transition-all duration-200" style={{
+                        filter: activeTab === 'arena' ? 'drop-shadow(0 0 10px rgba(0,212,255,0.8))' : 'none',
+                        transform: activeTab === 'arena' ? 'scale(1.1)' : 'scale(1)'
+                    }}>🌍</span>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-white/50'}`}>
                         Arena
                     </span>
                     {activeTab === 'arena' && <ActiveIndicator color="#00d4ff" />}
