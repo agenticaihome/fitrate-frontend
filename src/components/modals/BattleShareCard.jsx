@@ -69,38 +69,59 @@ export default function BattleShareCard({
 
         try {
             // Generate image from card
-            // Note: useCORS=true requires images to have proper CORS headers from server
-            // We DON'T use allowTaint because tainted canvases can't be exported
+            // Key fix: Use allowTaint for data URLs, but handle toBlob failure gracefully
             const canvas = await html2canvas(cardRef.current, {
                 scale: 2,
                 backgroundColor: '#0a0a0f',
                 logging: false,
                 useCORS: true,
-                // Don't use allowTaint - it prevents toBlob from working
-                // If images fail CORS, they just won't appear (better than total failure)
+                allowTaint: true, // Allow tainted canvas - we'll handle toBlob failure
                 imageTimeout: 5000,
                 onclone: (clonedDoc) => {
-                    // Force crossOrigin on all images in the clone
+                    // Force visibility of all elements
                     const images = clonedDoc.querySelectorAll('img')
                     images.forEach(img => {
                         img.crossOrigin = 'anonymous'
-                        // Add error handler to prevent breaking if image fails
-                        img.onerror = () => {
-                            img.style.display = 'none'
-                        }
+                        // Don't hide failed images - let them show placeholder
                     })
                 }
-            }).catch(err => {
-                console.error('[BattleShareCard] html2canvas failed:', err)
-                throw new Error('Failed to generate image')
             })
 
-            const blob = await new Promise((resolve, reject) => {
-                canvas.toBlob(blob => {
-                    if (blob) resolve(blob)
-                    else reject(new Error('Failed to create image blob'))
-                }, 'image/png')
-            })
+            // Try to export canvas - may fail if tainted
+            let blob = null
+            try {
+                blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob(b => {
+                        if (b) resolve(b)
+                        else reject(new Error('Canvas tainted or toBlob failed'))
+                    }, 'image/png')
+                })
+            } catch (taintError) {
+                console.warn('[BattleShareCard] Canvas tainted, falling back to text share:', taintError)
+                // Canvas is tainted - share text only
+                const shareText = userWon
+                    ? `🏆 I won a style battle on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} 🔥\n\nfitrate.app`
+                    : tied
+                        ? `🤝 Epic tie in a FitRate style battle! Both scored ${Math.round(userScore)}!\n\nfitrate.app`
+                        : `⚔️ Just battled on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} - so close!\n\nfitrate.app`
+
+                if (navigator.share) {
+                    await navigator.share({
+                        title: userWon ? 'I won a style battle! 🏆' : 'Check out this style battle!',
+                        text: shareText
+                    })
+                    setShareStatus('success')
+                    playSound('success')
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(shareText)
+                    setShareStatus('success')
+                    playSound('pop')
+                    vibrate(20)
+                } else {
+                    throw new Error('No share method available')
+                }
+                return
+            }
 
             const file = new File([blob], `fitrate-battle-${Date.now()}.png`, { type: 'image/png' })
 
@@ -181,16 +202,17 @@ export default function BattleShareCard({
                         playSound('pop')
                         vibrate(20)
                     } else {
-                        // Last resort failed
                         setShareStatus('error')
                         playSound('error')
                         vibrate(50)
                     }
                 } catch (fallbackErr) {
-                    console.error('[BattleShareCard] Fallback share also failed:', fallbackErr)
-                    setShareStatus('error')
-                    playSound('error')
-                    vibrate(50)
+                    if (fallbackErr.name !== 'AbortError') {
+                        console.error('[BattleShareCard] Fallback share also failed:', fallbackErr)
+                        setShareStatus('error')
+                        playSound('error')
+                        vibrate(50)
+                    }
                 }
             }
         } finally {
