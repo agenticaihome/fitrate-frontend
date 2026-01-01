@@ -279,7 +279,22 @@ export default function ChallengesScreen({
                                     </div>
                                 </div>
 
-                                {/* Leaderboard */}
+                                {/* CTA Button - Enter Daily Challenge */}
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(30)
+                                        onCompeteDaily?.()
+                                    }}
+                                    className="w-full py-4 rounded-2xl font-black text-lg text-white flex items-center justify-center gap-3 transition-all active:scale-95"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                                        boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)'
+                                    }}
+                                >
+                                    <span className="text-2xl">📸</span>
+                                    ENTER DAILY CHALLENGE
+                                </button>
                                 <div>
                                     <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-3 flex items-center gap-2">
                                         <span>📊</span> Today's Rankings
@@ -454,6 +469,23 @@ export default function ChallengesScreen({
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* CTA Button - Enter Weekly Challenge */}
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(30)
+                                        onCompeteWeekly?.()
+                                    }}
+                                    className="w-full py-4 rounded-2xl font-black text-lg text-white flex items-center justify-center gap-3 transition-all active:scale-95"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
+                                        boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)'
+                                    }}
+                                >
+                                    <span className="text-2xl">👗</span>
+                                    ENTER WEEKLY CHALLENGE
+                                </button>
 
                                 {/* User Status */}
                                 {userEventStatus?.participating && userEventStatus?.bestScore && (
