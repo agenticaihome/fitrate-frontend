@@ -1265,213 +1265,181 @@ export default function HomeScreen({
             </div>
 
             {/* ============================================ */}
-            {/* ARENA CTA - Always Visible Competition */}
+            {/* COMPETE - Always Visible Clean Grid */}
             {/* ============================================ */}
-            {onOpenArena && (
-                <motion.button
-                    onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
-                    className="w-full max-w-sm p-4 rounded-2xl mb-4 relative overflow-hidden"
-                    style={{
-                        background: 'linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(139,92,246,0.1) 100%)',
-                        border: '1px solid rgba(0,212,255,0.3)'
-                    }}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                >
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+            <div className="w-full max-w-sm">
+                {/* Section Header */}
+                <div className="flex items-center gap-2 mb-3 px-1">
+                    <span className="text-lg">⚡</span>
+                    <span className="text-white/80 text-sm font-semibold">Ways to Compete</span>
+                </div>
+
+                {/* 3-Column Feature Grid */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                    {/* Global Arena */}
+                    {onOpenArena && (
+                        <motion.button
+                            onClick={() => { playSound('click'); vibrate(15); onOpenArena(); }}
+                            className="p-3 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(145deg, rgba(0,212,255,0.15) 0%, rgba(139,92,246,0.08) 100%)',
+                                border: '1px solid rgba(0,212,255,0.25)'
+                            }}
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.97 }}
+                        >
+                            <div className="flex items-center gap-1 absolute top-1.5 right-1.5">
+                                <motion.span
+                                    className="w-1.5 h-1.5 rounded-full bg-green-400"
+                                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                />
+                                <span className="text-[8px] font-bold text-green-400">LIVE</span>
+                            </div>
                             <motion.span
-                                className="text-3xl"
+                                className="text-2xl mb-1"
                                 animate={{ rotate: [0, 5, -5, 0] }}
                                 transition={{ duration: 4, repeat: Infinity }}
                             >
                                 🌍
                             </motion.span>
-                            <div className="text-left">
-                                <span className="text-white font-bold text-lg block">Global Arena</span>
-                                <span className="text-cyan-300/70 text-xs">Random 1v1 • Win free scans</span>
-                            </div>
+                            <span className="text-white font-bold text-xs">Arena</span>
+                            <span className="text-cyan-300/70 text-[10px]">1v1 Battles</span>
+                        </motion.button>
+                    )}
+
+                    {/* Fashion Show */}
+                    {onStartFashionShow && (
+                        <motion.button
+                            onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
+                            className="p-3 rounded-2xl flex flex-col items-center justify-center"
+                            style={{
+                                background: 'linear-gradient(145deg, rgba(139,92,246,0.15) 0%, rgba(168,85,247,0.08) 100%)',
+                                border: '1px solid rgba(139,92,246,0.25)'
+                            }}
+                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileTap={{ scale: 0.97 }}
+                        >
+                            <motion.span
+                                className="text-2xl mb-1"
+                                animate={{ y: [0, -2, 0] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                            >
+                                🎭
+                            </motion.span>
+                            <span className="text-white font-bold text-xs">Fashion Show</span>
+                            <span className="text-purple-300/70 text-[10px]">With Friends</span>
+                        </motion.button>
+                    )}
+
+                    {/* Challenges */}
+                    <motion.button
+                        onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
+                        className="p-3 rounded-2xl flex flex-col items-center justify-center"
+                        style={{
+                            background: 'linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.08) 100%)',
+                            border: '1px solid rgba(16,185,129,0.25)'
+                        }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                    >
+                        <motion.span
+                            className="text-2xl mb-1"
+                            animate={{ scale: [1, 1.05, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                        >
+                            🏆
+                        </motion.span>
+                        <span className="text-white font-bold text-xs">Challenges</span>
+                        <span className="text-emerald-300/70 text-[10px]">Daily + Weekly</span>
+                    </motion.button>
+                </div>
+
+                {/* Active Battles - Only show when relevant */}
+                {activeBattles.length > 0 && (
+                    <div className="mb-3">
+                        <div className="flex items-center gap-2 mb-2 px-1">
+                            <span>⚔️</span>
+                            <span className="text-white/70 text-sm font-semibold">Your Battles</span>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <div className="flex items-center gap-1">
-                                <motion.span
-                                    className="w-2 h-2 rounded-full bg-green-400"
-                                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                />
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    style={{ background: 'linear-gradient(135deg, #ff6b35, #ff0080)', color: '#fff' }}>
-                                    LIVE
-                                </span>
-                            </div>
-                            <span className="text-cyan-400 text-xs font-bold mt-1">10 FREE/day →</span>
+                        <div className="space-y-2">
+                            {activeBattles.map((battle) => (
+                                <button
+                                    key={battle.battleId}
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(15)
+                                        onNavigateToBattle?.(battle.battleId)
+                                    }}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
+                                    style={{
+                                        background: battle.status === 'completed'
+                                            ? 'rgba(0,255,136,0.1)'
+                                            : 'rgba(255,107,53,0.1)',
+                                        border: battle.status === 'completed'
+                                            ? '1px solid rgba(0,255,136,0.2)'
+                                            : '1px solid rgba(255,107,53,0.2)'
+                                    }}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl">
+                                            {getModeData(battle.mode)?.emoji || '⚔️'}
+                                        </span>
+                                        <div className="text-left">
+                                            <p className="text-white font-semibold text-sm">
+                                                {getModeData(battle.mode)?.label || 'Battle'}
+                                            </p>
+                                            <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
+                                                {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span className="text-white/40">→</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
-                </motion.button>
-            )}
+                )}
 
-            {/* ============================================ */}
-            {/* MORE WAYS TO COMPETE - Collapsible Section */}
-            {/* ============================================ */}
-            <div className="w-full max-w-sm">
-                <button
-                    onClick={() => {
-                        playSound('click')
-                        vibrate(10)
-                        setShowMoreFeatures(!showMoreFeatures)
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-white/60 text-sm font-medium transition-all"
-                >
-                    <span>{showMoreFeatures ? '▲' : '▼'}</span>
-                    <span>More Ways to Compete</span>
-                    {activeItemsCount > 0 && (
-                        <span className="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">
-                            {activeItemsCount}
-                        </span>
-                    )}
-                </button>
-
-                {showMoreFeatures && (
-                    <div className="space-y-3 mt-2 animate-fade-in" style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
-                        {/* Quick Actions Grid - Clay Cards with 3D depth */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Fashion Show */}
-                            {onStartFashionShow && (
-                                <motion.button
-                                    onClick={() => { playSound('click'); vibrate(15); onStartFashionShow(); }}
-                                    className="p-4 rounded-2xl clay-card-purple card-float-3d"
-                                    whileHover={{ scale: 1.02, y: -4 }}
-                                    whileTap={{ scale: 0.97, y: 2 }}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 }}
+                {/* Active Shows - Only show when relevant */}
+                {activeShows.length > 0 && (
+                    <div className="mb-3">
+                        <div className="flex items-center gap-2 mb-2 px-1">
+                            <span>🎭</span>
+                            <span className="text-white/70 text-sm font-semibold">Your Shows</span>
+                        </div>
+                        <div className="space-y-2">
+                            {activeShows.map((show) => (
+                                <button
+                                    key={show.showId}
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(15)
+                                        onNavigateToShow?.(show.showId)
+                                    }}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl transition-all active:scale-[0.98]"
+                                    style={{
+                                        background: 'rgba(139,92,246,0.1)',
+                                        border: '1px solid rgba(139,92,246,0.2)'
+                                    }}
                                 >
-                                    <motion.span
-                                        className="text-2xl block mb-1"
-                                        animate={{ y: [0, -3, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    >
-                                        🎭
-                                    </motion.span>
-                                    <span className="text-white font-bold text-sm block">Fashion Show</span>
-                                    <span className="text-purple-300/70 text-xs">Battle Friends</span>
-                                </motion.button>
-                            )}
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xl">🎭</span>
+                                        <div className="text-left">
+                                            <p className="text-white font-semibold text-sm">{show.name}</p>
+                                            <p className="text-purple-300/70 text-xs">
+                                                {show.vibeLabel || 'Tap to rejoin'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span className="text-white/40">→</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
 
-                            {/* Weekly Challenge - Matches Fashion Show style */}
-                            <motion.button
-                                onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
-                                className="p-4 rounded-2xl clay-card card-float-3d"
-                                style={{
-                                    background: 'linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.08) 100%)'
-                                }}
-                                whileHover={{ scale: 1.02, y: -4 }}
-                                whileTap={{ scale: 0.97, y: 2 }}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.15 }}
-                            >
-                                <motion.span
-                                    className="text-2xl block mb-1"
-                                    animate={{ scale: [1, 1.05, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                    🏆
-                                </motion.span>
-                                <span className="text-white font-bold text-sm block">Challenges</span>
-                                <span className="text-emerald-300/70 text-xs">Daily + Weekly</span>
-                            </motion.button>
-                        </div>                        {/* Active Battles */}
-                        {
-                            activeBattles.length > 0 && (
-                                <div className="mt-4">
-                                    <div className="flex items-center gap-2 mb-2 px-1">
-                                        <span>⚔️</span>
-                                        <span className="text-white/70 text-sm font-semibold">Your Battles</span>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {activeBattles.map((battle) => (
-                                            <button
-                                                key={battle.battleId}
-                                                onClick={() => {
-                                                    playSound('click')
-                                                    vibrate(15)
-                                                    onNavigateToBattle?.(battle.battleId)
-                                                }}
-                                                className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
-                                                style={{
-                                                    background: battle.status === 'completed'
-                                                        ? 'rgba(0,255,136,0.1)'
-                                                        : 'rgba(255,107,53,0.1)',
-                                                    border: battle.status === 'completed'
-                                                        ? '1px solid rgba(0,255,136,0.2)'
-                                                        : '1px solid rgba(255,107,53,0.2)'
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xl">
-                                                        {getModeData(battle.mode)?.emoji || '⚔️'}
-                                                    </span>
-                                                    <div className="text-left">
-                                                        <p className="text-white font-semibold text-sm">
-                                                            {getModeData(battle.mode)?.label || 'Battle'}
-                                                        </p>
-                                                        <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
-                                                            {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <span className="text-white/40">→</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )
-                        }
-
-                        {/* Active Shows */}
-                        {
-                            activeShows.length > 0 && (
-                                <div className="mt-4">
-                                    <div className="flex items-center gap-2 mb-2 px-1">
-                                        <span>🎭</span>
-                                        <span className="text-white/70 text-sm font-semibold">Your Shows</span>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {activeShows.map((show) => (
-                                            <button
-                                                key={show.showId}
-                                                onClick={() => {
-                                                    playSound('click')
-                                                    vibrate(15)
-                                                    onNavigateToShow?.(show.showId)
-                                                }}
-                                                className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
-                                                style={{
-                                                    background: 'rgba(139,92,246,0.1)',
-                                                    border: '1px solid rgba(139,92,246,0.2)'
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xl">🎭</span>
-                                                    <div className="text-left">
-                                                        <p className="text-white font-semibold text-sm">{show.name}</p>
-                                                        <p className="text-purple-300/70 text-xs">
-                                                            {show.vibeLabel || 'Tap to rejoin'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <span className="text-white/40">→</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )
-                        }
-                    </div >
-                )
-                }
-            </div >
 
             {/* ============================================ */}
             {/* MODALS */}
