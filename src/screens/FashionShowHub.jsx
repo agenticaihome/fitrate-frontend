@@ -12,6 +12,7 @@ import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import EmptyState from '../components/common/EmptyState'
 import { ScoreboardLoader } from '../components/common/ShimmerLoader'
+import { LeadingBanner, FirstReactionCelebration } from '../components/common/Celebrations'
 
 const EMOJI_OPTIONS = ['😎', '🔥', '✨', '💅', '👑', '🎭']
 
@@ -54,6 +55,11 @@ export default function FashionShowHub({
     // Reactions state - track which entries user has reacted to
     const [userReactions, setUserReactions] = useState(new Set())
     const [reactingTo, setReactingTo] = useState(null) // Currently reacting to (for animation)
+
+    // Celebration state
+    const [showLeadingBanner, setShowLeadingBanner] = useState(false)
+    const [showFirstReaction, setShowFirstReaction] = useState(false)
+    const prevRankRef = useRef(null)
 
     // Camera state
     const [showCamera, setShowCamera] = useState(false)
@@ -303,6 +309,17 @@ export default function FashionShowHub({
     const canWalk = walksUsed < walksAllowed && timeRemaining > 0 && showData?.status !== 'ended'
     const userRank = scoreboard.findIndex(e => e.userId === userId) + 1
 
+    // Detect when user takes #1 position
+    useEffect(() => {
+        if (userRank === 1 && prevRankRef.current !== null && prevRankRef.current !== 1 && scoreboard.length > 1) {
+            // User just moved to #1!
+            playSound('celebrate')
+            vibrate([50, 30, 100])
+            setShowLeadingBanner(true)
+        }
+        prevRankRef.current = userRank
+    }, [userRank, scoreboard.length])
+
     // Show loading
     if (!showData) {
         return (
@@ -361,6 +378,16 @@ export default function FashionShowHub({
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex flex-col">
+            {/* Celebration components */}
+            <LeadingBanner 
+                show={showLeadingBanner} 
+                onComplete={() => setShowLeadingBanner(false)}
+            />
+            <FirstReactionCelebration 
+                show={showFirstReaction}
+                onComplete={() => setShowFirstReaction(false)}
+            />
+            
             {/* Hidden File Inputs - Platform-specific camera/gallery access */}
             {/* Fashion Show Camera Input - with capture attribute to force native camera */}
             <input

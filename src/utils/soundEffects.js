@@ -33,6 +33,18 @@ export const playSound = (type) => {
                 osc.stop(now + 0.1);
                 break;
 
+            case 'reaction':
+                // Quick satisfying pop for reactions
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                osc.frequency.exponentialRampToValueAtTime(1100, now + 0.12);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+                break;
+
             case 'click':
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(1500, now);
