@@ -1289,33 +1289,35 @@ export default function HomeScreen({
                                     const nextMode = MODES[(currentIndex + 1) % MODES.length]
                                     return (
                                         <>
-                                            {/* Left peek - TAPPABLE */}
+                                            {/* Left peek - TAPPABLE with name */}
                                             <motion.button
                                                 onClick={() => {
                                                     setMode(prevMode.id)
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
                                                 }}
-                                                className="absolute left-[-50px] top-1/2 -translate-y-1/2 text-3xl opacity-40 hover:opacity-70 transition-opacity p-2"
+                                                className="absolute left-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-50 hover:opacity-80 transition-opacity"
                                                 animate={{ x: [0, -3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
-                                                whileTap={{ scale: 0.8 }}
+                                                whileTap={{ scale: 0.85 }}
                                             >
-                                                {prevMode.emoji}
+                                                <span className="text-2xl">{prevMode.emoji}</span>
+                                                <span className="text-[9px] text-white/40 font-medium mt-0.5">{prevMode.label}</span>
                                             </motion.button>
-                                            {/* Right peek - TAPPABLE */}
+                                            {/* Right peek - TAPPABLE with name */}
                                             <motion.button
                                                 onClick={() => {
                                                     setMode(nextMode.id)
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
                                                 }}
-                                                className="absolute right-[-50px] top-1/2 -translate-y-1/2 text-3xl opacity-40 hover:opacity-70 transition-opacity p-2"
+                                                className="absolute right-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-50 hover:opacity-80 transition-opacity"
                                                 animate={{ x: [0, 3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
-                                                whileTap={{ scale: 0.8 }}
+                                                whileTap={{ scale: 0.85 }}
                                             >
-                                                {nextMode.emoji}
+                                                <span className="text-2xl">{nextMode.emoji}</span>
+                                                <span className="text-[9px] text-white/40 font-medium mt-0.5">{nextMode.label}</span>
                                             </motion.button>
                                         </>
                                     )
@@ -1409,40 +1411,16 @@ export default function HomeScreen({
                                                 : `${currentMode.label} Mode`}
                                     </motion.span>
 
-                                    {/* Swipe hint - always show when not in challenge mode */}
+                                    {/* Swipe hint - more visible */}
                                     {!dailyChallengeMode && !eventMode && (
                                         <motion.span
-                                            className="absolute bottom-4 text-white/30 text-[10px] font-medium"
+                                            className="absolute bottom-6 text-white/60 text-xs font-semibold tracking-wide"
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
-                                            transition={{ delay: 1 }}
+                                            transition={{ delay: 0.5 }}
                                         >
-                                            ← swipe to change →
+                                            ← swipe →
                                         </motion.span>
-                                    )}
-
-                                    {/* First-time user tooltip - ABOVE the button */}
-                                    {!dailyChallengeMode && !eventMode && !localStorage.getItem('fitrate_mode_tooltip_seen') && (
-                                        <motion.div
-                                            className="absolute -top-20 left-1/2 -translate-x-1/2 bg-black/95 border border-white/30 rounded-xl px-4 py-2 text-center whitespace-nowrap z-50 shadow-lg"
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 2 }}
-                                        >
-                                            <p className="text-white/90 text-xs font-medium">👆 Tap to scan • 👈👉 Swipe for modes</p>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    localStorage.setItem('fitrate_mode_tooltip_seen', 'true')
-                                                    playSound('click')
-                                                }}
-                                                className="text-cyan-400 text-[10px] mt-1 hover:underline"
-                                            >
-                                                Got it!
-                                            </button>
-                                            {/* Arrow pointing down */}
-                                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-black/95" />
-                                        </motion.div>
                                     )}
                                 </motion.button>
                             </motion.div>
