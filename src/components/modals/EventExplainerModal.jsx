@@ -146,12 +146,12 @@ export default function EventExplainerModal({
                         </p>
                     </div>
 
-                    {/* Bragging Rights Banner */}
-                    <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-3 mb-4 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+                    {/* Weekly Prizes Banner */}
+                    <div className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 rounded-xl p-3 mb-4 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
                         <div className="absolute inset-0 shimmer-sweep" />
-                        <span className="text-2xl relative" aria-hidden="true">🏅</span>
-                        <p className="text-purple-300 font-black text-lg relative">COMPETE FOR GLORY</p>
-                        <p className="text-purple-400/70 text-xs relative">#1 tops leaderboard • Top 5 featured!</p>
+                        <span className="text-2xl relative" aria-hidden="true">🏆</span>
+                        <p className="text-emerald-300 font-black text-lg relative">WIN FREE SCANS</p>
+                        <p className="text-emerald-400/70 text-xs relative">🥇 50 scans • 🥈🥉 25 scans • Top 10: 10 scans</p>
                     </div>
 
                     {/* How It Works */}

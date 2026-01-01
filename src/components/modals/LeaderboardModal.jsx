@@ -134,12 +134,12 @@ export default function LeaderboardModal({
                     </div>
                 )}
 
-                {/* Bragging Rights Banner */}
-                <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-2 mb-3 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
+                {/* Weekly Prizes Banner */}
+                <div className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 rounded-xl p-2 mb-3 text-center relative overflow-hidden animate-stagger-fade-up" style={{ opacity: 0, animationDelay: '0.1s' }}>
                     <div className="absolute inset-0 shimmer-sweep" />
-                    <span className="text-sm relative" aria-hidden="true">🏅</span>
-                    <span className="text-purple-300 font-bold text-sm ml-1 relative">BRAGGING RIGHTS</span>
-                    <span className="text-purple-400/70 text-xs ml-2 relative">Top the leaderboard!</span>
+                    <span className="text-sm relative" aria-hidden="true">🏆</span>
+                    <span className="text-emerald-300 font-bold text-sm ml-1 relative">WIN FREE SCANS</span>
+                    <span className="text-emerald-400/70 text-xs ml-2 relative">🥇50 • 🥈🥉25 • Top 10: 10</span>
                 </div>
 
                 {/* Leaderboard List */}

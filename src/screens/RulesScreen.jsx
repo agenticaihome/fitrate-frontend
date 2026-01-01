@@ -112,25 +112,30 @@ export default function RulesScreen({ onClose, currentEvent }) {
                     </ul>
                 </div>
 
-                {/* Bragging Rights */}
-                <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-2xl p-4 border border-purple-500/30">
-                    <h2 className="text-sm font-bold text-purple-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <span>🏆</span> Bragging Rights
+                {/* Weekly Prizes */}
+                <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-2xl p-4 border border-emerald-500/30">
+                    <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <span>🏆</span> Weekly Prizes
                     </h2>
-                    <ul className="space-y-2 text-sm text-gray-300">
-                        <li className="flex items-start gap-2">
-                            <span className="text-purple-400">👑</span>
-                            <span><strong className="text-purple-300">#1 Winner</strong> tops the leaderboard!</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                            <span className="text-purple-400">⭐</span>
-                            <span>Top 5 get featured on the leaderboard</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                            <span className="text-purple-400">📤</span>
-                            <span>Share your win with friends!</span>
-                        </li>
-                    </ul>
+                    <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-between bg-yellow-500/10 rounded-xl p-2">
+                            <span className="text-yellow-400 font-bold">🥇 1st Place</span>
+                            <span className="text-white font-black">50 FREE SCANS</span>
+                        </div>
+                        <div className="flex items-center justify-between bg-gray-400/10 rounded-xl p-2">
+                            <span className="text-gray-300 font-bold">🥈🥉 2nd-3rd</span>
+                            <span className="text-white font-bold">25 FREE SCANS</span>
+                        </div>
+                        <div className="flex items-center justify-between bg-orange-500/10 rounded-xl p-2">
+                            <span className="text-orange-300 font-bold">4th-10th</span>
+                            <span className="text-white font-bold">10 FREE SCANS</span>
+                        </div>
+                        <div className="flex items-center justify-between bg-purple-500/10 rounded-xl p-2">
+                            <span className="text-purple-300 font-bold">⭐ Top 25%</span>
+                            <span className="text-white font-bold">3 FREE SCANS</span>
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-400 text-center mt-3">Rewards distributed at week end!</p>
                 </div>
 
                 {/* Fair Play */}

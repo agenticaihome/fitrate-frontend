@@ -47,9 +47,10 @@ const MODE_COLORS = {
 /**
  * ChallengesScreen
  *
- * Combined view for Daily + Weekly challenges
- * - Daily: Highest score of the day wins 5 free pro scans (rotating mode!)
- * - Weekly: Themed event, #1 wins 1 year free pro
+ * Combined view for Daily + Weekly challenges with scan rewards:
+ * - Daily: 🥇10 / 🥈🥉5 / 4-10: 2 / Top 25%: 1 scan
+ * - Weekly: 🥇50 / 🥈🥉25 / 4-10: 10 / Top 25%: 3 scans
+ * - Arena: 🥇25 / 🥈🥉15 / 4-10: 5 scans
  */
 export default function ChallengesScreen({
     // Daily challenge props
