@@ -1232,7 +1232,7 @@ export default function HomeScreen({
                             </div>
                         )}
 
-                        {/* Single breathing ring */}
+                        {/* Single breathing ring - NOW SWIPEABLE FOR MODE CHANGES */}
                         <div className="relative mb-6">
                             {/* Premium outer halo */}
                             <div
@@ -1259,79 +1259,168 @@ export default function HomeScreen({
                                 }}
                             />
 
-                            <button
-                                onClick={handleStart}
-                                aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
-                                className="cta-alive cta-touch relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
-                                style={{
-                                    '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.3)' : eventMode ? 'rgba(16,185,129,0.3)' : `${currentMode.color}30`,
-                                    background: dailyChallengeMode
-                                        ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
-                                        : eventMode
-                                            ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
-                                            : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
-                                    border: dailyChallengeMode
-                                        ? '3px solid rgba(59,130,246,0.6)'
-                                        : eventMode
-                                            ? '3px solid rgba(16,185,129,0.6)'
-                                            : `3px solid ${currentMode.color}60`,
-                                    boxShadow: dailyChallengeMode
-                                        ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
-                                        : eventMode
-                                            ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
-                                            : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
+                            {/* Swipeable Button Container */}
+                            <motion.div
+                                className="relative"
+                                drag={!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') ? "x" : false}
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.3}
+                                onDragEnd={(_, info) => {
+                                    if (Math.abs(info.offset.x) > 50) {
+                                        const currentIndex = MODES.findIndex(m => m.id === mode) || 0
+                                        if (info.offset.x > 0) {
+                                            // Swipe right = previous mode
+                                            const prevIndex = (currentIndex - 1 + MODES.length) % MODES.length
+                                            setMode(MODES[prevIndex].id)
+                                        } else {
+                                            // Swipe left = next mode
+                                            const nextIndex = (currentIndex + 1) % MODES.length
+                                            setMode(MODES[nextIndex].id)
+                                        }
+                                        playSound('click')
+                                        vibrate([10, 5, 15])
+                                    }
                                 }}
                             >
-                                {/* Inner gradient */}
-                                <div
-                                    className="absolute inset-4 rounded-full"
+                                {/* Peek mode indicators on sides - only when mode switching is enabled */}
+                                {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (() => {
+                                    const currentIndex = MODES.findIndex(m => m.id === mode) || 0
+                                    const prevMode = MODES[(currentIndex - 1 + MODES.length) % MODES.length]
+                                    const nextMode = MODES[(currentIndex + 1) % MODES.length]
+                                    return (
+                                        <>
+                                            {/* Left peek */}
+                                            <motion.div
+                                                className="absolute left-[-40px] top-1/2 -translate-y-1/2 text-3xl opacity-30 pointer-events-none"
+                                                animate={{ x: [0, -5, 0] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                            >
+                                                {prevMode.emoji}
+                                            </motion.div>
+                                            {/* Right peek */}
+                                            <motion.div
+                                                className="absolute right-[-40px] top-1/2 -translate-y-1/2 text-3xl opacity-30 pointer-events-none"
+                                                animate={{ x: [0, 5, 0] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                            >
+                                                {nextMode.emoji}
+                                            </motion.div>
+                                        </>
+                                    )
+                                })()}
+
+                                <motion.button
+                                    onClick={handleStart}
+                                    aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
+                                    className="cta-alive cta-touch relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
                                     style={{
+                                        '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.3)' : eventMode ? 'rgba(16,185,129,0.3)' : `${currentMode.color}30`,
                                         background: dailyChallengeMode
-                                            ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+                                            ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
                                             : eventMode
-                                                ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
-                                                : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
+                                                ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
+                                                : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
+                                        border: dailyChallengeMode
+                                            ? '3px solid rgba(59,130,246,0.6)'
+                                            : eventMode
+                                                ? '3px solid rgba(16,185,129,0.6)'
+                                                : `3px solid ${currentMode.color}60`,
                                         boxShadow: dailyChallengeMode
-                                            ? '0 0 60px rgba(59,130,246,0.5)'
+                                            ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
                                             : eventMode
-                                                ? '0 0 60px rgba(16,185,129,0.5)'
-                                                : `0 0 60px ${currentMode.glow}`
+                                                ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
+                                                : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
                                     }}
-                                />
+                                    key={currentMode.id}
+                                    initial={{ scale: 0.95 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    {/* Inner gradient */}
+                                    <motion.div
+                                        className="absolute inset-4 rounded-full"
+                                        style={{
+                                            background: dailyChallengeMode
+                                                ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+                                                : eventMode
+                                                    ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
+                                                    : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
+                                            boxShadow: dailyChallengeMode
+                                                ? '0 0 60px rgba(59,130,246,0.5)'
+                                                : eventMode
+                                                    ? '0 0 60px rgba(16,185,129,0.5)'
+                                                    : `0 0 60px ${currentMode.glow}`
+                                        }}
+                                        key={`inner-${currentMode.id}`}
+                                        initial={{ scale: 0.9, opacity: 0.8 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
 
-                                {/* Icon */}
-                                <span className="cta-icon-shimmer relative text-6xl mb-2">
-                                    {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : '📸'}
-                                </span>
+                                    {/* Icon - animates on mode change */}
+                                    <motion.span
+                                        className="cta-icon-shimmer relative text-6xl mb-2"
+                                        key={`icon-${dailyChallengeMode ? 'daily' : eventMode ? 'event' : currentMode.id}`}
+                                        initial={{ scale: 0.5, rotate: -20 }}
+                                        animate={{ scale: 1, rotate: 0 }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                                    >
+                                        {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : currentMode.emoji}
+                                    </motion.span>
 
-                                {/* Main Text - Changes based on mode */}
-                                <span className="relative text-white font-black text-xl tracking-wide text-center px-4">
-                                    {dailyChallengeMode
-                                        ? 'DAILY CHALLENGE'
-                                        : eventMode
-                                            ? 'WEEKLY CHALLENGE'
-                                            : 'RATE MY OUTFIT'}
-                                </span>
+                                    {/* Main Text - Changes based on mode */}
+                                    <span className="relative text-white font-black text-xl tracking-wide text-center px-4">
+                                        {dailyChallengeMode
+                                            ? 'DAILY CHALLENGE'
+                                            : eventMode
+                                                ? 'WEEKLY CHALLENGE'
+                                                : 'RATE MY FIT'}
+                                    </span>
 
-                                {/* Mode indicator - Subtle */}
-                                <span className="relative text-white/70 text-sm font-medium mt-1">
-                                    {dailyChallengeMode
-                                        ? `${getDailyMode().emoji} ${getDailyMode().label} Mode`
-                                        : eventMode
-                                            ? currentEvent?.theme || 'Beat the leaderboard!'
-                                            : `${currentMode.emoji} ${currentMode.label} Mode`}
-                                </span>
-                            </button>
+                                    {/* Mode indicator - Shows mode name */}
+                                    <motion.span
+                                        className="relative text-white/70 text-sm font-medium mt-1"
+                                        key={`label-${currentMode.id}`}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                    >
+                                        {dailyChallengeMode
+                                            ? `${getDailyMode().emoji} ${getDailyMode().label} Mode`
+                                            : eventMode
+                                                ? currentEvent?.theme || 'Beat the leaderboard!'
+                                                : `${currentMode.label} Mode`}
+                                    </motion.span>
+
+                                    {/* Swipe hint - only when modes are active */}
+                                    {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
+                                        <motion.span
+                                            className="absolute bottom-4 text-white/30 text-[10px] font-medium"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 1 }}
+                                        >
+                                            ← swipe to change →
+                                        </motion.span>
+                                    )}
+                                </motion.button>
+                            </motion.div>
                         </div>
 
-                        {/* MODE CAROUSEL - Swipeable mode picker */}
-                        {/* Hidden during challenge modes AND for first-time users */}
+                        {/* All Modes Link - Opens drawer for full selection + judges */}
                         {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
-                            <ModeCarousel
-                                currentModeId={mode}
-                                onModeChange={setMode}
-                                onOpenDrawer={() => setShowModeDrawer(true)}
-                            />
+                            <button
+                                onClick={() => {
+                                    playSound('click')
+                                    vibrate(10)
+                                    setShowModeDrawer(true)
+                                }}
+                                className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1 mb-4"
+                            >
+                                <span>All 12 Modes</span>
+                                <span>👥</span>
+                                <span className="text-white/30">Meet the Judges</span>
+                            </button>
                         )}
 
                         {/* Challenge quick action - during challenge modes */}
