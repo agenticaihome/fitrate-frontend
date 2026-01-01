@@ -365,19 +365,6 @@ export default function ChallengesScreen({
                                         <span className="text-white font-bold text-lg">#{userDailyRank}</span>
                                     </div>
                                 )}
-
-                                {/* CTA */}
-                                <button
-                                    onClick={() => { playSound('click'); vibrate(30); onCompeteDaily?.(); }}
-                                    aria-label="Take a photo for daily challenge"
-                                    className="w-full py-5 rounded-2xl font-black text-xl transition-all active:scale-[0.98]"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                                        boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)'
-                                    }}
-                                >
-                                    📸 Take a Photo
-                                </button>
                             </div>
                         )
                     })()
@@ -577,42 +564,6 @@ export default function ChallengesScreen({
                                         </button>
                                     )}
                                 </div>
-
-                                {/* CTA */}
-                                {(isPro || !freeEventEntryUsed) ? (
-                                    <button
-                                        onClick={() => { playSound('click'); vibrate(30); onCompeteWeekly?.(); }}
-                                        aria-label="Take a photo for weekly challenge"
-                                        className="w-full py-5 rounded-2xl font-black text-xl transition-all active:scale-[0.98]"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
-                                            boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)'
-                                        }}
-                                    >
-                                        {userEventStatus?.participating ? '📸 Try Again' : '📸 Take a Photo'}
-                                    </button>
-                                ) : (
-                                    <div className="space-y-3">
-                                        <div className="text-center py-3 rounded-xl" style={{
-                                            background: 'rgba(251, 191, 36, 0.1)',
-                                            border: '1px solid rgba(251, 191, 36, 0.3)'
-                                        }}>
-                                            <p className="text-amber-400 text-sm font-medium">You've used your free entry this week</p>
-                                            <p className="text-white/40 text-xs">Come back next week!</p>
-                                        </div>
-                                        <button
-                                            onClick={() => { playSound('click'); vibrate(20); onShowPaywall?.(); }}
-                                            aria-label="Upgrade to Pro for more tries"
-                                            className="w-full py-5 rounded-2xl font-black text-xl"
-                                            style={{
-                                                background: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
-                                                color: '#000'
-                                            }}
-                                        >
-                                            ✨ Get More Scans
-                                        </button>
-                                    </div>
-                                )}
                             </>
                         )}
                     </div>
