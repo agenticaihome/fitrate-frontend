@@ -160,9 +160,38 @@ export default function BattleShareCard({
             if (err.name === 'AbortError') {
                 setShareStatus(null)
             } else {
-                setShareStatus('error')
-                playSound('error')
-                vibrate(50)
+                // Try text-only fallback share
+                const shareText = userWon
+                    ? `🏆 I won a style battle on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} 🔥\n\nfitrate.app`
+                    : tied
+                        ? `🤝 Epic tie in a FitRate style battle! Both scored ${Math.round(userScore)}!\n\nfitrate.app`
+                        : `⚔️ Just battled on FitRate! ${Math.round(userScore)} vs ${Math.round(opponentScore)} - so close!\n\nfitrate.app`
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: userWon ? 'I won a style battle! 🏆' : 'Check out this style battle!',
+                            text: shareText
+                        })
+                        setShareStatus('success')
+                        playSound('success')
+                    } else if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(shareText)
+                        setShareStatus('success')
+                        playSound('pop')
+                        vibrate(20)
+                    } else {
+                        // Last resort failed
+                        setShareStatus('error')
+                        playSound('error')
+                        vibrate(50)
+                    }
+                } catch (fallbackErr) {
+                    console.error('[BattleShareCard] Fallback share also failed:', fallbackErr)
+                    setShareStatus('error')
+                    playSound('error')
+                    vibrate(50)
+                }
             }
         } finally {
             setIsSharing(false)
@@ -230,7 +259,7 @@ export default function BattleShareCard({
                                     }}
                                 >
                                     {userThumb ? (
-                                        <img src={userThumb} alt="Your fit" className="w-full h-full object-cover" />
+                                        <img src={userThumb} alt="Your fit" className="w-full h-full object-cover" crossOrigin="anonymous" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>
                                     )}
@@ -274,7 +303,7 @@ export default function BattleShareCard({
                                     }}
                                 >
                                     {opponentThumb ? (
-                                        <img src={opponentThumb} alt="Their fit" className="w-full h-full object-cover" />
+                                        <img src={opponentThumb} alt="Their fit" className="w-full h-full object-cover" crossOrigin="anonymous" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>
                                     )}
