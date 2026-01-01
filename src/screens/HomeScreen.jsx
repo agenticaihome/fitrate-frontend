@@ -1421,11 +1421,11 @@ export default function HomeScreen({
                                         </motion.span>
                                     )}
 
-                                    {/* First-time user tooltip */}
+                                    {/* First-time user tooltip - ABOVE the button */}
                                     {!dailyChallengeMode && !eventMode && !localStorage.getItem('fitrate_mode_tooltip_seen') && (
                                         <motion.div
-                                            className="absolute -bottom-16 left-1/2 -translate-x-1/2 bg-black/90 border border-white/20 rounded-xl px-4 py-2 text-center whitespace-nowrap z-50"
-                                            initial={{ opacity: 0, y: -10 }}
+                                            className="absolute -top-20 left-1/2 -translate-x-1/2 bg-black/95 border border-white/30 rounded-xl px-4 py-2 text-center whitespace-nowrap z-50 shadow-lg"
+                                            initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 2 }}
                                         >
@@ -1440,8 +1440,8 @@ export default function HomeScreen({
                                             >
                                                 Got it!
                                             </button>
-                                            {/* Arrow pointing up */}
-                                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[8px] border-transparent border-b-black/90" />
+                                            {/* Arrow pointing down */}
+                                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-transparent border-t-black/95" />
                                         </motion.div>
                                     )}
                                 </motion.button>
