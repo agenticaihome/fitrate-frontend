@@ -1252,6 +1252,59 @@ export default function ResultsScreen({
                     </div>
                 )}
 
+                {/* 🎁 BONUS FORTUNE FIELD — Rare ~10% surprise delight */}
+                {(scores.outfitFortune || scores.outfitLore || scores.outfitSoundtrack ||
+                    scores.outfitEnemy || scores.outfitDatingApp || scores.outfitPowerMove) && (
+                        <div
+                            className="w-full mb-4 p-4 rounded-2xl text-center relative overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.10) 100%)',
+                                border: '1px solid rgba(139,92,246,0.3)',
+                                boxShadow: '0 0 25px rgba(139,92,246,0.15), inset 0 0 30px rgba(139,92,246,0.05)'
+                            }}
+                        >
+                            {/* Sparkle decorations */}
+                            <span className="absolute top-2 left-3 text-lg opacity-60">✨</span>
+                            <span className="absolute top-2 right-3 text-lg opacity-60">✨</span>
+
+                            {/* Header - changes based on which bonus field is present */}
+                            <div className="flex items-center justify-center gap-2 mb-2">
+                                <span className="text-xl">
+                                    {scores.outfitFortune ? '🥠' :
+                                        scores.outfitSoundtrack ? '🎵' :
+                                            scores.outfitLore ? '📖' :
+                                                scores.outfitEnemy ? '⚔️' :
+                                                    scores.outfitDatingApp ? '💘' :
+                                                        scores.outfitPowerMove ? '⚡' : '🎁'}
+                                </span>
+                                <span className="text-xs font-bold uppercase tracking-widest text-purple-300/70">
+                                    {scores.outfitFortune ? 'Outfit Fortune' :
+                                        scores.outfitSoundtrack ? 'Your Fit Plays' :
+                                            scores.outfitLore ? 'Outfit Backstory' :
+                                                scores.outfitEnemy ? 'Sworn Enemy' :
+                                                    scores.outfitDatingApp ? 'Dating App Bio' :
+                                                        scores.outfitPowerMove ? 'Power Unlocked' : 'Bonus'}
+                                </span>
+                                <span className="text-xl">
+                                    {scores.outfitFortune ? '🥠' :
+                                        scores.outfitSoundtrack ? '🎵' :
+                                            scores.outfitLore ? '📖' :
+                                                scores.outfitEnemy ? '⚔️' :
+                                                    scores.outfitDatingApp ? '💘' :
+                                                        scores.outfitPowerMove ? '⚡' : '🎁'}
+                                </span>
+                            </div>
+
+                            {/* The fortune/bonus content */}
+                            <p className="text-base font-medium text-white/90 italic leading-relaxed">
+                                "{scores.outfitFortune || scores.outfitLore || scores.outfitSoundtrack ||
+                                    scores.outfitEnemy || scores.outfitDatingApp || scores.outfitPowerMove}"
+                            </p>
+
+                            <p className="text-xs text-white/30 mt-2">Rare bonus insight ✨</p>
+                        </div>
+                    )}
+
                 {/* 3-Pill Micro Scores (inline like share card) */}
                 <div className="flex justify-center gap-2 mb-4">
                     {/* Color */}
