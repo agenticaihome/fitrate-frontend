@@ -1792,6 +1792,78 @@ export default function ResultsScreen({
                 )}
 
 
+                {/* ============================================ */}
+                {/* RETURN HOOKS - "Come Back" Countdown Section */}
+                {/* ============================================ */}
+                <div className="mt-6 space-y-2">
+                    {/* Daily Reset Timer */}
+                    {(() => {
+                        const now = new Date()
+                        const midnight = new Date(now)
+                        midnight.setUTCDate(midnight.getUTCDate() + 1)
+                        midnight.setUTCHours(0, 0, 0, 0)
+                        const hoursUntilReset = Math.ceil((midnight - now) / (1000 * 60 * 60))
+                        return (
+                            <div
+                                className="flex items-center justify-between p-3 rounded-xl"
+                                style={{
+                                    background: 'rgba(59,130,246,0.1)',
+                                    border: '1px solid rgba(59,130,246,0.2)'
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">⚡</span>
+                                    <span className="text-white/70 text-sm">Daily Challenge resets in</span>
+                                </div>
+                                <span className="text-blue-400 font-bold text-sm">
+                                    {hoursUntilReset}h
+                                </span>
+                            </div>
+                        )
+                    })()}
+
+                    {/* Weekly Event Timer */}
+                    {(() => {
+                        const now = new Date()
+                        const daysUntilMonday = (8 - now.getUTCDay()) % 7 || 7
+                        return (
+                            <div
+                                className="flex items-center justify-between p-3 rounded-xl"
+                                style={{
+                                    background: 'rgba(16,185,129,0.1)',
+                                    border: '1px solid rgba(16,185,129,0.2)'
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">🏆</span>
+                                    <span className="text-white/70 text-sm">Weekly Event ends in</span>
+                                </div>
+                                <span className="text-emerald-400 font-bold text-sm">
+                                    {daysUntilMonday}d
+                                </span>
+                            </div>
+                        )
+                    })()}
+
+                    {/* Arena Streak Hook */}
+                    <div
+                        className="flex items-center justify-between p-3 rounded-xl cursor-pointer active:scale-[0.98] transition-all"
+                        onClick={() => { playSound('click'); vibrate(15); onReset?.(); }}
+                        style={{
+                            background: 'rgba(0,212,255,0.1)',
+                            border: '1px solid rgba(0,212,255,0.2)'
+                        }}
+                    >
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">🌍</span>
+                            <span className="text-white/70 text-sm">Arena battles waiting</span>
+                        </div>
+                        <span className="text-cyan-400 font-bold text-sm">
+                            10 FREE/day →
+                        </span>
+                    </div>
+                </div>
+
             </div>
 
             {/* ===== LEGENDARY CONFETTI SYSTEM ===== */}
