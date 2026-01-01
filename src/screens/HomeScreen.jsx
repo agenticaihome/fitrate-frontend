@@ -968,37 +968,22 @@ export default function HomeScreen({
             )}
 
             {/* ============================================ */}
-            {/* P3.5 — TOP 3 LEADERBOARD MINI-WIDGET */}
-            {/* Shows daily challenge top 3 to drive engagement */}
+            {/* SOCIAL PROOF - Shows competition activity */}
             {/* ============================================ */}
             {dailyLeaderboard.length > 0 && !challengeScore && !fashionShowName && (
                 <button
                     onClick={() => { playSound('click'); vibrate(15); onShowChallenges?.(); }}
-                    className="w-full max-w-sm mb-4 p-4 rounded-2xl text-left transition-all active:scale-[0.98]"
+                    className="flex items-center justify-center gap-2 mb-4 px-4 py-2 rounded-full transition-all active:scale-95"
                     style={{
-                        background: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,165,0,0.05) 100%)',
-                        border: '1px solid rgba(255,215,0,0.2)'
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-bold text-yellow-400">🏆 Today's Top 3</span>
-                        <span className="text-xs text-white/40">See All →</span>
-                    </div>
-                    <div className="flex items-center justify-around">
-                        {dailyLeaderboard.slice(0, 3).map((entry, i) => {
-                            const medals = ['🥇', '🥈', '🥉']
-                            return (
-                                <div key={i} className="flex flex-col items-center">
-                                    <span className="text-lg">{medals[i]}</span>
-                                    <span className="text-white font-bold text-lg">{entry.score}</span>
-                                    <span className="text-white/40 text-[10px] uppercase tracking-wide">
-                                        {entry.nickname || `User ${i + 1}`}
-                                    </span>
-                                </div>
-                            )
-                        })}
-                    </div>
-                    <p className="text-center text-white/30 text-[10px] mt-2">Tap to compete!</p>
+                    <span className="text-yellow-400">🏆</span>
+                    <span className="text-white/70 text-sm font-medium">
+                        {dailyLeaderboard.length} people competing today
+                    </span>
+                    <span className="text-white/40 text-xs">→</span>
                 </button>
             )}
 
@@ -1373,201 +1358,186 @@ export default function HomeScreen({
                                 </motion.button>
                             )}
 
-
-                            {/* Challenges - Clay card with 3D effect */}
+                            {/* Weekly Challenge - Matches Fashion Show style */}
                             <motion.button
                                 onClick={() => { playSound('click'); vibrate(15); onShowWeeklyChallenge?.(); }}
-                                className="p-4 rounded-2xl col-span-2 clay-card card-float-3d"
+                                className="p-4 rounded-2xl clay-card card-float-3d"
                                 style={{
-                                    background: 'linear-gradient(145deg, rgba(59,130,246,0.12) 0%, rgba(16,185,129,0.08) 100%)'
+                                    background: 'linear-gradient(145deg, rgba(16,185,129,0.12) 0%, rgba(6,182,212,0.08) 100%)'
                                 }}
-                                whileHover={{ scale: 1.01, y: -3 }}
-                                whileTap={{ scale: 0.98, y: 1 }}
+                                whileHover={{ scale: 1.02, y: -4 }}
+                                whileTap={{ scale: 0.97, y: 2 }}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
+                                transition={{ delay: 0.15 }}
                             >
-                                <div className="flex items-center justify-around">
-                                    <motion.div
-                                        className="text-center flex-1"
-                                        animate={{ y: [0, -2, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity, delay: 0 }}
-                                    >
-                                        <span className="text-2xl block">⚡</span>
-                                        <p className="text-white font-bold text-xs">Daily</p>
-                                        <p className="text-blue-300 text-[10px] font-semibold">1 FREE scan/day</p>
-                                    </motion.div>
-                                    <motion.div
-                                        className="text-center px-3"
-                                        animate={{ scale: [1, 1.05, 1] }}
-                                        transition={{ duration: 3, repeat: Infinity }}
-                                    >
-                                        <span className="text-3xl block">🏆</span>
-                                        <p className="text-white font-bold text-sm">Challenges</p>
-                                    </motion.div>
-                                    <motion.div
-                                        className="text-center flex-1"
-                                        animate={{ y: [0, -2, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                                    >
-                                        <span className="text-2xl block">🌟</span>
-                                        <p className="text-white font-bold text-xs">Weekly</p>
-                                        <p className="text-emerald-300 text-[10px] font-semibold">1 FREE scan/week</p>
-                                    </motion.div>
-                                </div>
+                                <motion.span
+                                    className="text-2xl block mb-1"
+                                    animate={{ scale: [1, 1.05, 1] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                >
+                                    🏆
+                                </motion.span>
+                                <span className="text-white font-bold text-sm block">Challenges</span>
+                                <span className="text-emerald-300/70 text-xs">Daily + Weekly</span>
                             </motion.button>
-                        </div>
-
-                        {/* Active Battles */}
-                        {activeBattles.length > 0 && (
-                            <div className="mt-4">
-                                <div className="flex items-center gap-2 mb-2 px-1">
-                                    <span>⚔️</span>
-                                    <span className="text-white/70 text-sm font-semibold">Your Battles</span>
-                                </div>
-                                <div className="space-y-2">
-                                    {activeBattles.map((battle) => (
-                                        <button
-                                            key={battle.battleId}
-                                            onClick={() => {
-                                                playSound('click')
-                                                vibrate(15)
-                                                onNavigateToBattle?.(battle.battleId)
-                                            }}
-                                            className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
-                                            style={{
-                                                background: battle.status === 'completed'
-                                                    ? 'rgba(0,255,136,0.1)'
-                                                    : 'rgba(255,107,53,0.1)',
-                                                border: battle.status === 'completed'
-                                                    ? '1px solid rgba(0,255,136,0.2)'
-                                                    : '1px solid rgba(255,107,53,0.2)'
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-xl">
-                                                    {getModeData(battle.mode)?.emoji || '⚔️'}
-                                                </span>
-                                                <div className="text-left">
-                                                    <p className="text-white font-semibold text-sm">
-                                                        {getModeData(battle.mode)?.label || 'Battle'}
-                                                    </p>
-                                                    <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
-                                                        {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
-                                                    </p>
+                        </div>                        {/* Active Battles */}
+                        {
+                            activeBattles.length > 0 && (
+                                <div className="mt-4">
+                                    <div className="flex items-center gap-2 mb-2 px-1">
+                                        <span>⚔️</span>
+                                        <span className="text-white/70 text-sm font-semibold">Your Battles</span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {activeBattles.map((battle) => (
+                                            <button
+                                                key={battle.battleId}
+                                                onClick={() => {
+                                                    playSound('click')
+                                                    vibrate(15)
+                                                    onNavigateToBattle?.(battle.battleId)
+                                                }}
+                                                className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
+                                                style={{
+                                                    background: battle.status === 'completed'
+                                                        ? 'rgba(0,255,136,0.1)'
+                                                        : 'rgba(255,107,53,0.1)',
+                                                    border: battle.status === 'completed'
+                                                        ? '1px solid rgba(0,255,136,0.2)'
+                                                        : '1px solid rgba(255,107,53,0.2)'
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xl">
+                                                        {getModeData(battle.mode)?.emoji || '⚔️'}
+                                                    </span>
+                                                    <div className="text-left">
+                                                        <p className="text-white font-semibold text-sm">
+                                                            {getModeData(battle.mode)?.label || 'Battle'}
+                                                        </p>
+                                                        <p className={`text-xs ${battle.status === 'completed' ? 'text-green-400' : 'text-amber-400'}`}>
+                                                            {battle.status === 'completed' ? 'Results ready!' : 'Waiting...'}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <span className="text-white/40">→</span>
-                                        </button>
-                                    ))}
+                                                <span className="text-white/40">→</span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )
+                        }
 
                         {/* Active Shows */}
-                        {activeShows.length > 0 && (
-                            <div className="mt-4">
-                                <div className="flex items-center gap-2 mb-2 px-1">
-                                    <span>🎭</span>
-                                    <span className="text-white/70 text-sm font-semibold">Your Shows</span>
-                                </div>
-                                <div className="space-y-2">
-                                    {activeShows.map((show) => (
-                                        <button
-                                            key={show.showId}
-                                            onClick={() => {
-                                                playSound('click')
-                                                vibrate(15)
-                                                onNavigateToShow?.(show.showId)
-                                            }}
-                                            className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
-                                            style={{
-                                                background: 'rgba(139,92,246,0.1)',
-                                                border: '1px solid rgba(139,92,246,0.2)'
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-xl">🎭</span>
-                                                <div className="text-left">
-                                                    <p className="text-white font-semibold text-sm">{show.name}</p>
-                                                    <p className="text-purple-300/70 text-xs">
-                                                        {show.vibeLabel || 'Tap to rejoin'}
-                                                    </p>
+                        {
+                            activeShows.length > 0 && (
+                                <div className="mt-4">
+                                    <div className="flex items-center gap-2 mb-2 px-1">
+                                        <span>🎭</span>
+                                        <span className="text-white/70 text-sm font-semibold">Your Shows</span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {activeShows.map((show) => (
+                                            <button
+                                                key={show.showId}
+                                                onClick={() => {
+                                                    playSound('click')
+                                                    vibrate(15)
+                                                    onNavigateToShow?.(show.showId)
+                                                }}
+                                                className="w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]"
+                                                style={{
+                                                    background: 'rgba(139,92,246,0.1)',
+                                                    border: '1px solid rgba(139,92,246,0.2)'
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-xl">🎭</span>
+                                                    <div className="text-left">
+                                                        <p className="text-white font-semibold text-sm">{show.name}</p>
+                                                        <p className="text-purple-300/70 text-xs">
+                                                            {show.vibeLabel || 'Tap to rejoin'}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <span className="text-white/40">→</span>
-                                        </button>
-                                    ))}
+                                                <span className="text-white/40">→</span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
+                            )
+                        }
+                    </div >
+                )
+                }
+            </div >
 
             {/* ============================================ */}
             {/* MODALS */}
             {/* ============================================ */}
 
             {/* Android Photo Picker */}
-            {showAndroidPhotoModal && (
-                <div
-                    className="fixed inset-0 z-[60] flex items-end justify-center"
-                    style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)'
-                    }}
-                    onClick={() => setShowAndroidPhotoModal(false)}
-                >
+            {
+                showAndroidPhotoModal && (
                     <div
-                        className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                        className="fixed inset-0 z-[60] flex items-end justify-center"
                         style={{
-                            background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)',
-                            animation: 'slideUp 0.3s ease-out'
+                            background: 'rgba(0,0,0,0.7)',
+                            backdropFilter: 'blur(8px)'
                         }}
-                        onClick={e => e.stopPropagation()}
+                        onClick={() => setShowAndroidPhotoModal(false)}
                     >
-                        <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-6" />
-                        <h3 className="text-white text-lg font-bold text-center mb-6">
-                            Choose Photo Source
-                        </h3>
-                        <div className="flex flex-col gap-3">
-                            <button
-                                onClick={handleAndroidTakePhoto}
-                                className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
-                                style={{
-                                    background: `linear-gradient(135deg, ${currentMode.color} 0%, #00ff88 100%)`,
-                                    color: '#000'
-                                }}
-                            >
-                                <span className="text-2xl">📷</span>
-                                Take Photo
-                            </button>
-                            {/* Hide gallery for challenges - camera only to prevent gaming */}
-                            {!eventMode && !fashionShowName && !dailyChallengeMode && (
+                        <div
+                            className="w-full max-w-md p-6 pb-10 rounded-t-3xl"
+                            style={{
+                                background: 'linear-gradient(180deg, rgba(30,30,45,0.98) 0%, rgba(20,20,32,0.99) 100%)',
+                                animation: 'slideUp 0.3s ease-out'
+                            }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-6" />
+                            <h3 className="text-white text-lg font-bold text-center mb-6">
+                                Choose Photo Source
+                            </h3>
+                            <div className="flex flex-col gap-3">
                                 <button
-                                    onClick={handleAndroidUploadPhoto}
+                                    onClick={handleAndroidTakePhoto}
                                     className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
                                     style={{
-                                        background: 'rgba(255,255,255,0.1)',
-                                        color: '#fff',
-                                        border: '1px solid rgba(255,255,255,0.2)'
+                                        background: `linear-gradient(135deg, ${currentMode.color} 0%, #00ff88 100%)`,
+                                        color: '#000'
                                     }}
                                 >
-                                    <span className="text-2xl">🖼️</span>
-                                    Upload Photo
+                                    <span className="text-2xl">📷</span>
+                                    Take Photo
                                 </button>
-                            )}
-                            <button
-                                onClick={() => setShowAndroidPhotoModal(false)}
-                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
-                            >
-                                Cancel
-                            </button>
+                                {/* Hide gallery for challenges - camera only to prevent gaming */}
+                                {!eventMode && !fashionShowName && !dailyChallengeMode && (
+                                    <button
+                                        onClick={handleAndroidUploadPhoto}
+                                        className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98]"
+                                        style={{
+                                            background: 'rgba(255,255,255,0.1)',
+                                            color: '#fff',
+                                            border: '1px solid rgba(255,255,255,0.2)'
+                                        }}
+                                    >
+                                        <span className="text-2xl">🖼️</span>
+                                        Upload Photo
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => setShowAndroidPhotoModal(false)}
+                                    className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Mode Drawer - Animated with Stagger */}
             <AnimatePresence>
@@ -1747,6 +1717,6 @@ export default function HomeScreen({
                     to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
-        </div>
+        </div >
     )
 }
