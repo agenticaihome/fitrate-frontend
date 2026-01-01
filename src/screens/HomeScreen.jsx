@@ -1373,11 +1373,11 @@ export default function HomeScreen({
                                 </motion.button>
                             )}
 
-                            {/* 1v1 Friend Battle placeholder - right column */}
+                            {/* Meet The Judges - Show AI modes */}
                             <motion.button
                                 onClick={() => { playSound('click'); vibrate(15); onShowRules?.(); }}
                                 className="p-4 rounded-2xl clay-card card-float-3d"
-                                style={{ background: 'linear-gradient(145deg, rgba(255,107,53,0.12) 0%, rgba(255,68,68,0.08) 100%)' }}
+                                style={{ background: 'linear-gradient(145deg, rgba(139,92,246,0.12) 0%, rgba(168,85,247,0.08) 100%)' }}
                                 whileHover={{ scale: 1.02, y: -4 }}
                                 whileTap={{ scale: 0.97, y: 2 }}
                                 initial={{ opacity: 0, y: 20 }}
@@ -1386,13 +1386,13 @@ export default function HomeScreen({
                             >
                                 <motion.span
                                     className="text-2xl block mb-1"
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
+                                    animate={{ rotate: [0, 5, -5, 0] }}
+                                    transition={{ duration: 3, repeat: Infinity }}
                                 >
-                                    ⚔️
+                                    🎭
                                 </motion.span>
-                                <span className="text-white font-bold text-sm block">1v1 Battle</span>
-                                <span className="text-orange-300/70 text-xs">Challenge a Friend</span>
+                                <span className="text-white font-bold text-sm block">AI Judges</span>
+                                <span className="text-purple-300/70 text-xs">12 Modes</span>
                             </motion.button>
 
 
