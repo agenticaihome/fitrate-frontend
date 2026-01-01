@@ -1373,9 +1373,9 @@ export default function HomeScreen({
                                 </motion.button>
                             )}
 
-                            {/* Meet The Judges - Show AI modes */}
+                            {/* AI Modes - Opens mode selector drawer */}
                             <motion.button
-                                onClick={() => { playSound('click'); vibrate(15); onShowRules?.(); }}
+                                onClick={() => { playSound('click'); vibrate(15); setShowModeDrawer(true); }}
                                 className="p-4 rounded-2xl clay-card card-float-3d"
                                 style={{ background: 'linear-gradient(145deg, rgba(139,92,246,0.12) 0%, rgba(168,85,247,0.08) 100%)' }}
                                 whileHover={{ scale: 1.02, y: -4 }}
