@@ -286,6 +286,112 @@ const getDailyMode = () => {
 // Get mode data by ID
 const getModeData = (modeId) => MODES.find(m => m.id === modeId) || MODES[0]
 
+// ============================================
+// MODE CAROUSEL - Swipeable peek carousel
+// Shows current mode + neighbors for quick switching
+// ============================================
+const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
+    const currentIndex = MODES.findIndex(m => m.id === currentModeId) || 0
+
+    // Get prev/next indices (wrapping)
+    const prevIndex = (currentIndex - 1 + MODES.length) % MODES.length
+    const nextIndex = (currentIndex + 1) % MODES.length
+
+    const prevMode = MODES[prevIndex]
+    const currentMode = MODES[currentIndex]
+    const nextMode = MODES[nextIndex]
+
+    const handleSwipe = (direction) => {
+        playSound('click')
+        vibrate([10, 5, 15])
+        if (direction === 'left') {
+            onModeChange(nextMode.id)
+        } else {
+            onModeChange(prevMode.id)
+        }
+    }
+
+    return (
+        <div className="w-full max-w-xs mb-4">
+            {/* Carousel Container */}
+            <motion.div
+                className="relative flex items-center justify-center gap-2 py-3 px-4 rounded-2xl overflow-hidden"
+                style={{
+                    background: `linear-gradient(135deg, ${currentMode.color}15 0%, ${currentMode.color}05 100%)`,
+                    border: `1px solid ${currentMode.color}30`
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.3}
+                onDragEnd={(_, info) => {
+                    if (Math.abs(info.offset.x) > 50) {
+                        handleSwipe(info.offset.x > 0 ? 'right' : 'left')
+                    }
+                }}
+            >
+                {/* Left neighbor (dimmed) */}
+                <motion.button
+                    onClick={() => handleSwipe('right')}
+                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <span className="text-2xl">{prevMode.emoji}</span>
+                </motion.button>
+
+                {/* Current mode (center, prominent) */}
+                <motion.div
+                    className="flex-1 flex flex-col items-center px-4"
+                    key={currentMode.id}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                >
+                    <motion.span
+                        className="text-4xl mb-1"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {currentMode.emoji}
+                    </motion.span>
+                    <span className="text-white font-bold text-sm">{currentMode.label}</span>
+                    <span
+                        className="text-xs font-medium mt-0.5"
+                        style={{ color: currentMode.color }}
+                    >
+                        {currentMode.desc}
+                    </span>
+                </motion.div>
+
+                {/* Right neighbor (dimmed) */}
+                <motion.button
+                    onClick={() => handleSwipe('left')}
+                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <span className="text-2xl">{nextMode.emoji}</span>
+                </motion.button>
+            </motion.div>
+
+            {/* Swipe hint + drawer link */}
+            <div className="flex items-center justify-between mt-2 px-2">
+                <span className="text-white/30 text-xs">← swipe →</span>
+                <button
+                    onClick={() => {
+                        playSound('click')
+                        vibrate(10)
+                        onOpenDrawer()
+                    }}
+                    className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1"
+                >
+                    <span>All 12 Modes</span>
+                    <span>👥</span>
+                </button>
+            </div>
+        </div>
+    )
+}
+
+
 export default function HomeScreen({
     mode,
     setMode,
@@ -1218,25 +1324,14 @@ export default function HomeScreen({
                             </button>
                         </div>
 
-                        {/* Mode Selector - Hidden during challenge modes AND for first-time users */}
-                        {/* First-timers get Nice mode by default, modes unlock after first scan */}
+                        {/* MODE CAROUSEL - Swipeable mode picker */}
+                        {/* Hidden during challenge modes AND for first-time users */}
                         {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
-                            <button
-                                onClick={() => {
-                                    playSound('click')
-                                    vibrate(15)
-                                    setShowModeDrawer(true)
-                                }}
-                                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all active:scale-95 mb-4"
-                                style={{
-                                    background: `${currentMode.color}20`,
-                                    border: `1px solid ${currentMode.color}40`
-                                }}
-                            >
-                                <span className="text-xl">{currentMode.emoji}</span>
-                                <span className="text-white font-semibold">{currentMode.label}</span>
-                                <span className="text-white/50 text-sm">• Change ▼</span>
-                            </button>
+                            <ModeCarousel
+                                currentModeId={mode}
+                                onModeChange={setMode}
+                                onOpenDrawer={() => setShowModeDrawer(true)}
+                            />
                         )}
 
                         {/* Challenge quick action - during challenge modes */}
@@ -1254,10 +1349,13 @@ export default function HomeScreen({
                             </button>
                         )}
 
-                        {/* Privacy Note */}
+                        {/* Value Prop - Clear differentiation */}
                         <div className="text-center mb-4">
-                            <p className="text-white/40 text-xs">
-                                🔒 Your photos stay private • Auto-deleted
+                            <p className="text-white/60 text-xs mb-1">
+                                Get your rating → Dare friends to beat it
+                            </p>
+                            <p className="text-white/30 text-[10px]">
+                                🔒 Private • No account needed
                             </p>
                         </div>
                     </div>
