@@ -260,18 +260,18 @@ const FloatingParticles = ({ accentColor, secondaryColor = '#8b5cf6' }) => {
 // Punchier descriptions for 2025
 // ============================================
 const MODES = [
-    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Your biggest fan', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)' },
-    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Friendship-ending honesty', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)' },
-    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'No cap, real talk', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)' },
-    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)' },
-    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)' },
-    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)' },
-    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'AI off its meds', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)' },
-    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)' },
-    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)' },
-    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
+    { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Your biggest fan', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)', cta: 'HYPE MY FIT' },
+    { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Friendship-ending honesty', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)', cta: 'ROAST MY FIT' },
+    { id: 'honest', emoji: '📊', label: 'Honest', desc: 'No cap, real talk', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)', cta: 'RATE MY FIT' },
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)', cta: 'DESTROY MY FIT' },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY RIZZ' },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)', cta: 'JUDGE MY FIT' },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)', cta: 'READ MY AURA' },
+    { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'AI off its meds', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)', cta: 'CHAOS MY FIT' },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY Y2K' },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)', cta: 'VILLAIN CHECK' },
+    { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', cta: 'RATE MY SOFT' },
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)', cta: 'CHECK MY DRIP' }
 ]
 
 // Daily Challenge: Rotating mode based on day of year
@@ -1262,7 +1262,7 @@ export default function HomeScreen({
                             {/* Swipeable Button Container */}
                             <motion.div
                                 className="relative"
-                                drag={!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') ? "x" : false}
+                                drag={!dailyChallengeMode && !eventMode ? "x" : false}
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.3}
                                 onDragEnd={(_, info) => {
@@ -1282,29 +1282,41 @@ export default function HomeScreen({
                                     }
                                 }}
                             >
-                                {/* Peek mode indicators on sides - only when mode switching is enabled */}
-                                {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (() => {
+                                {/* Peek mode indicators on sides - TAPPABLE */}
+                                {!dailyChallengeMode && !eventMode && (() => {
                                     const currentIndex = MODES.findIndex(m => m.id === mode) || 0
                                     const prevMode = MODES[(currentIndex - 1 + MODES.length) % MODES.length]
                                     const nextMode = MODES[(currentIndex + 1) % MODES.length]
                                     return (
                                         <>
-                                            {/* Left peek */}
-                                            <motion.div
-                                                className="absolute left-[-40px] top-1/2 -translate-y-1/2 text-3xl opacity-30 pointer-events-none"
-                                                animate={{ x: [0, -5, 0] }}
+                                            {/* Left peek - TAPPABLE */}
+                                            <motion.button
+                                                onClick={() => {
+                                                    setMode(prevMode.id)
+                                                    playSound('click')
+                                                    vibrate([10, 5, 15])
+                                                }}
+                                                className="absolute left-[-50px] top-1/2 -translate-y-1/2 text-3xl opacity-40 hover:opacity-70 transition-opacity p-2"
+                                                animate={{ x: [0, -3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
+                                                whileTap={{ scale: 0.8 }}
                                             >
                                                 {prevMode.emoji}
-                                            </motion.div>
-                                            {/* Right peek */}
-                                            <motion.div
-                                                className="absolute right-[-40px] top-1/2 -translate-y-1/2 text-3xl opacity-30 pointer-events-none"
-                                                animate={{ x: [0, 5, 0] }}
+                                            </motion.button>
+                                            {/* Right peek - TAPPABLE */}
+                                            <motion.button
+                                                onClick={() => {
+                                                    setMode(nextMode.id)
+                                                    playSound('click')
+                                                    vibrate([10, 5, 15])
+                                                }}
+                                                className="absolute right-[-50px] top-1/2 -translate-y-1/2 text-3xl opacity-40 hover:opacity-70 transition-opacity p-2"
+                                                animate={{ x: [0, 3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
+                                                whileTap={{ scale: 0.8 }}
                                             >
                                                 {nextMode.emoji}
-                                            </motion.div>
+                                            </motion.button>
                                         </>
                                     )
                                 })()}
@@ -1369,14 +1381,19 @@ export default function HomeScreen({
                                         {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : currentMode.emoji}
                                     </motion.span>
 
-                                    {/* Main Text - Changes based on mode */}
-                                    <span className="relative text-white font-black text-xl tracking-wide text-center px-4">
+                                    {/* Main Text - Mode-specific CTA */}
+                                    <motion.span
+                                        className="relative text-white font-black text-xl tracking-wide text-center px-4"
+                                        key={`cta-${currentMode.id}`}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                    >
                                         {dailyChallengeMode
                                             ? 'DAILY CHALLENGE'
                                             : eventMode
                                                 ? 'WEEKLY CHALLENGE'
-                                                : 'RATE MY FIT'}
-                                    </span>
+                                                : currentMode.cta || 'RATE MY FIT'}
+                                    </motion.span>
 
                                     {/* Mode indicator - Shows mode name */}
                                     <motion.span
@@ -1392,8 +1409,8 @@ export default function HomeScreen({
                                                 : `${currentMode.label} Mode`}
                                     </motion.span>
 
-                                    {/* Swipe hint - only when modes are active */}
-                                    {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
+                                    {/* Swipe hint - always show when not in challenge mode */}
+                                    {!dailyChallengeMode && !eventMode && (
                                         <motion.span
                                             className="absolute bottom-4 text-white/30 text-[10px] font-medium"
                                             initial={{ opacity: 0 }}
@@ -1408,7 +1425,7 @@ export default function HomeScreen({
                         </div>
 
                         {/* All Modes Link - Opens drawer for full selection + judges */}
-                        {!dailyChallengeMode && !eventMode && localStorage.getItem('fitrate_first_scan_complete') && (
+                        {!dailyChallengeMode && !eventMode && (
                             <button
                                 onClick={() => {
                                     playSound('click')
