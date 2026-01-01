@@ -34,7 +34,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
             strokeLinecap="round"
             strokeLinejoin="round"
             style={{
-                filter: active ? 'drop-shadow(0 0 8px rgba(255,255,255,0.5))' : 'none',
+                filter: active ? 'drop-shadow(0 0 8px rgba(255,255,255,0.6))' : 'none',
                 transition: 'all 0.3s ease-out'
             }}
         >
@@ -70,7 +70,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke={eventMode ? '#ffd700' : active ? '#fff' : 'rgba(255,255,255,0.5)'}
+            stroke={eventMode ? '#ffd700' : active ? '#10b981' : 'rgba(255,255,255,0.5)'}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -78,7 +78,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                 filter: eventMode
                     ? 'drop-shadow(0 0 10px rgba(255,215,0,0.6))'
                     : active
-                        ? 'drop-shadow(0 0 8px rgba(255,255,255,0.5))'
+                        ? 'drop-shadow(0 0 8px rgba(16,185,129,0.6))'
                         : 'none',
                 transition: 'all 0.3s ease-out'
             }}
@@ -185,12 +185,12 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                 >
                     <TrophyIcon active={activeTab === 'challenges'} eventMode={eventMode} />
                     <span className={`text-[10px] mt-1 font-medium ${eventMode ? 'text-yellow-400' :
-                        activeTab === 'challenges' ? 'text-white' : 'text-white/50'
+                            activeTab === 'challenges' ? 'text-emerald-400' : 'text-white/50'
                         }`}>
                         Challenges
                     </span>
                     {(activeTab === 'challenges' || eventMode) && (
-                        <ActiveIndicator color={eventMode ? '#ffd700' : '#fff'} />
+                        <ActiveIndicator color={eventMode ? '#ffd700' : '#10b981'} />
                     )}
                 </button>
 
