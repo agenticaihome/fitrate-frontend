@@ -49,6 +49,10 @@ export default function FashionShowHub({
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
+    // Reactions state - track which entries user has reacted to
+    const [userReactions, setUserReactions] = useState(new Set())
+    const [reactingTo, setReactingTo] = useState(null) // Currently reacting to (for animation)
+
     // Camera state
     const [showCamera, setShowCamera] = useState(false)
     const [showAndroidPhotoModal, setShowAndroidPhotoModal] = useState(false)
@@ -149,6 +153,38 @@ export default function FashionShowHub({
             playSound('error')
         } finally {
             setLoading(false)
+        }
+    }
+
+    // Handle 🔥 reaction
+    const handleReaction = async (targetUserId) => {
+        if (reactingTo || userReactions.has(targetUserId) || targetUserId === userId) return
+
+        setReactingTo(targetUserId)
+        playSound('success')
+        vibrate([30, 20, 30])
+
+        try {
+            const res = await fetch(`${API_BASE}/show/${showId}/react`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, targetUserId })
+            })
+            const data = await res.json()
+            if (data.success) {
+                // Update local state
+                setUserReactions(prev => new Set([...prev, targetUserId]))
+                // Update scoreboard with new count
+                setScoreboard(prev => prev.map(entry =>
+                    entry.userId === targetUserId
+                        ? { ...entry, reactionCount: data.reactionCount }
+                        : entry
+                ))
+            }
+        } catch (err) {
+            console.error('[FashionShow] Reaction error:', err)
+        } finally {
+            setTimeout(() => setReactingTo(null), 300) // Delay to show animation
         }
     }
 
@@ -546,6 +582,33 @@ export default function FashionShowHub({
                                         <span className="flex-1 text-sm font-bold text-white/80 truncate">
                                             {entry.tagline || entry.nickname}
                                         </span>
+                                        {/* 🔥 Reaction Button */}
+                                        {!isUser && hasJoined && (
+                                            <button
+                                                onClick={() => handleReaction(entry.userId)}
+                                                disabled={userReactions.has(entry.userId) || reactingTo === entry.userId}
+                                                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-sm transition-all ${userReactions.has(entry.userId)
+                                                        ? 'bg-orange-500/20 text-orange-400'
+                                                        : 'bg-white/5 text-white/50 hover:bg-orange-500/20 hover:text-orange-400 active:scale-95'
+                                                    }`}
+                                                style={{
+                                                    transform: reactingTo === entry.userId ? 'scale(1.2)' : 'scale(1)',
+                                                    transition: 'transform 0.15s ease-out'
+                                                }}
+                                            >
+                                                <span className="text-base">🔥</span>
+                                                {entry.reactionCount > 0 && (
+                                                    <span className="font-bold">{entry.reactionCount}</span>
+                                                )}
+                                            </button>
+                                        )}
+                                        {/* Show reaction count for self */}
+                                        {isUser && entry.reactionCount > 0 && (
+                                            <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-orange-500/20 text-orange-400 text-sm">
+                                                <span className="text-base">🔥</span>
+                                                <span className="font-bold">{entry.reactionCount}</span>
+                                            </span>
+                                        )}
                                         <div className="text-2xl font-black text-white">{entry.score?.toFixed(1)}</div>
                                     </div>
                                 </div>
