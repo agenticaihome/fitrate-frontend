@@ -445,6 +445,7 @@ export default function ArenaEntryScreen({
 }) {
     const [screenState, setScreenState] = useState('entry')
     const [onlineCount, setOnlineCount] = useState(null)
+    const [battlesToday, setBattlesToday] = useState(0)
     const [photoData, setPhotoData] = useState(null)
     const [analysisProgress, setAnalysisProgress] = useState(0)
     const [error, setError] = useState(null)
@@ -492,7 +493,7 @@ export default function ArenaEntryScreen({
         return () => clearInterval(interval)
     }, [screenState])
 
-    // Fetch online count
+    // Fetch arena stats (online + battles today)
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -500,6 +501,7 @@ export default function ArenaEntryScreen({
                 if (res.ok) {
                     const data = await res.json()
                     setOnlineCount(data.online || 0)
+                    setBattlesToday(data.battlesToday || 0)
                 }
             } catch (err) {
                 console.log('[Arena] Stats fetch failed:', err)
@@ -817,20 +819,40 @@ export default function ArenaEntryScreen({
                     <span className="text-white text-lg">←</span>
                 </button>
 
-                {/* Online Count */}
-                {onlineCount !== null && (
-                    <div
-                        className="flex items-center gap-2 px-3 py-2 rounded-full"
-                        style={{
-                            background: 'rgba(0,255,136,0.1)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(0,255,136,0.2)'
-                        }}
-                    >
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                        <span className="text-green-400 text-sm font-bold">{onlineCount} live</span>
-                    </div>
-                )}
+                {/* Live Stats */}
+                <div className="flex flex-col items-end gap-2">
+                    {/* Online Count */}
+                    {onlineCount !== null && (
+                        <div
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                            style={{
+                                background: onlineCount <= 1 ? 'rgba(255,170,0,0.1)' : 'rgba(0,255,136,0.1)',
+                                backdropFilter: 'blur(10px)',
+                                border: `1px solid ${onlineCount <= 1 ? 'rgba(255,170,0,0.2)' : 'rgba(0,255,136,0.2)'}`
+                            }}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${onlineCount <= 1 ? 'bg-amber-400' : 'bg-green-400'} animate-pulse`} />
+                            <span className={`${onlineCount <= 1 ? 'text-amber-400' : 'text-green-400'} text-xs font-bold`}>
+                                {onlineCount <= 1 ? '👋 Be first!' : `${onlineCount} live`}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Battles Today - FOMO badge */}
+                    {battlesToday > 0 && (
+                        <div
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                            style={{
+                                background: 'rgba(255,107,53,0.1)',
+                                backdropFilter: 'blur(10px)',
+                                border: '1px solid rgba(255,107,53,0.2)'
+                            }}
+                        >
+                            <span className="text-xs">🔥</span>
+                            <span className="text-orange-400 text-xs font-bold">{battlesToday} today</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Main Content */}

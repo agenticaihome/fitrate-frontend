@@ -2686,8 +2686,17 @@ export default function App() {
               const opponentScore = battleResult.opponentScore
               // Use API result field ('win'|'loss'|'tie') if available, otherwise calculate from scores
               const result = battleResult.result || (myScore > opponentScore ? 'win' : myScore < opponentScore ? 'loss' : 'tie')
-              recordArenaResult(result)
+              const arenaStats = recordArenaResult(result)
               console.log(`[Arena] Recorded daily result: ${result} (${Math.round(myScore)} vs ${Math.round(opponentScore)})${battleResult.result ? ' [from API]' : ' [calculated]'}`)
+
+              // 🔥 WIN STREAK CELEBRATION - Show toast for streak milestones!
+              if (arenaStats.bonus) {
+                setTimeout(() => {
+                  displayToast(arenaStats.bonus.message, 3500)
+                  vibrate([100, 50, 100, 50, 200])
+                  playSound('celebrate')
+                }, 1500) // Delay to not overlap with battle reveal
+              }
             }
             // Add to active battles
             addToActiveBattles(battleId, arenaData.score, arenaData.mode, 'completed')

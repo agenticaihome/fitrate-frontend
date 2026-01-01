@@ -171,6 +171,7 @@ export default function ArenaQueueScreen({
 }) {
     const [waitTime, setWaitTime] = useState(0)
     const [onlineCount, setOnlineCount] = useState(null)
+    const [battlesToday, setBattlesToday] = useState(0)
     const [status, setStatus] = useState('joining') // joining → queued → matched → timeout
     const [searchMessage, setSearchMessage] = useState(0)
 
@@ -236,12 +237,13 @@ export default function ArenaQueueScreen({
             }
         }
 
-        // Fetch online count
+        // Fetch arena stats (online count + battles today)
         const fetchStats = async () => {
             try {
                 const res = await fetch(`${API_BASE}/arena/stats`)
                 const data = await res.json()
                 setOnlineCount(data.online || 0)
+                setBattlesToday(data.battlesToday || 0)
             } catch (err) {
                 console.warn('[Arena] Stats error:', err)
             }
@@ -477,19 +479,38 @@ export default function ArenaQueueScreen({
                 <span className="text-white text-xl font-bold">✕</span>
             </button>
 
-            {/* Online count */}
-            {onlineCount !== null && (
-                <div
-                    className="absolute top-6 right-6 flex items-center gap-2 px-3 py-2 rounded-full z-10"
-                    style={{
-                        background: 'rgba(0,255,136,0.15)',
-                        border: '1px solid rgba(0,255,136,0.3)'
-                    }}
-                >
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-green-400 text-sm font-bold">{onlineCount} online</span>
-                </div>
-            )}
+            {/* Stats Badges - Online + Battles Today */}
+            <div className="absolute top-6 right-4 flex flex-col gap-2 z-10">
+                {/* Online count */}
+                {onlineCount !== null && (
+                    <div
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{
+                            background: onlineCount <= 1 ? 'rgba(255,170,0,0.15)' : 'rgba(0,255,136,0.15)',
+                            border: `1px solid ${onlineCount <= 1 ? 'rgba(255,170,0,0.3)' : 'rgba(0,255,136,0.3)'}`
+                        }}
+                    >
+                        <span className={`w-2 h-2 rounded-full ${onlineCount <= 1 ? 'bg-amber-400' : 'bg-green-400'} animate-pulse`} />
+                        <span className={`${onlineCount <= 1 ? 'text-amber-400' : 'text-green-400'} text-xs font-bold`}>
+                            {onlineCount <= 1 ? '👋 Be first!' : `${onlineCount} online`}
+                        </span>
+                    </div>
+                )}
+
+                {/* Battles today - FOMO badge */}
+                {battlesToday > 0 && (
+                    <div
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                        style={{
+                            background: 'rgba(255,107,53,0.15)',
+                            border: '1px solid rgba(255,107,53,0.3)'
+                        }}
+                    >
+                        <span className="text-xs">🔥</span>
+                        <span className="text-orange-400 text-xs font-bold">{battlesToday} battles today</span>
+                    </div>
+                )}
+            </div>
 
             {/* Main Content */}
             <div className="relative z-10 flex flex-col items-center w-full max-w-md pt-14 pb-4">
