@@ -358,13 +358,64 @@ export default function ChallengesScreen({
                                     )}
                                 </div>
 
-                                {/* User's rank if not in top 5 */}
-                                {userDailyRank && userDailyRank > 5 && (
-                                    <div className="bg-blue-900/20 border border-blue-500/30 p-3 rounded-xl text-center">
-                                        <span className="text-blue-400 text-sm">Your rank: </span>
-                                        <span className="text-white font-bold text-lg">#{userDailyRank}</span>
-                                    </div>
-                                )}
+                                {/* User's rank if not in top 5 - with Top 25% celebration! */}
+                                {userDailyRank && userDailyRank > 5 && (() => {
+                                    const totalParticipants = dailyLeaderboard.length || userDailyRank
+                                    const top25Cutoff = Math.ceil(totalParticipants * 0.25)
+                                    const isTop25 = userDailyRank <= top25Cutoff
+                                    const isTop10 = userDailyRank <= 10
+
+                                    return (
+                                        <div
+                                            className="p-4 rounded-xl text-center"
+                                            style={{
+                                                background: isTop10
+                                                    ? 'linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,136,0,0.1) 100%)'
+                                                    : isTop25
+                                                        ? 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(6,182,212,0.1) 100%)'
+                                                        : 'rgba(59,130,246,0.1)',
+                                                border: isTop10
+                                                    ? '1px solid rgba(255,215,0,0.3)'
+                                                    : isTop25
+                                                        ? '1px solid rgba(16,185,129,0.3)'
+                                                        : '1px solid rgba(59,130,246,0.2)'
+                                            }}
+                                        >
+                                            {/* Rank Badge */}
+                                            <div className="flex items-center justify-center gap-2 mb-2">
+                                                <span className="text-2xl">{isTop10 ? '🏆' : isTop25 ? '⭐' : '📊'}</span>
+                                                <span className="text-white font-bold text-2xl">#{userDailyRank}</span>
+                                                <span className="text-white/50 text-sm">of {totalParticipants}</span>
+                                            </div>
+
+                                            {/* Top 25% Celebration */}
+                                            {isTop25 && (
+                                                <div
+                                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full"
+                                                    style={{
+                                                        background: isTop10 ? 'rgba(255,215,0,0.2)' : 'rgba(16,185,129,0.2)',
+                                                        border: isTop10 ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(16,185,129,0.4)'
+                                                    }}
+                                                >
+                                                    <span className="text-sm">🎉</span>
+                                                    <span className={`font-bold text-sm ${isTop10 ? 'text-yellow-400' : 'text-emerald-400'}`}>
+                                                        {isTop10 ? 'TOP 10' : 'TOP 25%'}
+                                                    </span>
+                                                    <span className="text-white/60 text-xs">
+                                                        +{isTop10 ? '2' : '1'} scan{isTop10 ? 's' : ''} earned!
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {/* Encouragement for non-qualifiers */}
+                                            {!isTop25 && (
+                                                <p className="text-white/50 text-xs mt-1">
+                                                    {Math.ceil(userDailyRank - top25Cutoff)} spots to Top 25% prize!
+                                                </p>
+                                            )}
+                                        </div>
+                                    )
+                                })()}
                             </div>
                         )
                     })()
