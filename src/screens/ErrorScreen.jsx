@@ -76,61 +76,97 @@ function getErrorConfig(errorCode, errorMessage) {
     };
 }
 
+// Animated floating emoji component
+const FloatingEmoji = ({ emoji }) => (
+    <div className="relative">
+        {/* Glow behind */}
+        <div
+            className="absolute inset-0 blur-2xl opacity-30"
+            style={{
+                background: 'radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 70%)'
+            }}
+        />
+        {/* Main emoji with bounce */}
+        <span
+            className="text-7xl block animate-bounce relative z-10"
+            style={{ animationDuration: '2s' }}
+        >
+            {emoji}
+        </span>
+    </div>
+)
+
 export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHome }) {
     // Get config for this error code or message
     const config = getErrorConfig(errorCode, error);
 
+    const handleAction = (callback, fallbackUrl = '/') => {
+        if (navigator.vibrate) navigator.vibrate([20, 10, 20]);
+        if (callback) {
+            callback();
+        } else {
+            window.location.href = fallbackUrl;
+        }
+    };
+
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#0a0a0f] text-white" style={{
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-        }}>
-            <span className="text-6xl mb-6">{config.emoji}</span>
-            <h2 className="text-2xl font-black mb-4 uppercase tracking-tight">{config.title}</h2>
-            <p className="text-white/60 text-center mb-8 max-w-xs">{config.message}</p>
+        <div
+            className="min-h-screen flex flex-col items-center justify-center p-8 text-white"
+            style={{
+                paddingTop: 'env(safe-area-inset-top)',
+                paddingBottom: 'env(safe-area-inset-bottom)',
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                background: 'linear-gradient(180deg, #0a0a12 0%, #1a1a2e 50%, #0a0a12 100%)'
+            }}
+        >
+            {/* Animated Emoji */}
+            <FloatingEmoji emoji={config.emoji} />
 
+            {/* Title */}
+            <h2 className="text-2xl font-black mb-3 mt-6 text-center bg-gradient-to-r from-white to-white/80 bg-clip-text">
+                {config.title}
+            </h2>
+
+            {/* Message */}
+            <p className="text-white/60 text-center mb-8 max-w-xs leading-relaxed">
+                {config.message}
+            </p>
+
+            {/* Action Buttons */}
             <div className="w-full max-w-xs space-y-3">
+                {/* Primary: Try Again */}
                 <button
-                    onClick={() => {
-                        // Haptic feedback to confirm click
-                        if (navigator.vibrate) navigator.vibrate(20);
-
-                        // Try the provided handler, or fall back to page reload
-                        if (onReset) {
-                            onReset();
-                        } else {
-                            // Nuclear option - full reload
-                            window.location.href = '/';
-                        }
+                    onClick={() => handleAction(onReset)}
+                    className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg 
+                        transition-all active:scale-95 hover:shadow-lg
+                        animate-pulse hover:animate-none"
+                    style={{
+                        boxShadow: '0 8px 0 rgba(255,255,255,0.1), 0 15px 30px rgba(0, 0, 0, 0.3)',
+                        animationDuration: '3s'
                     }}
-                    className="w-full py-4 rounded-2xl bg-white text-black font-black text-lg transition-all active:scale-95"
-                    style={{ boxShadow: 'var(--shadow-physical)' }}
                 >
-                    Try Again
+                    🔄 Try Again
                 </button>
 
+                {/* Upgrade CTA (if applicable) */}
                 {config.showUpgrade && onUpgrade && (
                     <button
-                        onClick={onUpgrade}
-                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg transition-all active:scale-95"
+                        onClick={() => handleAction(onUpgrade)}
+                        className="w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-95"
+                        style={{
+                            background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+                            boxShadow: '0 4px 20px rgba(139,92,246,0.4)'
+                        }}
                     >
-                        ⚡ Upgrade to Pro
+                        ⚡ Unlock Unlimited
                     </button>
                 )}
 
-                {/* Home Button - Always Available Escape Route */}
+                {/* Back to Home */}
                 <button
-                    onClick={() => {
-                        if (navigator.vibrate) navigator.vibrate(20);
-                        if (onHome) {
-                            onHome();
-                        } else {
-                            window.location.href = '/';
-                        }
-                    }}
-                    className="w-full py-3 mt-2 text-sm font-medium transition-all active:opacity-60"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}
+                    onClick={() => handleAction(onHome)}
+                    className="w-full py-3 mt-2 text-sm font-medium text-white/40 
+                        transition-all active:opacity-60 hover:text-white/60"
                 >
                     ← Back to Home
                 </button>
@@ -138,4 +174,3 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHo
         </div>
     )
 }
-

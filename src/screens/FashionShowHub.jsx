@@ -10,6 +10,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
+import EmptyState from '../components/common/EmptyState'
+import { ScoreboardLoader } from '../components/common/ShimmerLoader'
 
 const EMOJI_OPTIONS = ['😎', '🔥', '✨', '💅', '👑', '🎭']
 
@@ -538,20 +540,13 @@ export default function FashionShowHub({
                 </div>
 
                 {scoreboardLoading && scoreboard.length === 0 ? (
-                    <div className="space-y-2 animate-pulse">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="p-3 rounded-xl bg-white/5 flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                <div className="w-14 h-14 rounded-xl bg-white/10" />
-                                <div className="flex-1 h-4 bg-white/10 rounded" />
-                                <div className="w-12 h-6 bg-white/10 rounded" />
-                            </div>
-                        ))}
-                    </div>
+                    <ScoreboardLoader rows={3} />
                 ) : scoreboard.length === 0 ? (
-                    <div className="text-center py-8 text-white/30 text-sm">
-                        No walks yet — be the first! 🎭
-                    </div>
+                    <EmptyState
+                        variant="fashion"
+                        title="No walks yet"
+                        subtitle="Be the first to strut your stuff!"
+                    />
                 ) : (
                     <div className="space-y-2">
                         {scoreboard.slice(0, 10).map((entry, idx) => {
@@ -588,8 +583,8 @@ export default function FashionShowHub({
                                                 onClick={() => handleReaction(entry.userId)}
                                                 disabled={userReactions.has(entry.userId) || reactingTo === entry.userId}
                                                 className={`flex items-center gap-1 px-2 py-1 rounded-lg text-sm transition-all ${userReactions.has(entry.userId)
-                                                        ? 'bg-orange-500/20 text-orange-400'
-                                                        : 'bg-white/5 text-white/50 hover:bg-orange-500/20 hover:text-orange-400 active:scale-95'
+                                                    ? 'bg-orange-500/20 text-orange-400'
+                                                    : 'bg-white/5 text-white/50 hover:bg-orange-500/20 hover:text-orange-400 active:scale-95'
                                                     }`}
                                                 style={{
                                                     transform: reactingTo === entry.userId ? 'scale(1.2)' : 'scale(1)',
