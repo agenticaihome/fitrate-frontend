@@ -946,7 +946,37 @@ export default function ArenaEntryScreen({
                     </div>
                 </div>
 
-                {/* Daily Streak Card */}
+                {/* Weekly Arena Prizes */}
+                <div
+                    className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(251, 146, 60, 0.12) 100%)',
+                        border: '1px solid rgba(255, 215, 0, 0.3)'
+                    }}
+                >
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="text-2xl">🏆</span>
+                        <p className="text-yellow-300 font-bold">WEEKLY PRIZES</p>
+                        <span className="text-white/40 text-xs ml-auto">Distributed Monday</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                            <p className="text-yellow-400 text-lg font-black">🥇</p>
+                            <p className="text-white font-bold text-sm">25</p>
+                            <p className="text-white/40 text-[10px]">scans</p>
+                        </div>
+                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                            <p className="text-gray-300 text-lg font-black">🥈🥉</p>
+                            <p className="text-white font-bold text-sm">15</p>
+                            <p className="text-white/40 text-[10px]">scans</p>
+                        </div>
+                        <div className="bg-white/5 rounded-lg py-2 px-1">
+                            <p className="text-amber-600 text-xs font-bold">#4-10</p>
+                            <p className="text-white font-bold text-sm">5</p>
+                            <p className="text-white/40 text-[10px]">scans</p>
+                        </div>
+                    </div>
+                </div>
                 <div className="w-full max-w-md mb-4">
                     <StreakCard
                         streakData={streakData}

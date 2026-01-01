@@ -431,6 +431,19 @@ export default function ArenaLeaderboard({
             <div className="flex-1 overflow-y-auto px-4 pb-6 relative z-10">
                 {activeTab === 'leaderboard' && (
                     <div className="space-y-4">
+                        {/* Weekly Arena Prizes Banner */}
+                        <div
+                            className="p-3 rounded-xl relative overflow-hidden text-center"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(251, 146, 60, 0.10) 100%)',
+                                border: '1px solid rgba(255, 215, 0, 0.25)'
+                            }}
+                        >
+                            <span className="text-lg mr-2">🏆</span>
+                            <span className="text-yellow-300 font-bold text-sm">WEEKLY PRIZES</span>
+                            <span className="text-white/60 text-xs ml-2">🥇25 • 🥈🥉15 • Top 10: 5 scans</span>
+                        </div>
+
                         {/* Your Progress Card */}
                         <TierProgressCard
                             tierData={tierData}
