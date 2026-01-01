@@ -2761,6 +2761,7 @@ export default function App() {
             onShowFullLeaderboard={() => setShowLeaderboard(true)}
             onBack={() => setScreen('home')}
             onOpenArena={openArenaEntry}
+            onStartFashionShow={() => setFashionShowScreen('create')}
             // Data fetching
             fetchDailyLeaderboard={fetchDailyLeaderboard}
             fetchWeeklyLeaderboard={() => { fetchLeaderboard(); fetchUserEventStatus(); }}
