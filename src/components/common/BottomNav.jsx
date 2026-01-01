@@ -97,11 +97,11 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
         <span
             className="absolute -bottom-1"
             style={{
-                width: 4,
-                height: 4,
+                width: 5,
+                height: 5,
                 borderRadius: '50%',
                 background: color,
-                boxShadow: `0 0 8px ${color}`,
+                boxShadow: `0 0 10px ${color}`,
                 animation: 'nav-indicator-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}
         />
@@ -163,8 +163,9 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    <span className="text-xl" style={{
-                        filter: activeTab === 'fashionshow' ? 'drop-shadow(0 0 8px rgba(139,92,246,0.6))' : 'none'
+                    <span className="text-xl transition-all duration-200" style={{
+                        filter: activeTab === 'fashionshow' ? 'drop-shadow(0 0 10px rgba(168,85,247,0.8))' : 'none',
+                        transform: activeTab === 'fashionshow' ? 'scale(1.1)' : 'scale(1)'
                     }}>🎭</span>
                     <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'fashionshow' ? 'text-purple-400' : 'text-white/50'}`}>
                         Show
@@ -203,10 +204,10 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transition: 'transform 0.2s ease-out'
                     }}
                 >
-                    {/* Live indicator */}
-                    <div className="absolute top-1 right-1 flex items-center gap-0.5 z-10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" style={{
-                            boxShadow: '0 0 4px rgba(74, 222, 128, 0.8)'
+                    {/* Live indicator - larger for visibility */}
+                    <div className="absolute top-0.5 right-0 flex items-center gap-0.5 z-10">
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" style={{
+                            boxShadow: '0 0 6px rgba(74, 222, 128, 0.9)'
                         }} />
                     </div>
                     <ArenaIcon active={activeTab === 'arena'} />

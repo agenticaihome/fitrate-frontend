@@ -1296,13 +1296,13 @@ export default function HomeScreen({
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
                                                 }}
-                                                className="absolute left-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-50 hover:opacity-80 transition-opacity"
+                                                className="absolute left-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-60 hover:opacity-90 transition-opacity"
                                                 animate={{ x: [0, -3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
                                                 whileTap={{ scale: 0.85 }}
                                             >
                                                 <span className="text-2xl">{prevMode.emoji}</span>
-                                                <span className="text-[9px] text-white/40 font-medium mt-0.5">{prevMode.label}</span>
+                                                <span className="text-[9px] text-white/50 font-medium mt-0.5">{prevMode.label}</span>
                                             </motion.button>
                                             {/* Right peek - TAPPABLE with name */}
                                             <motion.button
@@ -1311,13 +1311,13 @@ export default function HomeScreen({
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
                                                 }}
-                                                className="absolute right-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-50 hover:opacity-80 transition-opacity"
+                                                className="absolute right-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-60 hover:opacity-90 transition-opacity"
                                                 animate={{ x: [0, 3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
                                                 whileTap={{ scale: 0.85 }}
                                             >
                                                 <span className="text-2xl">{nextMode.emoji}</span>
-                                                <span className="text-[9px] text-white/40 font-medium mt-0.5">{nextMode.label}</span>
+                                                <span className="text-[9px] text-white/50 font-medium mt-0.5">{nextMode.label}</span>
                                             </motion.button>
                                         </>
                                     )
@@ -1405,19 +1405,19 @@ export default function HomeScreen({
                                         animate={{ opacity: 1, y: 0 }}
                                     >
                                         {dailyChallengeMode
-                                            ? `${getDailyMode().emoji} ${getDailyMode().label} Mode`
+                                            ? `${getDailyMode().emoji} ${getDailyMode().label}`
                                             : eventMode
                                                 ? currentEvent?.theme || 'Beat the leaderboard!'
-                                                : `${currentMode.label} Mode`}
+                                                : currentMode.label}
                                     </motion.span>
 
-                                    {/* Swipe hint - more visible */}
+                                    {/* Swipe hint - subtle pulse then fade */}
                                     {!dailyChallengeMode && !eventMode && (
                                         <motion.span
-                                            className="absolute bottom-6 text-white/60 text-xs font-semibold tracking-wide"
+                                            className="absolute bottom-5 text-white/50 text-[11px] font-medium tracking-wider"
                                             initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            transition={{ delay: 0.5 }}
+                                            animate={{ opacity: [0, 0.6, 0.4] }}
+                                            transition={{ delay: 0.8, duration: 2 }}
                                         >
                                             ← swipe →
                                         </motion.span>
@@ -1426,7 +1426,7 @@ export default function HomeScreen({
                             </motion.div>
                         </div>
 
-                        {/* All Modes Link - Opens drawer for full selection + judges */}
+                        {/* All Modes Link - Opens drawer for full selection */}
                         {!dailyChallengeMode && !eventMode && (
                             <button
                                 onClick={() => {
@@ -1434,11 +1434,10 @@ export default function HomeScreen({
                                     vibrate(10)
                                     setShowModeDrawer(true)
                                 }}
-                                className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1 mb-2"
+                                className="text-white/60 text-xs hover:text-white/80 transition-colors flex items-center gap-1.5 mb-2"
                             >
                                 <span>All 12 Modes</span>
-                                <span>👥</span>
-                                <span className="text-white/30">Meet the Judges</span>
+                                <span className="text-white/40">→</span>
                             </button>
                         )}
 
@@ -1460,9 +1459,9 @@ export default function HomeScreen({
                         {/* Value Prop - Clear differentiation */}
                         <div className="text-center mb-3">
                             <p className="text-white/60 text-xs mb-1">
-                                Get your rating → Dare friends to beat it
+                                Get your rating, then dare friends to beat it
                             </p>
-                            <p className="text-white/30 text-[10px]">
+                            <p className="text-white/40 text-[10px]">
                                 🔒 Private • No account needed
                             </p>
                         </div>
