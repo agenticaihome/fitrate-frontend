@@ -1986,8 +1986,8 @@ export default function App() {
       const overall = data.scores.overall
       setScores({
         ...data.scores,
-        mode,
-        roastMode: mode === 'roast' || mode === 'savage',
+        mode: effectiveMode,  // Use effectiveMode to include Fashion Show vibe overrides
+        roastMode: effectiveMode === 'roast' || effectiveMode === 'savage',
         // Subscore fallbacks: if AI doesn't return, generate from overall ±5
         color: data.scores.color ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
         fit: data.scores.fit ?? Math.min(100, Math.max(0, Math.round(overall + (Math.random() * 10 - 5)))),
