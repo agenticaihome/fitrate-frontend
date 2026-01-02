@@ -159,6 +159,7 @@ export default function WardrobeSetup({
     const [activeSlot, setActiveSlot] = useState(null)
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef(null)
+    const multiFileInputRef = useRef(null)
     const displayName = getDisplayName()
 
     const filledCount = outfits.filter(o => o !== null).length
@@ -221,6 +222,63 @@ export default function WardrobeSetup({
         e.target.value = ''
     }
 
+    // Handle bulk file selection (multiple files at once)
+    const handleBulkSelect = async (e) => {
+        const files = Array.from(e.target.files || []).slice(0, 5)
+        if (files.length === 0) return
+
+        setIsUploading(true)
+        playSound?.('whoosh')
+
+        const processFile = (file, index) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader()
+                reader.onload = () => {
+                    const img = new Image()
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas')
+                        const size = 400
+                        canvas.width = size
+                        canvas.height = size * (img.height / img.width)
+                        const ctx = canvas.getContext('2d')
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+                        const thumb = canvas.toDataURL('image/jpeg', 0.7)
+                        resolve({
+                            id: `${Date.now()}_${index}`,
+                            thumb,
+                            addedAt: new Date().toISOString()
+                        })
+                    }
+                    img.src = reader.result
+                }
+                reader.readAsDataURL(file)
+            })
+        }
+
+        // Process all files in parallel
+        const newOutfits = await Promise.all(files.map((f, i) => processFile(f, i)))
+
+        // Fill empty slots first, then overwrite from start
+        const updated = [...outfits]
+        let fileIndex = 0
+        for (let i = 0; i < 5 && fileIndex < newOutfits.length; i++) {
+            if (updated[i] === null) {
+                updated[i] = newOutfits[fileIndex++]
+            }
+        }
+        // If we still have files, overwrite from the beginning
+        for (let i = 0; i < 5 && fileIndex < newOutfits.length; i++) {
+            updated[i] = newOutfits[fileIndex++]
+        }
+
+        setOutfits(updated)
+        saveWardrobe(updated.filter(Boolean))
+        setIsUploading(false)
+        playSound?.('success')
+        vibrate?.([50, 30, 50, 30, 50])
+        e.target.value = ''
+    }
+
     const handleContinue = () => {
         if (!isComplete) return
         playSound?.('celebrate')
@@ -237,12 +295,20 @@ export default function WardrobeSetup({
         >
             <AnimatedBackground color={color} />
 
-            {/* Hidden file input */}
+            {/* Hidden file inputs */}
             <input
                 type="file"
                 accept="image/*"
                 ref={fileInputRef}
                 onChange={handleFileSelect}
+                className="sr-only"
+            />
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                ref={multiFileInputRef}
+                onChange={handleBulkSelect}
                 className="sr-only"
             />
 
@@ -300,6 +366,29 @@ export default function WardrobeSetup({
                         You'll battle opponents in a Best of 5 showdown!
                     </p>
                 </div>
+            </div>
+
+            {/* Bulk Upload Button */}
+            <div className="px-6 mb-4">
+                <button
+                    onClick={() => {
+                        playSound?.('click')
+                        vibrate?.(15)
+                        multiFileInputRef.current?.click()
+                    }}
+                    disabled={isUploading}
+                    className="w-full py-3 rounded-xl font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    style={{
+                        background: `linear-gradient(135deg, ${color}40, ${color}20)`,
+                        border: `1px solid ${color}50`
+                    }}
+                >
+                    <span className="text-lg">📁</span>
+                    <span className="text-white">Select All 5 Photos</span>
+                </button>
+                <p className="text-white/40 text-xs text-center mt-2">
+                    Or tap individual slots below
+                </p>
             </div>
 
             {/* Outfit Grid */}
