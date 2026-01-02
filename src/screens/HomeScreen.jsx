@@ -681,11 +681,12 @@ export default function HomeScreen({
                 setShowAndroidPhotoModal(true)
             }
         } else if (isIOS()) {
-            // iOS: Use camera input for challenges, gallery otherwise
+            // iOS: Use camera input for challenges, native picker (all options) otherwise
             if (isChallengeMode) {
                 document.getElementById('androidCameraInput')?.click()
             } else {
-                document.getElementById('androidGalleryInput')?.click()
+                // Native file picker shows: Take Photo, Photo Library, Browse, etc.
+                fileInputRef.current?.click()
             }
         } else {
             startCamera()
