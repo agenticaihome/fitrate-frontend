@@ -60,7 +60,7 @@ export default function ThroneChallenge({
     }
 
     // Simulate battle (in real impl, this would call backend)
-    const simulateBattle = (photoThumb) => {
+    const simulateBattle = async (photoThumb) => {
         playSound?.('whoosh')
 
         // Generate scores
@@ -70,12 +70,27 @@ export default function ThroneChallenge({
         setMyScore(challengerScore)
         setKingScore(kingDefenseScore)
 
-        setTimeout(() => {
+        setTimeout(async () => {
             const won = challengerScore > kingDefenseScore
             setResult(won ? 'victory' : 'defeat')
             setPhase('result')
 
+            // Calculate points for leaderboard
+            const points = won ? (isVacant ? 25 : 50) : 15 // 25 claim, 50 dethrone, 15 defense bonus if lost? No, wait.
+            // If I WON: +25 (claim) or +50 (dethrone)
+            // If I LOST: +1 participation? OR if I am the king defending?
+            // This component is for the CHALLENGER.
+            // If challenger loses, they get 1 pt participation.
+            // BUT we also want to record the DEFENDER'S points? We can't easily record for another user without auth.
+            // So we only record for the current user.
+
+            let awardedPoints = 0
+            let reason = ''
+
             if (won) {
+                awardedPoints = isVacant ? 25 : 50
+                reason = isVacant ? 'koth:claim' : 'koth:dethrone'
+
                 // Claim the throne!
                 setKing(throne.id, {
                     displayName,
@@ -85,11 +100,40 @@ export default function ThroneChallenge({
                 playSound?.('celebrate')
                 vibrate?.([100, 50, 100, 50, 200])
             } else {
+                awardedPoints = 5 // Participation
+                reason = 'koth:challenge_lost'
+
                 // King defends
                 recordDefense(throne.id)
                 playSound?.('error')
                 vibrate?.(50)
             }
+
+            // Report score to backend
+            try {
+                // Get userId from localStorage (it's usually stored as 'fitrate_user' or similar, let's check utils)
+                // For now, assume we can get it from localStorage 'fitrate_userid' or similar
+                // Actually, let's use the standard storage key
+                const storedUser = localStorage.getItem('fitrate_user')
+                const userId = storedUser ? JSON.parse(storedUser).id : null
+
+                if (userId && awardedPoints > 0) {
+                    const API_URL = import.meta.env.VITE_API_URL || 'https://fitrate-backend-production.up.railway.app'
+                    await fetch(`${API_URL}/api/arena/record-score`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId,
+                            points: awardedPoints,
+                            source: reason
+                        })
+                    })
+                    console.log(`[KOTH] Reported score: +${awardedPoints} (${reason})`)
+                }
+            } catch (e) {
+                console.error('[KOTH] Failed to report score:', e)
+            }
+
         }, 2000)
     }
 
