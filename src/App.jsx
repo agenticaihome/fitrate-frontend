@@ -59,6 +59,7 @@ const ArenaEntryScreen = lazy(() => import('./screens/ArenaEntryScreen'))  // Ar
 const ArenaLeaderboard = lazy(() => import('./screens/ArenaLeaderboard'))  // Arena Rankings
 const WardrobeSetup = lazy(() => import('./screens/WardrobeSetup'))  // Wardrobe Wars Setup
 const WardrobeBattle = lazy(() => import('./screens/WardrobeBattle'))  // Wardrobe Wars Battle
+const WardrobeQueue = lazy(() => import('./screens/WardrobeQueue'))  // Wardrobe Wars Matchmaking
 const ThroneRoom = lazy(() => import('./screens/ThroneRoom'))  // King of the Hill
 const ThroneChallenge = lazy(() => import('./screens/ThroneChallenge'))  // Throne Challenge
 // Modals - less critical, lazy loaded
@@ -2694,9 +2695,40 @@ export default function App() {
           onComplete={(outfits) => {
             console.log('[Wardrobe] Setup complete with', outfits.length, 'outfits')
             setArenaData({ wardrobeOutfits: outfits })
-            setArenaScreen('wardrobeBattle')
+            setArenaScreen('wardrobeQueue') // Go to matchmaking queue
           }}
           onBack={() => setArenaScreen('entry')}
+          playSound={playSound}
+          vibrate={vibrate}
+          color="#9b59b6"
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
+  // WARDROBE WARS MATCHMAKING QUEUE
+  // ============================================
+  if (arenaScreen === 'wardrobeQueue' && arenaData?.wardrobeOutfits) {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <WardrobeQueue
+          userId={userId}
+          onMatchFound={(matchData) => {
+            console.log('[Wardrobe] Match found:', matchData)
+            setArenaData({
+              ...arenaData,
+              matchData,
+              opponentName: matchData.opponentName,
+              opponentOutfits: matchData.opponentOutfits,
+              rounds: matchData.rounds
+            })
+            setArenaScreen('wardrobeBattle')
+          }}
+          onCancel={() => {
+            setArenaScreen('entry')
+            setArenaData(null)
+          }}
           playSound={playSound}
           vibrate={vibrate}
           color="#9b59b6"
@@ -2709,16 +2741,10 @@ export default function App() {
   // WARDROBE WARS BATTLE SCREEN
   // ============================================
   if (arenaScreen === 'wardrobeBattle' && arenaData?.wardrobeOutfits) {
-    // Generate placeholder opponent (until real matchmaking exists)
-    // Use gradient backgrounds instead of user's own photos
-    const OPPONENT_NAMES = ['StyleMaster', 'FitKing99', 'DripLord', 'VogueQueen', 'TrendSetter', 'ChicVibes', 'FashionGuru', 'SlayQueen']
-    const opponentName = OPPONENT_NAMES[Math.floor(Math.random() * OPPONENT_NAMES.length)]
-    const placeholderColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4']
-    const opponentOutfits = arenaData.wardrobeOutfits.map((_, i) => ({
-      id: `opp_${i}`,
-      thumb: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="g${i}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${placeholderColors[i % 5]};stop-opacity:0.7"/><stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/></linearGradient></defs><rect fill="url(#g${i})" width="200" height="300"/><text x="100" y="150" text-anchor="middle" fill="white" font-size="40">👤</text><text x="100" y="180" text-anchor="middle" fill="white" font-size="12" opacity="0.6">${opponentName}</text></svg>`)}`,
-      isPlaceholder: true
-    }))
+    // Use real opponent data from matchmaking if available
+    const opponentOutfits = arenaData.opponentOutfits || arenaData.wardrobeOutfits
+    const opponentName = arenaData.opponentName || 'Opponent'
+    const preloadedRounds = arenaData.rounds || null
 
     return (
       <Suspense fallback={<LoadingFallback />}>
@@ -2726,9 +2752,9 @@ export default function App() {
           myOutfits={arenaData.wardrobeOutfits}
           opponentOutfits={opponentOutfits}
           opponentName={opponentName}
+          preloadedRounds={preloadedRounds}
           onComplete={(result) => {
             console.log('[Wardrobe] Battle complete:', result)
-            // TODO: Record result, show rewards
             displayToast(result.result === 'win' ? '🎉 Victory in Wardrobe Wars!' : result.result === 'loss' ? '😢 Better luck next time!' : '🤝 It\'s a tie!', 3000)
             setArenaScreen('entry')
             setArenaData(null)

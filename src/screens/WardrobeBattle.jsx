@@ -124,6 +124,7 @@ export default function WardrobeBattle({
     myOutfits,
     opponentOutfits,
     opponentName = 'Opponent',
+    preloadedRounds = null, // From backend matchmaking
     onComplete,
     onCancel,
     playSound,
@@ -137,8 +138,13 @@ export default function WardrobeBattle({
     const [myWins, setMyWins] = useState(0)
     const [opponentWins, setOpponentWins] = useState(0)
 
-    // Simulate AI scoring for each outfit (in real impl, this would come from backend)
-    const getScore = useCallback(() => Math.floor(Math.random() * 30) + 70, [])
+    // Use preloaded scores from backend if available, otherwise generate random
+    const getScore = useCallback((roundIndex, isPlayer) => {
+        if (preloadedRounds && preloadedRounds[roundIndex]) {
+            return isPlayer ? preloadedRounds[roundIndex].myScore : preloadedRounds[roundIndex].opponentScore
+        }
+        return Math.floor(Math.random() * 30) + 70
+    }, [preloadedRounds])
 
     const revealNextRound = useCallback(() => {
         if (currentRound >= 5 || myWins >= 3 || opponentWins >= 3) {
@@ -149,9 +155,9 @@ export default function WardrobeBattle({
         setIsRevealing(true)
         playSound?.('whoosh')
 
-        // Simulate scoring
-        const myScore = getScore()
-        const oppScore = getScore()
+        // Get scores (from backend if available)
+        const myScore = getScore(currentRound, true)
+        const oppScore = getScore(currentRound, false)
 
         setTimeout(() => {
             const result = {

@@ -32,6 +32,34 @@ export const saveWardrobe = (outfits) => {
     }
 }
 
+// Sync wardrobe to backend for matchmaking
+export const syncWardrobeToBackend = async (userId, outfits, displayName) => {
+    if (!outfits || outfits.length < 5) return { success: false }
+
+    const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
+
+    try {
+        const response = await fetch(`${API_BASE}/wardrobe/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId,
+                outfits: outfits.map(o => ({ id: o.id, thumb: o.thumb })),
+                displayName: displayName || 'Anonymous'
+            })
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+            console.log('[Wardrobe] Synced to backend:', data.outfitCount, 'outfits')
+            return { success: true, ...data }
+        }
+    } catch (e) {
+        console.error('[Wardrobe] Backend sync failed:', e)
+    }
+    return { success: false }
+}
+
 export const hasCompleteWardrobe = () => {
     const { outfits } = getWardrobe()
     return outfits.length >= 5
