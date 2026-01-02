@@ -287,6 +287,7 @@ export default function ArenaLeaderboard({
     const [leaderboardData, setLeaderboardData] = useState([])
     const [loading, setLoading] = useState(true)
     const [apiUserRank, setApiUserRank] = useState(null)
+    const [apiUserPoints, setApiUserPoints] = useState(null)
 
     // Fallback mock data (used if API fails)
     const MOCK_LEADERBOARD = [
@@ -302,34 +303,40 @@ export default function ArenaLeaderboard({
         { id: 10, name: 'NewPlayer', points: 120, tier: SEASON_TIERS[1] }
     ]
 
-    const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
+    const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-backend-production.up.railway.app').replace('/api/analyze', '/api')
 
     // Fetch leaderboard from API
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
                 setLoading(true)
+                // Always fetch with userId to get my rank/score
                 const url = userId
                     ? `${API_BASE}/arena/leaderboard?userId=${userId}`
                     : `${API_BASE}/arena/leaderboard`
+
                 const res = await fetch(url)
 
                 if (res.ok) {
                     const data = await res.json()
-                    if (data.success && data.entries?.length > 0) {
-                        // Transform API data to match component format
-                        const entries = data.entries.map(entry => ({
-                            id: entry.rank,
-                            name: entry.displayName,
-                            points: entry.points,
-                            tier: entry.tier ? SEASON_TIERS.find(t => t.name === entry.tier.name) || SEASON_TIERS[0] : SEASON_TIERS[0],
-                            isCurrentUser: entry.isCurrentUser
-                        }))
-                        setLeaderboardData(entries)
+                    if (data.success) {
+                        if (data.entries?.length > 0) {
+                            // Transform API data to match component format
+                            const entries = data.entries.map(entry => ({
+                                id: entry.rank,
+                                name: entry.displayName,
+                                points: entry.points,
+                                tier: entry.tier ? SEASON_TIERS.find(t => t.name === entry.tier.name) || SEASON_TIERS[0] : SEASON_TIERS[0],
+                                isCurrentUser: entry.isCurrentUser
+                            }))
+                            setLeaderboardData(entries)
+                        } else {
+                            setLeaderboardData([])
+                        }
+
+                        // Update user stats from backend (Single Source of Truth)
                         if (data.userRank) setApiUserRank(data.userRank)
-                    } else {
-                        // No entries yet - show empty state
-                        setLeaderboardData([])
+                        if (typeof data.userPoints === 'number') setApiUserPoints(data.userPoints)
                     }
                 } else {
                     setLeaderboardData([])
@@ -355,9 +362,34 @@ export default function ArenaLeaderboard({
     // Get display name or fallback to "You"
     const displayName = getDisplayName() || 'You'
 
-    // Find user's position - use API rank if available, else estimate
+    // Find user's position and points - prefer API, fallback to local
     const userRank = apiUserRank || 6
-    const userData = { id: 'user', name: displayName, points: seasonData.points, tier: tierData.tier }
+    const userPoints = apiUserPoints !== null ? apiUserPoints : seasonData.points
+
+    // Recalculate tier based on ACTUALLY displayed points (syncs UI)
+    const currentTier = SEASON_TIERS.slice().reverse().find(t => userPoints >= t.minPoints) || SEASON_TIERS[0]
+    const nextTierIndex = SEASON_TIERS.findIndex(t => t.name === currentTier.name) + 1
+    const nextTier = SEASON_TIERS[nextTierIndex]
+
+    // Calculate progress for the card
+    let progress = 0
+    let pointsToNext = 0
+    if (nextTier) {
+        const range = nextTier.minPoints - currentTier.minPoints
+        const current = userPoints - currentTier.minPoints
+        progress = Math.min(100, Math.max(0, (current / range) * 100))
+        pointsToNext = nextTier.minPoints - userPoints
+    } else {
+        progress = 100
+    }
+
+    // Override tierData for display
+    const displayTierData = {
+        tier: currentTier,
+        nextTier,
+        progress,
+        pointsToNext
+    }
 
     const handleTabChange = (tab) => {
         playSound?.('click')
@@ -446,8 +478,8 @@ export default function ArenaLeaderboard({
 
                         {/* Your Progress Card */}
                         <TierProgressCard
-                            tierData={tierData}
-                            seasonData={seasonData}
+                            tierData={displayTierData}
+                            seasonData={{ ...seasonData, points: userPoints }}
                             modeColor={modeColor}
                         />
 
@@ -511,8 +543,8 @@ export default function ArenaLeaderboard({
                                     <LeaderboardRow
                                         rank={userRank}
                                         name={displayName}
-                                        points={seasonData.points}
-                                        tier={tierData.tier}
+                                        points={userPoints}
+                                        tier={displayTierData.tier}
                                         isCurrentUser={true}
                                         modeColor={modeColor}
                                     />
@@ -530,7 +562,7 @@ export default function ArenaLeaderboard({
                 )}
 
                 {activeTab === 'rewards' && (
-                    <SeasonRewardsPreview tierData={tierData} />
+                    <SeasonRewardsPreview tierData={displayTierData} />
                 )}
             </div>
 
