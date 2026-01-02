@@ -788,7 +788,7 @@ export default function HomeScreen({
                         </button>
 
                         <button
-                            onClick={() => { playSound('click'); vibrate(30); capturePhoto(); }}
+                            onClick={() => { playSound('click'); vibrate(30); timerCapture(); }}
                             disabled={countdown !== null}
                             className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 disabled:opacity-50"
                             aria-label="Take photo"
