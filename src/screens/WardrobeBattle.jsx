@@ -101,7 +101,7 @@ const RoundResult = ({ roundNum, myOutfit, opponentOutfit, myScore, opponentScor
 // ============================================
 // SCORE INDICATOR
 // ============================================
-const ScoreIndicator = ({ myWins, opponentWins, color }) => {
+const ScoreIndicator = ({ myWins, opponentWins, opponentName = 'Opponent', color }) => {
     return (
         <div className="flex items-center justify-center gap-6 mb-6">
             <div className="text-center">
@@ -111,7 +111,7 @@ const ScoreIndicator = ({ myWins, opponentWins, color }) => {
             <div className="text-white/30 text-2xl">-</div>
             <div className="text-center">
                 <span className="text-4xl font-black text-white">{opponentWins}</span>
-                <p className="text-white/50 text-xs">Opponent</p>
+                <p className="text-white/50 text-xs truncate max-w-[80px]">{opponentName}</p>
             </div>
         </div>
     )
@@ -123,6 +123,7 @@ const ScoreIndicator = ({ myWins, opponentWins, color }) => {
 export default function WardrobeBattle({
     myOutfits,
     opponentOutfits,
+    opponentName = 'Opponent',
     onComplete,
     onCancel,
     playSound,
@@ -238,7 +239,7 @@ export default function WardrobeBattle({
 
             {/* Score */}
             <div className="px-6 pt-4">
-                <ScoreIndicator myWins={myWins} opponentWins={opponentWins} color={color} />
+                <ScoreIndicator myWins={myWins} opponentWins={opponentWins} opponentName={opponentName} color={color} />
             </div>
 
             {/* Rounds */}

@@ -2709,14 +2709,23 @@ export default function App() {
   // WARDROBE WARS BATTLE SCREEN
   // ============================================
   if (arenaScreen === 'wardrobeBattle' && arenaData?.wardrobeOutfits) {
-    // For demo, use same outfits shuffled as "opponent"
-    const opponentOutfits = [...arenaData.wardrobeOutfits].sort(() => Math.random() - 0.5)
+    // Generate placeholder opponent (until real matchmaking exists)
+    // Use gradient backgrounds instead of user's own photos
+    const OPPONENT_NAMES = ['StyleMaster', 'FitKing99', 'DripLord', 'VogueQueen', 'TrendSetter', 'ChicVibes', 'FashionGuru', 'SlayQueen']
+    const opponentName = OPPONENT_NAMES[Math.floor(Math.random() * OPPONENT_NAMES.length)]
+    const placeholderColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4']
+    const opponentOutfits = arenaData.wardrobeOutfits.map((_, i) => ({
+      id: `opp_${i}`,
+      thumb: `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="g${i}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${placeholderColors[i % 5]};stop-opacity:0.7"/><stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/></linearGradient></defs><rect fill="url(#g${i})" width="200" height="300"/><text x="100" y="150" text-anchor="middle" fill="white" font-size="40">👤</text><text x="100" y="180" text-anchor="middle" fill="white" font-size="12" opacity="0.6">${opponentName}</text></svg>`)}`,
+      isPlaceholder: true
+    }))
 
     return (
       <Suspense fallback={<LoadingFallback />}>
         <WardrobeBattle
           myOutfits={arenaData.wardrobeOutfits}
           opponentOutfits={opponentOutfits}
+          opponentName={opponentName}
           onComplete={(result) => {
             console.log('[Wardrobe] Battle complete:', result)
             // TODO: Record result, show rewards
