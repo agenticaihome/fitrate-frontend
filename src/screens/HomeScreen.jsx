@@ -491,7 +491,11 @@ export default function HomeScreen({
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: facing },
+                video: {
+                    facingMode: facing,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
                 audio: false
             })
             setCameraStream(stream)
