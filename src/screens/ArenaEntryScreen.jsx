@@ -494,6 +494,7 @@ export default function ArenaEntryScreen({
     onAnalysisComplete,
     onBack,
     onShowLeaderboard,
+    onStartWardrobe,
     playSound,
     vibrate
 }) {
@@ -963,7 +964,7 @@ export default function ArenaEntryScreen({
                     modeColor={todayMode.color}
                 />
 
-                {/* Wardrobe Wars - Coming Soon */}
+                {/* Wardrobe Wars */}
                 <div className={`w-full max-w-md p-8 rounded-2xl text-center mb-4 ${arenaMode !== 'wardrobe' ? 'hidden' : ''}`}
                     style={{
                         background: 'rgba(255,255,255,0.03)',
@@ -973,10 +974,17 @@ export default function ArenaEntryScreen({
                     <span className="text-6xl mb-4 block">👕</span>
                     <h3 className="text-2xl font-black text-white mb-2">Wardrobe Wars</h3>
                     <p className="text-white/50 mb-4">Build your 5-outfit wardrobe.<br />Best of 5 rounds. First to 3 wins!</p>
-                    <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full mx-auto w-fit"
-                        style={{ background: '#00ff8820', border: '1px solid #00ff8840' }}>
-                        <span className="text-green-400 text-sm font-bold">🚧 Coming Soon</span>
-                    </div>
+                    <button
+                        onClick={() => {
+                            playSound?.('click')
+                            vibrate?.([50, 30, 50])
+                            onStartWardrobe?.()
+                        }}
+                        className="px-6 py-3 rounded-2xl font-bold text-black transition-all active:scale-95"
+                        style={{ background: 'linear-gradient(135deg, #9b59b6, #00ff88)' }}
+                    >
+                        🏗️ Build Your Wardrobe
+                    </button>
                 </div>
 
                 {/* King of the Hill - Coming Soon */}
