@@ -1618,7 +1618,10 @@ export default function App() {
     setErrorCode(null) // Reset error code for fresh analysis
 
     // Optimistic check
-    if (!isPro && scansRemaining <= 0) {
+    // Allow if Pro OR Scans Remaining OR Daily Challenge OR Weekly Challenge (Event) OR Fashion Show
+    const isChallenge = dailyChallengeMode || (eventMode && !freeEventEntryUsed) || fashionShowId
+
+    if (!isPro && scansRemaining <= 0 && !isChallenge) {
       setIsAnalyzing(false)
       setScreen('limit-reached')
       return

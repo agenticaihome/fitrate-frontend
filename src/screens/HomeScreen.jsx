@@ -671,7 +671,17 @@ export default function HomeScreen({
             return
         }
 
-        if (scansRemaining > 0 || isPro || purchasedScans > 0) {
+        // Allow camera if:
+        // 1. Has daily scans remaining
+        // 2. Is Pro
+        // 3. Has purchased scans
+        // 4. Is Daily Challenge (1 free/day separate quota)
+        // 5. Is Weekly Challenge (1 free/week separate quota - checked above)
+        // 6. Is Fashion Show (host/join is free)
+        const canScan = scansRemaining > 0 || isPro || purchasedScans > 0 ||
+            dailyChallengeMode || (eventMode && !freeEventEntryUsed) || fashionShowName
+
+        if (canScan) {
             proceedToCamera()
         } else {
             onShowPaywall()
