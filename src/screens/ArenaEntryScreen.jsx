@@ -16,8 +16,39 @@ import {
 } from '../utils/arenaStorage'
 import DisplayNameModal from '../components/modals/DisplayNameModal'
 import { hasDisplayName, getDisplayName, setDisplayName } from '../utils/displayNameStorage'
-import { getWardrobe } from './WardrobeSetup'
-import { getKings, THRONES } from './ThroneRoom'
+
+// ============================================
+// INLINE STORAGE GETTERS (Avoid circular imports)
+// ============================================
+const getWardrobeCount = () => {
+    try {
+        const stored = localStorage.getItem('fitrate_wardrobe')
+        if (stored) {
+            const { outfits } = JSON.parse(stored)
+            return outfits?.length || 0
+        }
+    } catch (e) { }
+    return 0
+}
+
+const getCrownCount = () => {
+    try {
+        const stored = localStorage.getItem('fitrate_kings')
+        if (stored) {
+            const kings = JSON.parse(stored)
+            const myName = getDisplayName()
+            const now = Date.now()
+            let count = 0
+            for (const king of Object.values(kings)) {
+                if (king.displayName === myName && now - king.crownedAt < 24 * 60 * 60 * 1000) {
+                    count++
+                }
+            }
+            return count
+        }
+    } catch (e) { }
+    return 0
+}
 
 // ============================================
 // ARENA MODE OF THE DAY
@@ -538,12 +569,8 @@ export default function ArenaEntryScreen({
     const nextMilestone = getNextMilestone()
 
     // Get wardrobe and crown counts for mode tabs
-    const wardrobeCount = useMemo(() => getWardrobe().outfits?.length || 0, [])
-    const crownCount = useMemo(() => {
-        const kings = getKings()
-        const myName = getDisplayName()
-        return Object.values(kings).filter(k => k.displayName === myName).length
-    }, [])
+    const wardrobeCount = useMemo(() => getWardrobeCount(), [])
+    const crownCount = useMemo(() => getCrownCount(), [])
 
     const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
 
