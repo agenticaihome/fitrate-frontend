@@ -458,7 +458,12 @@ export default function HomeScreen({
 
     // Platform Detection
     const isAndroid = () => /Android/i.test(navigator.userAgent)
-    const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.MSStream
+    const isIOS = () => {
+        // Modern iPads report as Mac, so also check for touch + Safari
+        const isAppleDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        const isMacWithTouch = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1
+        return (isAppleDevice || isMacWithTouch) && !window.MSStream
+    }
 
     // Current mode data
     const currentMode = getModeData(mode)

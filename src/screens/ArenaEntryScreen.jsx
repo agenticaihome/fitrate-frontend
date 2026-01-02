@@ -433,6 +433,60 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
 }
 
 // ============================================
+// ARENA MODE TABS - Switch between game modes
+// ============================================
+const ArenaModeTab = ({ activeMode, onModeChange, modeColor }) => {
+    const modes = [
+        { id: 'quick', emoji: '⚡', label: 'Quick Battle', sublabel: '1v1' },
+        { id: 'wardrobe', emoji: '👕', label: 'Wardrobe Wars', sublabel: 'Best of 5', isNew: true },
+        { id: 'kings', emoji: '👑', label: 'King of Hill', sublabel: '12 Thrones', isNew: true }
+    ]
+
+    return (
+        <div className="w-full max-w-md mb-4">
+            <div
+                className="flex rounded-2xl p-1 gap-1"
+                style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                }}
+            >
+                {modes.map(mode => (
+                    <button
+                        key={mode.id}
+                        onClick={() => onModeChange(mode.id)}
+                        className="flex-1 flex flex-col items-center py-2.5 px-2 rounded-xl transition-all relative"
+                        style={{
+                            background: activeMode === mode.id
+                                ? `linear-gradient(135deg, ${modeColor}30, ${modeColor}10)`
+                                : 'transparent',
+                            border: activeMode === mode.id
+                                ? `1px solid ${modeColor}50`
+                                : '1px solid transparent'
+                        }}
+                    >
+                        {mode.isNew && (
+                            <span
+                                className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold text-black"
+                                style={{ background: '#00ff88' }}
+                            >
+                                NEW
+                            </span>
+                        )}
+                        <span className="text-lg mb-0.5">{mode.emoji}</span>
+                        <span className={`text-[10px] font-bold ${activeMode === mode.id ? 'text-white' : 'text-white/50'}`}>
+                            {mode.label}
+                        </span>
+                        <span className="text-[8px] text-white/30">{mode.sublabel}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+// ============================================
 // MAIN ARENA ENTRY SCREEN
 // ============================================
 export default function ArenaEntryScreen({
@@ -453,6 +507,7 @@ export default function ArenaEntryScreen({
     const [showStatsExpanded, setShowStatsExpanded] = useState(false)
     const [showDisplayNameModal, setShowDisplayNameModal] = useState(false)
     const [displayName, setDisplayNameState] = useState(() => getDisplayName())
+    const [arenaMode, setArenaMode] = useState('quick') // 'quick' | 'wardrobe' | 'kings'
 
     const todayMode = getTodayArenaMode()
     const fileInputRef = useRef(null)
@@ -896,6 +951,17 @@ export default function ArenaEntryScreen({
                     </h1>
                     <p className="text-white/50 text-base">Battle anyone in the world</p>
                 </div>
+
+                {/* Arena Mode Tabs */}
+                <ArenaModeTab
+                    activeMode={arenaMode}
+                    onModeChange={(mode) => {
+                        playSound?.('click')
+                        vibrate?.(15)
+                        setArenaMode(mode)
+                    }}
+                    modeColor={todayMode.color}
+                />
 
                 {/* Season Tier + Countdown */}
                 <div
