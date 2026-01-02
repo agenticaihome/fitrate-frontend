@@ -255,23 +255,37 @@ export const getSeasonData = () => {
     }
 }
 
-export const addSeasonPoints = (result, winStreak = 0) => {
+export const addSeasonPoints = (result, winStreak = 0, isFirstWinToday = false) => {
     const data = getSeasonData()
 
     let pointsEarned = 0
+    let bonusBreakdown = []
+
+    // Base points
     if (result === 'win') pointsEarned = 10
     else if (result === 'tie') pointsEarned = 3
     else pointsEarned = 1 // Losses still give 1 point (participation)
+    bonusBreakdown.push({ type: 'base', points: pointsEarned, label: result === 'win' ? '🏆 Win' : result === 'tie' ? '🤝 Tie' : '📈 Participation' })
 
-    // Win streak bonus
+    // 🌟 Daily First Win Bonus (+25 pts)
+    if (isFirstWinToday && result === 'win') {
+        pointsEarned += 25
+        bonusBreakdown.push({ type: 'firstWin', points: 25, label: '🌟 Daily First Win!' })
+    }
+
+    // 🔥 Win streak bonus (+5 for 3+, +10 for 5+, +15 for 10+)
     if (winStreak >= 3 && result === 'win') {
-        pointsEarned += Math.min(winStreak, 10) // Max +10 bonus
+        let streakBonus = 5
+        if (winStreak >= 10) streakBonus = 15
+        else if (winStreak >= 5) streakBonus = 10
+        pointsEarned += streakBonus
+        bonusBreakdown.push({ type: 'streak', points: streakBonus, label: `🔥 ${winStreak} Win Streak!` })
     }
 
     data.points += pointsEarned
     localStorage.setItem(STORAGE_KEYS.SEASON_DATA, JSON.stringify(data))
 
-    return { ...data, pointsEarned }
+    return { ...data, pointsEarned, bonusBreakdown }
 }
 
 export const getCurrentTier = () => {
@@ -340,8 +354,12 @@ export const getDailyArenaRecord = () => {
 }
 
 export const recordArenaResult = (result) => { // 'win' | 'loss' | 'tie'
+    // Get current daily record BEFORE updating (to check for first win)
+    const currentRecord = getDailyArenaRecord()
+    const isFirstWinToday = result === 'win' && currentRecord.wins === 0
+
     // Update daily record
-    const record = getDailyArenaRecord()
+    const record = { ...currentRecord }
     if (result === 'win') record.wins++
     else if (result === 'loss') record.losses++
     else record.ties++
@@ -360,15 +378,17 @@ export const recordArenaResult = (result) => { // 'win' | 'loss' | 'tie'
     // Update all-time stats
     const allTimeStats = updateAllTimeStats(result)
 
-    // Add season points
-    const seasonResult = addSeasonPoints(result, winStreakResult.currentWinStreak)
+    // Add season points (with first win bonus check)
+    const seasonResult = addSeasonPoints(result, winStreakResult.currentWinStreak, isFirstWinToday)
 
     return {
         dailyRecord: record,
         winStreak: winStreakResult,
         allTimeStats,
         seasonPoints: seasonResult,
-        bonus: winStreakResult.bonus
+        bonus: winStreakResult.bonus,
+        bonusBreakdown: seasonResult.bonusBreakdown,
+        isFirstWinToday
     }
 }
 

@@ -2830,13 +2830,29 @@ export default function App() {
               const arenaStats = recordArenaResult(result)
               console.log(`[Arena] Recorded daily result: ${result} (${Math.round(myScore)} vs ${Math.round(opponentScore)})${battleResult.result ? ' [from API]' : ' [calculated]'}`)
 
+              // 🌟 FIRST WIN OF THE DAY CELEBRATION
+              if (arenaStats.isFirstWinToday) {
+                setTimeout(() => {
+                  displayToast('🌟 DAILY FIRST WIN! +25 bonus points!', 4000)
+                  vibrate([100, 50, 100, 50, 200])
+                  playSound('celebrate')
+                }, 1500)
+              }
+
               // 🔥 WIN STREAK CELEBRATION - Show toast for streak milestones!
               if (arenaStats.bonus) {
                 setTimeout(() => {
                   displayToast(arenaStats.bonus.message, 3500)
                   vibrate([100, 50, 100, 50, 200])
                   playSound('celebrate')
-                }, 1500) // Delay to not overlap with battle reveal
+                }, arenaStats.isFirstWinToday ? 4000 : 1500) // Delay if first win toast is showing
+              }
+
+              // 📊 Show total points earned
+              if (arenaStats.seasonPoints?.pointsEarned > 10) {
+                setTimeout(() => {
+                  displayToast(`📊 +${arenaStats.seasonPoints.pointsEarned} season points!`, 2500)
+                }, arenaStats.bonus ? 5500 : 3000)
               }
             }
             // Add to active battles

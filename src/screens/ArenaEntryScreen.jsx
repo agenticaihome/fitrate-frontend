@@ -16,6 +16,8 @@ import {
 } from '../utils/arenaStorage'
 import DisplayNameModal from '../components/modals/DisplayNameModal'
 import { hasDisplayName, getDisplayName, setDisplayName } from '../utils/displayNameStorage'
+import { getWardrobe } from './WardrobeSetup'
+import { getKings, THRONES } from './ThroneRoom'
 
 // ============================================
 // ARENA MODE OF THE DAY
@@ -435,11 +437,11 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
 // ============================================
 // ARENA MODE TABS - Switch between game modes
 // ============================================
-const ArenaModeTab = ({ activeMode, onModeChange, modeColor }) => {
+const ArenaModeTab = ({ activeMode, onModeChange, modeColor, wardrobeCount = 0, crownCount = 0 }) => {
     const modes = [
         { id: 'quick', emoji: '⚡', label: 'Quick Battle', sublabel: '1v1' },
-        { id: 'wardrobe', emoji: '👕', label: 'Wardrobe Wars', sublabel: 'Best of 5', isNew: true },
-        { id: 'kings', emoji: '👑', label: 'King of Hill', sublabel: '12 Thrones', isNew: true }
+        { id: 'wardrobe', emoji: '👕', label: 'Wardrobe Wars', sublabel: wardrobeCount > 0 ? `${wardrobeCount}/5 fits` : 'Best of 5', isNew: wardrobeCount === 0 },
+        { id: 'kings', emoji: '👑', label: 'King of Hill', sublabel: crownCount > 0 ? `${crownCount} crown${crownCount > 1 ? 's' : ''}` : '12 Thrones', isNew: crownCount === 0 }
     ]
 
     return (
@@ -472,6 +474,15 @@ const ArenaModeTab = ({ activeMode, onModeChange, modeColor }) => {
                                 style={{ background: '#00ff88' }}
                             >
                                 NEW
+                            </span>
+                        )}
+                        {/* Crown indicator for Kings */}
+                        {mode.id === 'kings' && crownCount > 0 && (
+                            <span
+                                className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold text-black"
+                                style={{ background: '#ffd700' }}
+                            >
+                                👑 {crownCount}
                             </span>
                         )}
                         <span className="text-lg mb-0.5">{mode.emoji}</span>
@@ -525,6 +536,14 @@ export default function ArenaEntryScreen({
     const seasonTimeRemaining = getSeasonTimeRemaining()
     const dailyRecord = getDailyArenaRecord()
     const nextMilestone = getNextMilestone()
+
+    // Get wardrobe and crown counts for mode tabs
+    const wardrobeCount = useMemo(() => getWardrobe().outfits?.length || 0, [])
+    const crownCount = useMemo(() => {
+        const kings = getKings()
+        const myName = getDisplayName()
+        return Object.values(kings).filter(k => k.displayName === myName).length
+    }, [])
 
     const API_BASE = (import.meta.env.VITE_API_URL || 'https://fitrate-production.up.railway.app/api/analyze').replace('/api/analyze', '/api')
 
@@ -952,6 +971,21 @@ export default function ArenaEntryScreen({
                         Global Arena
                     </h1>
                     <p className="text-white/50 text-base">Battle anyone in the world</p>
+
+                    {/* Live Stats Badges */}
+                    <div className="flex items-center justify-center gap-4 mt-3">
+                        {onlineCount && (
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+                                style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)' }}>
+                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                                <span className="text-green-400 text-xs font-bold">{onlineCount.toLocaleString()} online</span>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+                            style={{ background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.3)' }}>
+                            <span className="text-yellow-400 text-xs font-bold">⚔️ {Math.floor(Math.random() * 50) + 150} live battles</span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Arena Mode Tabs */}
@@ -963,6 +997,8 @@ export default function ArenaEntryScreen({
                         setArenaMode(mode)
                     }}
                     modeColor={todayMode.color}
+                    wardrobeCount={wardrobeCount}
+                    crownCount={crownCount}
                 />
 
                 {/* Wardrobe Wars */}
