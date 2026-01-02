@@ -58,6 +58,7 @@ const ArenaQueueScreen = lazy(() => import('./screens/ArenaQueueScreen'))  // Gl
 const ArenaEntryScreen = lazy(() => import('./screens/ArenaEntryScreen'))  // Arena Entry
 const ArenaLeaderboard = lazy(() => import('./screens/ArenaLeaderboard'))  // Arena Rankings
 const WardrobeSetup = lazy(() => import('./screens/WardrobeSetup'))  // Wardrobe Wars Setup
+const WardrobeBattle = lazy(() => import('./screens/WardrobeBattle'))  // Wardrobe Wars Battle
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -520,8 +521,8 @@ export default function App() {
   // ============================================
   // GLOBAL ARENA STATE - Real-time matchmaking
   // ============================================
-  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue' | 'leaderboard' | 'wardrobeSetup'
-  const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode }
+  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue' | 'leaderboard' | 'wardrobeSetup' | 'wardrobeBattle'
+  const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode } or { wardrobeOutfits }
   const [arenaMode, setArenaMode] = useState(null)  // Mode for arena (from daily rotation)
 
   // Handler to open arena entry screen (from HomeScreen)
@@ -2689,10 +2690,41 @@ export default function App() {
         <WardrobeSetup
           onComplete={(outfits) => {
             console.log('[Wardrobe] Setup complete with', outfits.length, 'outfits')
-            // TODO: Start wardrobe battle queue
-            setArenaScreen('entry')
+            setArenaData({ wardrobeOutfits: outfits })
+            setArenaScreen('wardrobeBattle')
           }}
           onBack={() => setArenaScreen('entry')}
+          playSound={playSound}
+          vibrate={vibrate}
+          color="#9b59b6"
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
+  // WARDROBE WARS BATTLE SCREEN
+  // ============================================
+  if (arenaScreen === 'wardrobeBattle' && arenaData?.wardrobeOutfits) {
+    // For demo, use same outfits shuffled as "opponent"
+    const opponentOutfits = [...arenaData.wardrobeOutfits].sort(() => Math.random() - 0.5)
+
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <WardrobeBattle
+          myOutfits={arenaData.wardrobeOutfits}
+          opponentOutfits={opponentOutfits}
+          onComplete={(result) => {
+            console.log('[Wardrobe] Battle complete:', result)
+            // TODO: Record result, show rewards
+            displayToast(result.result === 'win' ? '🎉 Victory in Wardrobe Wars!' : result.result === 'loss' ? '😢 Better luck next time!' : '🤝 It\'s a tie!', 3000)
+            setArenaScreen('entry')
+            setArenaData(null)
+          }}
+          onCancel={() => {
+            setArenaScreen('entry')
+            setArenaData(null)
+          }}
           playSound={playSound}
           vibrate={vibrate}
           color="#9b59b6"
