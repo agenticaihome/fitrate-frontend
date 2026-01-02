@@ -59,6 +59,8 @@ const ArenaEntryScreen = lazy(() => import('./screens/ArenaEntryScreen'))  // Ar
 const ArenaLeaderboard = lazy(() => import('./screens/ArenaLeaderboard'))  // Arena Rankings
 const WardrobeSetup = lazy(() => import('./screens/WardrobeSetup'))  // Wardrobe Wars Setup
 const WardrobeBattle = lazy(() => import('./screens/WardrobeBattle'))  // Wardrobe Wars Battle
+const ThroneRoom = lazy(() => import('./screens/ThroneRoom'))  // King of the Hill
+const ThroneChallenge = lazy(() => import('./screens/ThroneChallenge'))  // Throne Challenge
 // Modals - less critical, lazy loaded
 const PaywallModal = lazy(() => import('./components/modals/PaywallModal'))
 const LeaderboardModal = lazy(() => import('./components/modals/LeaderboardModal'))
@@ -521,8 +523,8 @@ export default function App() {
   // ============================================
   // GLOBAL ARENA STATE - Real-time matchmaking
   // ============================================
-  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue' | 'leaderboard' | 'wardrobeSetup' | 'wardrobeBattle'
-  const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode } or { wardrobeOutfits }
+  const [arenaScreen, setArenaScreen] = useState(null)  // null | 'entry' | 'queue' | 'leaderboard' | 'wardrobeSetup' | 'wardrobeBattle' | 'throneRoom' | 'throneChallenge'
+  const [arenaData, setArenaData] = useState(null)  // { score, thumb, mode } or { wardrobeOutfits } or { throne, king }
   const [arenaMode, setArenaMode] = useState(null)  // Mode for arena (from daily rotation)
 
   // Handler to open arena entry screen (from HomeScreen)
@@ -2674,6 +2676,7 @@ export default function App() {
           }}
           onShowLeaderboard={() => setArenaScreen('leaderboard')}
           onStartWardrobe={() => setArenaScreen('wardrobeSetup')}
+          onStartKings={() => setArenaScreen('throneRoom')}
           playSound={playSound}
           vibrate={vibrate}
         />
@@ -2728,6 +2731,59 @@ export default function App() {
           playSound={playSound}
           vibrate={vibrate}
           color="#9b59b6"
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
+  // KING OF THE HILL - THRONE ROOM
+  // ============================================
+  if (arenaScreen === 'throneRoom') {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <ThroneRoom
+          onChallenge={(throne) => {
+            // Get current king for this throne
+            const { getKings } = require('./screens/ThroneRoom')
+            const kings = getKings()
+            setArenaData({ throne, king: kings[throne.id] || null })
+            setArenaScreen('throneChallenge')
+          }}
+          onBack={() => setArenaScreen('entry')}
+          playSound={playSound}
+          vibrate={vibrate}
+        />
+      </Suspense>
+    )
+  }
+
+  // ============================================
+  // KING OF THE HILL - THRONE CHALLENGE
+  // ============================================
+  if (arenaScreen === 'throneChallenge' && arenaData?.throne) {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <ThroneChallenge
+          throne={arenaData.throne}
+          currentKing={arenaData.king}
+          onComplete={(result) => {
+            console.log('[KOTH] Challenge complete:', result)
+            displayToast(
+              result.result === 'victory'
+                ? `👑 You are now the ${result.throne.name}!`
+                : `😢 The King defended the throne!`,
+              3000
+            )
+            setArenaScreen('throneRoom')
+            setArenaData(null)
+          }}
+          onCancel={() => {
+            setArenaScreen('throneRoom')
+            setArenaData(null)
+          }}
+          playSound={playSound}
+          vibrate={vibrate}
         />
       </Suspense>
     )

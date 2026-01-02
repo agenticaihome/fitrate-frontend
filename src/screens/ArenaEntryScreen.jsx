@@ -495,6 +495,7 @@ export default function ArenaEntryScreen({
     onBack,
     onShowLeaderboard,
     onStartWardrobe,
+    onStartKings,
     playSound,
     vibrate
 }) {
@@ -987,7 +988,7 @@ export default function ArenaEntryScreen({
                     </button>
                 </div>
 
-                {/* King of the Hill - Coming Soon */}
+                {/* King of the Hill */}
                 <div className={`w-full max-w-md p-8 rounded-2xl text-center mb-4 ${arenaMode !== 'kings' ? 'hidden' : ''}`}
                     style={{
                         background: 'rgba(255,255,255,0.03)',
@@ -1005,10 +1006,17 @@ export default function ArenaEntryScreen({
                             </div>
                         ))}
                     </div>
-                    <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full mx-auto w-fit"
-                        style={{ background: '#00ff8820', border: '1px solid #00ff8840' }}>
-                        <span className="text-green-400 text-sm font-bold">🚧 Coming Soon</span>
-                    </div>
+                    <button
+                        onClick={() => {
+                            playSound?.('click')
+                            vibrate?.([50, 30, 50])
+                            onStartKings?.()
+                        }}
+                        className="px-6 py-3 rounded-2xl font-bold text-black transition-all active:scale-95"
+                        style={{ background: 'linear-gradient(135deg, #ffd700, #ffa500)' }}
+                    >
+                        👑 Enter Throne Room
+                    </button>
                 </div>
 
                 {/* Quick Battle Content - Season Tier + Countdown */}
