@@ -247,18 +247,6 @@ export default function AnalyzingScreen({
 
     const currentCopy = copyPool[copyIndex] || "Analyzing your style…"
 
-    // Checklist items
-    const freeItems = [
-        "Overall score + breakdown",
-        "Celeb style match",
-        "Quick styling tip"
-    ]
-    const proItems = [
-        "Deep analysis (Pro)",
-        "Item-by-item feedback (Pro)",
-        "All AI modes (Pro)"
-    ]
-
     return (
         <div
             className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
@@ -416,45 +404,36 @@ export default function AnalyzingScreen({
                 </p>
             </div>
 
-            {/* Animated Checklist - Enhanced with glassmorphism */}
-            {!isPro && (
-                <div className="mt-6 p-5 rounded-2xl glass-premium relative z-10" style={{
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.08)'
-                }}>
-                    <div className="space-y-2.5 text-left">
-                        {freeItems.map((item, idx) => (
-                            <div
-                                key={item}
-                                className={`flex items-center gap-3 text-sm transition-all duration-500 ${checklistVisible[idx] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                                style={{ color: 'rgba(255,255,255,0.8)' }}
-                            >
-                                <span
-                                    className="text-green-400 text-base"
-                                    style={{
-                                        animation: checklistVisible[idx] ? 'checkmark-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
-                                        textShadow: '0 0 10px rgba(0,255,136,0.5)'
-                                    }}
-                                >✓</span>
-                                <span className="font-medium">{item}</span>
-                            </div>
-                        ))}
-
-                        <div className="h-px my-3" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)' }} />
-
-                        {proItems.map((item, idx) => (
-                            <div
-                                key={item}
-                                className={`flex items-center gap-3 text-sm transition-all duration-500 ${checklistVisible[idx + 3] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                                style={{ color: 'rgba(255,215,0,0.7)' }}
-                            >
-                                <span className="text-base" style={{ filter: 'drop-shadow(0 0 5px rgba(255,215,0,0.3))' }}>🔒</span>
-                                <span className="font-medium">{item}</span>
-                            </div>
-                        ))}
-                    </div>
+            {/* What You're Getting - Updated for 2025 */}
+            <div className="mt-6 p-5 rounded-2xl glass-premium relative z-10" style={{
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.08)'
+            }}>
+                <p className="text-xs text-center text-gray-400 uppercase tracking-wider mb-3 font-medium">You're getting</p>
+                <div className="space-y-2.5 text-left">
+                    {[
+                        "AI score + 3 subscores",
+                        "Personalized styling tip",
+                        "Shareable results card"
+                    ].map((item, idx) => (
+                        <div
+                            key={item}
+                            className={`flex items-center gap-3 text-sm transition-all duration-500 ${checklistVisible[idx] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                            style={{ color: 'rgba(255,255,255,0.8)' }}
+                        >
+                            <span
+                                className="text-base"
+                                style={{
+                                    color: accent,
+                                    animation: checklistVisible[idx] ? 'checkmark-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
+                                    textShadow: `0 0 10px ${accentGlow}`
+                                }}
+                            >✓</span>
+                            <span className="font-medium">{item}</span>
+                        </div>
+                    ))}
                 </div>
-            )}
+            </div>
 
             {/* Cancel Button - Glassmorphism */}
             {onBack && (
