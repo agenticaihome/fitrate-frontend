@@ -749,7 +749,6 @@ export default function HomeScreen({
     // ==========================================
     // Main Action Handler
     // ==========================================
-    const currentMode = getModeData(mode)
     const isModeLocked = currentMode.proOnly && !isPro
 
     const handleStart = () => {
