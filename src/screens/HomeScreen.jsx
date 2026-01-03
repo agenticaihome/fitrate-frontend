@@ -291,8 +291,9 @@ const getModeData = (modeId) => MODES.find(m => m.id === modeId) || MODES[0]
 // ============================================
 // MODE CAROUSEL - Swipeable peek carousel
 // Shows current mode + neighbors for quick switching
+// Now with pro-mode locking for free users
 // ============================================
-const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
+const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer, isPro = false, onShowPaywall }) => {
     const currentIndex = MODES.findIndex(m => m.id === currentModeId) || 0
 
     // Get prev/next indices (wrapping)
@@ -303,14 +304,34 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
     const currentMode = MODES[currentIndex]
     const nextMode = MODES[nextIndex]
 
+    // Check if a mode is locked for the current user
+    const isLocked = (modeData) => modeData.proOnly && !isPro
+
     const handleSwipe = (direction) => {
         playSound('click')
         vibrate([10, 5, 15])
-        if (direction === 'left') {
-            onModeChange(nextMode.id)
-        } else {
-            onModeChange(prevMode.id)
+        const targetMode = direction === 'left' ? nextMode : prevMode
+
+        // If target mode is locked, show paywall instead of switching
+        if (isLocked(targetMode)) {
+            onShowPaywall?.()
+            return
         }
+
+        onModeChange(targetMode.id)
+    }
+
+    const handleNeighborTap = (targetMode, direction) => {
+        playSound('click')
+        vibrate([10, 5, 15])
+
+        // If mode is locked, show paywall
+        if (isLocked(targetMode)) {
+            onShowPaywall?.()
+            return
+        }
+
+        handleSwipe(direction)
     }
 
     return (
@@ -331,13 +352,18 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
                     }
                 }}
             >
-                {/* Left neighbor (dimmed) */}
+                {/* Left neighbor (dimmed) - show lock if pro-only */}
                 <motion.button
-                    onClick={() => handleSwipe('right')}
-                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    onClick={() => handleNeighborTap(prevMode, 'right')}
+                    className={`flex flex-col items-center transition-opacity relative ${isLocked(prevMode) ? 'opacity-30' : 'opacity-40 hover:opacity-60'}`}
                     whileTap={{ scale: 0.9 }}
                 >
-                    <span className="text-2xl">{prevMode.emoji}</span>
+                    <span className="text-2xl">{isLocked(prevMode) ? '🔒' : prevMode.emoji}</span>
+                    {isLocked(prevMode) && (
+                        <span className="absolute -top-1 -right-1 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                            PRO
+                        </span>
+                    )}
                 </motion.button>
 
                 {/* Current mode (center, prominent) */}
@@ -364,13 +390,18 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
                     </span>
                 </motion.div>
 
-                {/* Right neighbor (dimmed) */}
+                {/* Right neighbor (dimmed) - show lock if pro-only */}
                 <motion.button
-                    onClick={() => handleSwipe('left')}
-                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    onClick={() => handleNeighborTap(nextMode, 'left')}
+                    className={`flex flex-col items-center transition-opacity relative ${isLocked(nextMode) ? 'opacity-30' : 'opacity-40 hover:opacity-60'}`}
                     whileTap={{ scale: 0.9 }}
                 >
-                    <span className="text-2xl">{nextMode.emoji}</span>
+                    <span className="text-2xl">{isLocked(nextMode) ? '🔒' : nextMode.emoji}</span>
+                    {isLocked(nextMode) && (
+                        <span className="absolute -top-1 -right-1 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                            PRO
+                        </span>
+                    )}
                 </motion.button>
             </motion.div>
 
@@ -1291,14 +1322,22 @@ export default function HomeScreen({
                                 onDragEnd={(_, info) => {
                                     if (Math.abs(info.offset.x) > 50) {
                                         const currentIndex = MODES.findIndex(m => m.id === mode) || 0
+                                        let targetMode
                                         if (info.offset.x > 0) {
                                             // Swipe right = previous mode
                                             const prevIndex = (currentIndex - 1 + MODES.length) % MODES.length
-                                            setMode(MODES[prevIndex].id)
+                                            targetMode = MODES[prevIndex]
                                         } else {
                                             // Swipe left = next mode
                                             const nextIndex = (currentIndex + 1) % MODES.length
-                                            setMode(MODES[nextIndex].id)
+                                            targetMode = MODES[nextIndex]
+                                        }
+
+                                        // Check if target mode is locked (proOnly and user is not Pro)
+                                        if (targetMode.proOnly && !isPro) {
+                                            onShowPaywall?.()
+                                        } else {
+                                            setMode(targetMode.id)
                                         }
                                         playSound('click')
                                         vibrate([10, 5, 15])
@@ -1310,36 +1349,60 @@ export default function HomeScreen({
                                     const currentIndex = MODES.findIndex(m => m.id === mode) || 0
                                     const prevMode = MODES[(currentIndex - 1 + MODES.length) % MODES.length]
                                     const nextMode = MODES[(currentIndex + 1) % MODES.length]
+                                    const isPrevLocked = prevMode.proOnly && !isPro
+                                    const isNextLocked = nextMode.proOnly && !isPro
                                     return (
                                         <>
-                                            {/* Left peek - TAPPABLE with name */}
+                                            {/* Left peek - TAPPABLE with lock if pro-only */}
                                             <motion.button
                                                 onClick={() => {
-                                                    setMode(prevMode.id)
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
+                                                    if (isPrevLocked) {
+                                                        onShowPaywall?.()
+                                                    } else {
+                                                        setMode(prevMode.id)
+                                                    }
                                                 }}
-                                                className="absolute left-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-60 hover:opacity-90 transition-opacity"
+                                                className={`absolute left-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center transition-opacity ${isPrevLocked ? 'opacity-40' : 'opacity-60 hover:opacity-90'}`}
                                                 animate={{ x: [0, -3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
                                                 whileTap={{ scale: 0.85 }}
                                             >
-                                                <span className="text-2xl">{prevMode.emoji}</span>
+                                                <span className="text-2xl relative">
+                                                    {isPrevLocked ? '🔒' : prevMode.emoji}
+                                                    {isPrevLocked && (
+                                                        <span className="absolute -top-1 -right-2 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                                                            PRO
+                                                        </span>
+                                                    )}
+                                                </span>
                                                 <span className="text-[9px] text-gray-400 font-medium mt-0.5">{prevMode.label}</span>
                                             </motion.button>
-                                            {/* Right peek - TAPPABLE with name */}
+                                            {/* Right peek - TAPPABLE with lock if pro-only */}
                                             <motion.button
                                                 onClick={() => {
-                                                    setMode(nextMode.id)
                                                     playSound('click')
                                                     vibrate([10, 5, 15])
+                                                    if (isNextLocked) {
+                                                        onShowPaywall?.()
+                                                    } else {
+                                                        setMode(nextMode.id)
+                                                    }
                                                 }}
-                                                className="absolute right-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center opacity-60 hover:opacity-90 transition-opacity"
+                                                className={`absolute right-[-55px] top-1/2 -translate-y-1/2 flex flex-col items-center transition-opacity ${isNextLocked ? 'opacity-40' : 'opacity-60 hover:opacity-90'}`}
                                                 animate={{ x: [0, 3, 0] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
                                                 whileTap={{ scale: 0.85 }}
                                             >
-                                                <span className="text-2xl">{nextMode.emoji}</span>
+                                                <span className="text-2xl relative">
+                                                    {isNextLocked ? '🔒' : nextMode.emoji}
+                                                    {isNextLocked && (
+                                                        <span className="absolute -top-1 -right-2 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                                                            PRO
+                                                        </span>
+                                                    )}
+                                                </span>
                                                 <span className="text-[9px] text-gray-400 font-medium mt-0.5">{nextMode.label}</span>
                                             </motion.button>
                                         </>
