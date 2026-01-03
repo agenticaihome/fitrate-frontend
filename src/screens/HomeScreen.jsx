@@ -433,7 +433,8 @@ export default function HomeScreen({
     onNavigate,
     onOpenArena,
     dailyLeaderboard = [],
-    onShowChallenges
+    onShowChallenges,
+    onShowJudges
 }) {
     // ==========================================
     // Local State
@@ -1448,17 +1449,30 @@ export default function HomeScreen({
 
                         {/* All Modes Link - Opens drawer for full selection */}
                         {!dailyChallengeMode && !eventMode && (
-                            <button
-                                onClick={() => {
-                                    playSound('click')
-                                    vibrate(10)
-                                    setShowModeDrawer(true)
-                                }}
-                                className="text-gray-300 text-xs hover:text-white/80 transition-colors flex items-center gap-1.5 mb-2"
-                            >
-                                <span>All 12 Modes</span>
-                                <span className="text-gray-400">→</span>
-                            </button>
+                            <div className="flex items-center gap-4 mb-2">
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(10)
+                                        setShowModeDrawer(true)
+                                    }}
+                                    className="text-gray-300 text-xs hover:text-white/80 transition-colors flex items-center gap-1.5"
+                                >
+                                    <span>All 12 Modes</span>
+                                    <span className="text-gray-400">→</span>
+                                </button>
+                                <span className="text-gray-600">•</span>
+                                <button
+                                    onClick={() => {
+                                        playSound('click')
+                                        vibrate(10)
+                                        onShowJudges?.()
+                                    }}
+                                    className="text-purple-300 text-xs hover:text-purple-200 transition-colors flex items-center gap-1.5"
+                                >
+                                    <span>🎭 Meet the Judges</span>
+                                </button>
+                            </div>
                         )}
 
                         {/* Challenge quick action - during challenge modes */}

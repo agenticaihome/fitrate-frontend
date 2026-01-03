@@ -2402,43 +2402,107 @@ export default function App() {
   }
 
   // ============================================
-  // SETTINGS / RESTORE MODAL
+  // SETTINGS PAGE - Full settings experience
   // ============================================
   if (showRestoreModal) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0f] text-white">
-        <div className="w-full max-w-sm">
-          <h2 className="text-2xl font-bold text-center mb-6">⚙️ Settings</h2>
+      <div
+        className="min-h-screen flex flex-col p-6 text-white"
+        style={{
+          background: 'linear-gradient(180deg, #0a0a0f 0%, #12121f 100%)',
+          paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
+          paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))'
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => setShowRestoreModal(false)}
+            className="p-2 rounded-full active:scale-95 transition-transform"
+            style={{ background: 'rgba(255,255,255,0.1)' }}
+          >
+            <span className="text-xl">←</span>
+          </button>
+          <h1 className="text-xl font-black">⚙️ Settings</h1>
+          <div className="w-10" />
+        </div>
 
-          {/* Pro Status */}
-          <div className="mb-6 p-4 rounded-2xl text-center" style={{
-            background: isPro ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.05)',
-            border: isPro ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.1)'
-          }}>
-            {isPro ? (
-              <>
-                <span className="text-3xl block mb-2">⚡</span>
-                <p className="text-emerald-400 font-bold">You're a Pro!</p>
-                <p className="text-gray-400 text-xs mt-1">Unlimited scans • All modes</p>
-              </>
-            ) : (
-              <>
-                <span className="text-3xl block mb-2">🔓</span>
-                <p className="text-white/70 font-medium">Free Account</p>
-                <p className="text-gray-400 text-xs mt-1">{scansRemaining} scans/day</p>
-              </>
-            )}
+        <div className="w-full max-w-sm mx-auto space-y-4">
+          {/* ===== ACCOUNT STATUS ===== */}
+          <div
+            className="p-4 rounded-2xl"
+            style={{
+              background: isPro ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.05)',
+              border: isPro ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <span className="text-4xl">{isPro ? '👑' : '🔓'}</span>
+              <div className="flex-1">
+                <p className={`font-bold text-lg ${isPro ? 'text-emerald-400' : 'text-white/80'}`}>
+                  {isPro ? 'Pro Member' : 'Free Account'}
+                </p>
+                <p className="text-gray-400 text-sm">
+                  {isPro ? 'Unlimited scans • All modes' : `${scansRemaining}/2 daily scans`}
+                </p>
+              </div>
+              {!isPro && (
+                <button
+                  onClick={() => { setShowRestoreModal(false); setShowPaywall(true); }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold"
+                  style={{ background: 'linear-gradient(135deg, #ffd700, #ff8c00)', color: '#000' }}
+                >
+                  Upgrade
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Restore Purchase */}
+          {/* ===== ACCOUNT STATS ===== */}
+          <div className="p-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Your Stats</p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-2xl font-black text-cyan-400">{totalScans || 0}</p>
+                <p className="text-[10px] text-gray-400 uppercase">Total Scans</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-orange-400">{dailyStreak?.current || 0}</p>
+                <p className="text-[10px] text-gray-400 uppercase">Day Streak</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-purple-400">{dailyStreak?.max || 0}</p>
+                <p className="text-[10px] text-gray-400 uppercase">Best Streak</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== MEET THE JUDGES ===== */}
+          <button
+            onClick={() => { setShowRestoreModal(false); setScreen('judges'); }}
+            className="w-full p-4 rounded-2xl flex items-center justify-between transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🎭</span>
+              <div className="text-left">
+                <p className="font-bold text-white">Meet the AI Judges</p>
+                <p className="text-xs text-purple-300">See all 12 personalities</p>
+              </div>
+            </div>
+            <span className="text-purple-400">→</span>
+          </button>
+
+          {/* ===== RESTORE PURCHASE ===== */}
           {!isPro && (
-            <div className="mb-6">
-              <p className="text-gray-400 text-sm text-center mb-3">Already purchased Pro?</p>
+            <div className="p-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Restore Purchase</p>
+              <p className="text-gray-400 text-sm mb-3">Already bought scans? Enter your purchase email:</p>
               <input
                 type="email"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="Enter purchase email"
+                placeholder="your@email.com"
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500/50 mb-3"
               />
               <button
@@ -2456,10 +2520,9 @@ export default function App() {
                       localStorage.setItem('fitrate_pro', 'true');
                       localStorage.setItem('fitrate_email', emailInput);
                       setIsPro(true);
-                      setShowRestoreModal(false);
                       displayToast('⚡ Pro restored!');
                     } else {
-                      displayToast('No Pro found for this email');
+                      displayToast('No purchase found for this email');
                     }
                   } catch (err) {
                     displayToast('Error checking status');
@@ -2468,18 +2531,74 @@ export default function App() {
                 className="w-full py-3 rounded-xl font-bold text-white transition-all active:scale-[0.98]"
                 style={{ background: 'linear-gradient(135deg, #00d4ff, #0099ff)' }}
               >
-                Restore Purchase
+                Restore
               </button>
             </div>
           )}
 
-          {/* Close */}
-          <button
-            onClick={() => setShowRestoreModal(false)}
-            className="w-full py-3 text-gray-400 font-medium"
+          {/* ===== LEGAL ===== */}
+          <div className="p-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Legal</p>
+            <div className="space-y-2">
+              <a
+                href="/privacy"
+                className="flex items-center justify-between py-2 text-white/80 hover:text-white"
+              >
+                <span className="flex items-center gap-2"><span>🔒</span> Privacy Policy</span>
+                <span className="text-gray-500">→</span>
+              </a>
+              <a
+                href="/terms"
+                className="flex items-center justify-between py-2 text-white/80 hover:text-white"
+              >
+                <span className="flex items-center gap-2"><span>📜</span> Terms of Service</span>
+                <span className="text-gray-500">→</span>
+              </a>
+            </div>
+          </div>
+
+          {/* ===== SUPPORT ===== */}
+          <a
+            href="mailto:support@fitrate.app?subject=FitRate Support"
+            className="w-full p-4 rounded-2xl flex items-center justify-between transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
           >
-            ← Back
+            <div className="flex items-center gap-3">
+              <span className="text-xl">💬</span>
+              <div className="text-left">
+                <p className="font-medium text-white">Contact Support</p>
+                <p className="text-xs text-gray-400">Questions or feedback</p>
+              </div>
+            </div>
+            <span className="text-gray-500">→</span>
+          </a>
+
+          {/* ===== RESET DATA (for testing) ===== */}
+          <button
+            onClick={() => {
+              if (window.confirm('Clear all local data? This will reset your stats and preferences.')) {
+                localStorage.clear();
+                displayToast('Data cleared! Refreshing...');
+                setTimeout(() => window.location.reload(), 1000);
+              }
+            }}
+            className="w-full p-4 rounded-2xl flex items-center justify-between text-left transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)' }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🗑️</span>
+              <div>
+                <p className="font-medium text-red-400">Reset All Data</p>
+                <p className="text-xs text-gray-400">Clear cache & preferences</p>
+              </div>
+            </div>
           </button>
+
+          {/* ===== APP VERSION ===== */}
+          <div className="text-center pt-4 pb-8">
+            <p className="text-gray-500 text-xs">FitRate v1.0.0</p>
+            <p className="text-gray-600 text-[10px] mt-1">Made with 🔥 for fashion lovers</p>
+          </div>
         </div>
       </div>
     )
@@ -3250,6 +3369,7 @@ export default function App() {
           onOpenArena={openArenaEntry}
           dailyLeaderboard={dailyLeaderboard}
           onShowChallenges={() => { fetchDailyLeaderboard(); fetchLeaderboard(); fetchUserEventStatus(); setScreen('challenges'); }}
+          onShowJudges={() => setScreen('judges')}
         />
         <BottomNav
           activeTab="home"
