@@ -529,6 +529,64 @@ const ArenaModeTab = ({ activeMode, onModeChange, modeColor, wardrobeCount = 0, 
 }
 
 // ============================================
+// HOW IT WORKS - Simple 3-step explanation
+// ============================================
+const HowItWorks = ({ modeColor }) => (
+    <div
+        className="w-full max-w-md p-4 rounded-2xl mb-4"
+        style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)'
+        }}
+    >
+        <p className="text-gray-400 text-xs uppercase tracking-widest text-center mb-4">How it works</p>
+        <div className="flex items-center justify-center gap-2">
+            {/* Step 1 */}
+            <div className="flex flex-col items-center">
+                <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-1"
+                    style={{ background: `${modeColor}20`, border: `1px solid ${modeColor}40` }}
+                >
+                    📸
+                </div>
+                <span className="text-white font-bold text-xs">Snap</span>
+                <span className="text-gray-500 text-[10px]">your fit</span>
+            </div>
+
+            {/* Arrow */}
+            <span className="text-gray-500 text-lg mb-4">→</span>
+
+            {/* Step 2 */}
+            <div className="flex flex-col items-center">
+                <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-1"
+                    style={{ background: `${modeColor}20`, border: `1px solid ${modeColor}40` }}
+                >
+                    ⚔️
+                </div>
+                <span className="text-white font-bold text-xs">Battle</span>
+                <span className="text-gray-500 text-[10px]">a stranger</span>
+            </div>
+
+            {/* Arrow */}
+            <span className="text-gray-500 text-lg mb-4">→</span>
+
+            {/* Step 3 */}
+            <div className="flex flex-col items-center">
+                <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-1"
+                    style={{ background: `${modeColor}20`, border: `1px solid ${modeColor}40` }}
+                >
+                    🏆
+                </div>
+                <span className="text-white font-bold text-xs">Win</span>
+                <span className="text-gray-500 text-[10px]">or rematch</span>
+            </div>
+        </div>
+    </div>
+)
+
+// ============================================
 // MAIN ARENA ENTRY SCREEN
 // ============================================
 export default function ArenaEntryScreen({
@@ -960,73 +1018,51 @@ export default function ArenaEntryScreen({
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col items-center px-5 pb-8 z-10">
-                {/* Hero Section */}
-                <div className="text-center mb-6">
-                    <div className="relative inline-block mb-4">
-                        <span
-                            className="text-7xl"
-                            style={{
-                                filter: `drop-shadow(0 0 40px ${todayMode.color})`,
-                                animation: 'globe-pulse 3s ease-in-out infinite'
-                            }}
-                        >
-                            🌍
-                        </span>
-                        {/* Orbiting rings */}
-                        <div
-                            className="absolute inset-0 rounded-full"
-                            style={{
-                                border: `1px solid ${todayMode.color}30`,
-                                transform: 'scale(1.8)',
-                                animation: 'orbit 10s linear infinite'
-                            }}
-                        />
-                        <div
-                            className="absolute inset-0 rounded-full"
-                            style={{
-                                border: `1px dashed ${todayMode.color}20`,
-                                transform: 'scale(2.2)',
-                                animation: 'orbit 15s linear infinite reverse'
-                            }}
-                        />
-                    </div>
+                {/* Hero Section - Simplified */}
+                <div className="text-center mb-4">
+                    <span
+                        className="text-6xl inline-block mb-2"
+                        style={{
+                            filter: `drop-shadow(0 0 30px ${todayMode.color})`,
+                        }}
+                    >
+                        🌍
+                    </span>
 
                     <h1
-                        className="text-4xl font-black text-white mb-1"
-                        style={{ textShadow: `0 0 40px ${todayMode.color}60` }}
+                        className="text-3xl font-black text-white mb-1"
+                        style={{ textShadow: `0 0 30px ${todayMode.color}40` }}
                     >
                         Global Arena
                     </h1>
-                    <p className="text-gray-400 text-base">Battle anyone in the world</p>
+                    <p className="text-gray-400 text-sm">Battle random players worldwide</p>
 
-                    {/* Live Stats Badges */}
-                    <div className="flex items-center justify-center gap-4 mt-3">
-                        {onlineCount && (
-                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-                                style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)' }}>
-                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                                <span className="text-green-400 text-xs font-bold">{onlineCount.toLocaleString()} online</span>
-                            </div>
-                        )}
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-                            style={{ background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.3)' }}>
-                            <span className="text-yellow-400 text-xs font-bold">⚔️ {Math.floor(Math.random() * 50) + 150} live battles</span>
+                    {/* Online count - simple social proof */}
+                    {onlineCount > 0 && (
+                        <div className="flex items-center justify-center gap-2 mt-2">
+                            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                            <span className="text-green-400 text-xs font-medium">{onlineCount} online now</span>
                         </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Arena Mode Tabs */}
-                <ArenaModeTab
-                    activeMode={arenaMode}
-                    onModeChange={(mode) => {
-                        playSound?.('click')
-                        vibrate?.(15)
-                        setArenaMode(mode)
-                    }}
-                    modeColor={todayMode.color}
-                    wardrobeCount={wardrobeCount}
-                    crownCount={crownCount}
-                />
+                {/* How It Works - Show for first-time users */}
+                {!hasPlayedBefore && <HowItWorks modeColor={todayMode.color} />}
+
+                {/* Arena Mode Tabs - Only show for returning users */}
+                {hasPlayedBefore && (
+                    <ArenaModeTab
+                        activeMode={arenaMode}
+                        onModeChange={(mode) => {
+                            playSound?.('click')
+                            vibrate?.(15)
+                            setArenaMode(mode)
+                        }}
+                        modeColor={todayMode.color}
+                        wardrobeCount={wardrobeCount}
+                        crownCount={crownCount}
+                    />
+                )}
 
                 {/* Wardrobe Wars */}
                 <div className={`w-full max-w-md p-8 rounded-2xl text-center mb-4 ${arenaMode !== 'wardrobe' ? 'hidden' : ''}`}
@@ -1082,42 +1118,45 @@ export default function ArenaEntryScreen({
                     </button>
                 </div>
 
-                {/* Quick Battle Content - Season Tier + Countdown */}
+                {/* Quick Battle Content */}
                 <div className={arenaMode !== 'quick' ? 'hidden' : 'contents'}>
-                    <div
-                        className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
-                        style={{
-                            background: `linear-gradient(135deg, ${tierData.tier.color}15, transparent)`,
-                            backdropFilter: 'blur(20px)',
-                            border: `1px solid ${tierData.tier.color}30`
-                        }}
-                    >
-                        <div className="flex items-center justify-between">
-                            <TierBadge
-                                tier={tierData.tier}
-                                progress={tierData.progress}
-                                pointsToNext={tierData.pointsToNext}
-                            />
-                            <div className="flex items-center gap-2">
-                                <SeasonCountdown timeRemaining={seasonTimeRemaining} tier={tierData.tier} />
-                                {/* Leaderboard Button */}
-                                <button
-                                    onClick={() => {
-                                        playSound?.('click')
-                                        vibrate?.(10)
-                                        onShowLeaderboard?.()
-                                    }}
-                                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90"
-                                    style={{
-                                        background: `${tierData.tier.color}20`,
-                                        border: `1px solid ${tierData.tier.color}40`
-                                    }}
-                                >
-                                    <span className="text-lg">🏆</span>
-                                </button>
+                    {/* Season Tier + Countdown - Only for returning users */}
+                    {hasPlayedBefore && (
+                        <div
+                            className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
+                            style={{
+                                background: `linear-gradient(135deg, ${tierData.tier.color}15, transparent)`,
+                                backdropFilter: 'blur(20px)',
+                                border: `1px solid ${tierData.tier.color}30`
+                            }}
+                        >
+                            <div className="flex items-center justify-between">
+                                <TierBadge
+                                    tier={tierData.tier}
+                                    progress={tierData.progress}
+                                    pointsToNext={tierData.pointsToNext}
+                                />
+                                <div className="flex items-center gap-2">
+                                    <SeasonCountdown timeRemaining={seasonTimeRemaining} tier={tierData.tier} />
+                                    {/* Leaderboard Button */}
+                                    <button
+                                        onClick={() => {
+                                            playSound?.('click')
+                                            vibrate?.(10)
+                                            onShowLeaderboard?.()
+                                        }}
+                                        className="w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                                        style={{
+                                            background: `${tierData.tier.color}20`,
+                                            border: `1px solid ${tierData.tier.color}40`
+                                        }}
+                                    >
+                                        <span className="text-lg">🏆</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Today's Mode Card */}
                     <div
@@ -1154,45 +1193,51 @@ export default function ArenaEntryScreen({
                         </div>
                     </div>
 
-                    {/* Weekly Arena Prizes */}
-                    <div
-                        className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
-                        style={{
-                            background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(251, 146, 60, 0.12) 100%)',
-                            border: '1px solid rgba(255, 215, 0, 0.3)'
-                        }}
-                    >
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="text-2xl">🏆</span>
-                            <p className="text-yellow-300 font-bold">WEEKLY PRIZES</p>
-                            <span className="text-gray-400 text-xs ml-auto">Distributed Monday</span>
+                    {/* Weekly Arena Prizes - Only for returning users */}
+                    {hasPlayedBefore && (
+                        <div
+                            className="w-full max-w-md p-4 rounded-2xl mb-4 relative overflow-hidden"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(251, 146, 60, 0.12) 100%)',
+                                border: '1px solid rgba(255, 215, 0, 0.3)'
+                            }}
+                        >
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="text-2xl">🏆</span>
+                                <p className="text-yellow-300 font-bold">WEEKLY PRIZES</p>
+                                <span className="text-gray-400 text-xs ml-auto">Distributed Monday</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="bg-white/5 rounded-lg py-2 px-1">
+                                    <p className="text-yellow-400 text-lg font-black">🥇</p>
+                                    <p className="text-white font-bold text-sm">25</p>
+                                    <p className="text-gray-400 text-[10px]">scans</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg py-2 px-1">
+                                    <p className="text-gray-300 text-lg font-black">🥈🥉</p>
+                                    <p className="text-white font-bold text-sm">15</p>
+                                    <p className="text-gray-400 text-[10px]">scans</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg py-2 px-1">
+                                    <p className="text-amber-600 text-xs font-bold">#4-10</p>
+                                    <p className="text-white font-bold text-sm">5</p>
+                                    <p className="text-gray-400 text-[10px]">scans</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="bg-white/5 rounded-lg py-2 px-1">
-                                <p className="text-yellow-400 text-lg font-black">🥇</p>
-                                <p className="text-white font-bold text-sm">25</p>
-                                <p className="text-gray-400 text-[10px]">scans</p>
-                            </div>
-                            <div className="bg-white/5 rounded-lg py-2 px-1">
-                                <p className="text-gray-300 text-lg font-black">🥈🥉</p>
-                                <p className="text-white font-bold text-sm">15</p>
-                                <p className="text-gray-400 text-[10px]">scans</p>
-                            </div>
-                            <div className="bg-white/5 rounded-lg py-2 px-1">
-                                <p className="text-amber-600 text-xs font-bold">#4-10</p>
-                                <p className="text-white font-bold text-sm">5</p>
-                                <p className="text-gray-400 text-[10px]">scans</p>
-                            </div>
+                    )}
+
+                    {/* Streak Card - Only for returning users */}
+                    {hasPlayedBefore && (
+                        <div className="w-full max-w-md mb-4">
+                            <StreakCard
+                                streakData={streakData}
+                                nextReward={nextStreakReward}
+                                modeColor={todayMode.color}
+                                onClaim={handleClaimReward}
+                            />
                         </div>
-                    </div>
-                    <div className="w-full max-w-md mb-4">
-                        <StreakCard
-                            streakData={streakData}
-                            nextReward={nextStreakReward}
-                            modeColor={todayMode.color}
-                            onClaim={handleClaimReward}
-                        />
-                    </div>
+                    )}
 
                     {/* Stats Dashboard (only if played before) */}
                     {hasPlayedBefore && (

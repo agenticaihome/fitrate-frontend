@@ -2463,7 +2463,7 @@ export default function App() {
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Your Stats</p>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <p className="text-2xl font-black text-cyan-400">{totalScans || 0}</p>
+                <p className="text-2xl font-black text-cyan-400">{parseInt(localStorage.getItem('fitrate_total_scans') || '0')}</p>
                 <p className="text-[10px] text-gray-400 uppercase">Total Scans</p>
               </div>
               <div>
