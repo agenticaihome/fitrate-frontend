@@ -19,6 +19,10 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
 
     return (
         <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="onboarding-title"
+            aria-describedby="onboarding-desc"
             className={`fixed inset-0 z-[100] flex items-center justify-center p-6 transition-opacity duration-400 ${isExiting ? 'opacity-0' : 'opacity-100'}`}
             style={{
                 background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 50%, #0a0610 100%)',
@@ -64,6 +68,7 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
 
                 {/* Main headline */}
                 <h1
+                    id="onboarding-title"
                     className="text-3xl font-black mb-3 text-white"
                     style={{
                         animation: 'stagger-fade-up 0.5s ease-out forwards'
@@ -74,7 +79,8 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
 
                 {/* Subheadline */}
                 <p
-                    className="text-xl text-white/60 mb-10"
+                    id="onboarding-desc"
+                    className="text-xl text-gray-300 mb-10"
                     style={{
                         animation: 'stagger-fade-up 0.5s ease-out 0.1s forwards',
                         opacity: 0,
@@ -88,7 +94,7 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
                 <button
                     onClick={handleStart}
                     aria-label="Start using FitRate"
-                    className="w-full py-5 rounded-2xl font-black text-xl relative overflow-hidden transition-all active:scale-[0.97] btn-premium-shine"
+                    className="w-full py-5 min-h-[56px] rounded-2xl font-black text-xl relative overflow-hidden transition-all active:scale-[0.97] btn-premium-shine focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
                     style={{
                         background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                         color: '#000',
@@ -97,13 +103,14 @@ export default function OnboardingModal({ onComplete, playSound, vibrate }) {
                         opacity: 0,
                         animationFillMode: 'forwards'
                     }}
+                    autoFocus
                 >
                     Let's Go! 🚀
                 </button>
 
                 {/* Privacy note */}
                 <p
-                    className="mt-6 text-white/30 text-xs"
+                    className="mt-6 text-gray-500 text-xs"
                     style={{
                         animation: 'stagger-fade-up 0.5s ease-out 0.3s forwards',
                         opacity: 0,

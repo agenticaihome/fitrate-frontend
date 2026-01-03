@@ -182,7 +182,7 @@ export default function ThroneChallenge({
 
                 <div className="text-center">
                     <h1 className="text-xl font-black text-white">{throne.emoji} {throne.name}</h1>
-                    <p className="text-white/50 text-xs">{throne.mode} Mode</p>
+                    <p className="text-gray-400 text-xs">{throne.mode} Mode</p>
                 </div>
 
                 <div className="w-11" />
@@ -204,7 +204,7 @@ export default function ThroneChallenge({
                                 <h2 className="text-3xl font-black text-white mb-3">
                                     🏆 Claim This Throne!
                                 </h2>
-                                <p className="text-white/60 mb-8">
+                                <p className="text-gray-300 mb-8">
                                     The {throne.name} throne is vacant!<br />
                                     Upload a fit to claim the crown.
                                 </p>
@@ -214,7 +214,7 @@ export default function ThroneChallenge({
                                 <h2 className="text-3xl font-black text-white mb-3">
                                     👑 Defend Your Crown!
                                 </h2>
-                                <p className="text-white/60 mb-8">
+                                <p className="text-gray-300 mb-8">
                                     You are the {throne.name}!<br />
                                     {currentKing.defenses || 0} successful defenses so far.
                                 </p>
@@ -224,7 +224,7 @@ export default function ThroneChallenge({
                                 <h2 className="text-3xl font-black text-white mb-3">
                                     ⚔️ Challenge the King!
                                 </h2>
-                                <p className="text-white/60 mb-8">
+                                <p className="text-gray-300 mb-8">
                                     {currentKing.displayName || 'Anonymous'} holds the throne.<br />
                                     Beat their score to claim the crown!
                                 </p>
@@ -274,7 +274,7 @@ export default function ThroneChallenge({
                             </div>
 
                             {/* VS */}
-                            <div className="text-white/40 text-2xl font-black">VS</div>
+                            <div className="text-gray-400 text-2xl font-black">VS</div>
 
                             {/* King */}
                             <div className="text-center">
@@ -311,7 +311,7 @@ export default function ThroneChallenge({
                             <div className="w-3 h-3 rounded-full bg-white/50 animate-bounce" style={{ animationDelay: '150ms' }} />
                             <div className="w-3 h-3 rounded-full bg-white/50 animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
-                        <p className="text-white/50 mt-2">
+                        <p className="text-gray-400 mt-2">
                             {myScore === null ? 'Analyzing your fit...' : 'Comparing scores...'}
                         </p>
                     </motion.div>
@@ -330,7 +330,7 @@ export default function ThroneChallenge({
                         <h2 className="text-4xl font-black text-white mb-2">
                             {result === 'victory' ? 'You Are King!' : 'The King Defends!'}
                         </h2>
-                        <p className="text-white/60 mb-2">
+                        <p className="text-gray-300 mb-2">
                             {result === 'victory'
                                 ? `You claimed the ${throne.name} throne!`
                                 : `${currentKing?.displayName || 'The King'} remains on the throne.`
@@ -339,12 +339,12 @@ export default function ThroneChallenge({
                         <div className="flex items-center justify-center gap-6 mb-8">
                             <div className="text-center">
                                 <span className="text-3xl font-black text-white">{myScore}</span>
-                                <p className="text-white/50 text-xs">Your Score</p>
+                                <p className="text-gray-400 text-xs">Your Score</p>
                             </div>
-                            <span className="text-white/30">vs</span>
+                            <span className="text-gray-500">vs</span>
                             <div className="text-center">
                                 <span className="text-3xl font-black text-white">{kingScore || '—'}</span>
-                                <p className="text-white/50 text-xs">King's Score</p>
+                                <p className="text-gray-400 text-xs">King's Score</p>
                             </div>
                         </div>
 

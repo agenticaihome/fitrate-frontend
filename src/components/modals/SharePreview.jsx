@@ -84,12 +84,12 @@ export default function SharePreview({
                     {isGenerating ? (
                         <div className="flex flex-col items-center gap-3">
                             <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            <span className="text-sm text-white/50">Generating preview...</span>
+                            <span className="text-sm text-gray-400">Generating preview...</span>
                         </div>
                     ) : error ? (
                         <div className="text-center p-4">
                             <span className="text-2xl mb-2 block">⚠️</span>
-                            <span className="text-sm text-white/50">{error}</span>
+                            <span className="text-sm text-gray-400">{error}</span>
                         </div>
                     ) : preview ? (
                         <img
@@ -101,7 +101,7 @@ export default function SharePreview({
                 </div>
 
                 {/* Confirmation Text */}
-                <p className="text-white/60 text-sm mb-4 text-center">
+                <p className="text-gray-300 text-sm mb-4 text-center">
                     Looks good? 👀
                 </p>
 

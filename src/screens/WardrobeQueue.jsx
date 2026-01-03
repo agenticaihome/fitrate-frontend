@@ -199,7 +199,7 @@ export default function WardrobeQueue({
                         <h1 className="text-2xl font-black text-white mb-2">
                             Uploading Wardrobe{dots}
                         </h1>
-                        <p className="text-white/50">Syncing your outfits</p>
+                        <p className="text-gray-400">Syncing your outfits</p>
                     </>
                 )}
 
@@ -215,7 +215,7 @@ export default function WardrobeQueue({
                         <h1 className="text-2xl font-black text-white mb-2">
                             Finding Opponent{dots}
                         </h1>
-                        <p className="text-white/50 mb-6">
+                        <p className="text-gray-400 mb-6">
                             {position ? `Position in queue: #${position}` : 'Searching for players'}
                         </p>
 
@@ -262,7 +262,7 @@ export default function WardrobeQueue({
                         <h1 className="text-2xl font-black text-white mb-2">
                             Opponent Found!
                         </h1>
-                        <p className="text-white/50 mb-2">
+                        <p className="text-gray-400 mb-2">
                             vs <span className="text-white font-bold">{matchData?.opponentName || 'Mystery Challenger'}</span>
                         </p>
                         <p className="text-green-400 text-sm">Starting battle...</p>
@@ -275,7 +275,7 @@ export default function WardrobeQueue({
                         <h1 className="text-2xl font-black text-white mb-2">
                             No Opponents Online
                         </h1>
-                        <p className="text-white/50 mb-6">Try again later or invite friends!</p>
+                        <p className="text-gray-400 mb-6">Try again later or invite friends!</p>
                     </>
                 )}
 
@@ -285,7 +285,7 @@ export default function WardrobeQueue({
                         <h1 className="text-2xl font-black text-white mb-2">
                             Connection Error
                         </h1>
-                        <p className="text-white/50 mb-6">Please check your connection</p>
+                        <p className="text-gray-400 mb-6">Please check your connection</p>
                     </>
                 )}
             </div>

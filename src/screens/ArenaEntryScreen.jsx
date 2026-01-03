@@ -204,7 +204,7 @@ const TierBadge = ({ tier, progress, pointsToNext, compact = false }) => {
                                 }}
                             />
                         </div>
-                        <span className="text-[10px] text-white/40">{pointsToNext} to next</span>
+                        <span className="text-[10px] text-gray-400">{pointsToNext} to next</span>
                     </div>
                 )}
             </div>
@@ -234,7 +234,7 @@ const StatsDashboard = ({ stats, winRate, winStreak, modeColor }) => {
             />
 
             <div className="flex items-center justify-between mb-3">
-                <span className="text-white/50 text-xs uppercase tracking-widest">Your Stats</span>
+                <span className="text-gray-400 text-xs uppercase tracking-widest">Your Stats</span>
                 {winStreak.currentWinStreak > 0 && (
                     <div
                         className="flex items-center gap-1 px-2 py-1 rounded-full"
@@ -252,19 +252,19 @@ const StatsDashboard = ({ stats, winRate, winStreak, modeColor }) => {
             <div className="grid grid-cols-4 gap-3">
                 <div className="text-center">
                     <div className="text-2xl font-black text-white">{stats.totalWins}</div>
-                    <div className="text-[10px] text-white/40 uppercase">Wins</div>
+                    <div className="text-[10px] text-gray-400 uppercase">Wins</div>
                 </div>
                 <div className="text-center">
                     <div className="text-2xl font-black" style={{ color: modeColor }}>{winRate}%</div>
-                    <div className="text-[10px] text-white/40 uppercase">Win Rate</div>
+                    <div className="text-[10px] text-gray-400 uppercase">Win Rate</div>
                 </div>
                 <div className="text-center">
                     <div className="text-2xl font-black text-amber-400">{winStreak.bestWinStreak}</div>
-                    <div className="text-[10px] text-white/40 uppercase">Best Streak</div>
+                    <div className="text-[10px] text-gray-400 uppercase">Best Streak</div>
                 </div>
                 <div className="text-center">
                     <div className="text-2xl font-black text-purple-400">{stats.totalBattles}</div>
-                    <div className="text-[10px] text-white/40 uppercase">Battles</div>
+                    <div className="text-[10px] text-gray-400 uppercase">Battles</div>
                 </div>
             </div>
         </div>
@@ -316,7 +316,7 @@ const StreakCard = ({ streakData, nextReward, modeColor, onClaim }) => {
                         <div className="text-white font-bold">
                             {streak > 0 ? `${streak} Day Streak!` : 'Start Your Streak'}
                         </div>
-                        <div className="text-white/50 text-xs">
+                        <div className="text-gray-400 text-xs">
                             {nextReward?.claimable
                                 ? `Claim: ${nextReward.label}`
                                 : nextReward?.daysUntil
@@ -348,7 +348,7 @@ const StreakCard = ({ streakData, nextReward, modeColor, onClaim }) => {
 // ============================================
 const SeasonCountdown = ({ timeRemaining, tier }) => {
     return (
-        <div className="flex items-center gap-2 text-xs text-white/40">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
             <span>⏱️</span>
             <span>Season ends in {timeRemaining.days}d {timeRemaining.hours}h</span>
         </div>
@@ -397,7 +397,7 @@ const ErrorModal = ({ message, onRetry, onCancel, modeColor }) => (
         >
             <div className="text-6xl mb-4">😅</div>
             <h2 className="text-xl font-bold text-white mb-2">Oops!</h2>
-            <p className="text-white/60 mb-6">{message}</p>
+            <p className="text-gray-300 mb-6">{message}</p>
             <div className="flex flex-col gap-3">
                 <button
                     onClick={onRetry}
@@ -408,7 +408,7 @@ const ErrorModal = ({ message, onRetry, onCancel, modeColor }) => (
                 </button>
                 <button
                     onClick={onCancel}
-                    className="w-full py-3 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                    className="w-full py-3 rounded-xl font-medium text-gray-300 transition-all active:scale-[0.97]"
                     style={{ background: 'rgba(255,255,255,0.1)' }}
                 >
                     Go Back
@@ -446,7 +446,7 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
+                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-gray-500'
                             }`}>
                             {step.label}
                         </span>
@@ -517,10 +517,10 @@ const ArenaModeTab = ({ activeMode, onModeChange, modeColor, wardrobeCount = 0, 
                             </span>
                         )}
                         <span className="text-lg mb-0.5">{mode.emoji}</span>
-                        <span className={`text-[10px] font-bold ${activeMode === mode.id ? 'text-white' : 'text-white/50'}`}>
+                        <span className={`text-[10px] font-bold ${activeMode === mode.id ? 'text-white' : 'text-gray-400'}`}>
                             {mode.label}
                         </span>
-                        <span className="text-[8px] text-white/30">{mode.sublabel}</span>
+                        <span className="text-[8px] text-gray-500">{mode.sublabel}</span>
                     </button>
                 ))}
             </div>
@@ -819,7 +819,7 @@ export default function ArenaEntryScreen({
                     <h2 className="text-2xl font-black text-white mb-2">
                         Analyzing Your Fit
                     </h2>
-                    <p className="text-white/50 text-sm mb-8 h-5 transition-all">
+                    <p className="text-gray-400 text-sm mb-8 h-5 transition-all">
                         {ANALYSIS_TIPS[analysisTip]}
                     </p>
 
@@ -833,12 +833,12 @@ export default function ArenaEntryScreen({
                                 }}
                             />
                         </div>
-                        <p className="text-white/40 text-xs mt-2 text-center">
+                        <p className="text-gray-400 text-xs mt-2 text-center">
                             {Math.round(Math.min(100, analysisProgress))}%
                         </p>
                     </div>
 
-                    <p className="text-white/30 text-xs">
+                    <p className="text-gray-500 text-xs">
                         Tap ✕ to cancel
                     </p>
                 </div>
@@ -997,7 +997,7 @@ export default function ArenaEntryScreen({
                     >
                         Global Arena
                     </h1>
-                    <p className="text-white/50 text-base">Battle anyone in the world</p>
+                    <p className="text-gray-400 text-base">Battle anyone in the world</p>
 
                     {/* Live Stats Badges */}
                     <div className="flex items-center justify-center gap-4 mt-3">
@@ -1037,7 +1037,7 @@ export default function ArenaEntryScreen({
                     }}>
                     <span className="text-6xl mb-4 block">👕</span>
                     <h3 className="text-2xl font-black text-white mb-2">Wardrobe Wars</h3>
-                    <p className="text-white/50 mb-4">Build your 5-outfit wardrobe.<br />Best of 5 rounds. First to 3 wins!</p>
+                    <p className="text-gray-400 mb-4">Build your 5-outfit wardrobe.<br />Best of 5 rounds. First to 3 wins!</p>
                     <button
                         onClick={() => {
                             playSound?.('click')
@@ -1060,7 +1060,7 @@ export default function ArenaEntryScreen({
                     }}>
                     <span className="text-6xl mb-4 block">👑</span>
                     <h3 className="text-2xl font-black text-white mb-2">King of the Hill</h3>
-                    <p className="text-white/50 mb-4">12 thrones. 12 modes.<br />Dethrone the King. Defend your crown!</p>
+                    <p className="text-gray-400 mb-4">12 thrones. 12 modes.<br />Dethrone the King. Defend your crown!</p>
                     <div className="grid grid-cols-6 gap-2 mb-4 mx-auto w-fit">
                         {['😐', '😇', '🔥', '💀', '😏', '🎀', '🔮', '📱', '📚', '🌊', '🎪', '✨'].map((e, i) => (
                             <div key={i} className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
@@ -1135,7 +1135,7 @@ export default function ArenaEntryScreen({
                                 animation: 'shimmer 4s ease-in-out infinite'
                             }}
                         />
-                        <p className="text-white/40 text-[10px] uppercase tracking-widest mb-2 relative z-10">
+                        <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-2 relative z-10">
                             Today's Battle Mode
                         </p>
                         <div className="flex items-center gap-4 relative z-10">
@@ -1165,23 +1165,23 @@ export default function ArenaEntryScreen({
                         <div className="flex items-center gap-2 mb-3">
                             <span className="text-2xl">🏆</span>
                             <p className="text-yellow-300 font-bold">WEEKLY PRIZES</p>
-                            <span className="text-white/40 text-xs ml-auto">Distributed Monday</span>
+                            <span className="text-gray-400 text-xs ml-auto">Distributed Monday</span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="bg-white/5 rounded-lg py-2 px-1">
                                 <p className="text-yellow-400 text-lg font-black">🥇</p>
                                 <p className="text-white font-bold text-sm">25</p>
-                                <p className="text-white/40 text-[10px]">scans</p>
+                                <p className="text-gray-400 text-[10px]">scans</p>
                             </div>
                             <div className="bg-white/5 rounded-lg py-2 px-1">
                                 <p className="text-gray-300 text-lg font-black">🥈🥉</p>
                                 <p className="text-white font-bold text-sm">15</p>
-                                <p className="text-white/40 text-[10px]">scans</p>
+                                <p className="text-gray-400 text-[10px]">scans</p>
                             </div>
                             <div className="bg-white/5 rounded-lg py-2 px-1">
                                 <p className="text-amber-600 text-xs font-bold">#4-10</p>
                                 <p className="text-white font-bold text-sm">5</p>
-                                <p className="text-white/40 text-[10px]">scans</p>
+                                <p className="text-gray-400 text-[10px]">scans</p>
                             </div>
                         </div>
                     </div>
@@ -1215,7 +1215,7 @@ export default function ArenaEntryScreen({
                                 border: '1px solid rgba(255,255,255,0.08)'
                             }}
                         >
-                            <span className="text-white/40 text-xs uppercase tracking-wider">Today ({totalBattlesToday}/{ARENA_DAILY_LIMIT})</span>
+                            <span className="text-gray-400 text-xs uppercase tracking-wider">Today ({totalBattlesToday}/{ARENA_DAILY_LIMIT})</span>
                             <div className="flex items-center gap-3 text-lg font-black">
                                 <span className="text-green-400">{dailyRecord.wins}W</span>
                                 <span className="text-white/20">·</span>
@@ -1228,7 +1228,7 @@ export default function ArenaEntryScreen({
 
                     {/* Next Milestone Teaser */}
                     {nextMilestone && (
-                        <div className="w-full max-w-md flex items-center justify-center gap-2 text-white/30 text-xs mb-6">
+                        <div className="w-full max-w-md flex items-center justify-center gap-2 text-gray-500 text-xs mb-6">
                             <span>{nextMilestone.emoji}</span>
                             <span>Next: {nextMilestone.name} - {nextMilestone.description}</span>
                         </div>

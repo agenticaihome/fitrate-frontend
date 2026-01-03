@@ -176,7 +176,7 @@ export default function ChallengeResultShareCard({
                                         </div>
                                     )}
                                 </div>
-                                <span className="text-xs text-white/50 uppercase tracking-wider">Me</span>
+                                <span className="text-xs text-gray-400 uppercase tracking-wider">Me</span>
                                 <span
                                     className="text-3xl font-black"
                                     style={{ color: won || tied ? style.accent : '#fff' }}
@@ -186,7 +186,7 @@ export default function ChallengeResultShareCard({
                             </div>
 
                             {/* VS */}
-                            <div className="text-xl font-black text-white/30">VS</div>
+                            <div className="text-xl font-black text-gray-500">VS</div>
 
                             {/* Opponent score */}
                             <div className="flex flex-col items-center">
@@ -200,7 +200,7 @@ export default function ChallengeResultShareCard({
                                 >
                                     <span className="text-3xl">{lost ? '😎' : '🤷'}</span>
                                 </div>
-                                <span className="text-xs text-white/50 uppercase tracking-wider">Them</span>
+                                <span className="text-xs text-gray-400 uppercase tracking-wider">Them</span>
                                 <span
                                     className="text-3xl font-black"
                                     style={{ color: lost ? style.accent : '#fff' }}
@@ -229,7 +229,7 @@ export default function ChallengeResultShareCard({
                         </div>
 
                         {/* CTA text */}
-                        <p className="text-center text-white/60 text-sm mb-4">
+                        <p className="text-center text-gray-300 text-sm mb-4">
                             {won
                                 ? "Think you can beat me? 👀"
                                 : tied

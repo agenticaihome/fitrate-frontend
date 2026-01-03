@@ -128,7 +128,7 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHo
             </h2>
 
             {/* Message */}
-            <p className="text-white/60 text-center mb-8 max-w-xs leading-relaxed">
+            <p className="text-gray-300 text-center mb-8 max-w-xs leading-relaxed">
                 {config.message}
             </p>
 
@@ -165,8 +165,8 @@ export default function ErrorScreen({ error, errorCode, onReset, onUpgrade, onHo
                 {/* Back to Home */}
                 <button
                     onClick={() => handleAction(onHome)}
-                    className="w-full py-3 mt-2 text-sm font-medium text-white/40 
-                        transition-all active:opacity-60 hover:text-white/60"
+                    className="w-full py-3 mt-2 text-sm font-medium text-gray-400 
+                        transition-all active:opacity-60 hover:text-gray-300"
                 >
                     ← Back to Home
                 </button>

@@ -89,7 +89,7 @@ export default function ProFairUseModal({ isOpen, onClose }) {
                     </h2>
 
                     {/* Subheadline - celebratory */}
-                    <p className="text-white/60 mb-6">
+                    <p className="text-gray-300 mb-6">
                         You're officially a power user 💪
                     </p>
 
@@ -104,7 +104,7 @@ export default function ProFairUseModal({ isOpen, onClose }) {
                         <p className="text-white/80 text-sm">
                             Fresh scans unlock at midnight
                         </p>
-                        <p className="text-white/50 text-xs mt-1">
+                        <p className="text-gray-400 text-xs mt-1">
                             ~{hoursLeft} hour{hoursLeft !== 1 ? 's' : ''} to go
                         </p>
                     </div>

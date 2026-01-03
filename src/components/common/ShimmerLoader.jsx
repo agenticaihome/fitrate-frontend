@@ -66,9 +66,14 @@ export const TextBlockLoader = ({ lines = 3 }) => (
 
 // Full screen loader
 export const FullScreenLoader = ({ emoji = '✨', message = 'Loading...' }) => (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-        <span className="text-5xl animate-pulse mb-4">{emoji}</span>
-        <p className="text-white/50 text-sm animate-pulse">{message}</p>
+    <div
+        className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900"
+        role="status"
+        aria-live="polite"
+        aria-label={message}
+    >
+        <span className="text-5xl animate-pulse mb-4" aria-hidden="true">{emoji}</span>
+        <p className="text-gray-400 text-sm animate-pulse">{message}</p>
     </div>
 )
 

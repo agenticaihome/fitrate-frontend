@@ -286,10 +286,10 @@ export default function BattleShareCard({
                                         <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>
                                     )}
                                 </div>
-                                <div className="text-xs text-white/50 mb-1">You</div>
+                                <div className="text-xs text-gray-400 mb-1">You</div>
                                 {scoresRecalculated && userOriginalScore != null ? (
                                     <div className="flex flex-col items-center">
-                                        <div className="flex items-center gap-1 text-xs text-white/40">
+                                        <div className="flex items-center gap-1 text-xs text-gray-400">
                                             <span>{Math.round(userOriginalScore)}</span>
                                             <span>→</span>
                                         </div>
@@ -311,7 +311,7 @@ export default function BattleShareCard({
                             {/* VS Badge */}
                             <div className="flex-shrink-0">
                                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                                    <span className="text-sm font-black text-white/60">VS</span>
+                                    <span className="text-sm font-black text-gray-300">VS</span>
                                 </div>
                             </div>
 
@@ -330,10 +330,10 @@ export default function BattleShareCard({
                                         <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>
                                     )}
                                 </div>
-                                <div className="text-xs text-white/50 mb-1">Opponent</div>
+                                <div className="text-xs text-gray-400 mb-1">Opponent</div>
                                 {scoresRecalculated && opponentOriginalScore != null ? (
                                     <div className="flex flex-col items-center">
-                                        <div className="flex items-center gap-1 text-xs text-white/40">
+                                        <div className="flex items-center gap-1 text-xs text-gray-400">
                                             <span>{Math.round(opponentOriginalScore)}</span>
                                             <span>→</span>
                                         </div>
@@ -355,7 +355,7 @@ export default function BattleShareCard({
 
                         {/* Score Recalculation Note */}
                         {scoresRecalculated && (
-                            <div className="text-[9px] text-white/30 text-center mb-2 italic">
+                            <div className="text-[9px] text-gray-500 text-center mb-2 italic">
                                 Scores recalculated for head-to-head comparison
                             </div>
                         )}
@@ -380,7 +380,7 @@ export default function BattleShareCard({
                             <div className="bg-white/5 rounded-xl p-3 mb-3">
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm">🤖</span>
-                                    <span className="text-[10px] text-white/40 uppercase tracking-wider">AI Judge</span>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">AI Judge</span>
                                 </div>
                                 <p className="text-xs text-white/80 leading-relaxed">
                                     "{battleCommentary}"
@@ -392,9 +392,9 @@ export default function BattleShareCard({
                         <div className="flex items-center justify-between pt-3 border-t border-white/10">
                             <div className="flex items-center gap-2">
                                 <img src="/logo.svg" alt="" className="h-5 opacity-60" />
-                                <span className="text-[10px] text-white/40 font-medium">FitRate.app</span>
+                                <span className="text-[10px] text-gray-400 font-medium">FitRate.app</span>
                             </div>
-                            <span className="text-[10px] text-white/30">
+                            <span className="text-[10px] text-gray-500">
                                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
                         </div>

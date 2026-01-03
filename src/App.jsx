@@ -75,7 +75,7 @@ const LoadingFallback = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
     <div className="text-center">
       <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-      <p className="text-white/60 text-sm">Loading...</p>
+      <p className="text-gray-300 text-sm">Loading...</p>
     </div>
   </div>
 )
@@ -2419,13 +2419,13 @@ export default function App() {
               <>
                 <span className="text-3xl block mb-2">⚡</span>
                 <p className="text-emerald-400 font-bold">You're a Pro!</p>
-                <p className="text-white/50 text-xs mt-1">Unlimited scans • All modes</p>
+                <p className="text-gray-400 text-xs mt-1">Unlimited scans • All modes</p>
               </>
             ) : (
               <>
                 <span className="text-3xl block mb-2">🔓</span>
                 <p className="text-white/70 font-medium">Free Account</p>
-                <p className="text-white/40 text-xs mt-1">{scansRemaining} scans/day</p>
+                <p className="text-gray-400 text-xs mt-1">{scansRemaining} scans/day</p>
               </>
             )}
           </div>
@@ -2433,13 +2433,13 @@ export default function App() {
           {/* Restore Purchase */}
           {!isPro && (
             <div className="mb-6">
-              <p className="text-white/50 text-sm text-center mb-3">Already purchased Pro?</p>
+              <p className="text-gray-400 text-sm text-center mb-3">Already purchased Pro?</p>
               <input
                 type="email"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 placeholder="Enter purchase email"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-500/50 mb-3"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500/50 mb-3"
               />
               <button
                 onClick={async () => {
@@ -2476,7 +2476,7 @@ export default function App() {
           {/* Close */}
           <button
             onClick={() => setShowRestoreModal(false)}
-            className="w-full py-3 text-white/50 font-medium"
+            className="w-full py-3 text-gray-400 font-medium"
           >
             ← Back
           </button>

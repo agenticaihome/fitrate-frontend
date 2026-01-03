@@ -66,7 +66,7 @@ export default function FashionShowInvite({
                 <h1 className="text-3xl font-black text-white mb-2">
                     Show Created!
                 </h1>
-                <p className="text-white/50">
+                <p className="text-gray-400">
                     "{showData?.name}" is ready
                 </p>
             </div>
@@ -74,7 +74,7 @@ export default function FashionShowInvite({
             {/* Invite Card */}
             <div className="w-full max-w-sm bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 mb-6">
                 <div className="text-center mb-6">
-                    <p className="text-white/60 text-sm mb-4">Scan to join:</p>
+                    <p className="text-gray-300 text-sm mb-4">Scan to join:</p>
 
                     {/* QR Code */}
                     <div className="flex justify-center mb-4">
@@ -90,7 +90,7 @@ export default function FashionShowInvite({
                         />
                     </div>
 
-                    <p className="text-white/40 text-xs mb-3">or share this link:</p>
+                    <p className="text-gray-400 text-xs mb-3">or share this link:</p>
                     <div
                         onClick={copyLink}
                         className="bg-black/30 rounded-xl p-4 cursor-pointer active:bg-black/50 transition-colors"
@@ -128,7 +128,7 @@ export default function FashionShowInvite({
             </div>
 
             {/* Show Info */}
-            <div className="w-full max-w-sm flex items-center justify-center gap-3 text-white/50 text-sm mb-8">
+            <div className="w-full max-w-sm flex items-center justify-center gap-3 text-gray-400 text-sm mb-8">
                 <span className="px-3 py-1 rounded-full bg-white/10">
                     {showData?.vibeLabel || (showData?.vibe === 'roast' ? 'Roast 🔥' : showData?.vibe === 'nice' ? 'Nice 😇' : showData?.vibe) || 'Nice 😇'}
                 </span>

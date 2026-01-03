@@ -192,7 +192,7 @@ export default function ChallengesScreen({
                                 <div className="text-center mb-2">
                                     <span className="text-5xl block mb-3">⚡</span>
                                     <h2 className="text-2xl font-black text-white mb-1">Daily Challenge</h2>
-                                    <p className="text-white/60 text-sm">Get the highest score today!</p>
+                                    <p className="text-gray-300 text-sm">Get the highest score today!</p>
                                 </div>
 
                                 {/* Today's Mode Card - Rotating daily mode! */}
@@ -204,13 +204,13 @@ export default function ChallengesScreen({
                                         <div className="flex items-center gap-3">
                                             <span className="text-3xl">{todayMode.emoji}</span>
                                             <div>
-                                                <p className="text-xs text-white/50 uppercase tracking-wider">Today's Mode</p>
+                                                <p className="text-xs text-gray-400 uppercase tracking-wider">Today's Mode</p>
                                                 <p className="font-black text-lg" style={{ color: modeColors.text }}>{todayMode.label}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white/40 text-[10px]">Changes daily</p>
-                                            <p className="text-xs text-white/50">{todayMode.desc}</p>
+                                            <p className="text-gray-400 text-[10px]">Changes daily</p>
+                                            <p className="text-xs text-gray-400">{todayMode.desc}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -225,29 +225,29 @@ export default function ChallengesScreen({
                                         <p className="text-yellow-300 font-bold">PRIZES</p>
                                         <div className="ml-auto text-right">
                                             <p className="text-yellow-400 font-bold text-sm">{dailyTimeRemaining}</p>
-                                            <p className="text-white/40 text-[10px]">until reset</p>
+                                            <p className="text-gray-400 text-[10px]">until reset</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-4 gap-2 text-center">
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-yellow-400 text-lg font-black">🥇</p>
                                             <p className="text-white font-bold text-sm">10</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-gray-300 text-lg font-black">🥈🥉</p>
                                             <p className="text-white font-bold text-sm">5</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-amber-600 text-xs font-bold">#4-10</p>
                                             <p className="text-white font-bold text-sm">2</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
-                                            <p className="text-white/60 text-xs font-bold">Top 25%</p>
+                                            <p className="text-gray-300 text-xs font-bold">Top 25%</p>
                                             <p className="text-white font-bold text-sm">1</p>
-                                            <p className="text-white/40 text-[10px]">scan</p>
+                                            <p className="text-gray-400 text-[10px]">scan</p>
                                         </div>
                                     </div>
                                 </div>
@@ -275,7 +275,7 @@ export default function ChallengesScreen({
                                         </div>
                                     </div>
                                     <div className="mt-3 pt-3 border-t border-white/10">
-                                        <p className="text-white/40 text-xs text-center">
+                                        <p className="text-gray-400 text-xs text-center">
                                             🎮 FREE for everyone • Your best score counts! • Resets at midnight
                                         </p>
                                     </div>
@@ -298,7 +298,7 @@ export default function ChallengesScreen({
                                     ENTER DAILY CHALLENGE
                                 </button>
                                 <div>
-                                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                                         <span>📊</span> Today's Rankings
                                     </h3>
                                     {dailyLeaderboard.length === 0 ? (
@@ -307,8 +307,8 @@ export default function ChallengesScreen({
                                             border: '1px dashed rgba(255,255,255,0.1)'
                                         }}>
                                             <span className="text-4xl block mb-2">🌅</span>
-                                            <p className="text-white/50">No fits rated today yet</p>
-                                            <p className="text-white/30 text-sm">Be the first to compete!</p>
+                                            <p className="text-gray-400">No fits rated today yet</p>
+                                            <p className="text-gray-500 text-sm">Be the first to compete!</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
@@ -386,7 +386,7 @@ export default function ChallengesScreen({
                                             <div className="flex items-center justify-center gap-2 mb-2">
                                                 <span className="text-2xl">{isTop10 ? '🏆' : isTop25 ? '⭐' : '📊'}</span>
                                                 <span className="text-white font-bold text-2xl">#{userDailyRank}</span>
-                                                <span className="text-white/50 text-sm">of {totalParticipants}</span>
+                                                <span className="text-gray-400 text-sm">of {totalParticipants}</span>
                                             </div>
 
                                             {/* Top 25% Celebration */}
@@ -402,7 +402,7 @@ export default function ChallengesScreen({
                                                     <span className={`font-bold text-sm ${isTop10 ? 'text-yellow-400' : 'text-emerald-400'}`}>
                                                         {isTop10 ? 'TOP 10' : 'TOP 25%'}
                                                     </span>
-                                                    <span className="text-white/60 text-xs">
+                                                    <span className="text-gray-300 text-xs">
                                                         +{isTop10 ? '2' : '1'} scan{isTop10 ? 's' : ''} earned!
                                                     </span>
                                                 </div>
@@ -410,7 +410,7 @@ export default function ChallengesScreen({
 
                                             {/* Encouragement for non-qualifiers */}
                                             {!isTop25 && (
-                                                <p className="text-white/50 text-xs mt-1">
+                                                <p className="text-gray-400 text-xs mt-1">
                                                     {Math.ceil(userDailyRank - top25Cutoff)} spots to Top 25% prize!
                                                 </p>
                                             )}
@@ -427,7 +427,7 @@ export default function ChallengesScreen({
                             <div className="text-center py-12">
                                 <span className="text-6xl block mb-4">🏆</span>
                                 <h2 className="text-xl font-bold mb-2">No Active Challenge</h2>
-                                <p className="text-white/50">Check back soon for the next weekly theme!</p>
+                                <p className="text-gray-400">Check back soon for the next weekly theme!</p>
                             </div>
                         ) : (
                             <>
@@ -435,7 +435,7 @@ export default function ChallengesScreen({
                                 <div className="text-center mb-2">
                                     <span className="text-5xl block mb-3">{currentEvent.themeEmoji || '🏆'}</span>
                                     <h2 className="text-2xl font-black text-white mb-1">{currentEvent.theme}</h2>
-                                    <p className="text-white/60 text-sm">This week's theme</p>
+                                    <p className="text-gray-300 text-sm">This week's theme</p>
                                 </div>
 
                                 {/* PRIZES Card - Weekly rewards! */}
@@ -449,7 +449,7 @@ export default function ChallengesScreen({
                                         {currentEvent.endDate && (
                                             <div className="ml-auto text-right">
                                                 <p className="text-yellow-400 font-bold text-sm">{formatTimeRemaining(new Date(currentEvent.endDate).getTime() - Date.now())}</p>
-                                                <p className="text-white/40 text-[10px]">remaining</p>
+                                                <p className="text-gray-400 text-[10px]">remaining</p>
                                             </div>
                                         )}
                                     </div>
@@ -457,22 +457,22 @@ export default function ChallengesScreen({
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-yellow-400 text-lg font-black">🥇</p>
                                             <p className="text-white font-bold text-sm">50</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-gray-300 text-lg font-black">🥈🥉</p>
                                             <p className="text-white font-bold text-sm">25</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
                                             <p className="text-amber-600 text-xs font-bold">#4-10</p>
                                             <p className="text-white font-bold text-sm">10</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                         <div className="bg-white/5 rounded-lg py-2 px-1">
-                                            <p className="text-white/60 text-xs font-bold">Top 25%</p>
+                                            <p className="text-gray-300 text-xs font-bold">Top 25%</p>
                                             <p className="text-white font-bold text-sm">3</p>
-                                            <p className="text-white/40 text-[10px]">scans</p>
+                                            <p className="text-gray-400 text-[10px]">scans</p>
                                         </div>
                                     </div>
                                 </div>
@@ -504,7 +504,7 @@ export default function ChallengesScreen({
                                         </div>
                                     </div>
                                     <div className="mt-3 pt-3 border-t border-white/10">
-                                        <p className="text-white/40 text-xs text-center">
+                                        <p className="text-gray-400 text-xs text-center">
                                             🎮 1 entry per week
                                         </p>
                                     </div>
@@ -532,12 +532,12 @@ export default function ChallengesScreen({
                                     <div className="bg-cyan-900/20 border border-cyan-500/30 p-4 rounded-xl">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className="text-white/50 text-xs">Your Best Score</p>
+                                                <p className="text-gray-400 text-xs">Your Best Score</p>
                                                 <p className="text-cyan-400 font-black text-2xl">{userEventStatus.bestScore}</p>
                                             </div>
                                             {userEventStatus.rank && (
                                                 <div className="text-right">
-                                                    <p className="text-white/50 text-xs">Current Rank</p>
+                                                    <p className="text-gray-400 text-xs">Current Rank</p>
                                                     <p className="text-white font-bold text-2xl">#{userEventStatus.rank}</p>
                                                 </div>
                                             )}
@@ -547,7 +547,7 @@ export default function ChallengesScreen({
 
                                 {/* Leaderboard */}
                                 <div>
-                                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                                         <span>📊</span> Leaderboard
                                     </h3>
                                     {weeklyLeaderboard.length === 0 ? (
@@ -555,8 +555,8 @@ export default function ChallengesScreen({
                                             background: 'rgba(255,255,255,0.02)',
                                             border: '1px dashed rgba(255,255,255,0.1)'
                                         }}>
-                                            <p className="text-white/50">No entries yet</p>
-                                            <p className="text-white/30 text-sm">Be the first to compete!</p>
+                                            <p className="text-gray-400">No entries yet</p>
+                                            <p className="text-gray-500 text-sm">Be the first to compete!</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
@@ -610,7 +610,7 @@ export default function ChallengesScreen({
                                     {weeklyLeaderboard.length > 0 && onShowFullLeaderboard && (
                                         <button
                                             onClick={() => { playSound('click'); vibrate(10); onShowFullLeaderboard(); }}
-                                            className="w-full text-center py-3 text-white/40 text-xs mt-2"
+                                            className="w-full text-center py-3 text-gray-400 text-xs mt-2"
                                         >
                                             View all {currentEvent?.totalParticipants || weeklyLeaderboard.length} participants →
                                         </button>

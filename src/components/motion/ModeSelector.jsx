@@ -186,7 +186,7 @@ export default function ModeSelector({
               transition={{ delay: 0.1 }}
             >
               <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
-              <p className="text-white/50 text-sm">How should we rate your fit?</p>
+              <p className="text-gray-400 text-sm">How should we rate your fit?</p>
             </motion.div>
 
             {/* Mode Grid with stagger */}
@@ -223,7 +223,7 @@ export default function ModeSelector({
             {/* Cancel */}
             <motion.button
               onClick={onClose}
-              className="w-full py-2 text-white/40 text-sm font-medium"
+              className="w-full py-2 text-gray-400 text-sm font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
@@ -272,7 +272,7 @@ export function ModePill({ mode, onClick }) {
         {modeData.emoji}
       </motion.span>
       <span className="text-white font-semibold">{modeData.label}</span>
-      <span className="text-white/50 text-sm">• Change ▼</span>
+      <span className="text-gray-400 text-sm">• Change ▼</span>
     </motion.button>
   )
 }

@@ -69,7 +69,7 @@ const ProgressSteps = ({ currentStep, modeColor }) => {
                         >
                             {i < currentStep ? '✓' : step.icon}
                         </div>
-                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-white/30'
+                        <span className={`text-[9px] mt-0.5 transition-all ${i <= currentStep ? 'text-white/80' : 'text-gray-500'
                             }`}>
                             {step.label}
                         </span>
@@ -347,7 +347,7 @@ export default function ArenaQueueScreen({
                         No Opponents Found
                     </h1>
 
-                    <p className="text-white/50 mb-8 text-lg">
+                    <p className="text-gray-400 mb-8 text-lg">
                         The arena is quiet right now. Try again or challenge a friend directly!
                     </p>
 
@@ -369,7 +369,7 @@ export default function ArenaQueueScreen({
 
                         <button
                             onClick={handleCancel}
-                            className="w-full py-4 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                            className="w-full py-4 rounded-xl font-medium text-gray-300 transition-all active:scale-[0.97]"
                             style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
                         >
                             Back to Home
@@ -429,7 +429,7 @@ export default function ArenaQueueScreen({
                         OPPONENT FOUND!
                     </h1>
 
-                    <p className="text-white/60">Get ready to battle...</p>
+                    <p className="text-gray-300">Get ready to battle...</p>
                 </div>
 
                 <style>{`
@@ -528,7 +528,7 @@ export default function ArenaQueueScreen({
                 <h2 className="text-xl font-black text-white mb-1">
                     {status === 'joining' ? 'Entering Arena...' : 'Finding Opponent...'}
                 </h2>
-                <p className="text-white/50 text-sm mb-4 h-5">
+                <p className="text-gray-400 text-sm mb-4 h-5">
                     {status === 'queued' ? SEARCH_MESSAGES[searchMessage] : 'Connecting to arena...'}
                 </p>
 
@@ -551,7 +551,7 @@ export default function ArenaQueueScreen({
                                 </div>
                             )}
                         </div>
-                        <p className="text-white/60 text-[10px] mt-1">{getDisplayName() || 'You'}</p>
+                        <p className="text-gray-300 text-[10px] mt-1">{getDisplayName() || 'You'}</p>
                         <p className="font-black text-base" style={{ color: modeColor }}>
                             {Math.round(score)}
                         </p>
@@ -572,8 +572,8 @@ export default function ArenaQueueScreen({
                     {/* Opponent silhouette */}
                     <div className="flex flex-col items-center">
                         <OpponentSilhouette color={modeColor} />
-                        <p className="text-white/40 text-[10px] mt-1">???</p>
-                        <p className="font-black text-base text-white/30">??</p>
+                        <p className="text-gray-400 text-[10px] mt-1">???</p>
+                        <p className="font-black text-base text-gray-500">??</p>
                     </div>
                 </div>
 
@@ -621,7 +621,7 @@ export default function ArenaQueueScreen({
                         <span className="text-xl font-black text-white">
                             {formatWait(waitTime)}
                         </span>
-                        <span className="text-white/40 text-[10px]">
+                        <span className="text-gray-400 text-[10px]">
                             {timeoutProgress > 75 ? 'Almost done...' : 'Searching'}
                         </span>
                     </div>
@@ -630,7 +630,7 @@ export default function ArenaQueueScreen({
                 {/* Cancel Button */}
                 <button
                     onClick={handleCancel}
-                    className="w-full max-w-xs py-3 rounded-xl font-medium text-white/60 transition-all active:scale-[0.97]"
+                    className="w-full max-w-xs py-3 rounded-xl font-medium text-gray-300 transition-all active:scale-[0.97]"
                     style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
                 >
                     Cancel

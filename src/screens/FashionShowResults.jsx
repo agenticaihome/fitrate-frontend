@@ -108,17 +108,17 @@ export default function FashionShowResults({
 
             {/* Header */}
             <div className="pt-safe px-4 py-4 flex items-center justify-between">
-                <button onClick={() => { playSound('click'); onBack?.(); }} className="text-white/60 text-sm">
+                <button onClick={() => { playSound('click'); onBack?.(); }} className="text-gray-300 text-sm">
                     ← Back
                 </button>
-                <span className="text-white/40 text-sm">Final Results</span>
+                <span className="text-gray-400 text-sm">Final Results</span>
             </div>
 
             {/* Show Name */}
             <div className="text-center px-4 mb-6">
                 <div className="text-4xl mb-2">🏁</div>
                 <h1 className="text-2xl font-black text-white mb-1">{showData?.name}</h1>
-                <p className="text-white/50 text-sm">Fashion Show Complete!</p>
+                <p className="text-gray-400 text-sm">Fashion Show Complete!</p>
             </div>
 
             {/* Winner Spotlight */}
@@ -171,7 +171,7 @@ export default function FashionShowResults({
                                     </div>
                                 )}
                                 <p className="text-white font-bold text-sm truncate">{second.nickname}</p>
-                                <p className="text-white/60 text-lg font-bold">{second.score?.toFixed(1)}</p>
+                                <p className="text-gray-300 text-lg font-bold">{second.score?.toFixed(1)}</p>
                             </div>
                         )}
 
@@ -187,7 +187,7 @@ export default function FashionShowResults({
                                     </div>
                                 )}
                                 <p className="text-white font-bold text-sm truncate">{third.nickname}</p>
-                                <p className="text-white/60 text-lg font-bold">{third.score?.toFixed(1)}</p>
+                                <p className="text-gray-300 text-lg font-bold">{third.score?.toFixed(1)}</p>
                             </div>
                         )}
                     </div>
@@ -213,21 +213,21 @@ export default function FashionShowResults({
             {/* Full Scoreboard */}
             {scoreboard.length > 3 && (
                 <div className="px-4 mb-6 flex-1 overflow-y-auto">
-                    <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-2">All Results</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">All Results</h3>
                     <div className="space-y-2">
                         {scoreboard.slice(3).map((entry, idx) => (
                             <div
                                 key={entry.userId}
                                 className={`p-3 rounded-xl flex items-center gap-3 ${entry.userId === userId ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-white/5'}`}
                             >
-                                <span className="w-8 text-center text-white/50 font-bold">#{idx + 4}</span>
+                                <span className="w-8 text-center text-gray-400 font-bold">#{idx + 4}</span>
                                 {entry.imageThumb ? (
                                     <img src={entry.imageThumb} alt="" className="w-10 h-10 rounded-lg object-cover" />
                                 ) : (
                                     <span className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl">{entry.emoji}</span>
                                 )}
                                 <span className="flex-1 text-white font-medium truncate">{entry.nickname}</span>
-                                <span className="text-white/60 font-bold">{entry.score?.toFixed(1)}</span>
+                                <span className="text-gray-300 font-bold">{entry.score?.toFixed(1)}</span>
                             </div>
                         ))}
                     </div>

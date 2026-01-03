@@ -225,7 +225,7 @@ export default function MeetTheJudges({ onBack, onSelectMode }) {
                                         >
                                             {judge.name}
                                         </h3>
-                                        <span className="text-sm text-white/60 uppercase tracking-wider">
+                                        <span className="text-sm text-gray-300 uppercase tracking-wider">
                                             {judge.id} mode
                                         </span>
                                     </div>

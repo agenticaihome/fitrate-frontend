@@ -156,7 +156,7 @@ const ThroneCard = ({ throne, king, isMyThrone, onChallenge, playSound, vibrate 
                 <div className="flex-1 min-w-0">
                     <h3 className="text-white font-bold text-sm truncate">{throne.name}</h3>
                     {hasKing ? (
-                        <p className="text-white/50 text-xs truncate">
+                        <p className="text-gray-400 text-xs truncate">
                             {isMyThrone ? 'Defend your crown!' : `${king.displayName || 'Anonymous'}`}
                         </p>
                     ) : (
@@ -169,10 +169,10 @@ const ThroneCard = ({ throne, king, isMyThrone, onChallenge, playSound, vibrate 
                     {hasKing && king.defenses > 0 ? (
                         <div className="text-center">
                             <span className="text-white/80 text-sm font-bold">{king.defenses}</span>
-                            <p className="text-white/30 text-[8px]">defenses</p>
+                            <p className="text-gray-500 text-[8px]">defenses</p>
                         </div>
                     ) : (
-                        <span className="text-white/30 text-lg">→</span>
+                        <span className="text-gray-500 text-lg">→</span>
                     )}
                 </div>
             </div>
@@ -233,7 +233,7 @@ export default function ThroneRoom({
 
                 <div className="text-center">
                     <h1 className="text-xl font-black text-white">👑 Throne Room</h1>
-                    <p className="text-white/50 text-xs">12 Thrones • {vacantCount} Vacant</p>
+                    <p className="text-gray-400 text-xs">12 Thrones • {vacantCount} Vacant</p>
                 </div>
 
                 <div className="w-11" />
@@ -253,7 +253,7 @@ export default function ThroneRoom({
                             <span className="text-3xl">👑</span>
                             <div>
                                 <h3 className="text-white font-bold">You are King!</h3>
-                                <p className="text-white/50 text-xs">
+                                <p className="text-gray-400 text-xs">
                                     Ruling {myThrones.length} throne{myThrones.length > 1 ? 's' : ''}: {myThrones.map(t => t.emoji).join(' ')}
                                 </p>
                             </div>
@@ -271,7 +271,7 @@ export default function ThroneRoom({
                         border: '1px solid rgba(255,255,255,0.1)'
                     }}
                 >
-                    <p className="text-white/60 text-sm">
+                    <p className="text-gray-300 text-sm">
                         <span className="text-green-400">🏆 Vacant</span> = Claim it instantly! &nbsp;
                         <span className="text-yellow-400">👑 Occupied</span> = Battle the King!
                     </p>
@@ -300,17 +300,17 @@ export default function ThroneRoom({
                 <div className="flex items-center justify-center gap-6 text-center">
                     <div>
                         <span className="text-2xl font-black text-white">{myThrones.length}</span>
-                        <p className="text-white/50 text-xs">Your Crowns</p>
+                        <p className="text-gray-400 text-xs">Your Crowns</p>
                     </div>
                     <div className="w-px h-8 bg-white/20" />
                     <div>
                         <span className="text-2xl font-black text-white">{12 - vacantCount}</span>
-                        <p className="text-white/50 text-xs">Total Kings</p>
+                        <p className="text-gray-400 text-xs">Total Kings</p>
                     </div>
                     <div className="w-px h-8 bg-white/20" />
                     <div>
                         <span className="text-2xl font-black text-green-400">{vacantCount}</span>
-                        <p className="text-white/50 text-xs">Up for Grabs</p>
+                        <p className="text-gray-400 text-xs">Up for Grabs</p>
                     </div>
                 </div>
             </div>

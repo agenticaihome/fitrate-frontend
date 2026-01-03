@@ -260,10 +260,16 @@ export default function AnalyzingScreen({
     ]
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative" style={{
-            background: 'radial-gradient(ellipse at center, #12121f 0%, #0a0a0f 100%)',
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
-        }}>
+        <div
+            className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
+            role="status"
+            aria-live="polite"
+            aria-label={`Analyzing your outfit. ${Math.round(progress)}% complete. ${currentCopy}`}
+            style={{
+                background: 'radial-gradient(ellipse at center, #12121f 0%, #0a0a0f 100%)',
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif"
+            }}
+        >
             {/* Background Glow with breathing effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Primary glow */}
@@ -392,7 +398,7 @@ export default function AnalyzingScreen({
                         }}>
                             {Math.round(progress)}%
                         </span>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300 flex items-center gap-2">
                             <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: accent }} />
                             Analyzing
                         </span>
@@ -459,11 +465,12 @@ export default function AnalyzingScreen({
                             onBack()
                         }
                     }}
-                    className="mt-6 px-6 py-3 rounded-full text-sm font-medium transition-all active:scale-95 glass-premium"
+                    className="mt-6 px-6 py-3 min-h-[44px] rounded-full text-sm font-medium transition-all active:scale-95 glass-premium focus-visible:ring-2 focus-visible:ring-cyan-400"
                     style={{
-                        color: 'rgba(255,255,255,0.5)',
-                        border: '1px solid rgba(255,255,255,0.1)'
+                        color: 'rgba(255,255,255,0.7)',
+                        border: '1px solid rgba(255,255,255,0.15)'
                     }}
+                    aria-label="Cancel outfit analysis"
                 >
                     ✕ Cancel
                 </button>

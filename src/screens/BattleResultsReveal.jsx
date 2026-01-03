@@ -816,7 +816,7 @@ export default function BattleResultsReveal({
                             BATTLE RESULTS
                         </h1>
                         <div
-                            className="mt-4 text-white/50 text-sm tracking-wider"
+                            className="mt-4 text-gray-400 text-sm tracking-wider"
                             style={{ animation: 'pulse-glow-intense 0.8s ease-in-out infinite 0.2s' }}
                         >
                             Calculating winner...
@@ -940,8 +940,8 @@ export default function BattleResultsReveal({
                                         {scoresRecalculated && originalCreatorScore != null ? (
                                             <div className="flex flex-col items-center">
                                                 <div className="flex items-center gap-1.5 mb-1">
-                                                    <span className="text-lg text-white/50">{Math.round(originalCreatorScore)}</span>
-                                                    <span className="text-sm text-white/30">→</span>
+                                                    <span className="text-lg text-gray-400">{Math.round(originalCreatorScore)}</span>
+                                                    <span className="text-sm text-gray-500">→</span>
                                                 </div>
                                                 <AnimatedScore
                                                     targetScore={Math.round(creatorScore)}
@@ -956,7 +956,7 @@ export default function BattleResultsReveal({
                                                 isWinner={creatorWon}
                                             />
                                         )}
-                                        <div className="text-xs text-white/40 mt-1">/100</div>
+                                        <div className="text-xs text-gray-400 mt-1">/100</div>
                                     </div>
                                 )}
                             </div>
@@ -1076,8 +1076,8 @@ export default function BattleResultsReveal({
                                         {scoresRecalculated && originalResponderScore != null ? (
                                             <div className="flex flex-col items-center">
                                                 <div className="flex items-center gap-1.5 mb-1">
-                                                    <span className="text-lg text-white/50">{Math.round(originalResponderScore)}</span>
-                                                    <span className="text-sm text-white/30">→</span>
+                                                    <span className="text-lg text-gray-400">{Math.round(originalResponderScore)}</span>
+                                                    <span className="text-sm text-gray-500">→</span>
                                                 </div>
                                                 <AnimatedScore
                                                     targetScore={Math.round(responderScore)}
@@ -1094,7 +1094,7 @@ export default function BattleResultsReveal({
                                                 isWinner={responderWon}
                                             />
                                         )}
-                                        <div className="text-xs text-white/40 mt-1">/100</div>
+                                        <div className="text-xs text-gray-400 mt-1">/100</div>
                                     </div>
                                 )}
                             </div>
@@ -1103,7 +1103,7 @@ export default function BattleResultsReveal({
                         {/* Score Recalculation Explanation */}
                         {phase >= 3 && scoresRecalculated && (
                             <p
-                                className="text-xs text-white/40 text-center mb-4 px-4 italic"
+                                className="text-xs text-gray-400 text-center mb-4 px-4 italic"
                                 style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}
                             >
                                 When outfits are compared head-to-head, the AI re-evaluates them against each other
@@ -1144,7 +1144,7 @@ export default function BattleResultsReveal({
                                         {/* AI Judge Header */}
                                         <div className="flex items-center justify-center gap-2 mb-3">
                                             <span className="text-lg">🤖</span>
-                                            <span className="text-xs font-bold text-white/50 uppercase tracking-wider">AI Judge Says</span>
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">AI Judge Says</span>
                                         </div>
 
                                         {/* Battle Commentary */}
@@ -1174,13 +1174,13 @@ export default function BattleResultsReveal({
                                             <div className="grid grid-cols-2 gap-3 mt-4">
                                                 {battleData?.outfit1Verdict && (
                                                     <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                        <div className="text-[10px] text-white/40 mb-1">{isCreator ? 'You' : 'Them'}</div>
+                                                        <div className="text-[10px] text-gray-400 mb-1">{isCreator ? 'You' : 'Them'}</div>
                                                         <div className="text-xs text-white/70">{battleData.outfit1Verdict}</div>
                                                     </div>
                                                 )}
                                                 {battleData?.outfit2Verdict && (
                                                     <div className="text-center p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                                                        <div className="text-[10px] text-white/40 mb-1">{isCreator ? 'Them' : 'You'}</div>
+                                                        <div className="text-[10px] text-gray-400 mb-1">{isCreator ? 'Them' : 'You'}</div>
                                                         <div className="text-xs text-white/70">{battleData.outfit2Verdict}</div>
                                                     </div>
                                                 )}

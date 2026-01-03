@@ -25,7 +25,9 @@ export default function LoadingSkeleton({ type = 'screen' }) {
 
                 {/* Loading text */}
                 <div
-                    className="text-white/60 font-medium"
+                    className="text-gray-300 font-medium"
+                    role="status"
+                    aria-live="polite"
                     style={{
                         animation: 'fade-pulse 1.5s ease-in-out infinite'
                     }}

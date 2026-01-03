@@ -56,19 +56,20 @@ class ErrorBoundary extends React.Component {
                     </h1>
 
                     {/* Message */}
-                    <p className="text-white/60 text-center mb-8 max-w-xs">
+                    <p className="text-gray-300 text-center mb-8 max-w-xs">
                         Don't worry, your data is safe. Let's get you back on track.
                     </p>
 
                     {/* Recovery Button */}
                     <button
                         onClick={this.handleReset}
-                        className="px-8 py-4 rounded-2xl font-bold text-lg transition-all active:scale-95"
+                        className="px-8 py-4 min-h-[48px] rounded-2xl font-bold text-lg transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
                         style={{
                             background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                             color: '#000',
                             boxShadow: '0 4px 20px rgba(0,212,255,0.3)'
                         }}
+                        aria-label="Try again and reload the application"
                     >
                         Try Again 🔄
                     </button>

@@ -352,7 +352,7 @@ export default function FashionShowHub({
                 <div className="absolute top-safe left-0 right-0 p-4 text-center">
                     <div className="inline-block px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
                         <span className="text-white font-bold">🎭 {showData.name}</span>
-                        <span className="text-white/60 ml-2 text-sm">{showData.vibeLabel}</span>
+                        <span className="text-gray-300 ml-2 text-sm">{showData.vibeLabel}</span>
                     </div>
                 </div>
 
@@ -417,10 +417,10 @@ export default function FashionShowHub({
 
             {/* Header */}
             <div className="pt-safe px-4 py-4 flex items-center justify-between">
-                <button onClick={() => { playSound('click'); onBack?.(); }} className="text-white/60 text-sm">
+                <button onClick={() => { playSound('click'); onBack?.(); }} className="text-gray-300 text-sm">
                     ← Exit
                 </button>
-                <button onClick={() => { playSound('click'); onShare?.(); }} className="text-white/60 text-sm">
+                <button onClick={() => { playSound('click'); onShare?.(); }} className="text-gray-300 text-sm">
                     Share 📤
                 </button>
             </div>
@@ -451,14 +451,14 @@ export default function FashionShowHub({
             <div className="px-4 text-center mb-4">
                 <h1 className="text-2xl font-black text-white mb-1">🎭 {showData.name}</h1>
                 <div className="flex items-center justify-center gap-3 text-sm">
-                    <span className="px-3 py-1 rounded-full bg-white/10 text-white/60">{showData.vibeLabel}</span>
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-gray-300">{showData.vibeLabel}</span>
                     {showData.familySafe && <span className="text-green-400 text-xs">Family Safe ✅</span>}
                 </div>
                 {/* Participant counter - creates FOMO */}
                 {(scoreboard.length > 0 || showData?.maxParticipants) && (
                     <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                         <span className="text-purple-400 font-bold">{scoreboard.length} {scoreboard.length === 1 ? 'friend' : 'friends'}</span>
-                        <span className="text-white/40">competing</span>
+                        <span className="text-gray-400">competing</span>
                         {showData?.maxParticipants && (
                             <span className={`text-sm px-2 py-0.5 rounded-full ${scoreboard.length >= showData.maxParticipants ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
                                 {scoreboard.length >= showData.maxParticipants
@@ -472,7 +472,7 @@ export default function FashionShowHub({
                     </div>
                 )}
                 {canStillWalk && (
-                    <div className="mt-2 text-white/40 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
+                    <div className="mt-2 text-gray-400 text-sm">⏰ {formatTime(timeRemaining)} remaining</div>
                 )}
             </div>
 
@@ -481,7 +481,7 @@ export default function FashionShowHub({
                 {!hasJoined && canStillWalk ? (
                     // Show join form only if show is still active AND has time remaining
                     <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                        <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                        <label className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 block">
                             Your Name
                         </label>
                         <input
@@ -490,7 +490,7 @@ export default function FashionShowHub({
                             onChange={(e) => setNickname(e.target.value)}
                             placeholder="Enter your name"
                             maxLength={20}
-                            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-white/30 focus:outline-none focus:border-purple-500 mb-4"
+                            className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-gray-500 focus:outline-none focus:border-purple-500 mb-4"
                         />
 
                         {/* Quick emoji picker */}
@@ -513,7 +513,7 @@ export default function FashionShowHub({
                             onClick={handleJoin}
                             disabled={loading || !nickname.trim()}
                             className={`w-full py-4 rounded-2xl font-black text-lg transition-all ${loading || !nickname.trim()
-                                ? 'bg-white/10 text-white/30'
+                                ? 'bg-white/10 text-gray-500'
                                 : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white active:scale-[0.98]'
                                 }`}
                         >
@@ -534,14 +534,14 @@ export default function FashionShowHub({
                         disabled={!canWalk}
                         className={`w-full py-6 rounded-3xl font-black text-xl flex flex-col items-center justify-center gap-1 transition-all ${canWalk
                             ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
-                            : 'bg-white/10 text-white/30'
+                            : 'bg-white/10 text-gray-500'
                             }`}
                     >
                         {walksUsed > 0 ? (
                             <>
                                 <span className="text-3xl">✅</span>
                                 <span>You've Walked!</span>
-                                {userRank > 0 && <span className="text-sm font-normal text-white/60">You're #{userRank}</span>}
+                                {userRank > 0 && <span className="text-sm font-normal text-gray-300">You're #{userRank}</span>}
                             </>
                         ) : timeRemaining <= 0 ? (
                             <>
@@ -552,7 +552,7 @@ export default function FashionShowHub({
                             <>
                                 <span className="text-3xl">📸</span>
                                 <span>Snap Your Fit</span>
-                                <span className="text-sm font-normal text-white/60">Take a photo to compete</span>
+                                <span className="text-sm font-normal text-gray-300">Take a photo to compete</span>
                             </>
                         )}
                     </button>
@@ -562,8 +562,8 @@ export default function FashionShowHub({
             {/* Scoreboard */}
             <div className="px-4 flex-1 overflow-y-auto pb-8">
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-black text-white/60 uppercase tracking-widest">📊 Scoreboard</h2>
-                    <span className="text-xs text-white/40">{scoreboard.length} entries</span>
+                    <h2 className="text-sm font-black text-gray-300 uppercase tracking-widest">📊 Scoreboard</h2>
+                    <span className="text-xs text-gray-400">{scoreboard.length} entries</span>
                 </div>
 
                 {scoreboardLoading && scoreboard.length === 0 ? (
@@ -611,7 +611,7 @@ export default function FashionShowHub({
                                                 disabled={userReactions.has(entry.userId) || reactingTo === entry.userId}
                                                 className={`flex items-center gap-1 px-2 py-1 rounded-lg text-sm transition-all ${userReactions.has(entry.userId)
                                                     ? 'bg-orange-500/20 text-orange-400'
-                                                    : 'bg-white/5 text-white/50 hover:bg-orange-500/20 hover:text-orange-400 active:scale-95'
+                                                    : 'bg-white/5 text-gray-400 hover:bg-orange-500/20 hover:text-orange-400 active:scale-95'
                                                     }`}
                                                 style={{
                                                     transform: reactingTo === entry.userId ? 'scale(1.2)' : 'scale(1)',
@@ -689,7 +689,7 @@ export default function FashionShowHub({
                             {/* Cancel Button */}
                             <button
                                 onClick={() => setShowAndroidPhotoModal(false)}
-                                className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                                className="w-full py-3 text-gray-400 text-sm font-medium mt-2"
                             >
                                 Cancel
                             </button>

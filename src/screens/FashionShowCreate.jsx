@@ -134,7 +134,7 @@ export default function FashionShowCreate({
                         vibrate(20)
                         onBack()
                     }}
-                    className="text-white/60 text-sm flex items-center gap-1"
+                    className="text-gray-300 text-sm flex items-center gap-1"
                 >
                     ← Back
                 </button>
@@ -147,35 +147,43 @@ export default function FashionShowCreate({
                     <h1 className="text-3xl font-black text-white mb-2">
                         Start a Fashion Show ✨
                     </h1>
-                    <p className="text-white/50 text-sm">
+                    <p className="text-gray-400 text-sm">
                         Create a private runway for friends & family
                     </p>
                 </div>
 
                 {/* Show Name */}
                 <div className="mb-6">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                    <label htmlFor="showName" className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 block">
                         Show Name
                     </label>
                     <input
+                        id="showName"
                         type="text"
                         value={showName}
                         onChange={(e) => setShowName(e.target.value)}
                         placeholder="Friday Night Fits"
                         maxLength={50}
-                        className="w-full px-4 py-4 rounded-2xl bg-white/10 border border-white/20 text-white text-lg font-semibold placeholder:text-white/30 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30"
+                        aria-describedby="showNameHint showNameError"
+                        aria-invalid={error ? "true" : "false"}
+                        className="w-full px-4 py-4 rounded-2xl bg-white/10 border border-white/20 text-white text-lg font-semibold placeholder:text-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 focus-visible:ring-2 focus-visible:ring-cyan-400"
                     />
-                    <p className="text-xs text-white/40 mt-1 text-right">
+                    <p id="showNameHint" className="text-xs text-gray-400 mt-1 text-right">
                         {showName.length}/50
                     </p>
+                    {error && (
+                        <p id="showNameError" className="text-xs text-red-400 mt-1" role="alert" aria-live="polite">
+                            {error}
+                        </p>
+                    )}
                 </div>
 
                 {/* Vibe/AI Mode Selector */}
                 <div className="mb-6">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                    <label className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 block">
                         AI Mode
                     </label>
-                    <p className="text-xs text-white/40 mb-3">Everyone in the show gets rated in this mode</p>
+                    <p className="text-xs text-gray-400 mb-3">Everyone in the show gets rated in this mode</p>
                     <div className="grid grid-cols-4 gap-2">
                         {VIBES.map((v) => {
                             const isLocked = v.proOnly && !isPro
@@ -209,7 +217,7 @@ export default function FashionShowCreate({
 
                 {/* Duration */}
                 <div className="mb-6">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                    <label className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 block">
                         Duration
                     </label>
                     <div className="flex gap-3">
@@ -225,7 +233,7 @@ export default function FashionShowCreate({
                                     }}
                                     className={`flex-1 py-3 px-4 rounded-xl border transition-all ${isSelected
                                         ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
-                                        : 'border-white/20 bg-white/5 text-white/60'
+                                        : 'border-white/20 bg-white/5 text-gray-300'
                                         }`}
                                 >
                                     {d.label}
@@ -237,10 +245,10 @@ export default function FashionShowCreate({
 
                 {/* Max Participants */}
                 <div className="mb-6">
-                    <label className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2 block">
+                    <label className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-2 block">
                         Max Participants
                     </label>
-                    <p className="text-xs text-white/40 mb-3">Show ends automatically when full (leave empty for unlimited)</p>
+                    <p className="text-xs text-gray-400 mb-3">Show ends automatically when full (leave empty for unlimited)</p>
                     <div className="flex items-center gap-3">
                         <input
                             type="number"
@@ -252,7 +260,7 @@ export default function FashionShowCreate({
                             placeholder="Unlimited"
                             min="2"
                             max="100"
-                            className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-white/30 focus:outline-none focus:border-purple-500 text-center text-lg"
+                            className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold placeholder:text-gray-500 focus:outline-none focus:border-purple-500 text-center text-lg"
                         />
                         <button
                             onClick={() => {
@@ -262,7 +270,7 @@ export default function FashionShowCreate({
                             }}
                             className={`py-3 px-4 rounded-xl border transition-all ${maxParticipants === 0
                                 ? 'border-purple-500 bg-purple-500/20 text-white font-bold'
-                                : 'border-white/20 bg-white/5 text-white/60'
+                                : 'border-white/20 bg-white/5 text-gray-300'
                                 }`}
                         >
                             ∞ Unlimited
@@ -273,25 +281,29 @@ export default function FashionShowCreate({
                 {/* Family Safe Toggle */}
                 <div className="mb-8">
                     <button
+                        role="switch"
+                        aria-checked={familySafe}
+                        aria-label="Family Safe Mode - Clean humor only, great for all ages"
                         onClick={() => {
                             setFamilySafe(!familySafe)
                             playSound('click')
                             vibrate(15)
                         }}
-                        className="w-full p-4 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-between"
+                        className="w-full p-4 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-between focus-visible:ring-2 focus-visible:ring-cyan-400"
                     >
                         <div>
                             <div className="text-white font-semibold flex items-center gap-2">
                                 Family Safe Mode
-                                {familySafe && <span className="text-green-400 text-sm">✅</span>}
+                                {familySafe && <span className="text-green-400 text-sm" aria-hidden="true">✅</span>}
                             </div>
-                            <div className="text-xs text-white/50">
+                            <div className="text-xs text-gray-400">
                                 Clean humor only — great for all ages
                             </div>
                         </div>
                         <div
                             className={`w-12 h-7 rounded-full transition-all flex items-center px-1 ${familySafe ? 'bg-green-500' : 'bg-white/20'
                                 }`}
+                            aria-hidden="true"
                         >
                             <div
                                 className={`w-5 h-5 rounded-full bg-white transition-transform ${familySafe ? 'translate-x-5' : 'translate-x-0'
@@ -313,7 +325,7 @@ export default function FashionShowCreate({
                     onClick={handleCreate}
                     disabled={loading || !showName.trim()}
                     className={`w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 transition-all ${loading || !showName.trim()
-                        ? 'bg-white/10 text-white/30'
+                        ? 'bg-white/10 text-gray-500'
                         : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 active:scale-[0.98]'
                         }`}
                 >

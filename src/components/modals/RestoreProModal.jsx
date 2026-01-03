@@ -199,7 +199,7 @@ export default function RestoreProModal({ onClose, userId, onRestoreSuccess }) {
                         {/* Email Form */}
                         <form onSubmit={handleRestore}>
                             <div className="mb-4">
-                                <label className="block text-sm text-white/60 mb-2">
+                                <label className="block text-sm text-gray-300 mb-2">
                                     Email used at checkout
                                 </label>
                                 <input
@@ -248,15 +248,15 @@ export default function RestoreProModal({ onClose, userId, onRestoreSuccess }) {
                         </button>
 
                         {/* Security note */}
-                        <p className="text-[10px] text-white/30 text-center mt-4">
+                        <p className="text-[10px] text-gray-500 text-center mt-4">
                             🔒 We'll restore your Pro status and any purchased scans
                         </p>
 
                         {/* Legal links */}
                         <div className="flex items-center justify-center gap-3 text-white/20 text-[10px] mt-3">
-                            <a href="/terms" target="_blank" className="hover:text-white/40 transition-colors underline">Terms</a>
+                            <a href="/terms" target="_blank" className="hover:text-gray-400 transition-colors underline">Terms</a>
                             <span>•</span>
-                            <a href="/privacy" target="_blank" className="hover:text-white/40 transition-colors underline">Privacy</a>
+                            <a href="/privacy" target="_blank" className="hover:text-gray-400 transition-colors underline">Privacy</a>
                         </div>
                     </>
                 )}

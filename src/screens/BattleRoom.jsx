@@ -301,7 +301,7 @@ export default function BattleRoom({
             <div className="min-h-screen flex flex-col items-center justify-center px-4"
                 style={{ background: 'linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%)' }}>
                 <div className="text-7xl animate-pulse mb-4">⚔️</div>
-                <p className="text-white/60 text-lg">Loading Battle...</p>
+                <p className="text-gray-300 text-lg">Loading Battle...</p>
             </div>
         )
     }
@@ -316,7 +316,7 @@ export default function BattleRoom({
                 <div className="absolute top-safe left-0 right-0 p-4 text-center">
                     <div className="inline-block px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
                         <span className="text-white font-bold">⚔️ Battle Mode</span>
-                        <span className="text-white/60 ml-2 text-sm">{getModeEmoji(battleMode)} {getModeLabel(battleMode)}</span>
+                        <span className="text-gray-300 ml-2 text-sm">{getModeEmoji(battleMode)} {getModeLabel(battleMode)}</span>
                     </div>
                 </div>
 
@@ -348,7 +348,7 @@ export default function BattleRoom({
 
                 <div className="text-8xl mb-6">⏰</div>
                 <h1 className="text-3xl font-black text-red-400 mb-2">Battle Expired</h1>
-                <p className="text-white/50 text-lg mb-8 max-w-xs">
+                <p className="text-gray-400 text-lg mb-8 max-w-xs">
                     This battle has ended. Start a new one!
                 </p>
 
@@ -431,14 +431,14 @@ export default function BattleRoom({
                                 <span className="text-4xl">{isCreator ? '👤' : '🎯'}</span>
                             )}
                         </div>
-                        <span className="text-sm text-white/50 font-bold uppercase tracking-wider mb-1">
+                        <span className="text-sm text-gray-400 font-bold uppercase tracking-wider mb-1">
                             {isCreator ? 'You' : 'Challenger'}
                         </span>
                         {scoresRecalculated && originalCreatorScore != null ? (
                             <div className="flex flex-col items-center">
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-lg text-white/50">{Math.round(originalCreatorScore)}</span>
-                                    <span className="text-sm text-white/30">→</span>
+                                    <span className="text-lg text-gray-400">{Math.round(originalCreatorScore)}</span>
+                                    <span className="text-sm text-gray-500">→</span>
                                     <span className="text-3xl font-black" style={{ color: creatorWon ? winColor : '#fff' }}>
                                         {Math.round(creatorScore)}
                                     </span>
@@ -451,7 +451,7 @@ export default function BattleRoom({
                         )}
                     </div>
 
-                    <div className="text-2xl font-black text-white/30">VS</div>
+                    <div className="text-2xl font-black text-gray-500">VS</div>
 
                     {/* Responder */}
                     <div className="flex flex-col items-center">
@@ -467,14 +467,14 @@ export default function BattleRoom({
                                 <span className="text-4xl">{isCreator ? '🎯' : '👤'}</span>
                             )}
                         </div>
-                        <span className="text-sm text-white/50 font-bold uppercase tracking-wider mb-1">
+                        <span className="text-sm text-gray-400 font-bold uppercase tracking-wider mb-1">
                             {isCreator ? 'Opponent' : 'You'}
                         </span>
                         {scoresRecalculated && originalResponderScore != null ? (
                             <div className="flex flex-col items-center">
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-lg text-white/50">{Math.round(originalResponderScore)}</span>
-                                    <span className="text-sm text-white/30">→</span>
+                                    <span className="text-lg text-gray-400">{Math.round(originalResponderScore)}</span>
+                                    <span className="text-sm text-gray-500">→</span>
                                     <span className="text-3xl font-black" style={{ color: responderWon ? winColor : '#fff' }}>
                                         {Math.round(responderScore)}
                                     </span>
@@ -491,7 +491,7 @@ export default function BattleRoom({
                 {/* Score Recalculation Explanation */}
                 {scoresRecalculated && (
                     <p
-                        className="text-xs text-white/40 text-center mb-4 px-4 italic max-w-xs"
+                        className="text-xs text-gray-400 text-center mb-4 px-4 italic max-w-xs"
                         style={{
                             opacity: revealed ? 1 : 0,
                             transition: 'opacity 0.5s ease-out 0.4s'
@@ -562,14 +562,14 @@ export default function BattleRoom({
 
             {/* Header with countdown */}
             <div className="flex items-center justify-between py-4 relative z-10">
-                <button onClick={() => { playSound('click'); onHome?.(); }} className="text-white/50 text-sm font-medium">
+                <button onClick={() => { playSound('click'); onHome?.(); }} className="text-gray-400 text-sm font-medium">
                     ← Exit
                 </button>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20">
                     <span className="text-lg">⏰</span>
                     <span className="text-sm font-bold text-white/80">{formatTime(timeRemaining)}</span>
                 </div>
-                <button onClick={() => { playSound('click'); onShare?.(); }} className="text-white/50 text-sm font-medium">
+                <button onClick={() => { playSound('click'); onShare?.(); }} className="text-gray-400 text-sm font-medium">
                     Share 📤
                 </button>
             </div>
@@ -599,7 +599,7 @@ export default function BattleRoom({
                         <p className="text-lg text-white/80 leading-relaxed">
                             Your friend scored <strong className="text-white">{Math.round(creatorScore)}</strong> points.
                             <br />
-                            <span className="text-white/60">Take a photo of your outfit to battle!</span>
+                            <span className="text-gray-300">Take a photo of your outfit to battle!</span>
                         </p>
                     </div>
                 )}
@@ -620,7 +620,7 @@ export default function BattleRoom({
                                 <span className="text-2xl">{isCreator ? '👤' : '🎯'}</span>
                             )}
                         </div>
-                        <p className="text-xs text-white/40 uppercase tracking-wider mb-1">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
                             {isCreator ? 'Your Score' : 'Their Score'}
                         </p>
                         <p className="text-4xl font-black" style={{ color: battlePurple }}>
@@ -629,7 +629,7 @@ export default function BattleRoom({
                     </div>
 
                     {/* VS */}
-                    <div className="text-xl font-black text-white/30">VS</div>
+                    <div className="text-xl font-black text-gray-500">VS</div>
 
                     {/* Responder slot */}
                     <div className="flex-1 bg-white/5 rounded-2xl p-5 border border-dashed border-white/20">
@@ -637,10 +637,10 @@ export default function BattleRoom({
                             style={{ background: 'rgba(255,255,255,0.05)', border: '3px dashed rgba(255,255,255,0.2)' }}>
                             <span className="text-2xl">❓</span>
                         </div>
-                        <p className="text-xs text-white/40 uppercase tracking-wider mb-1">
+                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
                             {isCreator ? 'Opponent' : 'Your Score'}
                         </p>
-                        <p className="text-2xl font-black text-white/30">
+                        <p className="text-2xl font-black text-gray-500">
                             ???
                         </p>
                     </div>
@@ -652,7 +652,7 @@ export default function BattleRoom({
                         <>
                             {/* Creator waiting - with forfeit countdown */}
                             <div className="text-center py-3">
-                                <p className="text-white/50 text-sm mb-2">
+                                <p className="text-gray-400 text-sm mb-2">
                                     ⏳ Waiting for someone to accept...
                                 </p>
                                 {/* P2.5: Show forfeit countdown */}
@@ -666,7 +666,7 @@ export default function BattleRoom({
                                         </p>
                                     ) : null
                                 })()}
-                                <p className="text-white/30 text-xs mt-1">
+                                <p className="text-gray-500 text-xs mt-1">
                                     {loading ? '🔄 Checking...' : 'Auto-refreshing every 10 seconds'}
                                 </p>
                             </div>
@@ -736,7 +736,7 @@ export default function BattleRoom({
                                 </button>
                             )}
 
-                            <p className="text-center text-white/40 text-sm">
+                            <p className="text-center text-gray-400 text-sm">
                                 {recentPhoto ? 'Or take a new outfit photo' : 'Take a photo and see who wins!'}
                             </p>
                         </>
@@ -781,7 +781,7 @@ export default function BattleRoom({
                                 Upload Photo
                             </button>
                             <button onClick={() => setShowAndroidPhotoModal(false)}
-                                className="w-full py-3 text-white/50 text-sm font-medium mt-2">
+                                className="w-full py-3 text-gray-400 text-sm font-medium mt-2">
                                 Cancel
                             </button>
                         </div>
