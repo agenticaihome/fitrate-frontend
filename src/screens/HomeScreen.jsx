@@ -531,19 +531,19 @@ export default function HomeScreen({
     // Background Camera Preview (Snapchat-style)
     // ==========================================
     useEffect(() => {
-        // Only start on desktop/web - skip on mobile for performance
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-        if (isMobile || !bgCameraEnabled) return
+        if (!bgCameraEnabled) return
 
         let stream = null
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
         const startBgCamera = async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'user', // Front camera
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
+                        // Lower resolution on mobile for battery
+                        width: { ideal: isMobile ? 480 : 640 },
+                        height: { ideal: isMobile ? 360 : 480 }
                     },
                     audio: false
                 })
