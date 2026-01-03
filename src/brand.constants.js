@@ -85,12 +85,26 @@ export const BUTTONS = {
 // ============================================
 export const PAYWALL = {
     headline: 'Unlock Unlimited Scans',
-    subheadline: 'All 12 AI judges included!',
+    subheadline: 'All 12 AI judges + unlimited everything!',
+    // Free tier limits (for display)
+    freeTier: {
+        scans: '2/day',
+        arenaBattles: '5/day',
+        aiModes: '6 judges',
+        weeklyEvents: '1/week',
+    },
+    // Pro tier benefits (for display)
+    proTier: {
+        scans: 'Unlimited',
+        arenaBattles: 'Unlimited',
+        aiModes: 'All 12 judges',
+        weeklyEvents: 'Unlimited',
+    },
     benefits: [
-        '2 FREE scans/day (resets midnight)',
-        'All 12 AI personalities',
-        'Scans never expire',
-        'Instant access',
+        'Unlimited scans (no daily limit)',
+        'All 12 AI personalities unlocked',
+        'Unlimited arena battles',
+        'Unlimited event entries',
     ],
     reassurance: '🔐 Secure · Instant access',
     outOfScans: 'You\'ve been busy! Get more scans to keep the fits coming 🔥',
