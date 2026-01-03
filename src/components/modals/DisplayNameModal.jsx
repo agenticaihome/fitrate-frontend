@@ -152,15 +152,19 @@ export default function DisplayNameModal({ onSubmit, onClose, userId }) {
 
                 {/* Input */}
                 <div className="mb-4">
+                    <label htmlFor="displayName" className="sr-only">Display Name</label>
                     <div className="relative">
                         <input
+                            id="displayName"
                             type="text"
                             value={name}
                             onChange={handleInputChange}
                             placeholder="Enter display name..."
                             maxLength={15}
                             autoFocus
-                            className="w-full px-4 py-4 rounded-xl text-white text-lg font-semibold placeholder-white/30 transition-all focus:outline-none"
+                            aria-describedby={error ? "displayNameError" : "displayNameHint"}
+                            aria-invalid={error ? "true" : "false"}
+                            className="w-full px-4 py-4 rounded-xl text-white text-lg font-semibold placeholder-gray-500 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                             style={{
                                 background: 'rgba(255,255,255,0.08)',
                                 border: error ? '2px solid #ef4444' : '2px solid rgba(0,212,255,0.3)',
@@ -168,14 +172,14 @@ export default function DisplayNameModal({ onSubmit, onClose, userId }) {
                             }}
                             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/40">
+                        <div id="displayNameHint" className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
                             {name.length}/15
                         </div>
                     </div>
 
                     {/* Error message */}
                     {error && (
-                        <p className="text-red-400 text-xs mt-2 pl-1">{error}</p>
+                        <p id="displayNameError" className="text-red-400 text-xs mt-2 pl-1" role="alert" aria-live="polite">{error}</p>
                     )}
 
                     {/* Randomize button */}
@@ -217,7 +221,7 @@ export default function DisplayNameModal({ onSubmit, onClose, userId }) {
                 )}
 
                 {/* Privacy note */}
-                <p className="text-[10px] text-white/30 text-center mt-4">
+                <p className="text-[10px] text-gray-500 text-center mt-4">
                     ✨ Your name is visible to other players
                 </p>
             </div>

@@ -135,7 +135,7 @@ const OutfitSlot = ({ index, outfit, onAdd, onRemove, isActive, color }) => {
                     >
                         <span className="text-2xl">+</span>
                     </div>
-                    <span className="text-white/40 text-xs">Add Fit #{index + 1}</span>
+                    <span className="text-gray-400 text-xs">Add Fit #{index + 1}</span>
                 </button>
             )}
         </div>
@@ -332,7 +332,7 @@ export default function WardrobeSetup({
 
                 <div className="text-center">
                     <h1 className="text-xl font-black text-white">Build Your Wardrobe</h1>
-                    <p className="text-white/50 text-xs">{filledCount}/5 outfits added</p>
+                    <p className="text-gray-400 text-xs">{filledCount}/5 outfits added</p>
                 </div>
 
                 <div className="w-11" /> {/* Spacer */}
@@ -361,7 +361,7 @@ export default function WardrobeSetup({
                     }}
                 >
                     <span className="text-3xl block mb-2">👕</span>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-gray-300 text-sm">
                         Upload your <span className="text-white font-bold">5 best outfits</span>.<br />
                         You'll battle opponents in a Best of 5 showdown!
                     </p>
@@ -386,7 +386,7 @@ export default function WardrobeSetup({
                     <span className="text-lg">📁</span>
                     <span className="text-white">Select All 5 Photos</span>
                 </button>
-                <p className="text-white/40 text-xs text-center mt-2">
+                <p className="text-gray-400 text-xs text-center mt-2">
                     Or tap individual slots below
                 </p>
             </div>
@@ -426,7 +426,7 @@ export default function WardrobeSetup({
                 <button
                     onClick={handleContinue}
                     disabled={!isComplete || isUploading}
-                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98] ${isComplete ? 'text-black' : 'text-white/50'
+                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all active:scale-[0.98] ${isComplete ? 'text-black' : 'text-gray-400'
                         }`}
                     style={{
                         background: isComplete

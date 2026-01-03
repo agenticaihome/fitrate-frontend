@@ -149,7 +149,7 @@ export default function BattleScreen({
                     <span className="text-sm font-bold text-white/80">{getModeLabel(battleMode)} Mode</span>
                 </div>
 
-                <p className="text-white/60 mb-8 max-w-xs">
+                <p className="text-gray-300 mb-8 max-w-xs">
                     {isCreator
                         ? "Waiting for someone to accept your battle..."
                         : "Scan your outfit to complete the battle!"
@@ -158,13 +158,13 @@ export default function BattleScreen({
 
                 {/* Creator's Score */}
                 <div className="bg-white/5 rounded-2xl p-6 mb-8 w-full max-w-xs">
-                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
                         {isCreator ? 'Your Score' : 'Their Score'}
                     </p>
                     <p className="text-5xl font-black" style={{ color: waitingColor }}>
                         {Math.round(creatorScore)}
                     </p>
-                    <p className="text-xs text-white/30 mt-2">
+                    <p className="text-xs text-gray-500 mt-2">
                         {formatTimeAgo(battleData?.createdAt)}
                     </p>
                 </div>
@@ -172,14 +172,14 @@ export default function BattleScreen({
                 {/* VS Divider */}
                 <div className="flex items-center gap-4 mb-8 w-full max-w-xs">
                     <div className="flex-1 h-px bg-white/10" />
-                    <span className="text-white/30 font-bold">VS</span>
+                    <span className="text-gray-500 font-bold">VS</span>
                     <div className="flex-1 h-px bg-white/10" />
                 </div>
 
                 {/* Waiting indicator */}
                 <div className="bg-white/5 rounded-2xl p-6 mb-8 w-full max-w-xs border border-dashed border-white/20">
                     <p className="text-4xl mb-2">🤷</p>
-                    <p className="text-white/40">
+                    <p className="text-gray-400">
                         {isCreator ? 'Waiting for opponent...' : 'Your score goes here'}
                     </p>
                 </div>
@@ -314,7 +314,7 @@ export default function BattleScreen({
                 {userWon ? 'YOU WON!' : userLost ? 'YOU LOST' : "IT'S A TIE!"}
             </h1>
 
-            <p className="text-white/50 text-sm mb-6" style={{
+            <p className="text-gray-400 text-sm mb-6" style={{
                 opacity: revealed ? 1 : 0,
                 transition: 'opacity 0.5s ease-out 0.3s'
             }}>
@@ -350,14 +350,14 @@ export default function BattleScreen({
                             <span className="text-3xl">{isCreator ? '👤' : '🤷'}</span>
                         )}
                     </div>
-                    <span className="text-xs text-white/50 uppercase tracking-wider">
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">
                         {isCreator ? 'You' : 'Them'}
                     </span>
                     {scoresRecalculated && originalCreatorScore != null ? (
                         <div className="flex flex-col items-center">
                             <div className="flex items-center gap-1.5">
-                                <span className="text-sm text-white/50">{Math.round(originalCreatorScore)}</span>
-                                <span className="text-xs text-white/30">→</span>
+                                <span className="text-sm text-gray-400">{Math.round(originalCreatorScore)}</span>
+                                <span className="text-xs text-gray-500">→</span>
                                 <span
                                     className="text-2xl font-black"
                                     style={{ color: creatorWon ? winColor : '#fff' }}
@@ -377,7 +377,7 @@ export default function BattleScreen({
                 </div>
 
                 {/* VS */}
-                <div className="text-xl font-black text-white/30">VS</div>
+                <div className="text-xl font-black text-gray-500">VS</div>
 
                 {/* Responder Score */}
                 <div className="flex flex-col items-center">
@@ -399,14 +399,14 @@ export default function BattleScreen({
                             <span className="text-3xl">{isCreator ? '🤷' : '👤'}</span>
                         )}
                     </div>
-                    <span className="text-xs text-white/50 uppercase tracking-wider">
+                    <span className="text-xs text-gray-400 uppercase tracking-wider">
                         {isCreator ? 'Them' : 'You'}
                     </span>
                     {scoresRecalculated && originalResponderScore != null ? (
                         <div className="flex flex-col items-center">
                             <div className="flex items-center gap-1.5">
-                                <span className="text-sm text-white/50">{Math.round(originalResponderScore)}</span>
-                                <span className="text-xs text-white/30">→</span>
+                                <span className="text-sm text-gray-400">{Math.round(originalResponderScore)}</span>
+                                <span className="text-xs text-gray-500">→</span>
                                 <span
                                     className="text-2xl font-black"
                                     style={{ color: responderWon ? winColor : '#fff' }}
@@ -429,7 +429,7 @@ export default function BattleScreen({
             {/* Score Recalculation Explanation */}
             {scoresRecalculated && (
                 <p
-                    className="text-xs text-white/40 text-center mb-4 px-4 italic max-w-xs"
+                    className="text-xs text-gray-400 text-center mb-4 px-4 italic max-w-xs"
                     style={{
                         opacity: revealed ? 1 : 0,
                         transition: 'opacity 0.5s ease-out 0.4s'

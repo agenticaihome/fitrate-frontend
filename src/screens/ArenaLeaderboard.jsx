@@ -94,7 +94,7 @@ const LeaderboardRow = ({ rank, name, points, tier, isCurrentUser, modeColor }) 
             <div className="flex-1 min-w-0">
                 <div className={`font-bold truncate ${isCurrentUser ? 'text-white' : 'text-white/80'}`}>
                     {name}
-                    {isCurrentUser && <span className="ml-1 text-xs text-white/40">(You)</span>}
+                    {isCurrentUser && <span className="ml-1 text-xs text-gray-400">(You)</span>}
                 </div>
             </div>
 
@@ -109,7 +109,7 @@ const LeaderboardRow = ({ rank, name, points, tier, isCurrentUser, modeColor }) 
             {/* Points */}
             <div className="text-right">
                 <div className="font-black text-white">{points.toLocaleString()}</div>
-                <div className="text-[10px] text-white/40">pts</div>
+                <div className="text-[10px] text-gray-400">pts</div>
             </div>
         </div>
     )
@@ -163,16 +163,16 @@ const TierProgressCard = ({ tierData, seasonData, modeColor }) => {
                     </span>
                     <div>
                         <div className="font-black text-white text-lg">{tier.name}</div>
-                        <div className="text-xs text-white/50">{seasonData.points} points</div>
+                        <div className="text-xs text-gray-400">{seasonData.points} points</div>
                     </div>
                 </div>
 
                 {nextTier && (
                     <div className="text-right">
-                        <div className="text-xs text-white/40">Next tier</div>
+                        <div className="text-xs text-gray-400">Next tier</div>
                         <div className="flex items-center gap-1">
                             <span className="text-lg">{nextTier.emoji}</span>
-                            <span className="text-xs text-white/60">{pointsToNext} pts</span>
+                            <span className="text-xs text-gray-300">{pointsToNext} pts</span>
                         </div>
                     </div>
                 )}
@@ -192,7 +192,7 @@ const TierProgressCard = ({ tierData, seasonData, modeColor }) => {
             )}
 
             {!nextTier && (
-                <div className="text-center text-sm text-white/50 mt-2">
+                <div className="text-center text-sm text-gray-400 mt-2">
                     🏆 Maximum tier reached!
                 </div>
             )}
@@ -206,7 +206,7 @@ const TierProgressCard = ({ tierData, seasonData, modeColor }) => {
 const MilestonesSection = ({ unlockedMilestones, allMilestones }) => {
     return (
         <div className="space-y-2">
-            <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">
                 Achievements ({unlockedMilestones.length}/{allMilestones.length})
             </h3>
             <div className="grid grid-cols-3 gap-2">
@@ -249,7 +249,7 @@ const SeasonRewardsPreview = ({ tierData }) => {
 
     return (
         <div className="space-y-2">
-            <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-3">
+            <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">
                 Season Rewards
             </h3>
             {rewards.map((r, i) => {
@@ -263,7 +263,7 @@ const SeasonRewardsPreview = ({ tierData }) => {
                         <span className="text-xl">{r.emoji}</span>
                         <div className="flex-1">
                             <div className="text-sm font-medium text-white/80">{r.tier}</div>
-                            <div className="text-xs text-white/50">{r.reward}</div>
+                            <div className="text-xs text-gray-400">{r.reward}</div>
                         </div>
                         {isAchieved && <span className="text-green-400 text-sm">✓</span>}
                     </div>
@@ -430,7 +430,7 @@ export default function ArenaLeaderboard({
                 </div>
 
                 {/* Season Timer */}
-                <div className="flex items-center justify-center gap-2 text-sm text-white/50 mb-4">
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-400 mb-4">
                     <span>⏱️</span>
                     <span>Season ends in {timeRemaining.days}d {timeRemaining.hours}h</span>
                 </div>
@@ -473,7 +473,7 @@ export default function ArenaLeaderboard({
                         >
                             <span className="text-lg mr-2">🏆</span>
                             <span className="text-yellow-300 font-bold text-sm">WEEKLY PRIZES</span>
-                            <span className="text-white/60 text-xs ml-2">🥇25 • 🥈🥉15 • Top 10: 5 scans</span>
+                            <span className="text-gray-300 text-xs ml-2">🥇25 • 🥈🥉15 • Top 10: 5 scans</span>
                         </div>
 
                         {/* Your Progress Card */}
@@ -490,25 +490,25 @@ export default function ArenaLeaderboard({
                         >
                             <div className="text-center">
                                 <div className="text-lg font-black text-white">{stats.totalWins}</div>
-                                <div className="text-[10px] text-white/40">Wins</div>
+                                <div className="text-[10px] text-gray-400">Wins</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-lg font-black" style={{ color: modeColor }}>{winRate}%</div>
-                                <div className="text-[10px] text-white/40">Rate</div>
+                                <div className="text-[10px] text-gray-400">Rate</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-lg font-black text-amber-400">#{userRank}</div>
-                                <div className="text-[10px] text-white/40">Rank</div>
+                                <div className="text-[10px] text-gray-400">Rank</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-lg font-black text-purple-400">{stats.totalBattles}</div>
-                                <div className="text-[10px] text-white/40">Battles</div>
+                                <div className="text-[10px] text-gray-400">Battles</div>
                             </div>
                         </div>
 
                         {/* Leaderboard */}
                         <div className="space-y-2">
-                            <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider">
+                            <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">
                                 Top Players
                             </h3>
                             {loading ? (
@@ -520,7 +520,7 @@ export default function ArenaLeaderboard({
                                 >
                                     <div className="text-4xl mb-3">🏆</div>
                                     <div className="text-white/80 font-bold mb-1">Be the first!</div>
-                                    <div className="text-white/50 text-sm">No battles yet this season. Start competing to claim the top spot!</div>
+                                    <div className="text-gray-400 text-sm">No battles yet this season. Start competing to claim the top spot!</div>
                                 </div>
                             ) : (
                                 leaderboardData.slice(0, 5).map((player, i) => (

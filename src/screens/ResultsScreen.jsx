@@ -222,7 +222,7 @@ const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay
                             {eventInfo.theme}
                         </h2>
                         {eventInfo?.themeDescription && (
-                            <p className="text-sm text-white/60 italic">
+                            <p className="text-sm text-gray-300 italic">
                                 "{eventInfo.themeDescription}"
                             </p>
                         )}
@@ -269,7 +269,7 @@ const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay
                     <div className="flex items-center justify-around">
                         {/* Score */}
                         <div className="flex flex-col items-center">
-                            <span className="text-xs uppercase tracking-wider text-white/50 mb-1">Your Score</span>
+                            <span className="text-xs uppercase tracking-wider text-gray-400 mb-1">Your Score</span>
                             <div
                                 className="text-4xl font-black"
                                 style={{
@@ -288,7 +288,7 @@ const ChallengeCard = ({ eventInfo, eventStatus, themeScore, themeVerdict, delay
 
                         {/* Rank */}
                         <div className="flex flex-col items-center">
-                            <span className="text-xs uppercase tracking-wider text-white/50 mb-1">Rank</span>
+                            <span className="text-xs uppercase tracking-wider text-gray-400 mb-1">Rank</span>
                             <div
                                 className="text-4xl font-black"
                                 style={{
@@ -421,10 +421,10 @@ const StatPill = ({ label, displayLabel, value, icon, delay, color, contribution
         <div className="flex items-baseline gap-1">
             <span className="text-2xl font-black" style={{ color: color || getScoreColor(value) }}>{value}</span>
             {contribution && (
-                <span className="text-[10px] font-bold text-white/40">+{contribution}</span>
+                <span className="text-[10px] font-bold text-gray-400">+{contribution}</span>
             )}
         </div>
-        <div className="text-[9px] uppercase tracking-widest text-white/50 font-bold mt-0.5">{displayLabel || label}</div>
+        <div className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mt-0.5">{displayLabel || label}</div>
         <RatingBar value={value} color={color || getScoreColor(value)} delay={delay + 0.3} />
     </div>
 )
@@ -1038,7 +1038,7 @@ export default function ResultsScreen({
                                     : displayedScore}
                             </span>
                             {/* /100 */}
-                            <span className="text-xs font-bold text-white/40">/100</span>
+                            <span className="text-xs font-bold text-gray-400">/100</span>
                         </div>
 
                         {/* Score ring progress - Crystal clear progress visualization */}
@@ -1170,7 +1170,7 @@ export default function ResultsScreen({
                 )}
 
                 {/* Percentile Context Line */}
-                <p className={`text-sm text-white/50 mt-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
+                <p className={`text-sm text-gray-400 mt-2 transition-all duration-500 ${revealStage >= 2 ? 'opacity-100' : 'opacity-0'}`}>
                     {scores.overall >= 50
                         ? `Better than ${getPercentile(scores.overall)}% of fits today`
                         : `Worse than ${100 - getPercentile(scores.overall)}% of fits today`
@@ -1215,7 +1215,7 @@ export default function ResultsScreen({
                 {/* Vibe Context (Aesthetic + Celeb) - now smaller, supporting */}
                 {scores.aesthetic && !scores.celebMatch && (
                     <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/60">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-300">
                             ✨ {scores.aesthetic}
                         </span>
                     </div>
@@ -1241,11 +1241,11 @@ export default function ResultsScreen({
                         <p className="text-2xl font-black text-white mb-1">
                             {scores.celebMatch}
                         </p>
-                        <p className="text-xs text-white/40">
+                        <p className="text-xs text-gray-400">
                             Your fit gives off {scores.celebMatch} energy ✨
                         </p>
                         {scores.aesthetic && (
-                            <div className="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-white/50">
+                            <div className="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-400">
                                 {scores.aesthetic} Aesthetic
                             </div>
                         )}
@@ -1301,7 +1301,7 @@ export default function ResultsScreen({
                                     scores.outfitEnemy || scores.outfitDatingApp || scores.outfitPowerMove}"
                             </p>
 
-                            <p className="text-xs text-white/30 mt-2">Rare bonus insight ✨</p>
+                            <p className="text-xs text-gray-500 mt-2">Rare bonus insight ✨</p>
                         </div>
                     )}
 
@@ -1317,7 +1317,7 @@ export default function ResultsScreen({
                     >
                         <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-lg">🎨</span>
-                            <span className="text-base font-semibold text-white/60">Color</span>
+                            <span className="text-base font-semibold text-gray-300">Color</span>
                         </div>
                         <span
                             className="text-xl font-black"
@@ -1337,7 +1337,7 @@ export default function ResultsScreen({
                     >
                         <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-lg">👔</span>
-                            <span className="text-base font-semibold text-white/60">Fit</span>
+                            <span className="text-base font-semibold text-gray-300">Fit</span>
                         </div>
                         <span
                             className="text-xl font-black"
@@ -1357,7 +1357,7 @@ export default function ResultsScreen({
                     >
                         <div className="flex items-center gap-1.5 mb-1">
                             <span className="text-lg">✨</span>
-                            <span className="text-base font-semibold text-white/60">Style</span>
+                            <span className="text-base font-semibold text-gray-300">Style</span>
                         </div>
                         <span
                             className="text-xl font-black"
@@ -1457,7 +1457,7 @@ export default function ResultsScreen({
                 scores.savageLevel && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context - Users know why they see this */}
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😈 Savage Mode Active</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-center">😈 Savage Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,68,68,0.08)', borderColor: 'rgba(255,68,68,0.25)' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-black text-red-500 uppercase tracking-widest">🔥 Brutality Level</span>
@@ -1489,7 +1489,7 @@ export default function ResultsScreen({
                 scores.mode === 'rizz' && scores.rizzType && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context */}
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">😏 Rizz Mode Active</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-center">😏 Rizz Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,105,180,0.08)', borderColor: 'rgba(255,105,180,0.25)' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-black text-pink-400 uppercase tracking-widest">😏 Rizz Rating</span>
@@ -1506,9 +1506,9 @@ export default function ResultsScreen({
                             )}
                             {scores.datingApps && (
                                 <div className="flex justify-around text-center">
-                                    <div><span className="text-lg">🔥</span><p className="text-xs text-white/60">Tinder</p><p className="text-lg font-black text-pink-400">{scores.datingApps.tinder}/10</p></div>
-                                    <div><span className="text-lg">💜</span><p className="text-xs text-white/60">Hinge</p><p className="text-lg font-black text-pink-400">{scores.datingApps.hinge}/10</p></div>
-                                    <div><span className="text-lg">🐝</span><p className="text-xs text-white/60">Bumble</p><p className="text-lg font-black text-pink-400">{scores.datingApps.bumble}/10</p></div>
+                                    <div><span className="text-lg">🔥</span><p className="text-xs text-gray-300">Tinder</p><p className="text-lg font-black text-pink-400">{scores.datingApps.tinder}/10</p></div>
+                                    <div><span className="text-lg">💜</span><p className="text-xs text-gray-300">Hinge</p><p className="text-lg font-black text-pink-400">{scores.datingApps.hinge}/10</p></div>
+                                    <div><span className="text-lg">🐝</span><p className="text-xs text-gray-300">Bumble</p><p className="text-lg font-black text-pink-400">{scores.datingApps.bumble}/10</p></div>
                                 </div>
                             )}
                         </div>
@@ -1521,12 +1521,12 @@ export default function ResultsScreen({
                 scores.mode === 'celeb' && scores.judgedBy && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context */}
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-center">🎭 Celebrity Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,215,0,0.08)', borderColor: 'rgba(255,215,0,0.25)' }}>
                             {/* Judge Badge */}
                             <div className="flex items-center gap-2 mb-3">
                                 <span className="text-2xl">🎭</span>
-                                <span className="text-xs text-white/50 uppercase tracking-wider">Judged by</span>
+                                <span className="text-xs text-gray-400 uppercase tracking-wider">Judged by</span>
                                 <span className="text-lg font-black text-yellow-400">{scores.judgedBy}</span>
                             </div>
                             {/* Judge Quote - uses the line field */}
@@ -1543,7 +1543,7 @@ export default function ResultsScreen({
                                 </span>
                             </div>
                             {/* Disclaimer */}
-                            <p className="text-[9px] text-white/30 text-center italic">
+                            <p className="text-[9px] text-gray-500 text-center italic">
                                 AI parody characters for entertainment only. Not affiliated with any real celebrities.
                             </p>
                         </div>
@@ -1556,7 +1556,7 @@ export default function ResultsScreen({
                 scores.mode === 'aura' && scores.auraColor && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context */}
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🔮 Aura Mode Active</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-center">🔮 Aura Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(155,89,182,0.08)', borderColor: 'rgba(155,89,182,0.25)' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-black text-purple-400 uppercase tracking-widest">🔮 Aura Reading</span>
@@ -1569,7 +1569,7 @@ export default function ResultsScreen({
                             </div>
                             {scores.vibeAssessment && (
                                 <div className="text-center mb-3">
-                                    <span className="text-xs uppercase text-white/40">Vibe Assessment</span>
+                                    <span className="text-xs uppercase text-gray-400">Vibe Assessment</span>
                                     <p className="text-xl font-black text-white">{scores.vibeAssessment}</p>
                                 </div>
                             )}
@@ -1588,7 +1588,7 @@ export default function ResultsScreen({
                 scores.mode === 'chaos' && scores.chaosLevel && (
                     <div className={`w-full max-w-sm px-4 mb-4 transition-all duration-700 ${revealStage >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         {/* Mode Context */}
-                        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 text-center">🎪 Chaos Mode Active</p>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2 text-center">🎪 Chaos Mode Active</p>
                         <div className="p-4 rounded-2xl border backdrop-blur-xl" style={{ background: 'rgba(255,107,107,0.08)', borderColor: 'rgba(255,107,107,0.25)', animation: scores.chaosLevel >= 8 ? 'shake 0.5s infinite' : 'none' }}>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-black text-red-400 uppercase tracking-widest">🎪 Chaos Level</span>
@@ -1605,7 +1605,7 @@ export default function ResultsScreen({
                             )}
                             {scores.alternateReality && (
                                 <div className="text-center">
-                                    <span className="text-[10px] uppercase text-white/40">In Another Universe</span>
+                                    <span className="text-[10px] uppercase text-gray-400">In Another Universe</span>
                                     <p className="text-sm text-white/70 italic">{scores.alternateReality}</p>
                                 </div>
                             )}
@@ -1617,7 +1617,7 @@ export default function ResultsScreen({
             {/* ===== SHARE SECTION ===== */}
             <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
                 {/* Score-aware copy */}
-                <p className="text-center text-sm text-white/40 mb-2">
+                <p className="text-center text-sm text-gray-400 mb-2">
                     {scores.overall >= 75
                         ? "Your friends will be honest. Probably."
                         : scores.overall >= 50
@@ -1626,7 +1626,7 @@ export default function ResultsScreen({
                 </p>
                 <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-[10px] uppercase tracking-widest text-white/30">Share</span>
+                    <span className="text-[10px] uppercase tracking-widest text-gray-500">Share</span>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
             </div>
@@ -1702,7 +1702,7 @@ export default function ResultsScreen({
                 <div className={`flex gap-2 ${fashionShowId && onReturnToRunway ? 'flex-row' : 'flex-col'}`}>
                     <button
                         onClick={onReset}
-                        className={`${fashionShowId && onReturnToRunway ? 'flex-1' : 'w-full'} py-3 rounded-xl bg-white/5 border border-white/10 text-white/50 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.97] transition-all`}
+                        className={`${fashionShowId && onReturnToRunway ? 'flex-1' : 'w-full'} py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.97] transition-all`}
                     >
                         🔄 {scores.overall >= 85 ? "Scan Again" : scores.overall < 50 ? "Try Again" : "New Scan"}
                     </button>
@@ -1750,7 +1750,7 @@ export default function ResultsScreen({
                                             <span className="text-lg">💎</span>
                                             <div>
                                                 <p className="text-xs font-bold text-white/80">Want more scans?</p>
-                                                <p className="text-[10px] text-white/40">3 for just $0.99 • Never expire</p>
+                                                <p className="text-[10px] text-gray-400">3 for just $0.99 • Never expire</p>
                                             </div>
                                         </div>
                                         <span className="text-xs font-bold text-cyan-400">→</span>
@@ -1774,7 +1774,7 @@ export default function ResultsScreen({
                             <h3 className="text-base font-black text-white text-center mb-1">
                                 You're on a roll!
                             </h3>
-                            <p className="text-xs text-white/50 text-center mb-3">
+                            <p className="text-xs text-gray-400 text-center mb-3">
                                 2 FREE scans reset at midnight ⏰
                             </p>
                             <div

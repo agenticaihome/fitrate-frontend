@@ -184,7 +184,7 @@ export function FirstReactionCelebration({
                 >
                     <div className="text-6xl mb-3">🔥</div>
                     <div className="text-2xl font-black text-white mb-1">Your first reaction!</div>
-                    <div className="text-white/60">Someone loves your fit!</div>
+                    <div className="text-gray-300">Someone loves your fit!</div>
                 </div>
                 <style>{`
                     @keyframes celebration-pop {

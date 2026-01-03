@@ -62,25 +62,39 @@ function Toast({ id, type = 'info', message, emoji, onDismiss }) {
         setTimeout(() => onDismiss(id), 200)
     }, [id, onDismiss])
 
+    // Handle keyboard dismiss
+    const handleKeyDown = useCallback((e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+            e.preventDefault()
+            handleDismiss()
+        }
+    }, [handleDismiss])
+
     useEffect(() => {
-        const timer = setTimeout(handleDismiss, 3000)
+        const timer = setTimeout(handleDismiss, 4000) // Increased from 3s for better readability
         return () => clearTimeout(timer)
     }, [handleDismiss])
 
     return (
         <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            tabIndex={0}
             onClick={handleDismiss}
+            onKeyDown={handleKeyDown}
             className={`flex items-center gap-3 px-4 py-3 rounded-2xl border backdrop-blur-xl cursor-pointer
                 ${style.bg} ${style.border} ${style.text}
-                transition-all duration-200 shadow-lg`}
+                transition-all duration-200 shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-400`}
             style={{
                 animation: isExiting
                     ? 'toast-exit 0.2s ease-in forwards'
                     : 'toast-enter 0.3s ease-out forwards'
             }}
         >
-            <span className="text-lg">{emoji || style.icon}</span>
+            <span className="text-lg" aria-hidden="true">{emoji || style.icon}</span>
             <span className="text-sm font-medium flex-1">{message}</span>
+            <span className="text-xs opacity-70 sr-only">Press Enter or Escape to dismiss</span>
         </div>
     )
 }

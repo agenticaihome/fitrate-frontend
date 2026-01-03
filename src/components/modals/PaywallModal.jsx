@@ -241,7 +241,7 @@ export default function PaywallModal({
                                 <p className="text-amber-200/80 text-sm">10 scans to start your journey ✨</p>
                             </div>
                             <div className="text-right">
-                                <div className="text-white/40 text-sm line-through">${PRICES.FIRST_TIME_ORIGINAL}</div>
+                                <div className="text-gray-400 text-sm line-through">${PRICES.FIRST_TIME_ORIGINAL}</div>
                                 <div className="text-2xl font-black text-amber-400">${PRICES.FIRST_TIME_PRICE}</div>
                             </div>
                         </div>
@@ -249,24 +249,31 @@ export default function PaywallModal({
                 )}
 
                 {/* Friendly Tab Toggle */}
-                <div className="flex rounded-2xl bg-white/5 p-1.5 mb-5 relative">
+                <div className="flex rounded-2xl bg-white/5 p-1.5 mb-5 relative" role="tablist" aria-label="Purchase options">
                     <div
                         className="absolute top-1.5 bottom-1.5 rounded-xl bg-gradient-to-r from-purple-500/30 to-pink-500/30 transition-all duration-300"
                         style={{
                             left: activeTab === 'packs' ? '6px' : '50%',
                             width: 'calc(50% - 6px)'
                         }}
+                        aria-hidden="true"
                     />
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'packs'}
+                        aria-controls="packs-panel"
                         onClick={() => { playSound('click'); setActiveTab('packs'); }}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all relative z-10 ${activeTab === 'packs' ? 'text-white' : 'text-white/50'
+                        className={`flex-1 py-3 min-h-[44px] rounded-xl text-sm font-bold transition-all relative z-10 focus-visible:ring-2 focus-visible:ring-cyan-400 ${activeTab === 'packs' ? 'text-white' : 'text-gray-400'
                             }`}
                     >
                         🎨 Scan Packs
                     </button>
                     <button
+                        role="tab"
+                        aria-selected={activeTab === 'unlimited'}
+                        aria-controls="unlimited-panel"
                         onClick={() => { playSound('click'); setActiveTab('unlimited'); }}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all relative z-10 ${activeTab === 'unlimited' ? 'text-white' : 'text-white/50'
+                        className={`flex-1 py-3 min-h-[44px] rounded-xl text-sm font-bold transition-all relative z-10 focus-visible:ring-2 focus-visible:ring-cyan-400 ${activeTab === 'unlimited' ? 'text-white' : 'text-gray-400'
                             }`}
                     >
                         👑 Go Unlimited
@@ -296,13 +303,13 @@ export default function PaywallModal({
                                 <div className="flex-1 text-left">
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-bold">{pack.scans} Scans</span>
-                                        <span className="text-white/40 text-xs">• {pack.label}</span>
+                                        <span className="text-gray-400 text-xs">• {pack.label}</span>
                                     </div>
-                                    <span className="text-white/50 text-xs">{pack.subtext}</span>
+                                    <span className="text-gray-400 text-xs">{pack.subtext}</span>
                                 </div>
                                 <div className="text-right">
                                     <div className="text-xl font-black text-white">${pack.price}</div>
-                                    <div className="text-white/40 text-xs">${(pack.price / pack.scans).toFixed(2)} ea</div>
+                                    <div className="text-gray-400 text-xs">${(pack.price / pack.scans).toFixed(2)} ea</div>
                                 </div>
                             </button>
                         ))}
@@ -334,11 +341,11 @@ export default function PaywallModal({
                                     2 MONTHS FREE
                                 </span>
                             </div>
-                            <p className="text-white/60 text-sm ml-9">
+                            <p className="text-gray-300 text-sm ml-9">
                                 Unlimited scans* • Just ${(PRICES.PRO_YEARLY / 12).toFixed(2)}/month
                             </p>
                             <div className="mt-3 ml-9 text-2xl font-black text-white">
-                                ${PRICES.PRO_YEARLY}<span className="text-white/50 text-sm font-normal">/year</span>
+                                ${PRICES.PRO_YEARLY}<span className="text-gray-400 text-sm font-normal">/year</span>
                             </div>
                         </button>
 
@@ -359,11 +366,11 @@ export default function PaywallModal({
                                 <span className="text-2xl">⚡</span>
                                 <span className="text-white font-bold text-lg">Monthly Flex</span>
                             </div>
-                            <p className="text-white/60 text-sm ml-9">
+                            <p className="text-gray-300 text-sm ml-9">
                                 Unlimited scans* • Cancel anytime
                             </p>
                             <div className="mt-3 ml-9 text-2xl font-black text-white">
-                                ${PRICES.PRO_MONTHLY}<span className="text-white/50 text-sm font-normal">/month</span>
+                                ${PRICES.PRO_MONTHLY}<span className="text-gray-400 text-sm font-normal">/month</span>
                             </div>
                         </button>
 
@@ -392,32 +399,33 @@ export default function PaywallModal({
                 )}
 
                 {/* Friendly reassurance */}
-                <div className="flex items-center justify-center gap-4 text-white/40 text-xs mb-3">
+                <div className="flex items-center justify-center gap-4 text-gray-400 text-xs mb-3">
                     <span>🔒 Secure</span>
-                    <span>•</span>
+                    <span aria-hidden="true">•</span>
                     <span>⏱️ Never expires</span>
-                    <span>•</span>
+                    <span aria-hidden="true">•</span>
                     <span>💬 Support</span>
                 </div>
 
                 {/* Fair use note for unlimited */}
                 {activeTab === 'unlimited' && (
-                    <p className="text-white/25 text-[10px] text-center mb-3">
+                    <p className="text-gray-500 text-[10px] text-center mb-3">
                         *Fair use: up to 100 scans/day – more than you'll ever need! 💫
                     </p>
                 )}
 
                 {/* Legal links */}
-                <div className="flex items-center justify-center gap-3 text-white/30 text-[10px] mb-4">
-                    <a href="/terms" target="_blank" className="hover:text-white/50 transition-colors underline">Terms of Service</a>
-                    <span>•</span>
-                    <a href="/privacy" target="_blank" className="hover:text-white/50 transition-colors underline">Privacy Policy</a>
+                <div className="flex items-center justify-center gap-3 text-gray-500 text-[10px] mb-4">
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors underline focus-visible:ring-2 focus-visible:ring-cyan-400 rounded">Terms of Service</a>
+                    <span aria-hidden="true">•</span>
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors underline focus-visible:ring-2 focus-visible:ring-cyan-400 rounded">Privacy Policy</a>
                 </div>
 
                 {/* Warm close option */}
                 <button
                     onClick={() => { playSound('click'); setShowPaywall(false); }}
-                    className="w-full py-3 text-sm text-white/40 font-medium hover:text-white/60 transition-colors"
+                    className="w-full py-3 min-h-[44px] text-sm text-gray-400 font-medium hover:text-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-xl"
+                    aria-label="Close and maybe purchase next time"
                 >
                     Maybe next time 💫
                 </button>

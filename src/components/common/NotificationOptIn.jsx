@@ -57,24 +57,26 @@ export default function NotificationOptIn({ userId, onClose }) {
                     <h3 className="text-sm font-bold text-white mb-1">
                         Get Daily Style Reminders
                     </h3>
-                    <p className="text-xs text-white/60 mb-3">
+                    <p className="text-xs text-gray-300 mb-3">
                         We'll remind you to rate your OOTD and never miss a chance to flex
                     </p>
                     <div className="flex gap-2">
                         <button
                             onClick={handleEnable}
                             disabled={isLoading}
-                            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 py-2 px-3 min-h-[44px] rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-white"
                             style={{
                                 background: 'linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)',
                                 color: '#000'
                             }}
+                            aria-label="Enable push notifications"
                         >
-                            {isLoading ? '...' : 'Enable 🔥'}
+                            {isLoading ? 'Enabling...' : 'Enable 🔥'}
                         </button>
                         <button
                             onClick={handleDismiss}
-                            className="py-2 px-3 rounded-xl text-xs font-bold text-white/40 transition-all active:scale-95 hover:text-white/60"
+                            className="py-2 px-3 min-h-[44px] rounded-xl text-xs font-bold text-gray-400 transition-all active:scale-95 hover:text-gray-200 focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            aria-label="Dismiss notification prompt"
                         >
                             Not now
                         </button>

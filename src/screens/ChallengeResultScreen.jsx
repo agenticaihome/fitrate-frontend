@@ -497,7 +497,7 @@ export default function ChallengeResultScreen({
                 {/* Your Score */}
                 <div className="flex flex-col items-center">
                     <motion.span
-                        className="text-sm text-white/50 uppercase tracking-widest mb-3 font-medium"
+                        className="text-sm text-gray-400 uppercase tracking-widest mb-3 font-medium"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: revealStage >= 4 ? 1 : 0 }}
                         transition={{ delay: 0.2 }}
@@ -592,7 +592,7 @@ export default function ChallengeResultScreen({
                 {/* Challenger Score */}
                 <div className="flex flex-col items-center">
                     <motion.span
-                        className="text-sm text-white/50 uppercase tracking-widest mb-3 font-medium"
+                        className="text-sm text-gray-400 uppercase tracking-widest mb-3 font-medium"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: revealStage >= 4 ? 1 : 0 }}
                         transition={{ delay: 0.2 }}

@@ -102,7 +102,7 @@ const OnboardingOverlay = ({ onComplete }) => {
 
                 {/* Subheadline */}
                 <motion.p
-                    className="text-xl text-white/60 mb-5"
+                    className="text-xl text-gray-300 mb-5"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
@@ -154,7 +154,7 @@ const OnboardingOverlay = ({ onComplete }) => {
 
                 {/* Privacy note */}
                 <motion.p
-                    className="mt-6 text-white/30 text-xs"
+                    className="mt-6 text-gray-500 text-xs"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
@@ -374,14 +374,14 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
 
             {/* Swipe hint + drawer link */}
             <div className="flex items-center justify-between mt-2 px-2">
-                <span className="text-white/30 text-xs">← swipe →</span>
+                <span className="text-gray-500 text-xs">← swipe →</span>
                 <button
                     onClick={() => {
                         playSound('click')
                         vibrate(10)
                         onOpenDrawer()
                     }}
-                    className="text-white/50 text-xs hover:text-white/70 transition-colors flex items-center gap-1"
+                    className="text-gray-400 text-xs hover:text-white/70 transition-colors flex items-center gap-1"
                 >
                     <span>All 12 Modes</span>
                     <span>👥</span>
@@ -1066,7 +1066,7 @@ export default function HomeScreen({
                     {getScanStatusText()}
                 </span>
                 {!isPro && (
-                    <span className="text-white/50 text-xs">• Get More</span>
+                    <span className="text-gray-400 text-xs">• Get More</span>
                 )}
             </button>
 
@@ -1079,7 +1079,7 @@ export default function HomeScreen({
                     border: '1px solid rgba(255,136,0,0.3)'
                 }}>
                     <p className="text-xl font-bold text-white">👊 Beat {challengeScore}?</p>
-                    <p className="text-white/60 text-sm">Your friend scored {challengeScore}/100</p>
+                    <p className="text-gray-300 text-sm">Your friend scored {challengeScore}/100</p>
                 </div>
             )}
 
@@ -1109,7 +1109,7 @@ export default function HomeScreen({
                     <span className="text-white/70 text-sm font-medium">
                         {dailyLeaderboard.length} people competing today
                     </span>
-                    <span className="text-white/40 text-xs">→</span>
+                    <span className="text-gray-400 text-xs">→</span>
                 </button>
             )}
 
@@ -1123,7 +1123,7 @@ export default function HomeScreen({
                         <div className="text-center">
                             <span className="text-5xl block mb-3">😅</span>
                             <h2 className="text-white text-xl font-bold mb-1">You've been busy!</h2>
-                            <p className="text-white/60 text-sm">Fresh scans drop at midnight ⏰</p>
+                            <p className="text-gray-300 text-sm">Fresh scans drop at midnight ⏰</p>
                         </div>
 
                         <button
@@ -1138,7 +1138,7 @@ export default function HomeScreen({
                             ✨ Unlock Unlimited
                         </button>
 
-                        <div className="text-white/50 text-sm mb-2">or play for free:</div>
+                        <div className="text-gray-400 text-sm mb-2">or play for free:</div>
 
                         <div className="flex flex-col gap-3 w-full max-w-xs">
                             {onOpenArena && (
@@ -1232,7 +1232,7 @@ export default function HomeScreen({
                                         {dailyChallengeMode ? 'Daily Challenge Active' : 'Weekly Challenge Active'}
                                     </span>
                                 </div>
-                                <p className="text-white/60 text-xs">
+                                <p className="text-gray-300 text-xs">
                                     {dailyChallengeMode
                                         ? `Today: ${getDailyMode().emoji} ${getDailyMode().label} Mode`
                                         : currentEvent?.theme || 'Beat the leaderboard!'}
@@ -1244,7 +1244,7 @@ export default function HomeScreen({
                                         setDailyChallengeMode?.(false)
                                         setEventMode?.(false)
                                     }}
-                                    className="absolute top-2 right-2 text-white/40 text-xs px-2 py-1 rounded-full hover:text-white/70"
+                                    className="absolute top-2 right-2 text-gray-400 text-xs px-2 py-1 rounded-full hover:text-white/70"
                                     style={{ background: 'rgba(255,255,255,0.1)' }}
                                 >
                                     ✕ Exit
@@ -1322,7 +1322,7 @@ export default function HomeScreen({
                                                 whileTap={{ scale: 0.85 }}
                                             >
                                                 <span className="text-2xl">{prevMode.emoji}</span>
-                                                <span className="text-[9px] text-white/50 font-medium mt-0.5">{prevMode.label}</span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">{prevMode.label}</span>
                                             </motion.button>
                                             {/* Right peek - TAPPABLE with name */}
                                             <motion.button
@@ -1337,7 +1337,7 @@ export default function HomeScreen({
                                                 whileTap={{ scale: 0.85 }}
                                             >
                                                 <span className="text-2xl">{nextMode.emoji}</span>
-                                                <span className="text-[9px] text-white/50 font-medium mt-0.5">{nextMode.label}</span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">{nextMode.label}</span>
                                             </motion.button>
                                         </>
                                     )
@@ -1434,7 +1434,7 @@ export default function HomeScreen({
                                     {/* Swipe hint - subtle pulse then fade */}
                                     {!dailyChallengeMode && !eventMode && (
                                         <motion.span
-                                            className="absolute bottom-5 text-white/50 text-[11px] font-medium tracking-wider"
+                                            className="absolute bottom-5 text-gray-400 text-[11px] font-medium tracking-wider"
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: [0, 0.6, 0.4] }}
                                             transition={{ delay: 0.8, duration: 2 }}
@@ -1454,10 +1454,10 @@ export default function HomeScreen({
                                     vibrate(10)
                                     setShowModeDrawer(true)
                                 }}
-                                className="text-white/60 text-xs hover:text-white/80 transition-colors flex items-center gap-1.5 mb-2"
+                                className="text-gray-300 text-xs hover:text-white/80 transition-colors flex items-center gap-1.5 mb-2"
                             >
                                 <span>All 12 Modes</span>
-                                <span className="text-white/40">→</span>
+                                <span className="text-gray-400">→</span>
                             </button>
                         )}
 
@@ -1478,10 +1478,10 @@ export default function HomeScreen({
 
                         {/* Value Prop - Clear differentiation */}
                         <div className="text-center mb-3">
-                            <p className="text-white/60 text-xs mb-1">
+                            <p className="text-gray-300 text-xs mb-1">
                                 Get your rating, then dare friends to beat it
                             </p>
-                            <p className="text-white/40 text-[10px]">
+                            <p className="text-gray-400 text-[10px]">
                                 🔒 Private • No account needed
                             </p>
                         </div>
@@ -1545,7 +1545,7 @@ export default function HomeScreen({
                                 )}
                                 <button
                                     onClick={() => setShowAndroidPhotoModal(false)}
-                                    className="w-full py-3 text-white/50 text-sm font-medium mt-2"
+                                    className="w-full py-3 text-gray-400 text-sm font-medium mt-2"
                                 >
                                     Cancel
                                 </button>
@@ -1603,7 +1603,7 @@ export default function HomeScreen({
                                 transition={{ delay: 0.1 }}
                             >
                                 <h3 className="text-white text-lg font-bold mb-1">Choose AI Mode</h3>
-                                <p className="text-white/50 text-sm">How should we rate your fit?</p>
+                                <p className="text-gray-400 text-sm">How should we rate your fit?</p>
                             </motion.div>
 
                             {/* P3.3 — FEATURED MODE PREVIEW - Shows selected mode personality */}
@@ -1623,7 +1623,7 @@ export default function HomeScreen({
                                     >
                                         <span className="text-4xl inline-block mb-2">{currentModeData.emoji}</span>
                                         <p className="text-lg font-black text-white mb-1">{currentModeData.label} Mode</p>
-                                        <p className="text-sm text-white/60 italic">"{currentModeData.desc}"</p>
+                                        <p className="text-sm text-gray-300 italic">"{currentModeData.desc}"</p>
                                     </motion.div>
                                 )
                             })()}
@@ -1710,7 +1710,7 @@ export default function HomeScreen({
 
                             <motion.button
                                 onClick={() => setShowModeDrawer(false)}
-                                className="w-full py-2 text-white/40 text-sm font-medium"
+                                className="w-full py-2 text-gray-400 text-sm font-medium"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5 }}

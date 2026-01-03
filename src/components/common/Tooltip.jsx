@@ -100,14 +100,19 @@ export default function Tooltip({
                     style={{ animation: 'tooltip-pop 0.3s ease-out forwards' }}
                 >
                     <div
+                        role="tooltip"
+                        tabIndex={0}
                         onClick={handleDismiss}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && handleDismiss(e)}
                         className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-500/90 backdrop-blur-sm
                             text-white text-sm font-medium cursor-pointer shadow-lg
-                            hover:bg-purple-500 transition-colors whitespace-nowrap"
+                            hover:bg-purple-500 transition-colors whitespace-nowrap
+                            focus-visible:ring-2 focus-visible:ring-white"
+                        aria-label={`${message}. Press Enter or Escape to dismiss.`}
                     >
-                        <span>{emoji}</span>
+                        <span aria-hidden="true">{emoji}</span>
                         <span>{message}</span>
-                        <span className="text-white/60 text-xs ml-1">✕</span>
+                        <span className="text-white/80 text-xs ml-1" aria-hidden="true">✕</span>
                     </div>
                     <style>{`
                         @keyframes tooltip-pop {
@@ -170,18 +175,22 @@ export function FloatingTooltip({
             className={`fixed left-4 right-4 z-50 flex justify-center pointer-events-none ${positionStyles[position]}`}
         >
             <div
+                role="tooltip"
+                tabIndex={0}
                 onClick={handleDismiss}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && handleDismiss()}
                 className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-purple-500/90 backdrop-blur-xl
                     text-white font-medium shadow-xl pointer-events-auto cursor-pointer
-                    hover:bg-purple-500 transition-colors"
+                    hover:bg-purple-500 transition-colors focus-visible:ring-2 focus-visible:ring-white"
                 style={{
                     animation: 'floating-tooltip 0.4s ease-out forwards',
                     boxShadow: '0 10px 40px rgba(139, 92, 246, 0.4)'
                 }}
+                aria-label={`${message}. Tap or press Enter to dismiss.`}
             >
-                <span className="text-xl">{emoji}</span>
+                <span className="text-xl" aria-hidden="true">{emoji}</span>
                 <span className="text-sm">{message}</span>
-                <span className="text-white/60 text-xs ml-2">Tap to dismiss</span>
+                <span className="text-white/80 text-xs ml-2" aria-hidden="true">Tap to dismiss</span>
             </div>
             <style>{`
                 @keyframes floating-tooltip {

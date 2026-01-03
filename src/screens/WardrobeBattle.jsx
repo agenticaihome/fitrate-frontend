@@ -52,7 +52,7 @@ const RoundResult = ({ roundNum, myOutfit, opponentOutfit, myScore, opponentScor
         >
             {/* Round number */}
             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="text-white/60 text-sm font-bold">{roundNum}</span>
+                <span className="text-gray-300 text-sm font-bold">{roundNum}</span>
             </div>
 
             {/* My outfit */}
@@ -67,7 +67,7 @@ const RoundResult = ({ roundNum, myOutfit, opponentOutfit, myScore, opponentScor
 
             {/* VS */}
             <div className="flex-shrink-0">
-                <span className="text-white/40 text-xs font-bold">VS</span>
+                <span className="text-gray-400 text-xs font-bold">VS</span>
             </div>
 
             {/* Opponent outfit */}
@@ -89,7 +89,7 @@ const RoundResult = ({ roundNum, myOutfit, opponentOutfit, myScore, opponentScor
             {/* Result */}
             <div className="flex-1 text-right">
                 {isRevealed && (
-                    <span className={`text-lg font-bold ${won ? 'text-green-400' : tie ? 'text-white/50' : 'text-red-400'}`}>
+                    <span className={`text-lg font-bold ${won ? 'text-green-400' : tie ? 'text-gray-400' : 'text-red-400'}`}>
                         {won ? '✓ Win' : tie ? '— Tie' : '✗ Loss'}
                     </span>
                 )}
@@ -106,12 +106,12 @@ const ScoreIndicator = ({ myWins, opponentWins, opponentName = 'Opponent', color
         <div className="flex items-center justify-center gap-6 mb-6">
             <div className="text-center">
                 <span className="text-4xl font-black text-white">{myWins}</span>
-                <p className="text-white/50 text-xs">You</p>
+                <p className="text-gray-400 text-xs">You</p>
             </div>
-            <div className="text-white/30 text-2xl">-</div>
+            <div className="text-gray-500 text-2xl">-</div>
             <div className="text-center">
                 <span className="text-4xl font-black text-white">{opponentWins}</span>
-                <p className="text-white/50 text-xs truncate max-w-[80px]">{opponentName}</p>
+                <p className="text-gray-400 text-xs truncate max-w-[80px]">{opponentName}</p>
             </div>
         </div>
     )
@@ -237,7 +237,7 @@ export default function WardrobeBattle({
 
                 <div className="text-center">
                     <h1 className="text-xl font-black text-white">Wardrobe Wars</h1>
-                    <p className="text-white/50 text-xs">Best of 5 • First to 3</p>
+                    <p className="text-gray-400 text-xs">Best of 5 • First to 3</p>
                 </div>
 
                 <div className="w-11" />
@@ -268,9 +268,9 @@ export default function WardrobeBattle({
                 {!battleComplete && currentRound < 5 && (
                     <div className="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-white/20">
                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                            <span className="text-white/60 text-sm font-bold">{currentRound + 1}</span>
+                            <span className="text-gray-300 text-sm font-bold">{currentRound + 1}</span>
                         </div>
-                        <span className="text-white/40 text-sm">
+                        <span className="text-gray-400 text-sm">
                             {isRevealing ? '⏳ Revealing...' : 'Ready to reveal'}
                         </span>
                     </div>
@@ -287,7 +287,7 @@ export default function WardrobeBattle({
                         <h2 className="text-2xl font-black text-white">
                             {myWins > opponentWins ? 'Victory!' : myWins < opponentWins ? 'Defeat' : 'Tie Game'}
                         </h2>
-                        <p className="text-white/50">
+                        <p className="text-gray-400">
                             Final Score: {myWins} - {opponentWins}
                         </p>
                     </div>

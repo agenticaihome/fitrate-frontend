@@ -150,7 +150,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         filter: activeTab === 'home' ? 'drop-shadow(0 0 10px rgba(255,255,255,0.8))' : 'none',
                         transform: activeTab === 'home' ? 'scale(1.1)' : 'scale(1)'
                     }}>🏠</span>
-                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'home' ? 'text-white' : 'text-white/50'}`}>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'home' ? 'text-white' : 'text-gray-400'}`}>
                         Home
                     </span>
                     {activeTab === 'home' && <ActiveIndicator />}
@@ -170,7 +170,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         filter: activeTab === 'fashionshow' ? 'drop-shadow(0 0 10px rgba(168,85,247,0.8))' : 'none',
                         transform: activeTab === 'fashionshow' ? 'scale(1.1)' : 'scale(1)'
                     }}>🎭</span>
-                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'fashionshow' ? 'text-purple-400' : 'text-white/50'}`}>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'fashionshow' ? 'text-purple-400' : 'text-gray-400'}`}>
                         Show
                     </span>
                     {activeTab === 'fashionshow' && <ActiveIndicator color="#a855f7" />}
@@ -195,7 +195,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         transform: (activeTab === 'challenges' || eventMode) ? 'scale(1.1)' : 'scale(1)'
                     }}>🏆</span>
                     <span className={`text-[10px] mt-0.5 font-medium ${eventMode ? 'text-yellow-400' :
-                            activeTab === 'challenges' ? 'text-emerald-400' : 'text-white/50'
+                            activeTab === 'challenges' ? 'text-emerald-400' : 'text-gray-400'
                         }`}>
                         Challenges
                     </span>
@@ -224,7 +224,7 @@ export default function BottomNav({ activeTab, eventMode, onNavigate, onScan, on
                         filter: activeTab === 'arena' ? 'drop-shadow(0 0 10px rgba(0,212,255,0.8))' : 'none',
                         transform: activeTab === 'arena' ? 'scale(1.1)' : 'scale(1)'
                     }}>🌍</span>
-                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-white/50'}`}>
+                    <span className={`text-[10px] mt-0.5 font-medium ${activeTab === 'arena' ? 'text-cyan-400' : 'text-gray-400'}`}>
                         Arena
                     </span>
                     {activeTab === 'arena' && <ActiveIndicator color="#00d4ff" />}

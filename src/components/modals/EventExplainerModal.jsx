@@ -156,7 +156,7 @@ export default function EventExplainerModal({
 
                     {/* How It Works */}
                     <div className="bg-white/5 rounded-2xl p-4 mb-4">
-                        <h3 className="text-xs font-bold text-white/50 uppercase tracking-widest mb-3 text-center">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 text-center">
                             How It Works
                         </h3>
                         <ol className="space-y-3" role="list">

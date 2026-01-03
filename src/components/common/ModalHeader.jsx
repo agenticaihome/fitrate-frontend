@@ -32,10 +32,10 @@ export default function ModalHeader({
             {onClose && (
                 <button
                     onClick={onClose}
-                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all"
+                    className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
                     aria-label="Close modal"
                 >
-                    ✕
+                    <span aria-hidden="true">✕</span>
                 </button>
             )}
         </div>

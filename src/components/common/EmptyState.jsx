@@ -53,7 +53,7 @@ export default function EmptyState({
             </h3>
 
             {/* Subtitle */}
-            <p className="text-sm text-white/50 text-center max-w-[200px]">
+            <p className="text-sm text-gray-400 text-center max-w-[200px]">
                 {subtitle}
             </p>
 
@@ -61,8 +61,10 @@ export default function EmptyState({
             {action && (
                 <button
                     onClick={action}
-                    className={`mt-4 px-5 py-2 rounded-xl font-bold text-sm transition-all active:scale-95
-                        bg-${color === 'white' ? 'white/10' : `${color}-500/20`} 
+                    aria-label={actionLabel}
+                    className={`mt-4 px-5 py-3 min-h-[44px] rounded-xl font-bold text-sm transition-all active:scale-95
+                        focus-visible:ring-2 focus-visible:ring-cyan-400
+                        bg-${color === 'white' ? 'white/10' : `${color}-500/20`}
                         text-${color === 'white' ? 'white' : `${color}-400`}
                         hover:bg-${color === 'white' ? 'white/20' : `${color}-500/30`}`}
                 >
