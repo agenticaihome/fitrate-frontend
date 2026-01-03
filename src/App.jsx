@@ -1693,6 +1693,14 @@ export default function App() {
         // Check if rate limited
         if (response.status === 429 || data.limitReached) {
           setScansRemaining(0)
+
+          // Persist the limit reached state so it persists across reloads
+          // This fixes the UI for users who just cleared their cache
+          localStorage.setItem('fitrate_scans', JSON.stringify({
+            date: new Date().toDateString(),
+            count: LIMITS.FREE_SCANS_DAILY || 2
+          }))
+
           setScreen('limit-reached')
           return
         }
