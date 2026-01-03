@@ -585,7 +585,7 @@ const HowItWorks = ({ modeColor }) => (
         </div>
         {/* Daily limit badge */}
         <p className="text-center text-gray-500 text-xs mt-3">
-            <span className="text-green-400 font-bold">10 FREE</span> battles per day
+            <span className="text-green-400 font-bold">5 FREE</span> battles per day • <span className="text-purple-400">Pro = Unlimited</span>
         </p>
     </div>
 )

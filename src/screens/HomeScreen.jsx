@@ -1161,7 +1161,7 @@ export default function HomeScreen({
                                         </div>
                                     </div>
                                     <span className="text-cyan-400 text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,212,255,0.2)' }}>
-                                        10 FREE/day
+                                        5 FREE/day
                                     </span>
                                 </button>
                             )}

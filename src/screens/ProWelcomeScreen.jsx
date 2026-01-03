@@ -11,7 +11,7 @@ export default function ProWelcomeScreen({ onStart }) {
             <div className="text-7xl mb-6">🎉</div>
             <h2 className="text-4xl font-black text-white mb-3">Welcome to FitRate Pro!</h2>
             <p className="text-center mb-8" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                You now have 25 ratings per day
+                You now have unlimited everything!
             </p>
 
             <div className="p-6 rounded-2xl mb-8 text-left" style={{
@@ -20,11 +20,11 @@ export default function ProWelcomeScreen({ onStart }) {
                 backdropFilter: 'blur(10px)'
             }}>
                 <div className="space-y-2" style={{ color: '#00ff88' }}>
-                    <p className="text-sm">⚡ 25 ratings per day</p>
-                    <p className="text-sm">🎭 6 Pro modes: Honest, Savage, Rizz, Celebrity, Aura, Chaos</p>
+                    <p className="text-sm">⚡ Unlimited scans (100/day fair use)</p>
+                    <p className="text-sm">🎭 All 12 AI judges unlocked</p>
+                    <p className="text-sm">⚔️ Unlimited arena battles</p>
+                    <p className="text-sm">🏆 Unlimited weekly challenge entries</p>
                     <p className="text-sm">📊 Precision scoring (87.4 vs 87)</p>
-                    <p className="text-sm">🏆 1 Weekly Challenge entry/day</p>
-                    <p className="text-sm">✨ Golden Insights (Identity + Perception)</p>
                     <p className="text-sm">💡 Pro Tips on every result</p>
                 </div>
             </div>
