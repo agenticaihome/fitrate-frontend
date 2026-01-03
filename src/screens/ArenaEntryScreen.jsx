@@ -64,8 +64,8 @@ const ARENA_DAILY_MODES = [
     { mode: 'celeb', emoji: '✨', name: 'Celeb', tagline: 'Star Saturday', color: '#ffd700' }
 ]
 
-// Daily battle limit
-const ARENA_DAILY_LIMIT = 10
+// Daily battle limit (reduced from 10 to increase Pro conversion)
+const ARENA_DAILY_LIMIT = 5
 
 export const getTodayArenaMode = () => {
     const dayIndex = new Date().getDay() // 0=Sunday, 1=Monday, etc.

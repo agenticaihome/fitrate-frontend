@@ -12,7 +12,19 @@ export const LIMITS = {
 
     // Weekly Event - SAME FOR EVERYONE
     EVENT_ENTRIES_WEEKLY: 1,        // All users get 1 entry per week
+
+    // Arena & Game Limits (Free tier)
+    ARENA_BATTLES_DAILY: 5,         // Free users get 5 arena battles/day
+    WARDROBE_BATTLES_DAILY: 1,      // Free users get 1 Wardrobe Wars battle/day
+    KOTH_ATTEMPTS_DAILY: 3,         // Free users get 3 King of the Hill attempts/day
+    DAILY_CHALLENGE_ENTRIES: 3,     // Free users get 3 daily challenge entries/day
 };
+
+// AI Mode Access Control
+// 6 Free modes + 6 Pro-exclusive modes
+export const FREE_MODES = ['nice', 'roast', 'honest', 'chaos', 'coquette', 'hypebeast'];
+export const PRO_MODES = ['savage', 'rizz', 'celeb', 'aura', 'y2k', 'villain'];
+export const isProMode = (modeId) => PRO_MODES.includes(modeId);
 
 export const PRICES = {
     // 5-Tier Scan Pack System (Optimized for teens)

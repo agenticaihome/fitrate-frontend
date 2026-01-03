@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { playSound, vibrate } from '../utils/soundEffects'
 import { compressImage } from '../utils/imageUtils'
 import { formatTimeRemaining } from '../utils/dateUtils'
-import { LIMITS } from '../config/constants'
+import { LIMITS, PRO_MODES, isProMode } from '../config/constants'
 
 // Lazy load 3D particle field for performance
 const ParticleField = lazy(() => import('../components/3d/ParticleField').then(m => ({ default: m.ParticleFieldLight })))
@@ -260,18 +260,20 @@ const FloatingParticles = ({ accentColor, secondaryColor = '#8b5cf6' }) => {
 // Punchier descriptions for 2025
 // ============================================
 const MODES = [
+    // FREE MODES (6)
     { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Your biggest fan', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)', cta: 'HYPE MY FIT' },
     { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Friendship-ending honesty', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)', cta: 'ROAST MY FIT' },
     { id: 'honest', emoji: '📊', label: 'Honest', desc: 'No cap, real talk', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)', cta: 'RATE MY FIT' },
-    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)', cta: 'DESTROY MY FIT' },
-    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY RIZZ' },
-    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)', cta: 'JUDGE MY FIT' },
-    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)', cta: 'READ MY AURA' },
     { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'AI off its meds', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)', cta: 'CHAOS MY FIT' },
-    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY Y2K' },
-    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)', cta: 'VILLAIN CHECK' },
     { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)', cta: 'RATE MY SOFT' },
-    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)', cta: 'CHECK MY DRIP' }
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)', cta: 'CHECK MY DRIP' },
+    // PRO MODES (6) - Exclusive to subscribers
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)', cta: 'DESTROY MY FIT', proOnly: true },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY RIZZ', proOnly: true },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)', cta: 'JUDGE MY FIT', proOnly: true },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)', cta: 'READ MY AURA', proOnly: true },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', cta: 'RATE MY Y2K', proOnly: true },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)', cta: 'VILLAIN CHECK', proOnly: true }
 ]
 
 // Daily Challenge: Rotating mode based on day of year
@@ -1644,64 +1646,81 @@ export default function HomeScreen({
 
                             {/* Mode Grid - Staggered animation */}
                             <div className="grid grid-cols-4 gap-2">
-                                {MODES.map((m, index) => (
-                                    <motion.button
-                                        key={m.id}
-                                        onClick={() => {
-                                            playSound('click')
-                                            vibrate([15, 10, 25])
-                                            setTimeout(() => {
-                                                setMode(m.id)
-                                                setEventMode(false)
-                                                setDailyChallengeMode?.(false)
-                                                setShowModeDrawer(false)
-                                            }, 150)
-                                        }}
-                                        className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl relative overflow-hidden ${mode === m.id ? 'ring-2' : ''}`}
-                                        style={{
-                                            background: `${m.color}15`,
-                                            ringColor: m.color
-                                        }}
-                                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                                        animate={{
-                                            opacity: 1,
-                                            scale: 1,
-                                            y: 0,
-                                            transition: {
-                                                type: 'spring',
-                                                stiffness: 400,
-                                                damping: 20,
-                                                delay: index * 0.03
-                                            }
-                                        }}
-                                        whileHover={{ scale: 1.08, rotateY: 5 }}
-                                        whileTap={{ scale: 0.92 }}
-                                        aria-label={`${m.label} mode - ${m.desc}`}
-                                    >
-                                        {/* Glow on selected */}
-                                        {mode === m.id && (
-                                            <motion.div
-                                                className="absolute inset-0 rounded-xl pointer-events-none"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                style={{
-                                                    boxShadow: `inset 0 0 15px ${m.glow}, 0 0 15px ${m.glow}`
-                                                }}
-                                            />
-                                        )}
-                                        <motion.span
-                                            className="text-2xl relative z-10"
-                                            animate={mode === m.id ? {
-                                                scale: [1, 1.2, 1],
-                                                rotate: [0, 10, -10, 0]
-                                            } : {}}
-                                            transition={{ duration: 0.4 }}
+                                {MODES.map((m, index) => {
+                                    const isLocked = m.proOnly && !isPro
+                                    return (
+                                        <motion.button
+                                            key={m.id}
+                                            onClick={() => {
+                                                playSound('click')
+                                                vibrate([15, 10, 25])
+                                                if (isLocked) {
+                                                    // Show paywall for locked Pro modes
+                                                    setShowModeDrawer(false)
+                                                    onShowPaywall?.()
+                                                    return
+                                                }
+                                                setTimeout(() => {
+                                                    setMode(m.id)
+                                                    setEventMode(false)
+                                                    setDailyChallengeMode?.(false)
+                                                    setShowModeDrawer(false)
+                                                }, 150)
+                                            }}
+                                            className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl relative overflow-hidden ${mode === m.id ? 'ring-2' : ''} ${isLocked ? 'opacity-60' : ''}`}
+                                            style={{
+                                                background: `${m.color}15`,
+                                                ringColor: m.color
+                                            }}
+                                            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                            animate={{
+                                                opacity: isLocked ? 0.6 : 1,
+                                                scale: 1,
+                                                y: 0,
+                                                transition: {
+                                                    type: 'spring',
+                                                    stiffness: 400,
+                                                    damping: 20,
+                                                    delay: index * 0.03
+                                                }
+                                            }}
+                                            whileHover={{ scale: 1.08, rotateY: 5 }}
+                                            whileTap={{ scale: 0.92 }}
+                                            aria-label={`${m.label} mode - ${m.desc}${isLocked ? ' (Pro only)' : ''}`}
                                         >
-                                            {m.emoji}
-                                        </motion.span>
-                                        <span className="text-[11px] font-bold text-white/90 relative z-10">{m.label}</span>
-                                    </motion.button>
-                                ))}
+                                            {/* Pro badge for locked modes */}
+                                            {isLocked && (
+                                                <div className="absolute top-1 right-1 z-20">
+                                                    <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                                                        PRO
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {/* Glow on selected */}
+                                            {mode === m.id && (
+                                                <motion.div
+                                                    className="absolute inset-0 rounded-xl pointer-events-none"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    style={{
+                                                        boxShadow: `inset 0 0 15px ${m.glow}, 0 0 15px ${m.glow}`
+                                                    }}
+                                                />
+                                            )}
+                                            <motion.span
+                                                className="text-2xl relative z-10"
+                                                animate={mode === m.id ? {
+                                                    scale: [1, 1.2, 1],
+                                                    rotate: [0, 10, -10, 0]
+                                                } : {}}
+                                                transition={{ duration: 0.4 }}
+                                            >
+                                                {isLocked ? '🔒' : m.emoji}
+                                            </motion.span>
+                                            <span className="text-[11px] font-bold text-white/90 relative z-10">{m.label}</span>
+                                        </motion.button>
+                                    )
+                                })}
                             </div>
 
                             {/* Meet The Judges */}

@@ -7,20 +7,22 @@ import React, { forwardRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { playSound, vibrate } from '../../utils/soundEffects'
 
-// Mode data
+// Mode data - 6 Free + 6 Pro-exclusive
 const MODES = [
+  // FREE MODES (6)
   { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Your biggest fan', color: '#00d4ff', glow: 'rgba(0,212,255,0.4)' },
   { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Friendship-ending honesty', color: '#ff6b35', glow: 'rgba(255,107,53,0.4)' },
   { id: 'honest', emoji: '📊', label: 'Honest', desc: 'No cap, real talk', color: '#3b82f6', glow: 'rgba(59,130,246,0.4)' },
-  { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)' },
-  { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-  { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)' },
-  { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)' },
   { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'AI off its meds', color: '#ff6b6b', glow: 'rgba(255,107,107,0.4)' },
-  { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)' },
-  { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)' },
   { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft girl aesthetic', color: '#f9a8d4', glow: 'rgba(249,168,212,0.4)' },
-  { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)' }
+  { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip doctor', color: '#f97316', glow: 'rgba(249,115,22,0.4)' },
+  // PRO MODES (6) - Exclusive to subscribers
+  { id: 'savage', emoji: '💀', label: 'Savage', desc: 'Emotional damage loading', color: '#8b00ff', glow: 'rgba(139,0,255,0.4)', proOnly: true },
+  { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Would they swipe right?', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', proOnly: true },
+  { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'A-list judgment', color: '#ffd700', glow: 'rgba(255,215,0,0.4)', proOnly: true },
+  { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Reading your energy', color: '#9b59b6', glow: 'rgba(155,89,182,0.4)', proOnly: true },
+  { id: 'y2k', emoji: '💎', label: 'Y2K', desc: 'Paris Hilton energy', color: '#ff69b4', glow: 'rgba(255,105,180,0.4)', proOnly: true },
+  { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main character threat', color: '#7c3aed', glow: 'rgba(124,58,237,0.4)', proOnly: true }
 ]
 
 // ============================================
@@ -31,11 +33,17 @@ const ModeCard = forwardRef(({
   mode,
   isSelected,
   onSelect,
-  index
+  index,
+  isLocked = false,
+  onShowPaywall
 }, ref) => {
   const handleTap = () => {
     playSound('click')
     vibrate([15, 10, 25])
+    if (isLocked) {
+      onShowPaywall?.()
+      return
+    }
     onSelect(mode.id)
   }
 
@@ -43,14 +51,14 @@ const ModeCard = forwardRef(({
     <motion.button
       ref={ref}
       onClick={handleTap}
-      className="flex flex-col items-center justify-center gap-1 p-3 rounded-xl relative overflow-hidden"
+      className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl relative overflow-hidden ${isLocked ? 'opacity-60' : ''}`}
       style={{
         background: `${mode.color}15`,
         border: isSelected ? `2px solid ${mode.color}` : '2px solid transparent'
       }}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{
-        opacity: 1,
+        opacity: isLocked ? 0.6 : 1,
         scale: 1,
         y: 0,
         transition: {
@@ -74,8 +82,17 @@ const ModeCard = forwardRef(({
         transformStyle: 'preserve-3d',
         perspective: '1000px'
       }}
-      aria-label={`${mode.label} mode - ${mode.desc}`}
+      aria-label={`${mode.label} mode - ${mode.desc}${isLocked ? ' (Pro only)' : ''}`}
     >
+      {/* Pro badge for locked modes */}
+      {isLocked && (
+        <div className="absolute top-1 right-1 z-20">
+          <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+            PRO
+          </span>
+        </div>
+      )}
+
       {/* Glow effect on selected */}
       {isSelected && (
         <motion.div
@@ -97,14 +114,14 @@ const ModeCard = forwardRef(({
         } : {}}
         transition={{ duration: 0.4 }}
       >
-        {mode.emoji}
+        {isLocked ? '🔒' : mode.emoji}
       </motion.span>
 
       {/* Label */}
       <span className="text-[11px] font-bold text-white/90">{mode.label}</span>
 
       {/* Selection indicator */}
-      {isSelected && (
+      {isSelected && !isLocked && (
         <motion.div
           className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
           initial={{ scale: 0 }}
@@ -129,13 +146,20 @@ export default function ModeSelector({
   onClose,
   currentMode,
   onSelectMode,
-  onNavigateToJudges
+  onNavigateToJudges,
+  isPro = false,
+  onShowPaywall
 }) {
   const handleSelect = (modeId) => {
     setTimeout(() => {
       onSelectMode(modeId)
       onClose()
     }, 150)
+  }
+
+  const handleShowPaywall = () => {
+    onClose()
+    onShowPaywall?.()
   }
 
   return (
@@ -198,6 +222,8 @@ export default function ModeSelector({
                   isSelected={currentMode === mode.id}
                   onSelect={handleSelect}
                   index={index}
+                  isLocked={mode.proOnly && !isPro}
+                  onShowPaywall={handleShowPaywall}
                 />
               ))}
             </div>

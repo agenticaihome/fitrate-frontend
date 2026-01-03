@@ -317,8 +317,62 @@ export default function PaywallModal({
                 ) : (
                     /* Friendly Subscription Options */
                     <div className="space-y-4 mb-5">
-                        <p className="text-purple-200/70 text-sm mb-3">
-                            Never worry about running out! 🌈
+                        {/* FREE vs PRO Comparison */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                            {/* Free Column */}
+                            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                                <div className="text-center mb-2">
+                                    <span className="text-lg">🆓</span>
+                                    <p className="text-xs font-bold text-gray-400 uppercase">Free</p>
+                                </div>
+                                <ul className="space-y-1.5 text-[10px] text-gray-400">
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-gray-500">✓</span>
+                                        <span>2 scans/day</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-gray-500">✓</span>
+                                        <span>5 arena battles/day</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-gray-500">✓</span>
+                                        <span>6 AI judges</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-gray-500">✓</span>
+                                        <span>1 event entry/week</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            {/* Pro Column */}
+                            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30">
+                                <div className="text-center mb-2">
+                                    <span className="text-lg">👑</span>
+                                    <p className="text-xs font-bold text-purple-300 uppercase">Pro</p>
+                                </div>
+                                <ul className="space-y-1.5 text-[10px] text-purple-200">
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-green-400">✓</span>
+                                        <span className="font-semibold">Unlimited scans</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-green-400">✓</span>
+                                        <span className="font-semibold">Unlimited battles</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-green-400">✓</span>
+                                        <span className="font-semibold">All 12 AI judges</span>
+                                    </li>
+                                    <li className="flex items-center gap-1.5">
+                                        <span className="text-green-400">✓</span>
+                                        <span className="font-semibold">Unlimited events</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <p className="text-purple-200/70 text-sm mb-3 text-center">
+                            Unlock everything! 🌈
                         </p>
 
                         {/* Yearly - Best Value */}

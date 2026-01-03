@@ -4,19 +4,23 @@ import { formatTimeRemaining } from '../utils/dateUtils'
 import BottomNav from '../components/common/BottomNav'
 
 // All 12 AI modes for rotating daily challenge
+// Daily challenges rotate through ALL modes (including Pro modes)
+// This gives free users a "taste" of Pro modes to encourage upgrades
 const DAILY_MODES = [
+    // FREE MODES (6)
     { id: 'nice', emoji: '😇', label: 'Nice', desc: 'Supportive & encouraging', color: 'cyan' },
     { id: 'roast', emoji: '🔥', label: 'Roast', desc: 'Brutally honest', color: 'orange' },
     { id: 'honest', emoji: '📊', label: 'Honest', desc: 'Balanced analysis', color: 'blue' },
-    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: 'purple' },
-    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Dating vibes', color: 'pink' },
-    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star treatment', color: 'yellow' },
-    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Mystical energy', color: 'violet' },
     { id: 'chaos', emoji: '🎪', label: 'Chaos', desc: 'Unhinged chaos', color: 'red' },
-    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: "That's hot", color: 'hotpink' },
-    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main villain energy', color: 'indigo' },
     { id: 'coquette', emoji: '🎀', label: 'Coquette', desc: 'Soft & romantic', color: 'lightpink' },
-    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip', color: 'darkorange' }
+    { id: 'hypebeast', emoji: '👟', label: 'Hypebeast', desc: 'Certified drip', color: 'darkorange' },
+    // PRO MODES (6) - Available in daily challenges to give users a taste
+    { id: 'savage', emoji: '💀', label: 'Savage', desc: 'No mercy', color: 'purple', proOnly: true },
+    { id: 'rizz', emoji: '😏', label: 'Rizz', desc: 'Dating vibes', color: 'pink', proOnly: true },
+    { id: 'celeb', emoji: '⭐', label: 'Celebrity', desc: 'Star treatment', color: 'yellow', proOnly: true },
+    { id: 'aura', emoji: '🔮', label: 'Aura', desc: 'Mystical energy', color: 'violet', proOnly: true },
+    { id: 'y2k', emoji: '💎', label: 'Y2K', desc: "That's hot", color: 'hotpink', proOnly: true },
+    { id: 'villain', emoji: '🖤', label: 'Villain', desc: 'Main villain energy', color: 'indigo', proOnly: true }
 ]
 
 // Get today's rotating mode based on day of year
