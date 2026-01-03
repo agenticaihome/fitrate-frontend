@@ -291,8 +291,10 @@ const getModeData = (modeId) => MODES.find(m => m.id === modeId) || MODES[0]
 // ============================================
 // MODE CAROUSEL - Swipeable peek carousel
 // Shows current mode + neighbors for quick switching
+// Users can swipe through ALL modes (including Pro) to preview them
+// Pro modes show lock - CTA is blocked, tapping mode opens paywall
 // ============================================
-const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
+const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer, isPro, onShowPaywall }) => {
     const currentIndex = MODES.findIndex(m => m.id === currentModeId) || 0
 
     // Get prev/next indices (wrapping)
@@ -303,13 +305,25 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
     const currentMode = MODES[currentIndex]
     const nextMode = MODES[nextIndex]
 
+    // Check if modes are locked
+    const isPrevLocked = prevMode.proOnly && !isPro
+    const isCurrentLocked = currentMode.proOnly && !isPro
+    const isNextLocked = nextMode.proOnly && !isPro
+
+    // Allow swiping to ALL modes (including locked ones) so users can preview
     const handleSwipe = (direction) => {
         playSound('click')
         vibrate([10, 5, 15])
-        if (direction === 'left') {
-            onModeChange(nextMode.id)
-        } else {
-            onModeChange(prevMode.id)
+        const targetMode = direction === 'left' ? nextMode : prevMode
+        onModeChange(targetMode.id)
+    }
+
+    // Tapping on the current locked mode opens paywall
+    const handleCurrentTap = () => {
+        if (isCurrentLocked) {
+            playSound('click')
+            vibrate([15, 10, 25])
+            onShowPaywall?.()
         }
     }
 
@@ -331,23 +345,36 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
                     }
                 }}
             >
-                {/* Left neighbor (dimmed) */}
+                {/* Left neighbor (dimmed) - show actual emoji, PRO badge if locked */}
                 <motion.button
                     onClick={() => handleSwipe('right')}
-                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    className={`flex flex-col items-center transition-opacity relative ${isPrevLocked ? 'opacity-50' : 'opacity-40 hover:opacity-60'}`}
                     whileTap={{ scale: 0.9 }}
                 >
                     <span className="text-2xl">{prevMode.emoji}</span>
+                    {isPrevLocked && (
+                        <span className="absolute -top-1 -right-1 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                            PRO
+                        </span>
+                    )}
                 </motion.button>
 
                 {/* Current mode (center, prominent) */}
                 <motion.div
-                    className="flex-1 flex flex-col items-center px-4"
+                    className={`flex-1 flex flex-col items-center px-4 relative ${isCurrentLocked ? 'cursor-pointer' : ''}`}
                     key={currentMode.id}
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    onClick={handleCurrentTap}
                 >
+                    {isCurrentLocked && (
+                        <div className="absolute -top-1 right-4 z-10">
+                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white animate-pulse">
+                                PRO
+                            </span>
+                        </div>
+                    )}
                     <motion.span
                         className="text-4xl mb-1"
                         animate={{ scale: [1, 1.1, 1] }}
@@ -360,17 +387,22 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
                         className="text-xs font-medium mt-0.5"
                         style={{ color: currentMode.color }}
                     >
-                        {currentMode.desc}
+                        {isCurrentLocked ? 'Tap to unlock' : currentMode.desc}
                     </span>
                 </motion.div>
 
-                {/* Right neighbor (dimmed) */}
+                {/* Right neighbor (dimmed) - show actual emoji, PRO badge if locked */}
                 <motion.button
                     onClick={() => handleSwipe('left')}
-                    className="flex flex-col items-center opacity-40 hover:opacity-60 transition-opacity"
+                    className={`flex flex-col items-center transition-opacity relative ${isNextLocked ? 'opacity-50' : 'opacity-40 hover:opacity-60'}`}
                     whileTap={{ scale: 0.9 }}
                 >
                     <span className="text-2xl">{nextMode.emoji}</span>
+                    {isNextLocked && (
+                        <span className="absolute -top-1 -right-1 text-[6px] font-black px-1 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                            PRO
+                        </span>
+                    )}
                 </motion.button>
             </motion.div>
 
@@ -385,7 +417,7 @@ const ModeCarousel = ({ currentModeId, onModeChange, onOpenDrawer }) => {
                     }}
                     className="text-gray-400 text-xs hover:text-white/70 transition-colors flex items-center gap-1"
                 >
-                    <span>All 12 Modes</span>
+                    <span>6 Free + 6 Pro</span>
                     <span>👥</span>
                 </button>
             </div>
@@ -454,6 +486,13 @@ export default function HomeScreen({
         return localStorage.getItem('fitrate_onboarded') !== 'true'
     })
 
+    // Background camera preview (Snapchat-style)
+    const [bgCameraStream, setBgCameraStream] = useState(null)
+    const [bgCameraEnabled, setBgCameraEnabled] = useState(() => {
+        return localStorage.getItem('fitrate_bg_camera') !== 'false'
+    })
+    const bgVideoRef = useRef(null)
+
     // Refs
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
@@ -487,6 +526,55 @@ export default function HomeScreen({
             }, 300)
         }
     }, [pendingFashionShowWalk])
+
+    // ==========================================
+    // Background Camera Preview (Snapchat-style)
+    // ==========================================
+    useEffect(() => {
+        // Only start on desktop/web - skip on mobile for performance
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        if (isMobile || !bgCameraEnabled) return
+
+        let stream = null
+
+        const startBgCamera = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'user', // Front camera
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: false
+                })
+                setBgCameraStream(stream)
+                if (bgVideoRef.current) {
+                    bgVideoRef.current.srcObject = stream
+                    bgVideoRef.current.play().catch(() => {})
+                }
+            } catch (err) {
+                console.log('[BgCamera] Not available:', err.message)
+            }
+        }
+
+        // Delay start slightly to not block initial render
+        const timer = setTimeout(startBgCamera, 1000)
+
+        return () => {
+            clearTimeout(timer)
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop())
+            }
+        }
+    }, [bgCameraEnabled])
+
+    // Stop bg camera when taking photo (to free resources)
+    useEffect(() => {
+        if (view === 'camera' && bgCameraStream) {
+            bgCameraStream.getTracks().forEach(track => track.stop())
+            setBgCameraStream(null)
+        }
+    }, [view])
 
     // ==========================================
     // Camera Handlers
@@ -661,11 +749,20 @@ export default function HomeScreen({
     // ==========================================
     // Main Action Handler
     // ==========================================
+    const currentMode = getModeData(mode)
+    const isModeLocked = currentMode.proOnly && !isPro
+
     const handleStart = () => {
         if (isProcessing) return
 
         playSound('click')
         vibrate(20)
+
+        // Block if trying to use a Pro-only mode without Pro subscription
+        if (isModeLocked) {
+            onShowPaywall()
+            return
+        }
 
         // Block free users in event mode who've used their weekly entry
         if (eventMode && !isPro && freeEventEntryUsed) {
@@ -855,11 +952,32 @@ export default function HomeScreen({
             minHeight: '100dvh',
             overflowX: 'hidden',
             overflowY: 'auto',
-            background: 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 30%, #12091f 70%, #0a0610 100%)',
+            background: bgCameraStream ? 'transparent' : 'linear-gradient(180deg, #0d0a1a 0%, #1a0f2e 30%, #12091f 70%, #0a0610 100%)',
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
             paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))',
             paddingBottom: 'calc(120px + env(safe-area-inset-bottom, 0px))'
         }}>
+            {/* Snapchat-style Camera Background (Desktop only) */}
+            {bgCameraStream && (
+                <div className="fixed inset-0 z-0 overflow-hidden">
+                    <video
+                        ref={bgVideoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{ transform: 'scaleX(-1)' }} // Mirror for selfie view
+                    />
+                    {/* Dark overlay to make UI readable */}
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            background: 'linear-gradient(180deg, rgba(13,10,26,0.85) 0%, rgba(26,15,46,0.8) 30%, rgba(18,9,31,0.85) 70%, rgba(10,6,16,0.9) 100%)'
+                        }}
+                    />
+                </div>
+            )}
+
             {/* Enhanced 3D Parallax Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none parallax-scene">
                 {/* Deep layer - slowest */}
@@ -1348,48 +1466,58 @@ export default function HomeScreen({
 
                                 <motion.button
                                     onClick={handleStart}
-                                    aria-label={dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
+                                    aria-label={isModeLocked ? "Unlock Pro to use this mode" : dailyChallengeMode ? "Take a photo for daily challenge" : eventMode ? "Take a photo for weekly challenge" : "Take a photo to rate your outfit"}
                                     className="cta-alive cta-touch relative w-64 h-64 rounded-full flex flex-col items-center justify-center"
                                     style={{
-                                        '--cta-glow-color': dailyChallengeMode ? 'rgba(59,130,246,0.3)' : eventMode ? 'rgba(16,185,129,0.3)' : `${currentMode.color}30`,
-                                        background: dailyChallengeMode
-                                            ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
-                                            : eventMode
-                                                ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
-                                                : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
-                                        border: dailyChallengeMode
-                                            ? '3px solid rgba(59,130,246,0.6)'
-                                            : eventMode
-                                                ? '3px solid rgba(16,185,129,0.6)'
-                                                : `3px solid ${currentMode.color}60`,
-                                        boxShadow: dailyChallengeMode
-                                            ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
-                                            : eventMode
-                                                ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
-                                                : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
+                                        '--cta-glow-color': isModeLocked ? 'rgba(168,85,247,0.3)' : dailyChallengeMode ? 'rgba(59,130,246,0.3)' : eventMode ? 'rgba(16,185,129,0.3)' : `${currentMode.color}30`,
+                                        background: isModeLocked
+                                            ? 'radial-gradient(circle, rgba(168,85,247,0.3) 0%, transparent 70%)'
+                                            : dailyChallengeMode
+                                                ? 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%)'
+                                                : eventMode
+                                                    ? 'radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)'
+                                                    : `radial-gradient(circle, ${currentMode.color}30 0%, transparent 70%)`,
+                                        border: isModeLocked
+                                            ? '3px solid rgba(168,85,247,0.6)'
+                                            : dailyChallengeMode
+                                                ? '3px solid rgba(59,130,246,0.6)'
+                                                : eventMode
+                                                    ? '3px solid rgba(16,185,129,0.6)'
+                                                    : `3px solid ${currentMode.color}60`,
+                                        boxShadow: isModeLocked
+                                            ? '0 0 50px rgba(168,85,247,0.4), 0 0 100px rgba(168,85,247,0.2)'
+                                            : dailyChallengeMode
+                                                ? '0 0 50px rgba(59,130,246,0.4), 0 0 100px rgba(59,130,246,0.2)'
+                                                : eventMode
+                                                    ? '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.2)'
+                                                    : `0 0 50px ${currentMode.glow}, 0 0 100px ${currentMode.glow}40`
                                     }}
-                                    key={currentMode.id}
+                                    key={`${currentMode.id}-${isModeLocked}`}
                                     initial={{ scale: 0.95 }}
                                     animate={{ scale: 1 }}
                                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    {/* Inner gradient */}
+                                    {/* Inner gradient - purple for locked modes */}
                                     <motion.div
                                         className="absolute inset-4 rounded-full"
                                         style={{
-                                            background: dailyChallengeMode
-                                                ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
-                                                : eventMode
-                                                    ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
-                                                    : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
-                                            boxShadow: dailyChallengeMode
-                                                ? '0 0 60px rgba(59,130,246,0.5)'
-                                                : eventMode
-                                                    ? '0 0 60px rgba(16,185,129,0.5)'
-                                                    : `0 0 60px ${currentMode.glow}`
+                                            background: isModeLocked
+                                                ? 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)'
+                                                : dailyChallengeMode
+                                                    ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)'
+                                                    : eventMode
+                                                        ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)'
+                                                        : `linear-gradient(135deg, ${currentMode.color} 0%, ${currentMode.color}90 100%)`,
+                                            boxShadow: isModeLocked
+                                                ? '0 0 60px rgba(168,85,247,0.5)'
+                                                : dailyChallengeMode
+                                                    ? '0 0 60px rgba(59,130,246,0.5)'
+                                                    : eventMode
+                                                        ? '0 0 60px rgba(16,185,129,0.5)'
+                                                        : `0 0 60px ${currentMode.glow}`
                                         }}
-                                        key={`inner-${currentMode.id}`}
+                                        key={`inner-${currentMode.id}-${isModeLocked}`}
                                         initial={{ scale: 0.9, opacity: 0.8 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ duration: 0.2 }}
@@ -1403,35 +1531,39 @@ export default function HomeScreen({
                                         animate={{ scale: 1, rotate: 0 }}
                                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                                     >
-                                        {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : currentMode.emoji}
+                                        {dailyChallengeMode ? '⚡' : eventMode ? '🏆' : isModeLocked ? '🔒' : currentMode.emoji}
                                     </motion.span>
 
-                                    {/* Main Text - Mode-specific CTA */}
+                                    {/* Main Text - Mode-specific CTA or UNLOCK for locked modes */}
                                     <motion.span
                                         className="relative text-white font-black text-xl tracking-wide text-center px-4"
-                                        key={`cta-${currentMode.id}`}
+                                        key={`cta-${currentMode.id}-${isModeLocked}`}
                                         initial={{ opacity: 0, y: 5 }}
                                         animate={{ opacity: 1, y: 0 }}
                                     >
-                                        {dailyChallengeMode
-                                            ? 'DAILY CHALLENGE'
-                                            : eventMode
-                                                ? 'WEEKLY CHALLENGE'
-                                                : currentMode.cta || 'RATE MY FIT'}
+                                        {isModeLocked
+                                            ? 'UNLOCK PRO'
+                                            : dailyChallengeMode
+                                                ? 'DAILY CHALLENGE'
+                                                : eventMode
+                                                    ? 'WEEKLY CHALLENGE'
+                                                    : currentMode.cta || 'RATE MY FIT'}
                                     </motion.span>
 
-                                    {/* Mode indicator - Shows mode name */}
+                                    {/* Mode indicator - Shows mode name or unlock hint */}
                                     <motion.span
                                         className="relative text-white/70 text-sm font-medium mt-1"
                                         key={`label-${currentMode.id}`}
                                         initial={{ opacity: 0, y: 5 }}
                                         animate={{ opacity: 1, y: 0 }}
                                     >
-                                        {dailyChallengeMode
-                                            ? `${getDailyMode().emoji} ${getDailyMode().label}`
-                                            : eventMode
-                                                ? currentEvent?.theme || 'Beat the leaderboard!'
-                                                : currentMode.label}
+                                        {isModeLocked
+                                            ? `${currentMode.emoji} ${currentMode.label} Mode`
+                                            : dailyChallengeMode
+                                                ? `${getDailyMode().emoji} ${getDailyMode().label}`
+                                                : eventMode
+                                                    ? currentEvent?.theme || 'Beat the leaderboard!'
+                                                    : currentMode.label}
                                     </motion.span>
 
                                     {/* Swipe hint - subtle pulse then fade */}
