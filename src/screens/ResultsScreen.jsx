@@ -1839,7 +1839,7 @@ export default function ResultsScreen({
                             <span className="text-white/70 text-sm">Arena battles waiting</span>
                         </div>
                         <span className="text-cyan-400 font-bold text-sm">
-                            10 FREE/day →
+                            5 FREE/day →
                         </span>
                     </div>
                 </div>
