@@ -1206,11 +1206,30 @@ export default function ResultsScreen({
 
                 {/* AI Tagline Quote */}
                 <p
-                    className="text-base mb-5 italic"
+                    className="text-base mb-4 italic"
                     style={{ color: 'rgba(255,255,255,0.6)' }}
                 >
                     "{scores.tagline}"
                 </p>
+
+                {/* ===== IMMEDIATE SHARE CTA - The #1 Action ===== */}
+                <button
+                    onClick={() => {
+                        playSound('click')
+                        vibrate(40)
+                        onGenerateShareCard()
+                    }}
+                    className={`w-full py-5 mb-4 rounded-2xl font-black text-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97] ${revealStage >= 3 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+                    style={{
+                        background: `linear-gradient(135deg, ${modeColors.accent} 0%, ${modeColors.end} 100%)`,
+                        boxShadow: `0 8px 32px ${modeColors.glow}, 0 0 60px ${modeColors.glow}40`,
+                        color: '#fff',
+                        transitionDuration: '0.5s'
+                    }}
+                >
+                    <span className="text-2xl">📲</span>
+                    <span>Share Your Score</span>
+                </button>
 
                 {/* Vibe Context (Aesthetic + Celeb) - now smaller, supporting */}
                 {scores.aesthetic && !scores.celebMatch && (
@@ -1614,24 +1633,7 @@ export default function ResultsScreen({
                 )
             }
 
-            {/* ===== SHARE SECTION ===== */}
-            <div className={`w-full max-w-sm px-4 py-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100' : 'opacity-0'}`}>
-                {/* Score-aware copy */}
-                <p className="text-center text-sm text-gray-400 mb-2">
-                    {scores.overall >= 75
-                        ? "Your friends will be honest. Probably."
-                        : scores.overall >= 50
-                            ? "See what your friends think"
-                            : "Get a second opinion"}
-                </p>
-                <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    <span className="text-[10px] uppercase tracking-widest text-gray-500">Share</span>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                </div>
-            </div>
-
-            {/* ===== CTAs - Simplified ===== */}
+            {/* ===== SECONDARY CTAs - Compact row ===== */}
             <div className={`w-full max-w-sm px-4 transition-all duration-700 ${revealStage >= 6 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
                 {/* Battle Results CTA - Show when user just responded to a battle */}
                 {pendingBattleId && onSeeBattleResults && (
@@ -1655,9 +1657,9 @@ export default function ResultsScreen({
                     </button>
                 )}
 
-                {/* Two share options in a row */}
-                <div className="flex gap-3 mb-3">
-                    {/* Challenge - Competitive share */}
+                {/* Challenge + Try Again - compact row */}
+                <div className="flex gap-2 mb-3">
+                    {/* Challenge a Friend */}
                     <button
                         onClick={() => {
                             playSound('click')
@@ -1665,66 +1667,44 @@ export default function ResultsScreen({
                             onGenerateShareCard('challenge')
                         }}
                         aria-label="Challenge a friend to beat your score"
-                        className="flex-1 py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97]"
-                        style={{
-                            background: `linear-gradient(135deg, ${modeColors.accent} 0%, ${modeColors.end} 100%)`,
-                            boxShadow: `0 4px 20px ${modeColors.glow}`,
-                            color: '#fff'
-                        }}
-                    >
-                        <span className="flex items-center gap-2 text-lg font-black">
-                            <span>🔥</span> Challenge
-                        </span>
-                        <span className="text-[10px] opacity-80">They scan, you compare</span>
-                    </button>
-
-                    {/* Share - Just show off */}
-                    <button
-                        onClick={onGenerateShareCard}
-                        aria-label="Share your outfit rating"
-                        className="flex-1 py-4 rounded-2xl font-bold flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97]"
+                        className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.97]"
                         style={{
                             background: 'rgba(255,255,255,0.08)',
                             border: '1px solid rgba(255,255,255,0.15)',
-                            color: 'rgba(255,255,255,0.9)'
+                            color: 'rgba(255,255,255,0.8)'
                         }}
                     >
-                        <span className="flex items-center gap-2 text-lg font-black">
-                            <span>📤</span> Share
-                        </span>
-                        <span className="text-[10px] opacity-60">
-                            {scores.overall >= 75 ? "Flex on them" : scores.overall >= 50 ? "Show your fit" : "Get feedback"}
-                        </span>
+                        <span>🔥</span>
+                        <span className="text-sm">Challenge</span>
                     </button>
-                </div>
 
-                {/* Try Again + Back to Runway (side-by-side when in Fashion Show) */}
-                <div className={`flex gap-2 ${fashionShowId && onReturnToRunway ? 'flex-row' : 'flex-col'}`}>
+                    {/* Try Again */}
                     <button
                         onClick={onReset}
-                        className={`${fashionShowId && onReturnToRunway ? 'flex-1' : 'w-full'} py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 active:scale-[0.97] transition-all`}
+                        className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
                     >
-                        🔄 {scores.overall >= 85 ? "Scan Again" : scores.overall < 50 ? "Try Again" : "New Scan"}
+                        🔄 {scores.overall >= 85 ? "Again" : scores.overall < 50 ? "Retry" : "New"}
                     </button>
-
-                    {fashionShowId && onReturnToRunway && (
-                        <button
-                            onClick={() => {
-                                playSound('click')
-                                vibrate(20)
-                                onReturnToRunway()
-                            }}
-                            className="flex-1 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(168,85,247,0.15) 100%)',
-                                border: '1px solid rgba(139,92,246,0.35)',
-                            }}
-                        >
-                            <span>🎭</span>
-                            <span className="text-purple-300">Back to Show</span>
-                        </button>
-                    )}
                 </div>
+
+                {/* Back to Runway - Only for Fashion Show */}
+                {fashionShowId && onReturnToRunway && (
+                    <button
+                        onClick={() => {
+                            playSound('click')
+                            vibrate(20)
+                            onReturnToRunway()
+                        }}
+                        className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-all mb-2"
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(168,85,247,0.15) 100%)',
+                            border: '1px solid rgba(139,92,246,0.35)',
+                        }}
+                    >
+                        <span>🎭</span>
+                        <span className="text-purple-300">Back to Show</span>
+                    </button>
+                )}
 
                 {/* Scans remaining or Inline Paywall - Hide during battle flow */}
                 {!isPro && !pendingBattleId && (
